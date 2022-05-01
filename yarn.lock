@@ -1846,7 +1846,7 @@
     semver "^7.3.5"
     tsutils "^3.21.0"
 
-"@typescript-eslint/utils@5.21.0":
+"@typescript-eslint/utils@5.21.0", "@typescript-eslint/utils@^5.10.0":
   version "5.21.0"
   resolved "https://registry.npmmirror.com/@typescript-eslint/utils/-/utils-5.21.0.tgz"
   integrity sha512-q/emogbND9wry7zxy7VYri+7ydawo2HDZhRZ5k6yggIvXa7PvBbAAZ4PFH/oZLem72ezC4Pr63rJvDK/sTlL8Q==
@@ -3329,6 +3329,13 @@ eslint-config-vue-global-api@0.4.1:
   version "0.4.1"
   resolved "https://registry.npmmirror.com/eslint-config-vue-global-api/-/eslint-config-vue-global-api-0.4.1.tgz"
   integrity sha512-mJTiKBGLe1FXmEifYzCQzUTBpFv8OtfYzP6PAOuVRf+3hkGLMeiDh4bVzZEaJfdExtc8mPw9vp35YSLhwTselQ==
+
+eslint-plugin-jest@^26.1.5:
+  version "26.1.5"
+  resolved "https://registry.npmmirror.com/eslint-plugin-jest/-/eslint-plugin-jest-26.1.5.tgz#6cfca264818d6d6aa120b019dab4d62b6aa8e775"
+  integrity sha512-su89aDuljL9bTjEufTXmKUMSFe2kZUL9bi7+woq+C2ukHZordhtfPm4Vg+tdioHBaKf8v3/FXW9uV0ksqhYGFw==
+  dependencies:
+    "@typescript-eslint/utils" "^5.10.0"
 
 eslint-plugin-prettier@^4.0.0:
   version "4.0.0"
