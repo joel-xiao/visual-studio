@@ -1,5 +1,5 @@
+import Test from '@/views/Test.vue';
 import { shallowMount } from '@vue/test-utils';
-import Test from '../src/views/Test.vue';
 
 test('Test.vue', async () => {
   const wrapper = shallowMount(Test);
