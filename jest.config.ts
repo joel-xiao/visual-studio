@@ -1,3 +1,9 @@
+/**
+ * @module jest
+ * @author: Joel
+ * @description: jest 配置
+ */
+
 import path from 'path';
 module.exports = {
   verbose: true,

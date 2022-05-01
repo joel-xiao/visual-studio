@@ -1,3 +1,8 @@
+/**
+ * @module postcss
+ * @author: Joel
+ * @description: CSS Style 手机适配
+ */
 module.exports = {
   plugins: {
     autoprefixer: {},

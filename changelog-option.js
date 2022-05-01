@@ -1,3 +1,9 @@
+/*
+ * @module git logs
+ * @author: Joel
+ * @description: git logs settings
+ */
+
 const compareFunc = `require('compare-func')`;
 module.exports = {
   writerOpts: {

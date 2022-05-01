@@ -1,3 +1,8 @@
+/**
+ * @module .babelrc
+ * @author: Joel
+ * @description: babel 配置
+ */
 {
   "presets": [["@babel/preset-env", { "targets": { "node": "current" } }]]
 }

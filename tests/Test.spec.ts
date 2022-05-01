@@ -1,3 +1,8 @@
+/*
+ * @module Test.vue
+ * @author: Joel
+ * @description: Test.vue 组件单元测试
+ */
 import Test from '@/views/Test.vue';
 import { shallowMount } from '@vue/test-utils';
 

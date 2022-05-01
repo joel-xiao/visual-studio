@@ -1,3 +1,8 @@
+/**
+ * @module .commitlintrc
+ * @author: Joel
+ * @description: git commit -m 规则校验
+ */
 module.exports = {
   extends: ['@commitlint/config-conventional'],
   rules: {
