@@ -1,7 +1,56 @@
-import { defineConfig } from 'vite';
+import path from 'path';
+import { builtinModules } from 'module';
+import { defineConfig, Plugin } from 'vite';
+import viteCompression from 'vite-plugin-compression';
 import vue from '@vitejs/plugin-vue';
+import vueJsx from '@vitejs/plugin-vue-jsx';
+import resolve from 'vite-plugin-resolve';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [vue()]
+  plugins: [
+    vue(),
+    vueJsx(),
+    viteCompression({
+      verbose: true,
+      disable: false,
+      threshold: 10240,
+      algorithm: 'gzip',
+      ext: '.gz'
+    })
+  ],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, 'src'),
+      '@v': path.resolve(__dirname, 'src/views'),
+      '@c': path.resolve(__dirname, 'src/components'),
+      '@u': path.resolve(__dirname, 'src/utils'),
+      '@a': path.resolve(__dirname, 'src/assets'),
+      '@s': path.resolve(__dirname, 'src/service'),
+      '@p': path.resolve(__dirname, 'src/plugins'),
+      '@d': path.resolve(__dirname, 'src/directives')
+      // "layouts": path.resolve(__dirname, "src/layouts"),
+    }
+  },
+  define: {
+    'process.env': {}
+  },
+  base: './',
+  build: {
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true
+      }
+    }
+  },
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:4523/mock/867399',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '')
+      }
+    }
+  }
 });

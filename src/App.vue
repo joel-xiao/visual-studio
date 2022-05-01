@@ -1,8 +1,15 @@
-<script setup lang="ts">
-// This starter template is using Vue 3 <script setup> SFCs
-// Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
-import HelloWorld from './components/HelloWorld.vue';
+<template lang="pug">
+n-config-provider(:theme="darkTheme" :theme-overrides="themeOverrides" :locale="native.locale" :date-locale="native.dateLocale" class="app-main")
+  n-loading-bar-provider
+    router-view(v-slot="{ Component }")
+      component(:is="Component")
+</template>
 
+<script setup lang="ts">
+// 1import HelloWorld from '@c/HelloWorld.vue';
+import { NConfigProvider, darkTheme } from 'naive-ui';
+import native from '@/plugins/native-i18n';
+import themeOverrides from '@a/style/native/native-ui-theme-overrides.json';
 // 导入 invoke 方法
 import { invoke } from '@tauri-apps/api/tauri';
 
@@ -13,18 +20,24 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-<template>
-  <img alt="Vue logo" src="./assets/logo.png" />
-  <HelloWorld msg="Hello Vue 3 + TypeScript + Vite" />
-</template>
-
-<style>
+<style lang="scss">
+html,
+body,
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  width: 100%;
+  min-width: 1024px;
+  height: 100%;
+  overflow: hidden;
+}
+
+body > #app {
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  & > .app-main {
+    height: 100%;
+    width: 100%;
+  }
 }
 </style>

@@ -10,9 +10,20 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "esModuleInterop": true,
+    "paths": {
+      "@/*": ["./src/*"],
+      "@v/*": ["./src/views/*"],
+      "@c/*": ["./src/components/*"],
+      "@u/*": ["./src/utils/*"],
+      "@a/*": ["./src/assets/*"],
+      "@s/*": ["./src/service/*"],
+      "@p/*": ["./src/plugins/*"],
+      "@d/*": ["./src/directives/*"]
+    },
     "lib": ["esnext", "dom"],
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "types": ["vite/client", "jest"]
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],
+  "include": ["./src/**/*.ts", "./src/**/*.d.ts", "./src/**/*.tsx", "./src/**/*.vue"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

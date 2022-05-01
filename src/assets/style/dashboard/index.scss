@@ -1,0 +1,125 @@
+/*
+  仪表盘模块
+*/
+#dashboard {
+  --color-bg: #212121;
+  --border-black: rgb(8 8 8);
+  --color-bg-dark: #080808;
+
+  --theme-color: 0, 0%, 100%;
+  --theme-light-600: 24%;
+  --theme-light-700: 19%;
+  --theme-light-800: 13%;
+  --theme-light-900: 3%;
+  --theme-color-real: #000;
+  --theme-color-gray-0: hsla(0, 0%, 100%, 0);
+  --theme-color-gray-100: hsla(0, 0%, 100%, 0.06);
+  --theme-color-gray-200: hsla(0, 0%, 100%, 0.08);
+  --theme-color-gray-300: hsla(0, 0%, 100%, 0.12);
+  --theme-color-gray-400: hsla(0, 0%, 100%, 0.18);
+  --theme-color-gray-500: hsla(0, 0%, 100%, 0.18);
+  --theme-color-gray-600: hsla(0, 0%, 100%, 0.3);
+  --theme-color-gray-700: hsla(0, 0%, 100%, 0.5);
+  --theme-color-gray-800: hsla(0, 0%, 100%, 0.85);
+  --theme-color-gray-900: hsla(0, 0%, 100%, 0.9);
+  --theme-color-gray-1000: #fff;
+  --theme-color-leftbar-bg: #262626;
+  --color-canvas-bg: #2c2c2c;
+  --color-gray-700: hsla(0, 0%, var(--theme-light-700), 1);
+  --color-gray-800: hsla(0, 0%, var(--theme-light-800), 1);
+  --color-gray-900: hsla(0, 0%, var(--theme-light-900), 1);
+  --color-tran-100: rgb(255 255 255 / 100%);
+  --color-tran-6: hsla(var(--theme-color), 0.06);
+  --color-tran-8: hsla(var(--theme-color), 0.08);
+  --color-tran-10: hsla(var(--theme-color), 0.1);
+  --color-tran-12: hsla(var(--theme-color), 0.12);
+  --color-tran-15: hsla(var(--theme-color), 0.15);
+  --color-tran-18: hsla(var(--theme-color), 0.18);
+  --color-tran-24: hsla(var(--theme-color), 0.24);
+  --color-tran-30: hsla(var(--theme-color), 0.3);
+  --color-tran-40: hsla(var(--theme-color), 0.4);
+  --color-tran-50: hsla(var(--theme-color), 0.5);
+  --color-tran-85: hsla(var(--theme-color), 0.9);
+  --color-select-light: rgba(54, 98, 236, 0.15);
+  --color-select: rgba(54, 98, 236, 0.3);
+  --color-realgray-100: #fff;
+  --color-realgray-200: #e6e6e6;
+  --color-realgray-300: #bbb;
+  --color-realgray-400: #8f8f8f;
+  --color-realgray-500: #5c5c5c;
+  --color-realgray-600: #3d3d3d;
+  --color-realgray-700: #303030;
+  --color-realgray-800: #212121;
+  --color-realgray-900: #080808;
+  --color-blue-600: #507afc;
+  --color-blue-700: #3662ec;
+  --color-blue-800: #2151e7;
+  --color-blue-900: #324894;
+  --border-radius-8: 8px;
+  --border-radius-6: 6px;
+  --border-radius-4: 4px;
+  --shadow-s: 0 2px 6px rgba(0, 0, 0, 0.1);
+  --shadow-m: 0 5px 10px rgba(0, 0, 0, 0.15);
+  --color-text-primary: var(--theme-color-gray-800);
+  --color-text-secondary: var(--theme-color-gray-700);
+  --color-text-assistant: var(--theme-color-gray-600);
+  --color-text-disabled: var(--theme-color-gray-500);
+  --color-text-guidance: var(--theme-color-text-guidance);
+  --color-text-magic-bold: hsla(var(--theme-color-text-magic), 1);
+  --color-text-magic: hsla(var(--theme-color-text-magic), 0.5);
+  --color-text-bold-white: #fff;
+  --color-text-primary-white: hsla(0, 0%, 100%, 0.85);
+  --color-text-secondary-white: hsla(0, 0%, 100%, 0.5);
+  --color-text-bold: var(--theme-color-gray-1000);
+  --color-main: var(--color-gray-800);
+  --color-text: var(--color-tran-85);
+  --color-border: var(--theme-color-gray-100);
+  --color-background-dark: var(--color-gray-800);
+
+  --m-font-size-xs: 12px;
+  --m-font-size-sm: 13px;
+  --m-font-size-md: 14px;
+  --m-font-size-lg: 18px;
+  --mg-theme-color-bg: #212121;
+  --mg-theme-color-text-highlight: #fff;
+  --mg-theme-color-text-primary: hsla(0, 0%, 100%, 0.85);
+  --mg-theme-color-text-secondary: hsla(0, 0%, 100%, 0.5);
+  --mg-theme-color-text-disabled: hsla(0, 0%, 100%, 0.18);
+  --mg-theme-color-gray-0: hsla(0, 0%, 100%, 0);
+  --mg-theme-color-gray-100: hsla(0, 0%, 100%, 0.06);
+  --mg-theme-color-gray-200: hsla(0, 0%, 100%, 0.08);
+  --mg-theme-color-gray-300: hsla(0, 0%, 100%, 0.12);
+  --mg-theme-color-gray-400: hsla(0, 0%, 100%, 0.18);
+  --mg-theme-color-gray-500: hsla(0, 0%, 100%, 0.18);
+  --mg-theme-color-gray-600: hsla(0, 0%, 100%, 0.3);
+  --mg-theme-color-gray-700: hsla(0, 0%, 100%, 0.5);
+  --mg-theme-color-gray-800: hsla(0, 0%, 100%, 0.85);
+  --mg-theme-color-gray-900: hsla(0, 0%, 100%, 0.9);
+  --mg-theme-color-gray-1000: #fff;
+  --m-color-black: #000;
+  --m-color-white: #fff;
+  --mg-color-blue-600: #507afc;
+  --mg-color-blue-700: #3662ec;
+  --mg-color-blue-800: #2151e7;
+  --mg-color-blue-900: #324894;
+  --mg-color-text-bold: var(--mg-theme-color-gray-1000);
+  --mg-theme-button-normal-hover: var(--mg-color-blue-800);
+  --mg-theme-button-normal-pressing: var(--mg-color-blue-600);
+  --mg-color-button-normal-bg: var(--mg-color-blue-700);
+  --mg-color-button-normal-bg-hover: var(--mg-theme-button-normal-hover);
+  --mg-color-button-normal-bg-pressing: var(--mg-theme-button-normal-pressing);
+
+  color: var(--color-text);
+
+  .border-radius-8 {
+    border-radius: var(--border-radius-8);
+  }
+
+  .border-radius-6 {
+    border-radius: var(--border-radius-6);
+  }
+
+  .border-radius-4 {
+    border-radius: var(--border-radius-4);
+  }
+}

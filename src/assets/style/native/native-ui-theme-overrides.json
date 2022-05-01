@@ -1,0 +1,54 @@
+{
+  "Card": {
+    "color": "rgba(0, 0, 0, 0)"
+  },
+  "Button": {
+    "paddingSmall": "0 14px",
+
+    "heightSmall": "30px",
+    "heightMedium": "32px",
+
+    "borderRadiusSmall": "var(--border-radius-6)",
+    "borderRadiusMedium": "var(--border-radius-8)",
+
+    "fontSizeSmall": "var(--m-font-size-xs)",
+    "fontSizeMedium": "var(--m-font-size-sm)",
+
+    "colorTertiary": "var(--color-tran-12)",
+    "colorTertiaryHover": "var(--color-tran-10)",
+    "colorTertiaryPressed": "var(--color-tran-12)",
+
+    "colorPrimary": "var(--mg-color-button-normal-bg)",
+    "colorHoverPrimary": "var(--mg-color-button-normal-bg-hover)",
+    "colorPressedPrimary": "var(--mg-color-button-normal-bg-pressing)",
+    "colorFocusPrimary": "var(--mg-color-button-normal-bg)",
+    "textColorPrimary": "var(--m-color-white)",
+    "textColorHoverPrimary": "var(--m-color-white)",
+    "textColorPressedPrimary": "var(--m-color-white)",
+    "textColorFocusPrimary": "var(--m-color-white)",
+    "borderPrimary": "var(--mg-color-button-normal-bg)",
+    "borderHoverPrimary": "var(--mg-color-button-normal-bg-hover)",
+    "borderPressedPrimary": "var(--mg-color-button-normal-bg-pressing)",
+    "borderFocusPrimary": "var(--mg-color-button-normal-bg)"
+  },
+  "Input": {
+    "textColor": "var(--mg-color-text-bold)",
+    "fontSizeSmall": "var(--m-font-size-xs)",
+    "fontSizeMedium": "var(--m-font-size-sm)",
+    "caretColor": "var(--mg-color-text-bold)",
+    "color": "var(--theme-color-gray-100)",
+    "colorFocus": "var(--theme-color-gray-100)",
+    "border": "var(--theme-color-gray-100)",
+    "borderHover": "var(--theme-color-gray-100)",
+    "borderFocus": "var(--theme-color-gray-100)",
+    "boxShadowFocus": "none"
+  },
+  "Breadcrumb": {
+    "fontWeightActive": "400",
+    "fontSize": "13px",
+    "itemTextColor": "var(--color-tran-50)",
+    "itemTextColorHover": "var(--color-tran-85)",
+    "itemTextColorPressed": "var(--color-tran-50)",
+    "itemTextColorActive": "var(--color-tran-85)"
+  }
+}
