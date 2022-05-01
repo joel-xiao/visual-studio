@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, reactive, defineEmits, defineProps, withDefaults } from 'vue';
+import { ref, reactive, withDefaults } from 'vue';
 import type { TreeItemData, TreeItemMenu } from './interface';
 
 interface Props {

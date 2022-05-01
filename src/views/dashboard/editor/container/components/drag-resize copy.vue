@@ -17,17 +17,7 @@ div(
 </template>
 
 <script setup lang="ts">
-import {
-  ref,
-  reactive,
-  computed,
-  readonly,
-  markRaw,
-  defineExpose,
-  defineEmits,
-  withDefaults,
-  defineProps
-} from 'vue';
+import { ref, reactive, computed, readonly, markRaw, withDefaults } from 'vue';
 import type { DargDataset } from '@d/darg-resize/interface';
 
 interface Props {

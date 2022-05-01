@@ -27,9 +27,6 @@ import {
   computed,
   readonly,
   provide,
-  defineEmits,
-  defineExpose,
-  defineProps,
   withDefaults,
   createApp,
   onUnmounted

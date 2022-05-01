@@ -5,7 +5,7 @@ div.editor-panel-tab_bar
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, defineEmits, defineProps, withDefaults } from 'vue';
+import { ref, reactive, withDefaults } from 'vue';
 import type { Tab } from './panel-tab_bar';
 
 interface Props {

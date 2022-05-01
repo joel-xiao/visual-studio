@@ -12,8 +12,6 @@ import {
   inject,
   markRaw,
   readonly,
-  defineEmits,
-  defineProps,
   withDefaults,
   createApp,
   watch,

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import LayerItem from './layer-item.vue';
-import { ref, reactive, computed, defineProps, withDefaults, defineEmits, onUnmounted } from 'vue';
+import { ref, reactive, computed, withDefaults, onUnmounted } from 'vue';
 import type { LayerItemData, LayerItemMenu } from './interface';
 
 interface Props {

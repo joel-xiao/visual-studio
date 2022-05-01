@@ -9,7 +9,7 @@ n-card(class="item-card" :bordered="false" content-style="padding: 6px;")
     span(class="name ellipsis") {{data?.label}}
 </template>
 <script lang="ts" setup>
-import { ref, reactive, inject, defineEmits, defineProps, withDefaults } from 'vue';
+import { ref, reactive, inject, withDefaults } from 'vue';
 import type { ItemCard } from './item-card.d';
 
 interface Props {

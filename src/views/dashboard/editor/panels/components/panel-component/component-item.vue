@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, reactive, inject, defineEmits, defineProps, withDefaults } from 'vue';
+import { ref, reactive, inject, withDefaults } from 'vue';
 import type { ComponentData } from './interface';
 
 interface Props {

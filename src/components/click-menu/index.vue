@@ -1,13 +1,5 @@
 <script lang="ts" setup>
-import {
-  computed,
-  reactive,
-  defineProps,
-  withDefaults,
-  defineEmits,
-  defineExpose,
-  onUnmounted
-} from 'vue';
+import { computed, reactive, withDefaults, onUnmounted } from 'vue';
 import type { ClickMenu } from './interface';
 
 interface Props {

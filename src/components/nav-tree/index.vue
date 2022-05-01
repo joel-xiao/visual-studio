@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import TreeItem from './tree-item.vue';
-import { ref, reactive, computed, defineProps, withDefaults, defineEmits, onUnmounted } from 'vue';
+import { ref, reactive, computed, withDefaults, onUnmounted } from 'vue';
 import type { TreeItemData, TreeItemMenu } from './interface';
 
 interface Props {

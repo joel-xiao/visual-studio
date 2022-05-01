@@ -28,7 +28,7 @@ import PanelLayer from './components/panel-layer/index.vue';
 import type { LayerItemData, LayerItemMenu } from './components/panel-layer/interface';
 import PanelComponent from './components/panel-component/index.vue';
 import type { Component, ComponentData } from './components/panel-component/interface';
-import { ref, reactive, defineEmits } from 'vue';
+import { ref, reactive } from 'vue';
 
 const emit = defineEmits(['component-drag-start', 'component-drag-stop']);
 

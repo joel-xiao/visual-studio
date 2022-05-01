@@ -19,7 +19,7 @@ div(class='editor-panel-component')
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, provide, defineEmits, defineProps, withDefaults } from 'vue';
+import { ref, reactive, provide, withDefaults } from 'vue';
 import type { ComponentData } from './interface';
 import ComponentItem from './component-item.vue';
 
