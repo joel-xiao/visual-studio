@@ -17,6 +17,7 @@ import { invoke } from '@tauri-apps/api/tauri';
 document.addEventListener('DOMContentLoaded', () => {
   // DOM 内容加载完成之后，通过 invoke 调用 在 Rust 中已经注册的命令
   invoke('close_splashscreen');
+  console.log('2');
 });
 </script>
 
