@@ -10,15 +10,6 @@ n-config-provider(:theme="darkTheme" :theme-overrides="themeOverrides" :locale="
 import { NConfigProvider, darkTheme } from 'naive-ui';
 import native from '@/plugins/native-i18n';
 import themeOverrides from '@a/style/native/native-ui-theme-overrides.json';
-// 导入 invoke 方法
-import { invoke } from '@tauri-apps/api/tauri';
-
-// 添加监听函数，监听 DOM 内容加载完成事件
-document.addEventListener('DOMContentLoaded', () => {
-  // DOM 内容加载完成之后，通过 invoke 调用 在 Rust 中已经注册的命令
-  invoke('close_splashscreen');
-  console.log('2');
-});
 </script>
 
 <style lang="scss">

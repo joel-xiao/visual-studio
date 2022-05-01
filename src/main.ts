@@ -1,4 +1,5 @@
 import { createApp } from 'vue';
+import { invoke } from '@tauri-apps/api/tauri';
 // import 'amfe-flexible';// 用于设置rem基准值
 import '@a/style/index.scss';
 import '@a/style/font/iconfont.css';
@@ -17,8 +18,7 @@ setupRouter(app);
 setupStore(app);
 
 router.isReady().then(() => {
-  app.mount('#app').$nextTick(window.removeLoading);
+  app.mount('#app').$nextTick((): void => {
+    invoke('close_splashscreen');
+  });
 });
-
-console.log('fs', window.fs);
-console.log('ipcRenderer', window.ipcRenderer);
