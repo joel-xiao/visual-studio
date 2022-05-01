@@ -1,10 +1,8 @@
 import path from 'path';
-import { builtinModules } from 'module';
 import { defineConfig, Plugin } from 'vite';
 import viteCompression from 'vite-plugin-compression';
 import vue from '@vitejs/plugin-vue';
 import vueJsx from '@vitejs/plugin-vue-jsx';
-import resolve from 'vite-plugin-resolve';
 
 // https://vitejs.dev/config/
 export default defineConfig({
