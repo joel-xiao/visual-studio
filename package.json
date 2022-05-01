@@ -12,7 +12,7 @@
     "es:lint": "eslint . --ext .vue,.js,.ts,.jsx,.tsx,.html",
     "style:fix": "stylelint . --fix .css,.less,.scss",
     "style:lint": "stylelint . --aei .css,.less,.scss",
-    "format": "prettier --write ./**/*.{vue,ts,js,scss,json,md}",
+    "format": "prettier --write ./**/*.{vue,ts,js,json,md}",
     "test": "jest",
     "log": "conventional-changelog -p custom-config -i CHANGELOG.md -s -r 0  -n ./changelog-option.js",
     "prepare": "husky install"
@@ -35,6 +35,8 @@
     ]
   },
   "dependencies": {
+    "@commitlint/cli": "^16.2.4",
+    "@commitlint/config-conventional": "^16.2.4",
     "@tauri-apps/api": "^1.0.0-rc.4",
     "@types/autoprefixer": "^10.2.0",
     "@types/axios": "^0.14.0",
@@ -47,6 +49,7 @@
     "@types/sass": "^1.43.1",
     "@types/stylelint": "^14.0.0",
     "@types/vue-router": "^2.0.0",
+    "@typescript-eslint/parser": "^5.21.0",
     "amfe-flexible": "^2.2.1",
     "autoprefixer": "^10.4.5",
     "axios": "^0.27.2",
@@ -54,7 +57,9 @@
     "conventional-changelog-custom-config": "^0.3.1",
     "eslint": "^8.14.0",
     "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-jest": "^26.1.5",
     "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-vue": "^8.7.1",
     "husky": "^7.0.4",
     "jest": "^28.0.3",
     "lint-staged": "^12.4.1",
@@ -74,10 +79,12 @@
     "stylelint-config-recommended-vue": "^1.4.0",
     "stylelint-config-standard-scss": "^3.0.0",
     "vue": "^3.2.25",
+    "vue-global-api": "^0.4.1",
     "vue-router": "^4.0.14"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1.0.0-rc.9",
+    "@typescript-eslint/eslint-plugin": "^5.21.0",
     "@vitejs/plugin-vue": "^2.3.1",
     "typescript": "^4.6.4",
     "vite": "^2.9.5",

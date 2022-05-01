@@ -1,0 +1,5 @@
+dist
+public
+src-tauri
+*.html
+src/env.d.ts
