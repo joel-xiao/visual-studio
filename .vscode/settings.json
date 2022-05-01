@@ -1,0 +1,64 @@
+{
+  "cSpell.words": ["ipcrenderer", "optimizelegibility", "pxtorem", "vite"],
+  // 基础设置
+  "editor.detectIndentation": false, // 重置 editor.tabSize属性
+  "editor.tabSize": 2, // 缩进2单元格
+  // "files.autoSave": "afterDelay", // 打开自动保存
+  "editor.fontSize": 14, // 默认字体大小
+  "editor.lineHeight": 20, // 行高
+  "editor.mouseWheelZoom": false, // 通过使用鼠标滚轮同时按住 Ctrl 可缩放编辑器的字体
+  "editor.wordWrap": "on", // 行太长自动换行
+  "editor.formatOnPaste": false, // 编辑粘贴自动格式化
+  "html.format.wrapAttributes": "auto", // 格式化html的标签属性
+  "terminal.integrated.rendererType": "dom",
+  "search.followSymlinks": false, // 关闭rg.exe进程
+  "workbench.startupEditor": "welcomePage", // 图标
+  "workbench.iconTheme": "vscode-icons",
+  "workbench.colorTheme": "escook dark soft",
+  "files.saveConflictResolution": "overwriteFileOnDisk",
+  "explorer.confirmDelete": false,
+  // 格式化校验
+  "javascript.validate.enable": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode", // 设置默认格式化工具为prettier
+  "editor.formatOnSave": true, // 保存自动格式化
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true,
+    "source.fixAll.eslint": true,
+    "source.fixAll.stylelint": true
+  },
+  "vetur.format.enable": false,
+  "vetur.validation.template": false,
+  "vetur.validation.interpolation": false,
+  "vetur.validation.style": false,
+  "vetur.languageFeatures.codeActions": false,
+  "vetur.validation.script": false,
+  // "vetur.format.defaultFormatter.html": "js-beautify-html",
+  // "vetur.format.defaultFormatterOptions": {
+  //   "js-beautify-html": {
+  //     "wrap_attributes": "force-aligned" //属性强制折行对齐
+  //   }
+  // },
+  "eslint.format.enable": true, //是否开启vscode的eslint
+  "eslint.options": {
+    //指定vscode的eslint所处理的文件的后缀
+    "extensions": [".js", ".jsx", ".vue", ".react", ".ts", ".tsx"]
+  },
+  // eslint 校验准则
+  "eslint.validate": [
+    "vue",
+    "html",
+    "jsx",
+    "tsx",
+    "javascript",
+    "typescript",
+    "javascriptreact",
+    "typescriptreact"
+  ],
+  "stylelint.autoFix": true,
+  "stylelint.enable": true,
+  "css.validate": false,
+  "less.validate": false,
+  "scss.validate": false,
+  "css.lint.unknownAtRules": "ignore",
+  "scss.lint.unknownAtRules": "ignore"
+}
