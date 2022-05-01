@@ -1,17 +1,16 @@
 <script setup lang="ts">
 // This starter template is using Vue 3 <script setup> SFCs
 // Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
-import HelloWorld from './components/HelloWorld.vue'
+import HelloWorld from "./components/HelloWorld.vue";
 
 // 导入 invoke 方法
-import { invoke } from '@tauri-apps/api/tauri'
+import { invoke } from "@tauri-apps/api/tauri";
 
 // 添加监听函数，监听 DOM 内容加载完成事件
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   // DOM 内容加载完成之后，通过 invoke 调用 在 Rust 中已经注册的命令
-  invoke('close_splashscreen')
-})
-
+  invoke("close_splashscreen");
+});
 </script>
 
 <template>

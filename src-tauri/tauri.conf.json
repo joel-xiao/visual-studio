@@ -15,34 +15,40 @@
       "longDescription": null,
       "beforeHelp": null,
       "afterHelp": null,
-      "args": [{
-        "short": "c",
-        "name": "config",
-        "takesValue": true,
-        "description": "Config path"
-      }, {
-        "short": "t",
-        "name": "theme",
-        "takesValue": true,
-        "description": "App theme",
-        "possibleValues": ["light", "dark", "system"]
-      }, {
-        "short": "v",
-        "name": "verbose",
-        "multipleOccurrences": true,
-        "description": "Verbosity level"
-      }],
+      "args": [
+        {
+          "short": "c",
+          "name": "config",
+          "takesValue": true,
+          "description": "Config path"
+        },
+        {
+          "short": "t",
+          "name": "theme",
+          "takesValue": true,
+          "description": "App theme",
+          "possibleValues": ["light", "dark", "system"]
+        },
+        {
+          "short": "v",
+          "name": "verbose",
+          "multipleOccurrences": true,
+          "description": "Verbosity level"
+        }
+      ],
       "subcommands": {
         "update": {
           "description": "Updates the app",
           "longDescription": null,
           "beforeHelp": null,
           "afterHelp": null,
-          "args": [{
-            "short": "b",
-            "name": "background",
-            "description": "Update in background"
-          }],
+          "args": [
+            {
+              "short": "b",
+              "name": "background",
+              "description": "Update in background"
+            }
+          ],
           "subcommands": null
         }
       }
@@ -94,13 +100,13 @@
         "resizable": true,
         "fullscreen": false
       },
-     {
-      "width": 400,
-      "height": 200,
-      "decorations": false,
-      "url": "splashscreen.html",
-      "label": "splashscreen"
-     }
+      {
+        "width": 400,
+        "height": 200,
+        "decorations": false,
+        "url": "splashscreen.html",
+        "label": "splashscreen"
+      }
     ],
     "security": {
       "csp": "default-src blob: data: filesystem: ws: wss: http: https: tauri: 'unsafe-eval' 'unsafe-inline' 'self'"

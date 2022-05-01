@@ -6,16 +6,78 @@
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "tsc": "vue-tsc --noEmit",
+    "es:fix": "eslint . --fix --ext .js,.jsx,.ts,.tsx,.vue,.html",
+    "es:lint": "eslint . --ext .vue,.js,.ts,.jsx,.tsx,.html",
+    "style:fix": "stylelint . --fix .css,.less,.scss",
+    "style:lint": "stylelint . --aei .css,.less,.scss",
+    "format": "prettier --write ./**/*.{vue,ts,js,json,md}",
+    "test": "jest",
+    "log": "conventional-changelog -p custom-config -i CHANGELOG.md -s -r 0  -n ./changelog-option.js",
+    "prepare": "husky install"
+  },
+  "changelog": {
+    "bugsUrl": "https://github.com/huoyou/vue_cli3/issues/",
+    "emojis": true,
+    "authorName": true,
+    "authorEmail": true
+  },
+  "lint-staged": {
+    "./**/*.{js,jsx,ts,.tsx,vue,html}": [
+      "yarn es:fix"
+    ],
+    "./**/*.{css,less,scss}": [
+      "yarn style:fix"
+    ],
+    "./**/*.{vue,ts,js,scss,json,md}": [
+      "yarn format"
+    ]
   },
   "dependencies": {
     "@tauri-apps/api": "^1.0.0-rc.4",
-    "vue": "^3.2.25"
+    "@types/autoprefixer": "^10.2.0",
+    "@types/axios": "^0.14.0",
+    "@types/eslint": "^8.4.1",
+    "@types/eslint-config-prettier": "^6.11.0",
+    "@types/eslint-plugin-prettier": "^3.1.0",
+    "@types/prettier": "^2.6.0",
+    "@types/pug": "^2.0.6",
+    "@types/sass": "^1.43.1",
+    "@types/stylelint": "^14.0.0",
+    "@types/vue-router": "^2.0.0",
+    "amfe-flexible": "^2.2.1",
+    "autoprefixer": "^10.4.5",
+    "axios": "^0.27.2",
+    "conventional-changelog-cli": "^2.2.2",
+    "conventional-changelog-custom-config": "^0.3.1",
+    "eslint": "^8.14.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "husky": "^7.0.4",
+    "lint-staged": "^12.4.1",
+    "naive-ui": "^2.28.2",
+    "pinia": "^2.0.13",
+    "pinia-plugin-persist": "^0.0.93",
+    "postcss": "^8.4.13",
+    "postcss-html": "^1.4.1",
+    "postcss-pxtorem": "^6.0.0",
+    "prettier": "^2.6.2",
+    "pug": "^3.0.2",
+    "register-service-worker": "^1.7.2",
+    "sass": "^1.51.0",
+    "stylelint": "^14.8.1",
+    "stylelint-config-prettier": "^9.0.3",
+    "stylelint-config-recess-order": "^3.0.0",
+    "stylelint-config-recommended-vue": "^1.4.0",
+    "stylelint-config-standard-scss": "^3.0.0",
+    "vue": "^3.2.25",
+    "vue-router": "^4.0.14"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1.0.0-rc.9",
     "@vitejs/plugin-vue": "^2.3.1",
-    "typescript": "^4.5.4",
+    "typescript": "^4.6.4",
     "vite": "^2.9.5",
     "vue-tsc": "^0.34.7"
   }
