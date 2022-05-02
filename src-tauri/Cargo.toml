@@ -1,11 +1,11 @@
 [package]
-name = "app"
+name = "visual"
 version = "0.1.0"
-description = "A Tauri App"
+description = "A Visual Studio"
 authors = ["you"]
 license = ""
 repository = ""
-default-run = "app"
+default-run = "visual"
 edition = "2021"
 rust-version = "1.57"
 
