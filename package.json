@@ -25,13 +25,13 @@
   },
   "lint-staged": {
     "./**/*.{js,jsx,ts,.tsx,vue,html}": [
-      "yarn es:fix"
+      "npm run es:fix"
     ],
     "./**/*.{css,less,scss}": [
-      "yarn style:fix"
+      "npm run style:fix"
     ],
     "./**/*.{vue,ts,js,scss,json,md}": [
-      "yarn format"
+      "npm run format"
     ]
   },
   "dependencies": {
