@@ -26,7 +26,8 @@ export default defineConfig({
       '@a': path.resolve(__dirname, 'src/assets'),
       '@s': path.resolve(__dirname, 'src/service'),
       '@p': path.resolve(__dirname, 'src/plugins'),
-      '@d': path.resolve(__dirname, 'src/directives')
+      '@d': path.resolve(__dirname, 'src/directives'),
+      '@hooks': path.resolve(__dirname, 'src/hooks')
       // "layouts": path.resolve(__dirname, "src/layouts"),
     }
   },

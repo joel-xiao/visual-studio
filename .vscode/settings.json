@@ -13,8 +13,8 @@
   "terminal.integrated.rendererType": "dom",
   "search.followSymlinks": false, // 关闭rg.exe进程
   "workbench.startupEditor": "welcomePage", // 图标
-  "workbench.iconTheme": "vscode-icons",
-  "workbench.colorTheme": "escook dark soft",
+  "workbench.iconTheme": "material-icon-theme",
+  "workbench.colorTheme": "Default Dark+",
   "files.saveConflictResolution": "overwriteFileOnDisk",
   "explorer.confirmDelete": false,
   // 格式化校验

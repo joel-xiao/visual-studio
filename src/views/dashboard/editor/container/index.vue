@@ -23,7 +23,6 @@ div.editor-middle(
 import GridLine from './grid-line.vue';
 import ContainerNode from './node.vue';
 import type { Node, AddNode } from './../interface';
-import type { Binding } from '@d/darg-resize/interface';
 import { useDashboardStore } from '@/store/dashboard';
 import { ref, inject, reactive, computed, onMounted } from 'vue';
 import { storeToRefs } from 'pinia';

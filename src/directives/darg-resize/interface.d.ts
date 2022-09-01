@@ -1,10 +1,6 @@
-export interface DargDataset {
-  y2: number;
-  x2: number;
-  x: number;
-  y: number;
-}
+import { DargDataset as _DargDataset } from '@hooks/drag-hooks/interface';
 
+export type DargDataset = _DargDataset;
 export interface Binding {
   initPos: DargDataset;
   disabled: boolean;

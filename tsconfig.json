@@ -19,7 +19,8 @@
       "@a/*": ["./src/assets/*"],
       "@s/*": ["./src/service/*"],
       "@p/*": ["./src/plugins/*"],
-      "@d/*": ["./src/directives/*"]
+      "@d/*": ["./src/directives/*"],
+      "@hooks/*": ["./src/hooks/*"]
     },
     "allowSyntheticDefaultImports": true,
     "lib": ["esnext", "dom"],
