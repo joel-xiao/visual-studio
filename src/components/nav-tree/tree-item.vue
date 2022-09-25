@@ -52,88 +52,90 @@ const onCommand = function (event: PointerEvent, cmd: TreeItemMenu, item: TreeIt
     TreeItem(:recursion="recursion + 1" @select="onSelect" @command="onCommand" :data="item.children" :itemIcon="itemIcon" :itemMenus="itemMenus" :currentNav="currentNav")
 </template>
 
-<style scoped lang="scss">
-.tree-item {
-  .tree-item-nav {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 32px;
-    padding-right: 4px;
-    padding-left: 4px;
-    margin: 4px 0;
-    overflow: hidden;
-    color: var(--color-tran-85);
-    border-radius: var(--border-radius-6);
-
-    .tree-item-left {
+<style lang="scss">
+.c-nav-tree {
+  .tree-item {
+    .tree-item-nav {
       position: relative;
       display: flex;
       align-items: center;
-      justify-content: center;
-
-      .arrow {
-        position: absolute;
-        left: -20px;
-        cursor: pointer;
-        transition: transform 0.2s;
-        opacity: 0.6;
-
-        &.active {
-          transform: rotate(90deg);
-        }
-      }
-
-      .dot {
-        position: absolute;
-        left: -12px;
-        width: 8px;
-        height: 8px;
-        background: var(--color-tran-12);
-        border-radius: 2px;
-      }
-
-      .name-icon {
-        color: var(--color-tran-50);
-      }
-
-      .name-icon-margin {
-        margin: 0 2px;
-      }
-    }
-
-    .tree-item-handle {
-      position: absolute;
-      right: 0;
-      display: flex;
-      align-items: center;
-      height: 100%;
-      padding: 0 4px;
-      opacity: 0;
-      transition: opacity 0.15s;
-    }
-
-    &:hover {
-      background-color: var(--theme-color-gray-100);
+      justify-content: space-between;
+      height: 32px;
+      padding-right: 4px;
+      padding-left: 4px;
+      margin: 4px 0;
+      overflow: hidden;
+      color: var(--color-tran-85);
+      border-radius: var(--border-radius-6);
 
       .tree-item-left {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .arrow {
+          position: absolute;
+          left: -20px;
+          cursor: pointer;
+          transition: transform 0.2s;
+          opacity: 0.6;
+
+          &.active {
+            transform: rotate(90deg);
+          }
+        }
+
+        .dot {
+          position: absolute;
+          left: -12px;
+          width: 8px;
+          height: 8px;
+          background: var(--color-tran-12);
+          border-radius: 2px;
+        }
+
         .name-icon {
-          color: var(--color-tran-85);
+          color: var(--color-tran-50);
+        }
+
+        .name-icon-margin {
+          margin: 0 2px;
         }
       }
 
       .tree-item-handle {
-        opacity: 1;
+        position: absolute;
+        right: 0;
+        display: flex;
+        align-items: center;
+        height: 100%;
+        padding: 0 4px;
+        opacity: 0;
+        transition: opacity 0.15s;
       }
-    }
 
-    &.active {
-      background-color: var(--theme-color-gray-300);
+      &:hover {
+        background-color: var(--theme-color-gray-100);
 
-      .tree-item-left {
-        .name-icon {
-          color: var(--color-text-bold);
+        .tree-item-left {
+          .name-icon {
+            color: var(--color-tran-85);
+          }
+        }
+
+        .tree-item-handle {
+          opacity: 1;
+        }
+      }
+
+      &.active {
+        background-color: var(--theme-color-gray-300);
+
+        .tree-item-left {
+          .name-icon {
+            color: var(--color-text-bold);
+          }
         }
       }
     }

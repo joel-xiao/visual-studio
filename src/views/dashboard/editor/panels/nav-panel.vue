@@ -53,79 +53,81 @@ const onShare = function (): void {
 };
 </script>
 
-<style lang="scss" scoped>
-.editor-nav-panel {
-  border-bottom: 1px solid var(--theme-color-canvas);
-  width: 100%;
-  height: var(--nav-bar-height);
-  padding: 0 6px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: absolute;
-  top: 0;
-  left: 0;
-  background-color: var(--editor-panel-bg-color);
-
-  .nav-panel-left,
-  .nav-panel-right {
-    width: 50%;
+<style lang="scss">
+#editor {
+  .editor-nav-panel {
+    border-bottom: 1px solid var(--theme-color-canvas);
+    width: 100%;
+    height: var(--nav-bar-height);
+    padding: 0 6px;
     display: flex;
     align-items: center;
-    height: 100%;
+    justify-content: space-between;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: var(--editor-panel-bg-color);
 
-    .share-btn {
-      margin: 0 6px;
-      .share-btn-icon {
+    .nav-panel-left,
+    .nav-panel-right {
+      width: 50%;
+      display: flex;
+      align-items: center;
+      height: 100%;
+
+      .share-btn {
+        margin: 0 6px;
+        .share-btn-icon {
+          margin-right: 4px;
+        }
+      }
+    }
+
+    .nav-panel-left {
+      float: left;
+      .mas-button-icon {
+        margin-left: -2px;
+        width: 34px;
+        height: 34px;
         margin-right: 4px;
       }
     }
-  }
 
-  .nav-panel-left {
-    float: left;
-    .mas-button-icon {
-      margin-left: -2px;
-      width: 34px;
-      height: 34px;
-      margin-right: 4px;
-    }
-  }
-
-  .nav-panel-right {
-    justify-content: flex-end;
-    .preview-button-icon {
-      height: 30px;
-      width: 30px;
-    }
-  }
-
-  .nav-panel-content {
-    flex: none;
-    display: flex;
-    float: left;
-    height: 32px;
-    padding: 3px;
-    overflow: hidden;
-    background-color: var(--color-bg-dark);
-    border-radius: var(--border-radius-8);
-
-    .nav-panel-content-span {
-      display: flex;
-      align-items: center;
-      padding: 0 20px;
-      color: var(--color-tran-50);
-      cursor: pointer;
-      border-radius: var(--border-radius-6);
-      transition: all 0.2s;
-
-      &:hover {
-        color: var(--color-tran-85);
+    .nav-panel-right {
+      justify-content: flex-end;
+      .preview-button-icon {
+        height: 30px;
+        width: 30px;
       }
+    }
 
-      &.active {
-        color: var(--color-tran-85);
-        background: var(--color-tran-12);
+    .nav-panel-content {
+      flex: none;
+      display: flex;
+      float: left;
+      height: 32px;
+      padding: 3px;
+      overflow: hidden;
+      background-color: var(--color-bg-dark);
+      border-radius: var(--border-radius-8);
+
+      .nav-panel-content-span {
+        display: flex;
+        align-items: center;
+        padding: 0 20px;
+        color: var(--color-tran-50);
+        cursor: pointer;
+        border-radius: var(--border-radius-6);
+        transition: all 0.2s;
+
+        &:hover {
+          color: var(--color-tran-85);
+        }
+
+        &.active {
+          color: var(--color-tran-85);
+          background: var(--color-tran-12);
+        }
       }
     }
   }

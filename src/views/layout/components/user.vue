@@ -5,7 +5,7 @@ div#user
 
 <script setup lang="ts"></script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 #user {
   width: 36px;
   height: 100%;

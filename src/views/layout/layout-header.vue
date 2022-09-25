@@ -11,7 +11,7 @@ div#layout-header()
 import User from './components/user.vue';
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 #layout-header {
   display: flex;
   align-items: center;

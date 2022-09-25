@@ -62,7 +62,7 @@ onSwitchType();
 provide('getType', getCurrentType);
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .editor-panel-component {
   padding: 0 6px 6px;
   position: relative;

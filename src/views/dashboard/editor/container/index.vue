@@ -70,28 +70,30 @@ const onDrop = function (event: DragEvent): void {
 };
 </script>
 
-<style lang="scss" scoped>
-.editor-middle {
-  z-index: 0;
-  position: absolute;
-  top: calc(var(--nav-bar-height) + var(--tool-bar-height));
-  left: var(--left-menu-width);
-  right: var(--right-menu-width);
-  bottom: 0px;
-  background-color: var(--theme-color-canvas-bg);
-  .editor-middle-container {
+<style lang="scss">
+#editor {
+  .editor-middle {
+    z-index: 0;
     position: absolute;
-    background-color: var(--color-bg-dark);
-  }
-  .editor-middle-container-mask {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    top: 0;
-    cursor: grab;
-    &.down {
-      cursor: grabbing;
+    top: calc(var(--nav-bar-height) + var(--tool-bar-height));
+    left: var(--left-menu-width);
+    right: var(--right-menu-width);
+    bottom: 0px;
+    background-color: var(--theme-color-canvas-bg);
+    .editor-middle-container {
+      position: absolute;
+      background-color: var(--color-bg-dark);
+    }
+    .editor-middle-container-mask {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      top: 0;
+      cursor: grab;
+      &.down {
+        cursor: grabbing;
+      }
     }
   }
 }

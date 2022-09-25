@@ -86,7 +86,7 @@ const nodes = myNodeContext.getNodes();
 createBindKeysContext();
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 #editor {
   --nav-bar-height: 42px;
   --tool-bar-height: 0px;

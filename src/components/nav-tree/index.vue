@@ -104,7 +104,7 @@ div(class='c-nav-tree')
     @command="onMenuCommand")
 </template>
 
-<style scoped lang="scss">
+<style lang="scss">
 .c-nav-tree {
   width: 100%;
   height: 100%;

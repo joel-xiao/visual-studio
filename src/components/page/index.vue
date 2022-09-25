@@ -5,7 +5,7 @@ div(class='c-page')
 
 <script lang="ts" setup></script>
 
-<style scoped lang="scss">
+<style lang="scss">
 .c-page {
   position: relative;
   box-sizing: border-box;

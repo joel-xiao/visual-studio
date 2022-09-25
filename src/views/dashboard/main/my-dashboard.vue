@@ -107,127 +107,128 @@ div#dashboard-my-project
 
 </template>
 
-<style lang="scss" scoped>
-#dashboard-my-project {
-  position: relative;
-  width: 100%;
-  height: 100%;
-
-  .project-manage {
-    width: 264px;
+<style lang="scss">
+#dashboard {
+  #dashboard-my-project {
+    position: relative;
+    width: 100%;
     height: 100%;
-    padding: 8px;
-    background: var(--theme-color-leftbar-bg);
-    z-index: 1;
 
-    .manage-title {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 56px;
-      padding: 0 30px 0 24px;
-      font-size: 14px;
-      color: #fff;
-      border-bottom: 1px solid #27343e;
+    .project-manage {
+      width: 264px;
+      height: 100%;
+      padding: 8px;
+      background: var(--theme-color-leftbar-bg);
+      z-index: 1;
 
-      .add-group {
-      }
-    }
-
-    .manage-main {
-      .main-project {
+      .manage-title {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        height: 36px;
-        padding: 0 30px 0 50px;
+        height: 56px;
+        padding: 0 30px 0 24px;
         font-size: 14px;
-        color: #b9c2cc;
-        transition: all 0.2s;
+        color: #fff;
+        border-bottom: 1px solid #27343e;
 
-        &:hover {
-          color: var(--dashboard-main-color);
-        }
-
-        &.active {
-          color: #fff;
-          background: url(`~@/assets/img/dashboard/main/my-project-check.png`);
-          background-repeat: round;
-          background-size: contain;
-        }
-
-        &:not(.all, .no-group),
-        &.no-group .project-num {
-          font-size: 12px;
+        .add-group {
         }
       }
-    }
-  }
 
-  .project-screen-list {
-    z-index: 0;
-    width: calc(100% - 264px);
-    height: 100%;
-    padding: 10px 16px;
-
-    .new-projects {
-      display: flex;
-      align-items: center;
-      height: 32px;
-
-      .n-button {
-        width: 113px;
-      }
-      .search {
-        width: 100%;
-        padding-left: 16px;
-        height: 100%;
-        .n-input {
-          height: 100%;
-          border-radius: var(--border-radius-8);
-        }
-      }
-    }
-
-    .project-header {
-      position: sticky;
-      z-index: 1;
-      display: flex;
-      align-items: center;
-      height: 36px;
-      margin: 0 6px;
-      margin-top: 8px;
-      margin-bottom: 4px;
-
-      .project-title {
-        display: flex;
-        align-items: center;
-        margin-right: 20px;
-        flex: none;
-
-        h2 {
-          max-width: 200px;
-          font-size: 16px;
-          color: var(--color-text);
-        }
-
-        span.projects-sum {
-          padding-left: 6px;
+      .manage-main {
+        .main-project {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          height: 36px;
+          padding: 0 30px 0 50px;
           font-size: 14px;
-          color: #bcc9d4;
-          letter-spacing: 1px;
-          .projects-number {
-            padding: 0 2px;
+          color: #b9c2cc;
+          transition: all 0.2s;
+
+          &:hover {
+            color: var(--dashboard-main-color);
+          }
+
+          &.active {
+            color: #fff;
+            background: url(`~@/assets/img/dashboard/main/my-project-check.png`);
+            background-repeat: round;
+            background-size: contain;
+          }
+
+          &:not(.all, .no-group),
+          &.no-group .project-num {
+            font-size: 12px;
           }
         }
       }
     }
 
-    .projects-content {
-      display: flex;
-    }
+    .project-screen-list {
+      z-index: 0;
+      width: calc(100% - 264px);
+      height: 100%;
+      padding: 10px 16px;
 
-    /* .new-projects {
+      .new-projects {
+        display: flex;
+        align-items: center;
+        height: 32px;
+
+        .n-button {
+          width: 113px;
+        }
+        .search {
+          width: 100%;
+          padding-left: 16px;
+          height: 100%;
+          .n-input {
+            height: 100%;
+            border-radius: var(--border-radius-8);
+          }
+        }
+      }
+
+      .project-header {
+        position: sticky;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        height: 36px;
+        margin: 0 6px;
+        margin-top: 8px;
+        margin-bottom: 4px;
+
+        .project-title {
+          display: flex;
+          align-items: center;
+          margin-right: 20px;
+          flex: none;
+
+          h2 {
+            max-width: 200px;
+            font-size: 16px;
+            color: var(--color-text);
+          }
+
+          span.projects-sum {
+            padding-left: 6px;
+            font-size: 14px;
+            color: #bcc9d4;
+            letter-spacing: 1px;
+            .projects-number {
+              padding: 0 2px;
+            }
+          }
+        }
+      }
+
+      .projects-content {
+        display: flex;
+      }
+
+      /* .new-projects {
       display: flex;
       flex-direction: row;
       flex-wrap: wrap;
@@ -275,6 +276,7 @@ div#dashboard-my-project
       }
     }
     } */
+    }
   }
 }
 </style>

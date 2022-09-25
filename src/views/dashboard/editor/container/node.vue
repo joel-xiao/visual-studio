@@ -79,7 +79,9 @@ onMounted(() => {
 });
 </script>
 
-<style lang="scss" scoped>
-.node {
+<style lang="scss">
+#editor {
+  .node {
+  }
 }
 </style>

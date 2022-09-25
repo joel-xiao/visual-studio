@@ -11,7 +11,7 @@ import Header from './layout-header.vue';
 import Content from './layout-content.vue';
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 #layout {
   position: relative;
   width: 100%;

@@ -16,7 +16,7 @@ onMounted(() => {
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 #layout-content {
   position: relative;
   width: 100%;

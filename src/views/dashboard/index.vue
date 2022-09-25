@@ -5,7 +5,7 @@ div#dashboard(class="not-select")
 
 <script setup lang="ts"></script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 #dashboard {
   background: var(--color-main);
   position: relative;

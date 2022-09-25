@@ -44,7 +44,7 @@ div#layout
 import headerVue from './layout-header.vue';
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 #layout {
   position: relative;
   width: 100%;

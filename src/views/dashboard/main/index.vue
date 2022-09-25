@@ -31,7 +31,7 @@ const onNavSelect = function (nav: navData): void {
   MyDashboard(v-show="currentNav.id === 'dashboard'")
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
 #dashboard {
   position: relative;
   width: 100%;

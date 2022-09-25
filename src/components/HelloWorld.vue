@@ -15,4 +15,4 @@ defineProps<{ msg: string }>();
   <p>{{ count }}</p>-->
 </template>
 
-<style scoped></style>
+<style></style>

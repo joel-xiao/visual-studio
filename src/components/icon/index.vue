@@ -21,7 +21,7 @@ span(class='c-icon-font' :class="[button ? 'button' : '', block ? 'block' : '', 
   i(class='icon-font' :class='src')
 </template>
 
-<style scoped lang="scss">
+<style lang="scss">
 .c-icon-font {
   display: inline-block;
   overflow: hidden;

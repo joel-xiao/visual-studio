@@ -26,7 +26,7 @@ const onSelect = function (tab: Tab): void {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .editor-panel-tab_bar {
   height: 100%;
   .tab_container {

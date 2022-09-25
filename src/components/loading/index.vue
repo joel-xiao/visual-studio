@@ -6,7 +6,7 @@ div(class='c-loading')
 
 <script lang="ts" setup></script>
 
-<style scoped lang="scss">
+<style lang="scss">
 .c-loading {
   display: flex;
   align-items: center;

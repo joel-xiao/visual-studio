@@ -18,11 +18,13 @@ svg(class="grid" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg")
   rect(width="100%" height="100%" fill="url(#grid)")
 </template>
 
-<style lang="scss" scoped>
-.grid {
-  position: absolute;
-  top: 0;
-  left: 0;
-  opacity: 0.4;
+<style lang="scss">
+#editor {
+  .grid {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0.4;
+  }
 }
 </style>

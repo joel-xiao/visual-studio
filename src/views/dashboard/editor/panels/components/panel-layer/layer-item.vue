@@ -52,94 +52,96 @@ const onCommand = function (event: PointerEvent, cmd: LayerItemMenu, item: Layer
     LayerItem(:recursion="recursion + 1" @select="onSelect" @command="onCommand" :data="item.children" :itemIcon="itemIcon" :itemMenus="itemMenus" :currentNav="currentNav")
 </template>
 
-<style scoped lang="scss">
-.layer-item {
-  &.layer-item_check {
-    background: var(--color-select-light);
-    border-radius: 6px;
-    overflow: hidden;
-  }
-  .layer-item-nav {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 30px;
-    padding-right: 4px;
-    padding-left: 4px;
-    overflow: hidden;
-    color: var(--color-text-primary);
-    border-radius: 6px;
-
-    .layer-item-left {
+<style lang="scss">
+.editor-panel-layer {
+  .layer-item {
+    &.layer-item_check {
+      background: var(--color-select-light);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .layer-item-nav {
       position: relative;
       display: flex;
       align-items: center;
-      justify-content: center;
-
-      .arrow {
-        position: absolute;
-        left: -20px;
-        cursor: pointer;
-        transition: transform 0.2s;
-        transform: rotate(-90deg);
-        opacity: 0.5;
-
-        &.active {
-          transform: rotate(0deg);
-        }
-      }
-
-      .dot {
-        position: absolute;
-        left: -12px;
-        width: 6px;
-        height: 6px;
-        background: var(--color-tran-12);
-        border-radius: 2px;
-      }
-
-      .name-icon {
-        color: var(--color-tran-50);
-      }
-
-      .name-icon-margin {
-        margin: 0 2px;
-      }
-    }
-
-    .layer-item-handle {
-      position: absolute;
-      right: 0;
-      display: flex;
-      align-items: center;
-      height: 100%;
-      padding: 0 4px;
-      opacity: 0;
-      transition: opacity 0.15s;
-    }
-
-    &:hover,
-    &.hover {
-      background: var(--color-tran-6);
+      justify-content: space-between;
+      height: 30px;
+      padding-right: 4px;
+      padding-left: 4px;
+      overflow: hidden;
+      color: var(--color-text-primary);
+      border-radius: 6px;
 
       .layer-item-left {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .arrow {
+          position: absolute;
+          left: -20px;
+          cursor: pointer;
+          transition: transform 0.2s;
+          transform: rotate(-90deg);
+          opacity: 0.5;
+
+          &.active {
+            transform: rotate(0deg);
+          }
+        }
+
+        .dot {
+          position: absolute;
+          left: -12px;
+          width: 6px;
+          height: 6px;
+          background: var(--color-tran-12);
+          border-radius: 2px;
+        }
+
         .name-icon {
-          color: var(--color-text-primary);
+          color: var(--color-tran-50);
+        }
+
+        .name-icon-margin {
+          margin: 0 2px;
         }
       }
 
       .layer-item-handle {
-        opacity: 1;
+        position: absolute;
+        right: 0;
+        display: flex;
+        align-items: center;
+        height: 100%;
+        padding: 0 4px;
+        opacity: 0;
+        transition: opacity 0.15s;
       }
-    }
 
-    &.active {
-      background-color: var(--color-select);
+      &:hover,
+      &.hover {
+        background: var(--color-tran-6);
 
-      .layer-item-left {
-        .name-icon {
-          color: var(--color-text-bold);
+        .layer-item-left {
+          .name-icon {
+            color: var(--color-text-primary);
+          }
+        }
+
+        .layer-item-handle {
+          opacity: 1;
+        }
+      }
+
+      &.active {
+        background-color: var(--color-select);
+
+        .layer-item-left {
+          .name-icon {
+            color: var(--color-text-bold);
+          }
         }
       }
     }

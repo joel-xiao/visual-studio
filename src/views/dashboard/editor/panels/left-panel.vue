@@ -141,26 +141,28 @@ const componentData = reactive<ComponentData[]>([
 ]);
 </script>
 
-<style lang="scss" scoped>
-.editor-left-panel {
-  position: absolute;
-  left: 0px;
-  top: var(--nav-bar-height);
-  bottom: 0px;
-  width: var(--left-menu-width);
-  border-right: 1px solid var(--theme-color-canvas);
-  background-color: var(--editor-panel-bg-color);
-  .panel-tab_bar {
-    border-bottom: 1px solid var(--theme-color-canvas);
-    padding: 0 12px 0 6px;
-    height: var(--tab-bar-height);
-  }
-  .panel-component {
-    .panel-component-tab_bar {
+<style lang="scss">
+#editor {
+  .editor-left-panel {
+    position: absolute;
+    left: 0px;
+    top: var(--nav-bar-height);
+    bottom: 0px;
+    width: var(--left-menu-width);
+    border-right: 1px solid var(--theme-color-canvas);
+    background-color: var(--editor-panel-bg-color);
+    .panel-tab_bar {
       border-bottom: 1px solid var(--theme-color-canvas);
       padding: 0 12px 0 6px;
       height: var(--tab-bar-height);
-      .tab_bar-title {
+    }
+    .panel-component {
+      .panel-component-tab_bar {
+        border-bottom: 1px solid var(--theme-color-canvas);
+        padding: 0 12px 0 6px;
+        height: var(--tab-bar-height);
+        .tab_bar-title {
+        }
       }
     }
   }

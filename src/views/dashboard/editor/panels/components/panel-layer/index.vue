@@ -98,11 +98,13 @@ div(class='editor-panel-layer')
     @command="onMenuCommand")
 </template>
 
-<style scoped lang="scss">
-.editor-panel-layer {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  padding: 4px 6px 7px;
+<style lang="scss">
+#editor {
+  .editor-panel-layer {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    padding: 4px 6px 7px;
+  }
 }
 </style>

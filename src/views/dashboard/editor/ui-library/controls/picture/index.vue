@@ -6,4 +6,4 @@ div(class="control-picture")
 
 <script setup lang="ts"></script>
 
-<style lang="scss" scoped></style>
+<style lang="scss"></style>
