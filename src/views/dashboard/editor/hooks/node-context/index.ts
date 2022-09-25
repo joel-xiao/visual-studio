@@ -1,14 +1,19 @@
-import { computed, reactive, ComputedRef, onBeforeUnmount } from 'vue';
-import type { EditorData, Node, AddNode, NodeDelta, TreeNode, NodeVm } from './interface';
+import { computed, reactive, ComputedRef, onBeforeUnmount, App, defineAsyncComponent } from 'vue';
+import type { EditorData, Node, AddNode, NodeDelta, TreeNode, NodeInstance } from './interface';
+import { createComponent } from '@hooks/vue-hooks';
 
 class CreateNodeContext {
   #data: EditorData;
-  #nodesVm?: {
-    [nodeId: string]: NodeVm;
+  #nodeInstances?: {
+    [nodeId: string]: NodeInstance;
+  };
+  #nodeComponents?: {
+    [nodeId: string]: App | undefined;
   };
   constructor(data: EditorData) {
     this.#data = data;
-    this.#nodesVm = {};
+    this.#nodeInstances = {};
+    this.#nodeComponents = {};
 
     this.getNodeTree = this.getNodeTree.bind(this);
     this.getNodes = this.getNodes.bind(this);
@@ -18,8 +23,10 @@ class CreateNodeContext {
     this.onUpdateNode = this.onUpdateNode.bind(this);
     this.onAddNode = this.onAddNode.bind(this);
     this.onSelectNode = this.onSelectNode.bind(this);
-    this.addNodeVm = this.addNodeVm.bind(this);
-    this.removeNodeVm = this.removeNodeVm.bind(this);
+    this.addNodeInstance = this.addNodeInstance.bind(this);
+    this.removeNodeInstance = this.removeNodeInstance.bind(this);
+    this.createNodeComponent = this.createNodeComponent.bind(this);
+    this.deleteNodeComponent = this.deleteNodeComponent.bind(this);
     this.uninstall = this.uninstall.bind(this);
   }
 
@@ -127,20 +134,41 @@ class CreateNodeContext {
       } else {
         node.select = false;
       }
-      this.#nodesVm?.[node.id]?.setActive?.(node.select);
+      this.#nodeInstances?.[node.id]?.setActive?.(node.select);
     });
   }
 
-  addNodeVm(nodeId: string, addNodeVm: NodeVm): void {
-    this.#nodesVm && (this.#nodesVm[nodeId] = addNodeVm);
+  addNodeInstance(nodeId: string, addNodeInstance: NodeInstance): void {
+    this.#nodeInstances && (this.#nodeInstances[nodeId] = addNodeInstance);
   }
 
-  removeNodeVm(nodeId: string): void {
-    this.#nodesVm && delete this.#nodesVm[nodeId];
+  removeNodeInstance(nodeId: string): void {
+    this.#nodeInstances && delete this.#nodeInstances[nodeId];
+  }
+
+  createNodeComponent(node: Node, parentEl: HTMLElement | undefined): void {
+    if (parentEl && this.#nodeComponents) {
+      this.#nodeComponents[node.id] = createComponent<{ aa: string }>(
+        'middle-node-component',
+        parentEl,
+        defineAsyncComponent(() => import('./../../ui-library/controls/picture/index.vue')),
+        {
+          aa: 'createNodeInstance aaaaaaaaaaaaaaaaaaaa'
+        }
+      );
+    }
+  }
+
+  deleteNodeComponent(node: Node): void {
+    if (this.#nodeComponents) {
+      this.#nodeComponents[node.id]?.unmount();
+      delete this.#nodeComponents[node.id];
+    }
   }
 
   uninstall(): void {
-    this.#nodesVm = undefined;
+    this.#nodeInstances = undefined;
+    this.#nodeComponents = undefined;
   }
 }
 

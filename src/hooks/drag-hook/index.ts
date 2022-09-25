@@ -291,7 +291,10 @@ export const createDrag = function <T>(
     pos = { x: rect.x, y: rect.y, x2: rect.x + rect.width, y2: rect.y + rect.height };
   }
 
-  let app: App | null = createComponent<T>('createDrag', parentEl, comp, prop, currentTarget);
+  let app: App | null = createComponent<T>('createDrag', parentEl, comp, {
+    ...prop,
+    element: currentTarget?.cloneNode(true) as HTMLElement
+  });
   const el: HTMLElement = app._container;
 
   let drag: Drag | null = new Drag();

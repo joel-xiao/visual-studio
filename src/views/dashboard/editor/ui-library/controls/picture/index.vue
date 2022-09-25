@@ -1,7 +1,5 @@
 <template lang="pug">
-div(class="control-picture")
-  div(class='picture-content')
-  |erahfafhjafah
+|111111
 </template>
 
 <script setup lang="ts"></script>

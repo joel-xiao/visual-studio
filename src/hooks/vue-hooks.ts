@@ -4,13 +4,9 @@ export const createComponent = function <T>(
   key: string,
   parentEl: HTMLElement,
   component: Component,
-  prop: T | void,
-  srcElement: HTMLElement | void
+  prop: T | void
 ): App {
-  const app = createApp(component, {
-    ...(prop && prop instanceof Object ? prop : {}),
-    element: srcElement?.cloneNode(true) as HTMLElement
-  });
+  const app = createApp(component, { ...(prop && prop instanceof Object ? prop : {}) });
 
   let el: HTMLElement | null = document.createElement('div');
   el.setAttribute('key', key);
