@@ -7,13 +7,13 @@ class CreateNodeContext {
   #nodeInstances?: {
     [nodeId: string]: NodeInstance;
   };
-  #nodeComponents?: {
+  #nodeComponentInstances?: {
     [nodeId: string]: App | undefined;
   };
   constructor(data: EditorData) {
     this.#data = data;
     this.#nodeInstances = {};
-    this.#nodeComponents = {};
+    this.#nodeComponentInstances = {};
 
     this.getNodeTree = this.getNodeTree.bind(this);
     this.getNodes = this.getNodes.bind(this);
@@ -147,8 +147,8 @@ class CreateNodeContext {
   }
 
   createNodeComponent(node: Node, parentEl: HTMLElement | undefined): void {
-    if (parentEl && this.#nodeComponents) {
-      this.#nodeComponents[node.id] = createComponent<{ aa: string }>(
+    if (parentEl && this.#nodeComponentInstances) {
+      this.#nodeComponentInstances[node.id] = createComponent<{ aa: string }>(
         'middle-node-component',
         parentEl,
         defineAsyncComponent(() => import('./../../ui-library/controls/picture/index.vue')),
@@ -160,15 +160,15 @@ class CreateNodeContext {
   }
 
   deleteNodeComponent(node: Node): void {
-    if (this.#nodeComponents) {
-      this.#nodeComponents[node.id]?.unmount();
-      delete this.#nodeComponents[node.id];
+    if (this.#nodeComponentInstances) {
+      this.#nodeComponentInstances[node.id]?.unmount();
+      delete this.#nodeComponentInstances[node.id];
     }
   }
 
   uninstall(): void {
     this.#nodeInstances = undefined;
-    this.#nodeComponents = undefined;
+    this.#nodeComponentInstances = undefined;
   }
 }
 
