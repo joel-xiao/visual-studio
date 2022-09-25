@@ -18,7 +18,6 @@ import MiddleContainer from './container/index.vue';
 
 import { reactive } from 'vue';
 import { useDashboardStore } from '@/store/dashboard';
-import { createNodeTree } from './hooks/node-tree';
 import { createNodeContext } from './hooks/node-context';
 import type { EditorData } from './hooks/node-context/interface';
 import { createBindKeysContext } from './hooks/bind-keys-context';
@@ -77,9 +76,8 @@ const init = function (editorData: EditorData): void {
 };
 defineExpose({ init });
 
-const nodesTree = createNodeTree(data);
-
 const myNodeContext = createNodeContext(data);
+const nodesTree = myNodeContext.getNodeTree();
 const nodes = myNodeContext.getNodes();
 
 // 绑定组合键

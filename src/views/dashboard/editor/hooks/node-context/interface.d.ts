@@ -1,4 +1,6 @@
 import type { App } from 'vue';
+import type { LayerData } from './../../panels/components/panel-layer/interface';
+
 export interface Node {
   container?: string;
   name: string;
@@ -37,6 +39,17 @@ export interface EditorData {
   type: string;
   nodes: Node[];
 }
+
+interface TreeNodeData {
+  container?: string | undefined | null;
+  id: string;
+  name: string;
+  z: number;
+  select?: boolean;
+  type: string;
+}
+
+export type TreeNode = LayerData<TreeNodeData>;
 
 export interface NodeVm {
   setActive?: (val: boolean) => void;

@@ -1,5 +1,5 @@
-import { computed, ComputedRef, onBeforeUnmount } from 'vue';
-import type { EditorData, Node, AddNode, NodeDelta, NodeVm } from './interface';
+import { computed, reactive, ComputedRef, onBeforeUnmount } from 'vue';
+import type { EditorData, Node, AddNode, NodeDelta, TreeNode, NodeVm } from './interface';
 
 class CreateNodeContext {
   #data: EditorData;
@@ -10,6 +10,7 @@ class CreateNodeContext {
     this.#data = data;
     this.#nodesVm = {};
 
+    this.getNodeTree = this.getNodeTree.bind(this);
     this.getNodes = this.getNodes.bind(this);
     this.getRoot = this.getRoot.bind(this);
     this.getRootStyle = this.getRootStyle.bind(this);
@@ -20,6 +21,39 @@ class CreateNodeContext {
     this.addNodeVm = this.addNodeVm.bind(this);
     this.removeNodeVm = this.removeNodeVm.bind(this);
     this.uninstall = this.uninstall.bind(this);
+  }
+
+  getNodeTree(): TreeNode[] {
+    let nodesTree: TreeNode[] = [];
+    const nodes: TreeNode[] = this.#data.nodes.map(
+      (n): TreeNode => ({
+        parentId: n.container,
+        icon: '',
+        id: n.id,
+        name: n.name,
+        data: {
+          name: n.name,
+          id: n.id,
+          container: n.container,
+          type: n.type,
+          z: n.z
+        }
+      })
+    );
+
+    const rootNode = nodes.find((node) => node.id === 'root');
+    if (rootNode) {
+      nodesTree = [rootNode];
+      this.#formatTreeNode(nodes, nodesTree);
+    }
+    return reactive<TreeNode[]>(nodesTree);
+  }
+
+  #formatTreeNode(nodes: TreeNode[], nodesTree: TreeNode[]): void {
+    nodesTree.forEach((node: TreeNode): void => {
+      node.children = nodes.filter((n) => n.parentId === node.id);
+      this.#formatTreeNode(nodes, node.children);
+    });
   }
 
   getNodes(): ComputedRef<Node[]> {
