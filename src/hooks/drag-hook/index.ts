@@ -103,6 +103,7 @@ export class Drag {
         stickDom.removeEventListener('mousedown', this.stickDown, true);
         stickDom.remove();
       });
+      this.stickEl?.remove();
 
       childNodes = undefined;
       this.stickEl = undefined;

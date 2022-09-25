@@ -25,12 +25,19 @@ div.editor-left-panel
 import PanelTabBar from './components/panel-tab_bar.vue';
 import type { Tab } from './components/panel-tab_bar';
 import PanelLayer from './components/panel-layer/index.vue';
-import type { LayerItemData, LayerItemMenu } from './components/panel-layer/interface';
+import type { LayerItemMenu, LayerItemData } from './components/panel-layer/interface';
+import type { TreeNode } from './../hooks/node-tree/interface';
 import PanelComponent from './components/panel-component/index.vue';
-import type { Component, ComponentData } from './components/panel-component/interface';
+import type { ComponentData } from './components/panel-component/interface';
 import { ref, reactive } from 'vue';
+import { useDrag } from './../hooks/drag';
 
-const emit = defineEmits(['component-drag-start', 'component-drag-stop']);
+interface Props {
+  layerData: TreeNode[];
+}
+const props = withDefaults(defineProps<Props>(), {
+  layerData: () => []
+});
 
 const tabBars = reactive<Tab[]>([
   { name: '图层', id: 'layer', show: false },
@@ -45,20 +52,20 @@ const onSelect = function (tab: Tab) {
   tab.show = true;
 };
 
-const layerData: LayerItemData[] = reactive([
-  { name: '全部应用', id: 'all', sum: 0, handle: false },
-  { name: '未分组', id: 'no-group', sum: 0, handle: false },
-  {
-    name: 'xiao',
-    id: '123',
-    sum: 0,
-    children: [
-      { name: '全部应用', id: '1all', sum: 0 },
-      { name: '未分组', id: '1no-group', sum: 0 },
-      { name: '其他', id: '1123', sum: 0 }
-    ]
-  }
-]);
+// const layerData: LayerItemData[] = reactive([
+//   { name: '全部应用', id: 'all', sum: 0, handle: false },
+//   { name: '未分组', id: 'no-group', sum: 0, handle: false },
+//   {
+//     name: 'xiao',
+//     id: '123',
+//     sum: 0,
+//     children: [
+//       { name: '全部应用', id: '1all', sum: 0 },
+//       { name: '未分组', id: '1no-group', sum: 0 },
+//       { name: '其他', id: '1123', sum: 0 }
+//     ]
+//   }
+// ]);
 
 const layerMenus = reactive<LayerItemMenu[]>([
   {
@@ -76,6 +83,8 @@ const onLayerCommand = function (cmd: LayerItemMenu, item: LayerItemData) {
 
 const componentTabBars = reactive<Tab[]>([{ name: '组件库', id: 'component' }]);
 const componentTab = ref<Tab>(componentTabBars[0]);
+
+const { onDragStart, onDragStop } = useDrag();
 
 const getIcon = (icon: string): string => {
   return `image/dashboard/editor/panel-component/${icon}`;
@@ -130,12 +139,6 @@ const componentData = reactive<ComponentData[]>([
     ]
   }
 ]);
-const onDragStart = function (item: Component, event: DragEvent): void {
-  emit('component-drag-start', item, event);
-};
-const onDragStop = function (event: DragEvent): void {
-  emit('component-drag-stop', event);
-};
 </script>
 
 <style lang="scss" scoped>

@@ -1,4 +1,4 @@
-import { DargDataset as _DargDataset } from '@hooks/drag-hooks/interface';
+import { DargDataset as _DargDataset } from '@hooks/drag-hook/interface';
 
 export type DargDataset = _DargDataset;
 export interface Binding {

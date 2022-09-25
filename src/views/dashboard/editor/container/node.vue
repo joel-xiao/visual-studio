@@ -17,20 +17,18 @@ import {
   watch,
   onMounted
 } from 'vue';
-import { storeToRefs } from 'pinia';
-import type { Node, NodeDelta } from './../interface';
 import type { DargDataset } from '@d/darg-resize/interface';
-import { divide } from 'lodash';
+import { useNodeContext } from './../hooks/node-context';
+
 interface Props {
   id: string;
 }
-
 const props = withDefaults(defineProps<Props>(), {
   id: ''
 });
 
-let getNode = inject('getNode');
-const node: Node = typeof getNode === 'function' ? getNode(props.id) : {};
+const { getNode, onUpdateNode, onSelectNode, addNodeVm } = useNodeContext();
+const node = getNode(props.id);
 
 const dargDataset = readonly(
   reactive<DargDataset>(
@@ -44,29 +42,17 @@ const dargDataset = readonly(
 );
 const resize = ref<null | InstanceType<typeof DragResize>>(null);
 
-watch(
-  () => node.select,
-  (val: boolean | undefined): void => {
-    resize?.value?.setActive(val);
-  }
-);
-
-const updateNode = inject('updateNode');
-const onUpdateNode = function (node: Node, delta: NodeDelta): void {
-  typeof updateNode === 'function' && updateNode(node.id, delta);
+const setActive = function setActive(val: boolean | undefined) {
+  resize?.value?.setActive(val);
 };
-
-let selectNode = inject('selectNode');
-const onSelectNode = function (node: Node): void {
-  typeof selectNode === 'function' && selectNode(node.id);
-};
+addNodeVm(node.id, { setActive });
 
 const onDown = function (): void {
-  onSelectNode(node);
+  onSelectNode(node.id);
 };
 
 const onResizing = function (dargDataset: DargDataset): void {
-  onUpdateNode(node, {
+  onUpdateNode(node.id, {
     x: dargDataset.x,
     y: dargDataset.y,
     width: dargDataset.x2 - dargDataset.x,
@@ -75,7 +61,6 @@ const onResizing = function (dargDataset: DargDataset): void {
 };
 
 const initNodeVm = function (el: HTMLElement | undefined): void {
-  // console.log(el);
   if (el) {
     const path = './ui-library/controls/picture/index.vue';
     const component = import.meta.glob(`./ui-library/controls/picture/index.vue`);

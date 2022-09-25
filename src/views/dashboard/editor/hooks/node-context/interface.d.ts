@@ -1,8 +1,9 @@
 import type { App } from 'vue';
 export interface Node {
+  container?: string;
   name: string;
   id: string;
-  key: string;
+  type: string;
   width: number;
   height: number;
   x: number;
@@ -12,12 +13,14 @@ export interface Node {
   z: number;
   vm?: App<Element>;
 }
+
 export interface AddNode {
   name: string;
-  key: string;
+  type: string;
   width?: number;
   height?: number;
 }
+
 export interface NodeDelta {
   name?: string;
   id?: string;
@@ -31,6 +34,10 @@ export interface EditorData {
   folder?: string;
   name: string;
   id: string;
-  key: string;
+  type: string;
   nodes: Node[];
+}
+
+export interface NodeVm {
+  setActive?: (val: boolean) => void;
 }

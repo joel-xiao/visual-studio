@@ -6,9 +6,11 @@ export interface LayerItemData {
   children?: LayerItemData[];
   AFold?: boolean;
   handle?: boolean;
-  parentId?: string;
+  parentId?: string | undefined | null;
   cascades?: LayerItemData[];
+  data?: T;
 }
+export type LayerData<T> = LayerItemData;
 
 export interface LayerItemMenu {
   name: string;

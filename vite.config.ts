@@ -36,12 +36,13 @@ export default defineConfig({
   },
   base: './',
   build: {
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true
-      }
-    }
+    // minify: 'terser',
+    // terserOptions: {
+    //   compress: {
+    //     drop_console: true,
+    //     drop_debugger: true
+    //   }
+    // }
   },
   server: {
     proxy: {

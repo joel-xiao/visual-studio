@@ -1,5 +1,5 @@
 import type { App, DirectiveBinding } from 'vue';
-import { Drag } from '@hooks/drag-hooks';
+import { Drag } from '@hooks/drag-hook';
 import type { Binding } from './interface';
 
 const dragData: { [uid: string]: Drag } = {};

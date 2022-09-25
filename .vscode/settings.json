@@ -14,7 +14,7 @@
   "search.followSymlinks": false, // 关闭rg.exe进程
   "workbench.startupEditor": "welcomePage", // 图标
   "workbench.iconTheme": "material-icon-theme",
-  "workbench.colorTheme": "Default Dark+",
+  "workbench.colorTheme": "One Dark Pro",
   "files.saveConflictResolution": "overwriteFileOnDisk",
   "explorer.confirmDelete": false,
   // 格式化校验
