@@ -32,9 +32,11 @@ const tree = computed<LayerItemData[]>(() => {
   return findLayer(props.data);
 });
 
-const currentNav = ref<LayerItemData>();
+const oldSelect = ref<LayerItemData>();
 const onNavSelect = function (item: LayerItemData): void {
-  currentNav.value = item;
+  oldSelect.value && (oldSelect.value.select = false);
+  oldSelect.value = item;
+  item.select = true;
   emit('select', item);
 };
 
@@ -88,8 +90,7 @@ div(class='editor-panel-layer')
     @command="onCommand"
     :data="tree"
     :itemIcon="itemIcon"
-    :itemMenus="itemMenus"
-    :currentNav="currentNav")
+    :itemMenus="itemMenus")
   ClickMenu(
     v-model='clickMenu.show'
     :data="commandData?.cmd?.children || []"

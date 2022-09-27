@@ -9,6 +9,7 @@ export class Drag {
   resize: boolean;
   disabled: boolean;
   active: boolean;
+  #moved: boolean;
   callbackUp?: (() => void) | null;
   stickEl?: HTMLElement;
   sticks: string[];
@@ -37,6 +38,7 @@ export class Drag {
     this.resize = !!this.binding.resize;
     this.disabled = !!this.binding.disabled;
     this.active = !!this.binding.disabled;
+    this.#moved = false;
 
     this.bodyDown = this.bodyDown.bind(this);
     this.stickDown = this.stickDown.bind(this);
@@ -124,6 +126,12 @@ export class Drag {
     this.active = active;
   }
 
+  #setMoved(moved: boolean): void {
+    if (!this.resize) return;
+    this.stickEl?.classList[moved ? 'add' : 'remove']('no-opacity');
+    this.#moved = moved;
+  }
+
   bodyDown(event: MouseEvent): void {
     event?.button && this.prevent(event);
     if (this.disabled) return;
@@ -153,6 +161,7 @@ export class Drag {
   }
 
   onUp(event: MouseEvent): void {
+    this.#setMoved(false);
     this.prevent(event);
     this.defaultPos = { ...this.pos };
     this.updateStyle(this.defaultPos);
@@ -186,7 +195,9 @@ export class Drag {
 
   onMove(event: MouseEvent): void {
     if (!this.active) return;
+    if (this.currentStick === 'body') this.#setMoved(true);
     this.prevent(event);
+
     const stick: string = this.currentStick;
     const defaultPos: DargDataset = this.defaultPos;
     if (stick === 'body') {

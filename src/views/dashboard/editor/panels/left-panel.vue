@@ -8,6 +8,7 @@ div.editor-left-panel
     v-show="selectTab === tabBars[0]"
     :data="layerData"
     :itemMenus="layerMenus"
+    @select="onLayerSelect"
     @command="onLayerCommand"
     temIcon="icon-wenjianjia"
     )
@@ -22,22 +23,22 @@ div.editor-left-panel
 </template>
 
 <script setup lang="ts">
-import PanelTabBar from './components/panel-tab_bar.vue';
-import type { Tab } from './components/panel-tab_bar';
+import PanelTabBar from './components/panel-tab-bar/index.vue';
+import type { Tab } from './components/panel-tab-bar/interface';
 import PanelLayer from './components/panel-layer/index.vue';
 import type { LayerItemMenu, LayerItemData } from './components/panel-layer/interface';
-import type { TreeNode } from './../hooks/node-tree/interface';
 import PanelComponent from './components/panel-component/index.vue';
 import type { ComponentData } from './components/panel-component/interface';
 import { ref, reactive } from 'vue';
 import { useDrag } from './../hooks/drag';
+import { useNodeContext } from './../hooks/node-context';
 
-interface Props {
-  layerData: TreeNode[];
-}
-const props = withDefaults(defineProps<Props>(), {
-  layerData: () => []
-});
+// interface Props {
+//   layerData: TreeNode[];
+// }
+// const props = withDefaults(defineProps<Props>(), {
+//   layerData: () => []
+// });
 
 const tabBars = reactive<Tab[]>([
   { name: '图层', id: 'layer', show: false },
@@ -45,27 +46,15 @@ const tabBars = reactive<Tab[]>([
   { name: '资源库', id: 'repository', show: false }
 ]);
 
-const selectTab = ref<Tab>(tabBars[1]);
+const selectTab = ref<Tab>(tabBars[0]);
 selectTab.value.show = true;
 
 const onSelect = function (tab: Tab) {
   tab.show = true;
 };
 
-// const layerData: LayerItemData[] = reactive([
-//   { name: '全部应用', id: 'all', sum: 0, handle: false },
-//   { name: '未分组', id: 'no-group', sum: 0, handle: false },
-//   {
-//     name: 'xiao',
-//     id: '123',
-//     sum: 0,
-//     children: [
-//       { name: '全部应用', id: '1all', sum: 0 },
-//       { name: '未分组', id: '1no-group', sum: 0 },
-//       { name: '其他', id: '1123', sum: 0 }
-//     ]
-//   }
-// ]);
+const { getNodeTree, onSelectNode } = useNodeContext();
+const layerData = getNodeTree();
 
 const layerMenus = reactive<LayerItemMenu[]>([
   {
@@ -76,6 +65,10 @@ const layerMenus = reactive<LayerItemMenu[]>([
   },
   { name: '添加组', id: 'add', icon: 'icon-jiahao', disabled: true }
 ]);
+
+const onLayerSelect = function (item: LayerItemData) {
+  onSelectNode(item?.data?.id);
+};
 
 const onLayerCommand = function (cmd: LayerItemMenu, item: LayerItemData) {
   console.log(cmd, item);

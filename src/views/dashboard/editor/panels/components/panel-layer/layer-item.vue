@@ -7,7 +7,6 @@ interface Props {
   data?: LayerItemData[];
   itemIcon?: string;
   itemMenus: LayerItemMenu[];
-  currentNav?: LayerItemData | null;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -27,10 +26,8 @@ const onSelect = function (item: LayerItemData): void {
 const layerItemStyle: { paddingLeft?: string } = reactive({});
 layerItemStyle.paddingLeft = 24 + props.recursion * 16 + 'px';
 
-// const AFold = ref<boolean>(false);
 const onArrow = function (item: LayerItemData): void {
   item.AFold = !item.AFold;
-  // AFold.value = item.AFold;
 };
 
 const onCommand = function (event: PointerEvent, cmd: LayerItemMenu, item: LayerItemData): void {
@@ -38,8 +35,8 @@ const onCommand = function (event: PointerEvent, cmd: LayerItemMenu, item: Layer
 };
 </script>
 <template lang="pug">
-.layer-item(v-for="item in data" :key="item.id" :class="{ 'layer-item_check': currentNav?.id === item.id }")
-  .layer-item-nav(@click="onSelect(item)" :class="{ active: currentNav?.id === item.id }" :style="layerItemStyle")
+.layer-item(v-for="item in data" :key="item.id" :class="{ 'layer-item_check': item.select }")
+  .layer-item-nav(@click="onSelect(item)" :class="{ active: item.select }" :style="layerItemStyle")
     .layer-item-left
       Icon.arrow(block src="icon-zhankai" :class="{ active: item.AFold }" v-if="item?.children?.length" @click.stop="onArrow(item)")
       span.dot(v-else)
@@ -49,7 +46,7 @@ const onCommand = function (event: PointerEvent, cmd: LayerItemMenu, item: Layer
     .layer-item-handle(v-if="item.handle !== false")
       Icon(button v-for="cmd in itemMenus" :key="cmd.id" :class="cmd.id" @click.stop.prevent="onCommand($event, cmd, item)" :src="cmd.icon")
   .layer-item-swapper(v-if="!!item?.children?.length" v-show="item.AFold")
-    LayerItem(:recursion="recursion + 1" @select="onSelect" @command="onCommand" :data="item.children" :itemIcon="itemIcon" :itemMenus="itemMenus" :currentNav="currentNav")
+    LayerItem(:recursion="recursion + 1" @select="onSelect" @command="onCommand" :data="item.children" :itemIcon="itemIcon" :itemMenus="itemMenus")
 </template>
 
 <style lang="scss">

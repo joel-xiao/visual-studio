@@ -5,6 +5,7 @@ export interface LayerItemData {
   sum?: number;
   children?: LayerItemData[];
   AFold?: boolean;
+  select?: boolean;
   handle?: boolean;
   parentId?: string | undefined | null;
   cascades?: LayerItemData[];

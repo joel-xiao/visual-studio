@@ -35,8 +35,7 @@ const props = withDefaults(defineProps<Props>(), {
   nodes: () => []
 });
 
-const { getBindKeys, addBindKeysUpdated } = useBindKeysContext();
-const bindKeys = getBindKeys();
+const { addBindKeysUpdated } = useBindKeysContext();
 
 const { getRoot, getRootStyle, onSelectNode, onAddNode } = useNodeContext();
 const root = getRoot();

@@ -30,6 +30,10 @@
       display: none !important;
     }
 
+    &.no-opacity {
+      opacity: 0;
+    }
+
     &.active {
       display: block;
 

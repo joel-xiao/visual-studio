@@ -4,6 +4,9 @@ import { createComponent } from '@hooks/vue-hooks';
 
 class CreateNodeContext {
   #data: EditorData;
+  #nodes: Node[];
+  #nodesTreeSource: TreeNode[];
+  #nodesTree: TreeNode[];
   #nodeInstances?: {
     [nodeId: string]: NodeInstance;
   };
@@ -12,6 +15,9 @@ class CreateNodeContext {
   };
   constructor(data: EditorData) {
     this.#data = data;
+    this.#nodes = [];
+    this.#nodesTreeSource = [];
+    this.#nodesTree = [];
     this.#nodeInstances = {};
     this.#nodeComponentInstances = {};
 
@@ -27,33 +33,42 @@ class CreateNodeContext {
     this.removeNodeInstance = this.removeNodeInstance.bind(this);
     this.createNodeComponent = this.createNodeComponent.bind(this);
     this.deleteNodeComponent = this.deleteNodeComponent.bind(this);
+    this.install = this.install.bind(this);
     this.uninstall = this.uninstall.bind(this);
   }
 
   getNodeTree(): TreeNode[] {
+    return this.#nodesTree;
+  }
+
+  #createNodeTree(): void {
     let nodesTree: TreeNode[] = [];
-    const nodes: TreeNode[] = this.#data.nodes.map(
-      (n): TreeNode => ({
-        parentId: n.container,
-        icon: '',
-        id: n.id,
-        name: n.name,
-        data: {
-          name: n.name,
+    this.#nodesTreeSource = reactive<TreeNode[]>(
+      this.#data.nodes.map(
+        (n): TreeNode => ({
+          parentId: n.container,
+          icon: '',
           id: n.id,
-          container: n.container,
-          type: n.type,
-          z: n.z
-        }
-      })
+          name: n.name,
+          select: n.select,
+          data: {
+            name: n.name,
+            id: n.id,
+            container: n.container,
+            type: n.type,
+            z: n.z
+          }
+        })
+      )
     );
 
-    const rootNode = nodes.find((node) => node.id === 'root');
+    const rootNode = this.#nodesTreeSource.find((node) => node.id === 'root');
     if (rootNode) {
+      rootNode.AFold = true;
       nodesTree = [rootNode];
-      this.#formatTreeNode(nodes, nodesTree);
+      this.#formatTreeNode(this.#nodesTreeSource, nodesTree);
     }
-    return reactive<TreeNode[]>(nodesTree);
+    this.#nodesTree = reactive<TreeNode[]>(nodesTree);
   }
 
   #formatTreeNode(nodes: TreeNode[], nodesTree: TreeNode[]): void {
@@ -63,10 +78,12 @@ class CreateNodeContext {
     });
   }
 
-  getNodes(): ComputedRef<Node[]> {
-    return computed<Node[]>(() => {
-      return this.#data.nodes.filter((node) => node.id !== 'root');
-    });
+  getNodes(): Node[] {
+    return this.#nodes;
+  }
+
+  #createNodes(): void {
+    this.#nodes = reactive<Node[]>(this.#data.nodes.filter((node) => node.id !== 'root'));
   }
 
   getRoot(): Node {
@@ -136,6 +153,14 @@ class CreateNodeContext {
       }
       this.#nodeInstances?.[node.id]?.setActive?.(node.select);
     });
+
+    this.#nodesTreeSource.forEach((TreeNode) => {
+      if (id === TreeNode.data.id) {
+        TreeNode.select = true;
+      } else {
+        TreeNode.select = false;
+      }
+    });
   }
 
   addNodeInstance(nodeId: string, addNodeInstance: NodeInstance): void {
@@ -166,7 +191,16 @@ class CreateNodeContext {
     }
   }
 
+  install(): void {
+    this.#createNodes();
+    this.#createNodeTree();
+    this.onSelectNode('root');
+  }
+
   uninstall(): void {
+    this.#nodes = [];
+    this.#nodesTreeSource = [];
+    this.#nodesTree = [];
     this.#nodeInstances = undefined;
     this.#nodeComponentInstances = undefined;
   }
@@ -176,6 +210,7 @@ let myNodeContext: CreateNodeContext;
 
 export const createNodeContext = function (data: EditorData): CreateNodeContext {
   myNodeContext = new CreateNodeContext(data);
+  myNodeContext.install();
   onBeforeUnmount(() => {
     myNodeContext.uninstall();
   });

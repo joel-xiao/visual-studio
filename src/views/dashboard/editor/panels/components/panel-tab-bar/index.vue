@@ -6,7 +6,7 @@ div.editor-panel-tab_bar
 
 <script setup lang="ts">
 import { ref, reactive, withDefaults } from 'vue';
-import type { Tab } from './panel-tab_bar';
+import type { Tab } from './interface';
 
 interface Props {
   data?: Tab[];

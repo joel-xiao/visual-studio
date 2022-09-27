@@ -3,9 +3,7 @@ div#editor
   MiddleContainer(:nodes="nodes")
   NavPanel
   //- ToolbarPanel
-  LeftPanel(
-    :layerData="nodesTree"
-    )
+  LeftPanel
   RightPanel
 </template>
 
@@ -77,7 +75,6 @@ const init = function (editorData: EditorData): void {
 defineExpose({ init });
 
 const myNodeContext = createNodeContext(data);
-const nodesTree = myNodeContext.getNodeTree();
 const nodes = myNodeContext.getNodes();
 
 // 绑定组合键
