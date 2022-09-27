@@ -13,8 +13,7 @@ div.editor-middle(
     @dragover="onDragover"
     @mousewheel="onWheel"
     @mousedown.self="onDown")
-    GridLine
-    |{{nodes.length}}
+    GridLineS
     ContainerNode(v-for="(node, idx) in nodes" :key="node.id" :id="node.id")
 </template>
 
