@@ -19,7 +19,7 @@ div.editor-middle(
 </template>
 
 <script setup lang="ts">
-import GridLine from './grid-line.vue';
+import GridLine from './components/grid-line.vue';
 import ContainerNode from './node.vue';
 import { ref, reactive, computed, onMounted, watch } from 'vue';
 import { useDrag } from './../hooks/drag';
