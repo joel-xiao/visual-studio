@@ -111,6 +111,14 @@
 
   color: var(--color-text);
 
+  --color-input-background: var(--color-tran-8);
+  --color-input-background-hover: var(--color-tran-12);
+  --color-select-background: hsla(0, 0%, 100%, 0.08);
+  --color-select-background-hover: hsla(0, 0%, 100%, 0.12);
+  --color-border-black-12: hsla(0, 0%, 100%, 0.12);
+
+  --color-focus-border: var(--color-blue-700);
+
   .border-radius-8 {
     border-radius: var(--border-radius-8);
   }

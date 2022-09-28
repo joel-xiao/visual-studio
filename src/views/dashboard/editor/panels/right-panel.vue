@@ -1,12 +1,13 @@
-ya
 <template lang="pug">
 div.editor-right-panel
   .panel-tab_bar
     PanelTabBar
+  PanelAttribute
 </template>
 
 <script setup lang="ts">
 import PanelTabBar from './components/panel-tab-bar/index.vue';
+import PanelAttribute from './components/panel-attribute/index.vue';
 </script>
 
 <style lang="scss">

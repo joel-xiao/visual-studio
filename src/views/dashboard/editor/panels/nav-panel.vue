@@ -39,8 +39,9 @@ interface Tab {
   id: string;
 }
 const tabs: Tab[] = reactive([
-  { label: '设计', id: 'dashboard' },
-  { label: '数据', id: 'web' }
+  { label: '设计', id: 'design' },
+  { label: '数据', id: 'data' },
+  { label: '蓝图', id: 'blueprint' }
 ]);
 
 const currentTab = ref<Tab>(tabs[0]);
