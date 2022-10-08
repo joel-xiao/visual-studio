@@ -1,5 +1,5 @@
 <template lang="pug">
-BasicStatusButtonBox( v-bind="$attrs" key="attribute-status-button")
+BasicStatusButtonBox( v-bind="$attrs" keyValue="attribute-status-button")
   BasicIcon
 </template>
 

@@ -2,26 +2,69 @@
 div(class="attribute-radius")
   ul(class="attribute-radius__options")
     li
-      AttributeInput
+      AttributeInput(v-model="data.radius" :placeholder="data.isMore ? '' : '多个值'")
     template(v-if="data.isMore")
       li
-        AttributeInput
+        AttributeInput(v-model="modelValue[1]")
       li
-        AttributeInput
+        AttributeInput(v-model="modelValue[2]")
       li
-        AttributeInput
+        AttributeInput(v-model="modelValue[3]")
   div(class="attribute-radius__button-switch")
     AttributeStatusButton(v-model="data.isMore")
 
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { reactive, watch } from 'vue';
 import AttributeInput from './attribute-input.vue';
 import AttributeStatusButton from './attribute-status-button.vue';
 
+interface Props {
+  modelValue: number[];
+}
+const props = withDefaults(defineProps<Props>(), {
+  modelValue: () => [0, 0, 0, 0]
+});
+
+const emit = defineEmits(['update:modelValue']);
+
 const data = reactive({
-  isMore: false
+  isMore: false,
+  radius: props.modelValue[0] + ''
+});
+
+watch(data, (newValue) => {
+  if (data.isMore) {
+    let radius = Number(newValue.radius);
+    radius = isNaN(radius) ? 0 : radius;
+    emit('update:modelValue', [
+      radius,
+      props.modelValue[1],
+      props.modelValue[2],
+      props.modelValue[3]
+    ]);
+  } else {
+    const isRadius = newValue.radius.includes(',');
+    if (!isRadius) {
+      let radius = Number(newValue.radius);
+      radius = isNaN(radius) ? 0 : radius;
+      emit('update:modelValue', [radius, radius, radius, radius]);
+    } else {
+      let radius = newValue.radius
+        .split(',')
+        .map((r) => Number(newValue.radius))
+        .map((r) => (isNaN(r) ? 0 : r));
+
+      if (radius.length === 2) {
+        emit('update:modelValue', [radius[0], radius[1], props.modelValue[2], props.modelValue[3]]);
+      } else if (radius.length === 3) {
+        emit('update:modelValue', [radius[0], radius[1], radius[2], props.modelValue[3]]);
+      } else if (radius.length === 4) {
+        emit('update:modelValue', [radius[0], radius[1], radius[2], radius[3]]);
+      }
+    }
+  }
 });
 </script>
 

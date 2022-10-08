@@ -11,7 +11,7 @@ div(class="attribute-container-layout" :key="keyValue")
 <script setup lang="ts">
 interface Props {
   keyValue: string;
-  title: string;
+  title?: string;
 }
 const props = withDefaults(defineProps<Props>(), {
   keyValue: '',

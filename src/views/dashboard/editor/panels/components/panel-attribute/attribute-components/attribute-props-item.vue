@@ -7,7 +7,7 @@ div(class="attribute-props-item" :class="itemClass")
 import { ref } from 'vue';
 
 interface Props {
-  type: string;
+  type?: string;
 }
 const props = withDefaults(defineProps<Props>(), {
   type: ''

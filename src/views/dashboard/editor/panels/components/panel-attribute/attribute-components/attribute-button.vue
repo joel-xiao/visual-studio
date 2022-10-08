@@ -1,5 +1,5 @@
 <template lang="pug">
-BasicButtonBox(@click="onClick" key="attribute-button")
+BasicButtonBox(@click="onClick" keyValue="attribute-button")
   BasicIcon
 </template>
 

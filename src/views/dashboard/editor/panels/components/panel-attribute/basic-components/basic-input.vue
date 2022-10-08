@@ -1,8 +1,42 @@
 <template lang="pug">
-input(class="attribute-basic-input" v-bind="$attrs" v-on="$listeners")
+input(class="attribute-basic-input" v-model="inputValue" v-bind="$attrs" @blur="onBlur")
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { ref, watch } from 'vue';
+interface Props {
+  modelValue: string | number;
+}
+const props = withDefaults(defineProps<Props>(), {
+  lock: false,
+  modelValue: ''
+});
+
+const emit = defineEmits(['blur', 'update:modelValue']);
+
+const inputValue = ref(props.modelValue);
+
+watch(props, (newValue) => {
+  if (newValue.modelValue !== inputValue.value) {
+    inputValue.value = newValue.modelValue;
+  }
+});
+
+watch(inputValue, (newValue) => {
+  if ((newValue ? String(newValue).trim() : newValue) || newValue === 0) {
+    emit('update:modelValue', newValue);
+  }
+});
+
+const onBlur = function (event: Event) {
+  if (
+    !(inputValue.value ? String(inputValue.value).trim() : inputValue.value) &&
+    inputValue.value !== 0
+  )
+    inputValue.value = props.modelValue;
+  emit('blur', event);
+};
+</script>
 
 <style lang="scss">
 .editor-panel-attribute .attribute-basic-input {
@@ -16,5 +50,9 @@ input(class="attribute-basic-input" v-bind="$attrs" v-on="$listeners")
   align-items: center;
   font-size: inherit;
   font-weight: 500;
+
+  &:disabled {
+    color: var(--color-tran-30);
+  }
 }
 </style>
