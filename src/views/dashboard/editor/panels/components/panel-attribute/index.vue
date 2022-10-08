@@ -1,10 +1,10 @@
 <template lang="pug">
 div(class = "editor-panel-attribute")
-  Input
+  AttributeComponentContainer
 </template>
 
 <script setup lang="ts">
-import Input from './attribute-basic-ctrl/input.vue';
+import AttributeComponentContainer from './attribute-packing/attribute-component-container.vue';
 </script>
 
 <style lang="scss">
