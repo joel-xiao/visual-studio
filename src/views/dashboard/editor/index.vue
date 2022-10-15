@@ -19,6 +19,7 @@ import { useDashboardStore } from '@/store/dashboard';
 import { createNodeContext } from './hooks/node-context';
 import type { EditorData } from './hooks/node-context/interface';
 import { createBindKeysContext } from './hooks/bind-keys-context';
+import { createUiLibraryContext } from './hooks/ui-library-context';
 
 const { saveCurrentNode } = useDashboardStore();
 
@@ -29,7 +30,11 @@ let data = reactive<EditorData>({
   name: '',
   nodes: [
     {
+      container: '',
       id: 'root',
+      icon: '',
+      component: 'root',
+      schema: 'root',
       name: '根容器',
       width: 1000,
       height: 600,
@@ -38,32 +43,6 @@ let data = reactive<EditorData>({
       y: 0,
       z: 0,
       select: true,
-      lock: false
-    },
-    {
-      container: 'root',
-      id: 'qweywdawshw',
-      name: '图片',
-      width: 500,
-      height: 400,
-      type: '',
-      x: 0,
-      y: 0,
-      z: 1,
-      select: false,
-      lock: false
-    },
-    {
-      container: 'root',
-      id: '34324',
-      name: 'a',
-      width: 500,
-      height: 400,
-      type: '',
-      x: 100,
-      y: 100,
-      z: 2,
-      select: false,
       lock: false
     }
   ]
@@ -74,11 +53,15 @@ const init = function (editorData: EditorData): void {
 };
 defineExpose({ init });
 
+// Create  Node Handles
 const myNodeContext = createNodeContext(data);
 const nodes = myNodeContext.getNodes();
 
-// 绑定组合键
+// Create Bind Keys Handles
 createBindKeysContext();
+
+// Create Ui Library  Handles
+createUiLibraryContext();
 </script>
 
 <style lang="scss">
@@ -88,7 +71,7 @@ createBindKeysContext();
   --tab-bar-height: 42px;
   --left-menu-width: 241px;
   --right-menu-width: 252px;
-  --theme-color-canvas: var(--color-realgray-900);
+  --theme-color-canvas: var(--color-real-gray-900);
   --theme-color-canvas-bg: #262626;
   --editor-panel-bg-color: var(--color-main);
   position: relative;

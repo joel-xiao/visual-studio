@@ -2,12 +2,12 @@
 div.editor-right-panel
   .panel-tab_bar
     PanelTabBar
-  PanelAttribute
+  PanelSchema
 </template>
 
 <script setup lang="ts">
 import PanelTabBar from './components/panel-tab-bar/index.vue';
-import PanelAttribute from './components/panel-attribute/index.vue';
+import PanelSchema from './components/panel-schema/index.vue';
 </script>
 
 <style lang="scss">

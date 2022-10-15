@@ -1,9 +1,15 @@
 import type { LayerData } from './../../panels/components/panel-layer/interface';
 
+export interface PointerPos {
+  x: number;
+  y: number;
+}
+
 export interface Node {
-  container?: string;
+  container: string;
   name: string;
   id: string;
+  icon: string;
   type: string;
   width: number;
   height: number;
@@ -12,13 +18,15 @@ export interface Node {
   select?: boolean;
   lock?: boolean;
   z: number;
+  component: string;
+  schema: string;
 }
 
 export interface AddNode {
   name: string;
-  type: string;
-  width?: number;
-  height?: number;
+  icon: string;
+  component: string;
+  schema: string;
 }
 
 export interface NodeDelta {

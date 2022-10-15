@@ -18,7 +18,7 @@ const emit = defineEmits(['select', 'command']);
 
 const findLayer = function (folders: LayerItemData[], cascades?: LayerItemData[]): LayerItemData[] {
   folders.forEach((folder) => {
-    folder.cascades = [{ name: folder.name, id: folder.id }];
+    folder.cascades = [folder];
     if (cascades) folder.cascades.unshift(...cascades);
     if (folder.children) {
       findLayer(folder.children, folder.cascades);

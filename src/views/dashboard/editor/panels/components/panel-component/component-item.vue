@@ -3,7 +3,7 @@ import { inject, withDefaults } from 'vue';
 import type { ComponentData } from './interface';
 
 interface Props {
-  data?: ComponentData;
+  data?: ComponentData | { name?: string };
   darg: boolean | undefined | null;
 }
 

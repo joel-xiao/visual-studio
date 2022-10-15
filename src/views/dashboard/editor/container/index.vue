@@ -21,7 +21,7 @@ div.editor-middle(
 import GridLine from './components/grid-line.vue';
 import ContainerNode from './node.vue';
 import { ref, reactive, computed, onMounted, watch } from 'vue';
-import { useDrag } from './../hooks/drag';
+import { useDrag } from './../hooks/drag-context';
 import { useNodeContext } from './../hooks/node-context';
 import type { Node, AddNode } from './../hooks/node-context/interface';
 import { useBindKeysContext } from './../hooks/bind-keys-context';
@@ -64,7 +64,10 @@ const onWheel = function (event: WheelEvent): void {
 
 const { onDragenter, onDragover, dropHandler } = useDrag();
 const onDrop = function (event: DragEvent): void {
-  dropHandler<AddNode>(event, onAddNode);
+  dropHandler<AddNode>(event, (addNode: AddNode, pos) => {
+    const rect = middleContainerDom.value?.getBoundingClientRect() || { x: 0, y: 0 };
+    onAddNode(addNode, 'root', { x: pos.x - rect.x, y: pos.y - rect.y });
+  });
 };
 </script>
 

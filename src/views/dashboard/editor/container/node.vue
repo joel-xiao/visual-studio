@@ -9,6 +9,7 @@ import DragResize from './components/drag-resize.vue';
 import { ref, reactive, markRaw, readonly, withDefaults, watch, onMounted } from 'vue';
 import type { DargDataset } from '@d/darg-resize/interface';
 import { useNodeContext } from './../hooks/node-context';
+import { useUiLibraryContext } from './../hooks/ui-library-context';
 
 interface Props {
   id: string;
@@ -51,9 +52,10 @@ const onResizing = function (dargDataset: DargDataset): void {
   });
 };
 
+const { getComponent } = useUiLibraryContext();
 const vm = ref<HTMLElement>();
 onMounted(() => {
-  createNodeComponent(node, vm.value);
+  createNodeComponent(node, vm.value, getComponent(node.component));
 });
 </script>
 

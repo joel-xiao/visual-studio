@@ -1,6 +1,6 @@
 export interface LayerItemData {
   name?: string;
-  icon?: string;
+  icon: string;
   id: string;
   sum?: number;
   children?: LayerItemData[];

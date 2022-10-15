@@ -1,12 +1,21 @@
-import { computed, reactive, ComputedRef, onBeforeUnmount, App, defineAsyncComponent } from 'vue';
-import type { EditorData, Node, AddNode, NodeDelta, TreeNode, NodeInstance } from './interface';
+import { computed, reactive, ComputedRef, onBeforeUnmount, App } from 'vue';
+import { getUuid } from '@a/utils/index';
+import type {
+  EditorData,
+  PointerPos,
+  Node,
+  AddNode,
+  NodeDelta,
+  TreeNode,
+  NodeInstance
+} from './interface';
 import { createComponent } from '@hooks/vue-hooks';
 
 class CreateNodeContext {
   #data: EditorData;
-  #nodes: Node[];
+  #nodes: ComputedRef<Node[]> | [];
   #nodesTreeSource: TreeNode[];
-  #nodesTree: TreeNode[];
+  #nodesTree: ComputedRef<TreeNode[]> | [];
   #nodeInstances?: {
     [nodeId: string]: NodeInstance;
   };
@@ -37,38 +46,26 @@ class CreateNodeContext {
     this.uninstall = this.uninstall.bind(this);
   }
 
-  getNodeTree(): TreeNode[] {
+  getNodeTree(): ComputedRef<TreeNode[]> | [] {
     return this.#nodesTree;
   }
 
   #createNodeTree(): void {
-    let nodesTree: TreeNode[] = [];
-    this.#nodesTreeSource = reactive<TreeNode[]>(
-      this.#data.nodes.map(
-        (n): TreeNode => ({
-          parentId: n.container,
-          icon: '',
-          id: n.id,
-          name: n.name,
-          select: n.select,
-          data: {
-            name: n.name,
-            id: n.id,
-            container: n.container,
-            type: n.type,
-            z: n.z
-          }
-        })
-      )
-    );
+    this.#nodesTreeSource = reactive<TreeNode[]>([]);
+    this.#data.nodes.forEach((node) => {
+      this.#addTreeNode(node);
+    });
 
+    let nodesTree: TreeNode[] = [];
     const rootNode = this.#nodesTreeSource.find((node) => node.id === 'root');
     if (rootNode) {
       rootNode.AFold = true;
       nodesTree = [rootNode];
-      this.#formatTreeNode(this.#nodesTreeSource, nodesTree);
     }
-    this.#nodesTree = reactive<TreeNode[]>(nodesTree);
+    this.#nodesTree = computed<TreeNode[]>(() => {
+      this.#formatTreeNode(this.#nodesTreeSource, nodesTree);
+      return nodesTree;
+    });
   }
 
   #formatTreeNode(nodes: TreeNode[], nodesTree: TreeNode[]): void {
@@ -78,12 +75,29 @@ class CreateNodeContext {
     });
   }
 
-  getNodes(): Node[] {
-    return this.#nodes;
+  #addTreeNode(node: Node) {
+    this.#nodesTreeSource.push({
+      parentId: node.container,
+      icon: node.icon,
+      id: node.id,
+      name: node.name,
+      select: node.select,
+      data: {
+        name: node.name,
+        id: node.id,
+        container: node.container,
+        type: node.type,
+        z: node.z
+      }
+    });
   }
 
-  #createNodes(): void {
-    this.#nodes = reactive<Node[]>(this.#data.nodes.filter((node) => node.id !== 'root'));
+  #createNodes() {
+    this.#nodes = computed<Node[]>(() => this.#data.nodes.filter((node) => node.id !== 'root'));
+  }
+
+  getNodes(): ComputedRef<Node[]> | [] {
+    return this.#nodes;
   }
 
   getRoot(): Node {
@@ -116,31 +130,40 @@ class CreateNodeContext {
     }
   }
 
-  #onAddNode(addNode: AddNode): void {
+  #onAddNode(addNode: AddNode, container: string, pos: PointerPos): void {
     if (addNode instanceof Object) {
       const node: Node = {
-        id: Math.random() + '',
+        container: container,
+        id: getUuid(),
         name: addNode.name,
-        width: addNode.width || 400,
-        height: addNode.height || 400,
-        type: addNode.type,
+        icon: addNode.icon,
+        schema: addNode.schema,
+        component: addNode.component,
+        width: 400,
+        height: 400,
+        type: '',
         x: 0,
         y: 0,
         z: 0,
-        select: true,
+        select: false,
         lock: false
       };
+
+      node.x = pos.x - node.width / 2;
+      node.y = pos.y - node.height / 2;
+
       this.#data.nodes.push(node);
+      this.#addTreeNode(node);
     }
   }
 
-  onAddNode(nodes: AddNode[] | AddNode): void {
+  onAddNode(nodes: AddNode[] | AddNode, container: string, pos: PointerPos): void {
     if (Array.isArray(nodes)) {
       nodes.forEach((node: AddNode) => {
-        this.#onAddNode(node);
+        this.#onAddNode(node, container, pos);
       });
     } else if (nodes instanceof Object) {
-      this.#onAddNode(nodes);
+      this.#onAddNode(nodes, container, pos);
     }
   }
 
@@ -171,12 +194,12 @@ class CreateNodeContext {
     this.#nodeInstances && delete this.#nodeInstances[nodeId];
   }
 
-  createNodeComponent(node: Node, parentEl: HTMLElement | undefined): void {
+  createNodeComponent(node: Node, parentEl: HTMLElement | undefined, component: App): void {
     if (parentEl && this.#nodeComponentInstances) {
       this.#nodeComponentInstances[node.id] = createComponent<{ aa: string }>(
         'middle-node-component',
         parentEl,
-        defineAsyncComponent(() => import('./../../ui-library/controls/picture/index.vue')),
+        component,
         {
           aa: 'createNodeInstance aaaaaaaaaaaaaaaaaaaa'
         }

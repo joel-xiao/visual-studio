@@ -30,7 +30,8 @@ import type { LayerItemMenu, LayerItemData } from './components/panel-layer/inte
 import PanelComponent from './components/panel-component/index.vue';
 import type { ComponentData } from './components/panel-component/interface';
 import { ref, reactive } from 'vue';
-import { useDrag } from './../hooks/drag';
+import { useDrag } from './../hooks/drag-context';
+import { useUiLibraryContext } from './../hooks/ui-library-context';
 import { useNodeContext } from './../hooks/node-context';
 
 // interface Props {
@@ -79,59 +80,8 @@ const componentTab = ref<Tab>(componentTabBars[0]);
 
 const { onDragStart, onDragStop } = useDrag();
 
-const getIcon = (icon: string): string => {
-  return `image/dashboard/editor/panel-component/${icon}`;
-};
-const componentData = reactive<ComponentData[]>([
-  {
-    name: '本地',
-    id: '1',
-    children: [
-      {
-        name: '全局组件',
-        id: 'control',
-        children: [
-          {
-            dot: true,
-            component: true,
-            name: 'button',
-            id: 'picture',
-            children: [
-              {
-                name: 'button',
-                id: 'picture',
-                icon: getIcon('qw.png')
-              },
-              {
-                name: 'button',
-                id: '2',
-                icon: getIcon('qw.png')
-              }
-            ]
-          },
-          {
-            dot: true,
-            component: true,
-            name: 'button',
-            id: '2',
-            children: [
-              {
-                name: 'button',
-                id: '2',
-                icon: getIcon('qw.png')
-              },
-              {
-                name: 'button',
-                id: '2',
-                icon: getIcon('qw.png')
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
-]);
+const { getUiLibrary } = useUiLibraryContext();
+const componentData = reactive<ComponentData[]>(getUiLibrary());
 </script>
 
 <style lang="scss">
