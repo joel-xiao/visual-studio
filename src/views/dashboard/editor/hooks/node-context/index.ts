@@ -9,7 +9,6 @@ import type {
   TreeNode,
   NodeInstance
 } from './interface';
-import { createComponent } from '@hooks/vue-hooks';
 
 class CreateNodeContext {
   #data: EditorData;
@@ -40,7 +39,6 @@ class CreateNodeContext {
     this.onSelectNode = this.onSelectNode.bind(this);
     this.addNodeInstance = this.addNodeInstance.bind(this);
     this.removeNodeInstance = this.removeNodeInstance.bind(this);
-    this.createNodeComponent = this.createNodeComponent.bind(this);
     this.deleteNodeComponent = this.deleteNodeComponent.bind(this);
     this.install = this.install.bind(this);
     this.uninstall = this.uninstall.bind(this);
@@ -139,6 +137,7 @@ class CreateNodeContext {
         icon: addNode.icon,
         schema: addNode.schema,
         component: addNode.component,
+        props: addNode.props,
         width: 400,
         height: 400,
         type: '',
@@ -148,6 +147,8 @@ class CreateNodeContext {
         select: false,
         lock: false
       };
+
+      console.log(node);
 
       node.x = pos.x - node.width / 2;
       node.y = pos.y - node.height / 2;
@@ -194,17 +195,8 @@ class CreateNodeContext {
     this.#nodeInstances && delete this.#nodeInstances[nodeId];
   }
 
-  createNodeComponent(node: Node, parentEl: HTMLElement | undefined, component: App): void {
-    if (parentEl && this.#nodeComponentInstances) {
-      this.#nodeComponentInstances[node.id] = createComponent<{ aa: string }>(
-        'middle-node-component',
-        parentEl,
-        component,
-        {
-          aa: 'createNodeInstance aaaaaaaaaaaaaaaaaaaa'
-        }
-      );
-    }
+  addNodeNodeComponent(node: Node, component: App): void {
+    this.#nodeComponentInstances && (this.#nodeComponentInstances[node.id] = component);
   }
 
   deleteNodeComponent(node: Node): void {

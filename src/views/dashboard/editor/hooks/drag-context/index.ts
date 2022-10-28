@@ -13,14 +13,7 @@ const dropHandler = function <T>(
   const data: string | undefined = event.dataTransfer?.getData('component');
   const node: Component = data ? JSON.parse(data) : undefined;
   if (node) {
-    callback?.(
-      {
-        name: node.data?.name,
-        schema: node.data?.schema,
-        component: node.data?.component
-      } as T,
-      { x: event.x, y: event.y }
-    );
+    callback?.(node.data as T, { x: event.x, y: event.y });
   }
 };
 

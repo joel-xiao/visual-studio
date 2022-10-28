@@ -1,8 +1,12 @@
+import type { SchemaExport } from '../../use/interface';
 const SCHEMA_NAME = 'COMMON_LAYOUT';
+const SCHEMA_LABEL = '布局';
+const SCHEMA_KEY = 'layout';
 
-export default {
+const schema: SchemaExport = {
   name: SCHEMA_NAME,
-  label: '布局',
+  label: SCHEMA_LABEL,
+  key: SCHEMA_KEY,
   schema: {
     x: {
       type: Number,
@@ -16,14 +20,14 @@ export default {
       required: true,
       icon: 'y'
     },
-    width: {
+    w: {
       type: Number,
       default: 0,
       required: true,
       icon: 'width'
     },
 
-    height: {
+    h: {
       type: Number,
       default: 0,
       required: true,
@@ -43,3 +47,4 @@ export default {
     }
   }
 };
+export default schema;

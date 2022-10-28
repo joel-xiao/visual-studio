@@ -23,20 +23,12 @@ import PropsItem from './../components/props-item.vue';
 import Input from './../../../../components/basic/c-input/index.vue';
 import Button from './../../../../components/basic/c-button/index.vue';
 import Radius from './../radius/index.vue';
+import type { PanelSchemaLayout } from './interface';
 
 interface Props {
-  lock?: boolean;
-  modelValue?: {
-    x: number;
-    y: number;
-    w: number;
-    h: number;
-    rotate: number;
-    radius: number[];
-  };
+  modelValue?: PanelSchemaLayout;
 }
 const props = withDefaults(defineProps<Props>(), {
-  lock: false,
   modelValue: () => ({
     x: 0,
     y: 0,

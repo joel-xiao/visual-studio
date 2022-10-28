@@ -19,9 +19,10 @@ div(class="schema-radius")
 import { reactive, watch } from 'vue';
 import Input from './../../../../components/basic/c-input/index.vue';
 import Button from './../../../../components/basic/c-button/index.vue';
+import type { PanelSchemaRadius } from './interface';
 
 interface Props {
-  modelValue: number[];
+  modelValue: PanelSchemaRadius;
 }
 const props = withDefaults(defineProps<Props>(), {
   modelValue: () => [0, 0, 0, 0]

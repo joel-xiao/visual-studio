@@ -1,9 +1,5 @@
+import { ComponentSchemaExport } from './../../schema/use/interface';
 export interface UseComponent {
   name: string;
   id: string;
-}
-export interface Schema {
-  name: string;
-  type: string;
-  icon: string;
 }

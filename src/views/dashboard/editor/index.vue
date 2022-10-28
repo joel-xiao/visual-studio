@@ -19,6 +19,7 @@ import { useDashboardStore } from '@/store/dashboard';
 import { createNodeContext } from './hooks/node-context';
 import type { EditorData } from './hooks/node-context/interface';
 import { createBindKeysContext } from './hooks/bind-keys-context';
+import { createSchemaContext } from './hooks/schema-context';
 import { createUiLibraryContext } from './hooks/ui-library-context';
 
 const { saveCurrentNode } = useDashboardStore();
@@ -43,7 +44,8 @@ let data = reactive<EditorData>({
       y: 0,
       z: 0,
       select: true,
-      lock: false
+      lock: false,
+      props: {}
     }
   ]
 });
@@ -53,14 +55,17 @@ const init = function (editorData: EditorData): void {
 };
 defineExpose({ init });
 
-// Create  Node Handles
+// Create  Node
 const myNodeContext = createNodeContext(data);
 const nodes = myNodeContext.getNodes();
 
-// Create Bind Keys Handles
+// Create Bind Keys
 createBindKeysContext();
 
-// Create Ui Library  Handles
+// Create Schema
+createSchemaContext();
+
+// Create Ui Library
 createUiLibraryContext();
 </script>
 

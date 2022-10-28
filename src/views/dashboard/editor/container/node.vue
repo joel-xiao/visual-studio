@@ -18,8 +18,7 @@ const props = withDefaults(defineProps<Props>(), {
   id: ''
 });
 
-const { getNode, onUpdateNode, onSelectNode, addNodeInstance, createNodeComponent } =
-  useNodeContext();
+const { getNode, onUpdateNode, onSelectNode, addNodeInstance } = useNodeContext();
 const node = getNode(props.id);
 
 const dargDataset = readonly(
@@ -52,10 +51,10 @@ const onResizing = function (dargDataset: DargDataset): void {
   });
 };
 
-const { getComponent } = useUiLibraryContext();
+const { getComponent, createNodeComponent } = useUiLibraryContext();
 const vm = ref<HTMLElement>();
 onMounted(() => {
-  createNodeComponent(node, vm.value, getComponent(node.component));
+  createNodeComponent(node.props, vm?.value, getComponent(node.component));
 });
 </script>
 

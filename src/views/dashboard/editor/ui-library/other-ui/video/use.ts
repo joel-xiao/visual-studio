@@ -1,4 +1,8 @@
-export default {
+import { UseComponent } from '../../use/interface';
+
+const use: UseComponent = {
   name: '视频',
   id: 'controls_video'
 };
+
+export default use;

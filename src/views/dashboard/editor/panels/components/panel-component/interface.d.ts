@@ -1,10 +1,10 @@
-import { AddNode } from '../../../hooks/node-context/interface';
+import { BasicNode } from '../../../hooks/node-context/interface';
 export interface Component {
   name: string;
   id: string;
   component?: boolean;
   icon?: string;
-  data?: AddNode;
+  data?: BasicNode;
 }
 
 export interface ComponentData extends Component {

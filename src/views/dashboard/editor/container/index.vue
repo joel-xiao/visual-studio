@@ -23,7 +23,9 @@ import ContainerNode from './node.vue';
 import { ref, reactive, computed, onMounted, watch } from 'vue';
 import { useDrag } from './../hooks/drag-context';
 import { useNodeContext } from './../hooks/node-context';
-import type { Node, AddNode } from './../hooks/node-context/interface';
+import type { Node, BasicNode } from './../hooks/node-context/interface';
+import { useSchemaContext } from './../hooks/schema-context';
+import { useUiLibraryContext } from './../hooks/ui-library-context';
 import { useBindKeysContext } from './../hooks/bind-keys-context';
 import { createMiddleMask } from './../hooks/middle';
 
@@ -63,10 +65,20 @@ const onWheel = function (event: WheelEvent): void {
 };
 
 const { onDragenter, onDragover, dropHandler } = useDrag();
+
+const { getSchemas } = useSchemaContext();
+const { getComponentProps } = useUiLibraryContext();
 const onDrop = function (event: DragEvent): void {
-  dropHandler<AddNode>(event, (addNode: AddNode, pos) => {
+  dropHandler<BasicNode>(event, (node, pos) => {
     const rect = middleContainerDom.value?.getBoundingClientRect() || { x: 0, y: 0 };
-    onAddNode(addNode, 'root', { x: pos.x - rect.x, y: pos.y - rect.y });
+    onAddNode(
+      {
+        ...node,
+        props: getComponentProps(node.schema, getSchemas())
+      },
+      'root',
+      { x: pos.x - rect.x, y: pos.y - rect.y }
+    );
   });
 };
 </script>

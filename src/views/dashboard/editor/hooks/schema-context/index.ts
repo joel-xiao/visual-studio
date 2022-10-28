@@ -1,19 +1,19 @@
 import { onBeforeUnmount } from 'vue';
-import { UiLibrary } from './../../ui-library/use';
+import { Schema } from './../../schema/use';
 
-class CreateUiLibrary extends UiLibrary {}
+class CreateSchema extends Schema {}
 
-let myUiLibraryContext: CreateUiLibrary;
+let mySchemaContext: CreateSchema;
 
-export const createUiLibraryContext = function (): CreateUiLibrary {
-  myUiLibraryContext = new CreateUiLibrary();
-  myUiLibraryContext.install();
+export const createSchemaContext = function (): CreateSchema {
+  mySchemaContext = new CreateSchema();
+  mySchemaContext.install();
   onBeforeUnmount(() => {
-    myUiLibraryContext.uninstall();
+    mySchemaContext.uninstall();
   });
-  return myUiLibraryContext;
+  return mySchemaContext;
 };
 
-export const useUiLibraryContext = function (): CreateUiLibrary {
-  return myUiLibraryContext;
+export const useSchemaContext = function (): CreateSchema {
+  return mySchemaContext;
 };
