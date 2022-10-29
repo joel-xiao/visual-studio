@@ -1,4 +1,4 @@
-import { SchemaLayout } from '../common/layout/interface';
+import type { PanelSchemaLayout } from '../../panels/components/panel-schema/layout/interface';
 
 interface defaultSchemaKeyData {
   label?: string;
@@ -47,14 +47,19 @@ export interface ComponentSchemaExport {
     type: string;
     schema: string;
     required: boolean;
-    default: SchemaLayout;
+    default: PanelSchemaLayout;
   }[];
 }
 
 export type ComponentProp =
-  | SchemaLayout
+  | PanelSchemaLayout
   | { [key: string]: number | string | number[] | boolean | undefined };
 
 export interface ComponentProps {
   [key: string]: ComponentProp;
+}
+
+export interface UseUILibraryComponent {
+  name: string;
+  id: string;
 }

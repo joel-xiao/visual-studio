@@ -1,49 +1,58 @@
+import { onBeforeUnmount } from 'vue';
 import { App, readonly } from 'vue';
 import { cloneDeep } from 'lodash';
 import { createComponent } from '@hooks/vue-hooks';
 import type { ComponentData } from './../../panels/components/panel-component/interface';
-import type { UseComponent } from './interface';
 import type {
   SchemaExport,
   SchemaKeysTypes,
   SchemaKeyTypes,
   ComponentSchemaExport,
   ComponentProp,
-  ComponentProps
-} from './../../schema/use/interface';
+  ComponentProps,
+  UseUILibraryComponent
+} from './interface';
 
-export class UiLibrary {
-  libraryUses: Record<string, { [key: string]: UseComponent }>;
-  componentUses: Record<string, { [key: string]: UseComponent }>;
-  components: Record<string, { [key: string]: App }>;
+export class CreateComponentContext {
+  UILibraryUses: Record<string, { [key: string]: UseUILibraryComponent }>;
+  UILibraryComponentUses: Record<string, { [key: string]: UseUILibraryComponent }>;
+
+  #schemas: { [key: string]: SchemaExport };
   componentSchemas: Record<string, { [key: string]: ComponentSchemaExport }>;
+  components: Record<string, { [key: string]: App }>;
   constructor() {
-    this.libraryUses = {};
-    this.componentUses = {};
-    this.components = {};
+    this.UILibraryUses = {};
+    this.UILibraryComponentUses = {};
+
+    this.#schemas = {};
     this.componentSchemas = {};
+    this.components = {};
 
     this.install = this.install.bind(this);
     this.uninstall = this.uninstall.bind(this);
+
     this.getUiLibrary = this.getUiLibrary.bind(this);
-    this.createNodeComponent = this.createNodeComponent.bind(this);
-    this.getComponent = this.getComponent.bind(this);
-    this.getComponentSchema = this.getComponentSchema.bind(this);
+
     this.getComponentProps = this.getComponentProps.bind(this);
     this.getComponentPropsTypes = this.getComponentPropsTypes.bind(this);
+    this.createNodeComponent = this.createNodeComponent.bind(this);
   }
 
   #install() {
-    this.components = import.meta.globEager('./../*/*/index.vue');
-    this.componentSchemas = import.meta.globEager('./../*/*/schema/*.ts');
+    Object.values(import.meta.globEager('./../../schema/**/*.ts')).forEach((schema) => {
+      schema.default && (this.#schemas[schema.default.name] = readonly(schema.default));
+    });
+
+    this.components = import.meta.globEager('./../../ui-library/*/*/index.vue');
+    this.componentSchemas = import.meta.globEager('./../../ui-library/*/*/schema/*.ts');
   }
   install() {
     this.#install();
   }
 
   #uninstall() {
-    this.componentUses = {};
     this.components = {};
+    this.#schemas = {};
     this.componentSchemas = {};
   }
   uninstall() {
@@ -75,17 +84,17 @@ export class UiLibrary {
       });
     }
 
-    return cloneDeep(schemas);
+    return schemas;
   }
 
   #getLibraryComponents(library_path: string): ComponentData[] {
     const components: ComponentData[] = [];
 
-    for (const path of Object.keys(this.componentUses).filter(
+    for (const path of Object.keys(this.UILibraryComponentUses).filter(
       (key) => key && key.startsWith(library_path)
     )) {
       const component_path = path.substring(0, path.lastIndexOf('/use.ts') + 1);
-      const component: UseComponent = this.componentUses[path].default;
+      const component: UseUILibraryComponent = this.UILibraryComponentUses[path].default;
       components.push({
         dot: true,
         component: true,
@@ -95,17 +104,17 @@ export class UiLibrary {
       });
     }
 
-    return cloneDeep(components);
+    return components;
   }
 
   getUiLibrary(): ComponentData[] {
-    this.componentUses = import.meta.globEager('./../*/*/use.ts');
-    this.libraryUses = import.meta.globEager('./../*/use.ts');
+    this.UILibraryComponentUses = import.meta.globEager('./../../ui-library/*/*/use.ts');
+    this.UILibraryUses = import.meta.globEager('./../../ui-library/*/use.ts');
 
     const children: ComponentData[] = [];
-    for (const path of Object.keys(this.libraryUses)) {
+    for (const path of Object.keys(this.UILibraryUses)) {
       const library_path = path.substring(0, path.lastIndexOf('/use.ts') + 1);
-      const library: UseComponent = this.libraryUses[path].default;
+      const library: UseUILibraryComponent = this.UILibraryUses[path].default;
       children.push({
         name: library.name,
         id: library.id,
@@ -113,46 +122,40 @@ export class UiLibrary {
       });
     }
 
-    this.libraryUses = {};
-    this.componentUses = {};
-    return cloneDeep([
+    this.UILibraryUses = {};
+    this.UILibraryComponentUses = {};
+    return [
       {
         name: '本地',
         id: 'local',
         children: children
       }
-    ]);
+    ];
   }
 
-  createNodeComponent(
-    props: ComponentProps,
-    parentEl: HTMLElement | undefined,
-    component: App
-  ): App {
-    return createComponent<{ data: ComponentProps }>('component', parentEl, component, {
-      data: props
-    });
-  }
+  #getSchemas(schema_names?: string | string[]): { [key: string]: SchemaExport } {
+    const schemas: { [key: string]: SchemaExport } = {};
 
-  #getComponent(component_path: string): App {
-    return cloneDeep(this.components[component_path].default);
-  }
-  getComponent(component_path: string): App {
-    return this.#getComponent(component_path);
+    if (typeof schema_names === 'string') {
+      schemas[schema_names] = this.#schemas[schema_names];
+    } else if (Array.isArray(schema_names)) {
+      schema_names.forEach((schema_name) => {
+        schemas[schema_name] = this.#schemas[schema_name];
+      });
+    } else {
+      return this.#schemas;
+    }
+
+    return schemas;
   }
 
   #getComponentSchema(schema_path: string): ComponentSchemaExport {
-    return cloneDeep(this.componentSchemas[schema_path].default);
-  }
-  getComponentSchema(schema_path: string): ComponentSchemaExport {
-    return this.#getComponentSchema(schema_path);
+    return this.componentSchemas[schema_path].default;
   }
 
-  #getComponentPropsTypes(
-    schema_path: string,
-    schemas: { [Key: string]: SchemaExport }
-  ): SchemaKeysTypes {
-    const componentSchemas = this.getComponentSchema(schema_path);
+  #getComponentPropsTypes(schema_path: string): SchemaKeysTypes {
+    const schemas = this.#getSchemas();
+    const componentSchemas = this.#getComponentSchema(schema_path);
     const propsTypes: SchemaKeysTypes = {};
 
     if (
@@ -185,18 +188,13 @@ export class UiLibrary {
     }
     return readonly(propsTypes);
   }
-  getComponentPropsTypes(
-    schema_path: string,
-    schemas: { [Key: string]: SchemaExport }
-  ): SchemaKeysTypes {
-    return this.#getComponentPropsTypes(schema_path, schemas);
+  getComponentPropsTypes(schema_path: string): SchemaKeysTypes {
+    return this.#getComponentPropsTypes(schema_path);
   }
 
-  #getComponentProps(
-    schema_path: string,
-    schemas: { [Key: string]: SchemaExport }
-  ): ComponentProps {
-    const componentSchemas = this.getComponentSchema(schema_path);
+  #getComponentProps(schema_path: string): ComponentProps {
+    const schemas = this.#getSchemas();
+    const componentSchemas = this.#getComponentSchema(schema_path);
     const props: ComponentProps = {};
     if (
       componentSchemas &&
@@ -255,7 +253,41 @@ export class UiLibrary {
     }
     return cloneDeep(props);
   }
-  getComponentProps(schema_path: string, schemas: { [Key: string]: SchemaExport }) {
-    return this.#getComponentProps(schema_path, schemas);
+  getComponentProps(schema_path: string) {
+    return this.#getComponentProps(schema_path);
+  }
+
+  #getComponent(component_path: string): App {
+    return this.components[component_path].default;
+  }
+
+  createNodeComponent(
+    props: ComponentProps,
+    parentEl: HTMLElement | undefined,
+    component: string
+  ): App {
+    return createComponent<{ data: ComponentProps }>(
+      'component',
+      parentEl,
+      this.#getComponent(component),
+      {
+        data: props
+      }
+    );
   }
 }
+
+let myComponentContext: CreateComponentContext;
+
+export const createComponentContext = function (): CreateComponentContext {
+  myComponentContext = new CreateComponentContext();
+  myComponentContext.install();
+  onBeforeUnmount(() => {
+    myComponentContext.uninstall();
+  });
+  return myComponentContext;
+};
+
+export const useComponentContext = function (): CreateComponentContext {
+  return myComponentContext;
+};

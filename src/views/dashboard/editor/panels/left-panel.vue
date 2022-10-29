@@ -31,7 +31,7 @@ import PanelComponent from './components/panel-component/index.vue';
 import type { ComponentData } from './components/panel-component/interface';
 import { ref, reactive } from 'vue';
 import { useDrag } from './../hooks/drag-context';
-import { useUiLibraryContext } from './../hooks/ui-library-context';
+import { useComponentContext } from './../hooks/component-context';
 import { useNodeContext } from './../hooks/node-context';
 
 // interface Props {
@@ -80,7 +80,7 @@ const componentTab = ref<Tab>(componentTabBars[0]);
 
 const { onDragStart, onDragStop } = useDrag();
 
-const { getUiLibrary } = useUiLibraryContext();
+const { getUiLibrary } = useComponentContext();
 const componentData = reactive<ComponentData[]>(getUiLibrary());
 </script>
 

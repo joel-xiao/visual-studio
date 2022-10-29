@@ -19,8 +19,7 @@ import { useDashboardStore } from '@/store/dashboard';
 import { createNodeContext } from './hooks/node-context';
 import type { EditorData } from './hooks/node-context/interface';
 import { createBindKeysContext } from './hooks/bind-keys-context';
-import { createSchemaContext } from './hooks/schema-context';
-import { createUiLibraryContext } from './hooks/ui-library-context';
+import { createComponentContext } from './hooks/component-context';
 
 const { saveCurrentNode } = useDashboardStore();
 
@@ -59,14 +58,11 @@ defineExpose({ init });
 const myNodeContext = createNodeContext(data);
 const nodes = myNodeContext.getNodes();
 
-// Create Bind Keys
+// Create Bind Keys Context
 createBindKeysContext();
 
-// Create Schema
-createSchemaContext();
-
-// Create Ui Library
-createUiLibraryContext();
+// Create Component Context
+createComponentContext();
 </script>
 
 <style lang="scss">

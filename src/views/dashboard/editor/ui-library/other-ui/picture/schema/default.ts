@@ -1,4 +1,4 @@
-import type { ComponentSchemaExport } from '../../../../schema/use/interface';
+import type { ComponentSchemaExport } from '../../../interface';
 
 const schema: ComponentSchemaExport = {
   name: '图片',

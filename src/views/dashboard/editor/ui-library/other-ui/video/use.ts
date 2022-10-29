@@ -1,4 +1,4 @@
-import { UseComponent } from '../../use/interface';
+import { UseComponent } from '../../interface';
 
 const use: UseComponent = {
   name: '视频',
