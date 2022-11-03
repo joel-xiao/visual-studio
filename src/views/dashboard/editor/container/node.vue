@@ -18,7 +18,7 @@ const props = withDefaults(defineProps<Props>(), {
   id: ''
 });
 
-const { getNode, onUpdateNode, onSelectNode, addNodeInstance } = useNodeContext();
+const { getNode, updateNode, onSelectNode, addNodeInstance } = useNodeContext();
 const node = getNode(props.id);
 
 const dargDataset = readonly(
@@ -43,7 +43,7 @@ const onDown = function (): void {
 };
 
 const onResizing = function (dargDataset: DargDataset): void {
-  onUpdateNode(node.id, {
+  updateNode(node.id, {
     x: dargDataset.x,
     y: dargDataset.y,
     width: dargDataset.x2 - dargDataset.x,

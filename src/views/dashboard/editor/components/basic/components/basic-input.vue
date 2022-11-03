@@ -4,6 +4,7 @@ input(class="basic-input" type="input" v-model="inputValue" v-bind="$attrs" @blu
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
+
 interface Props {
   modelValue: string | number;
 }
@@ -12,7 +13,7 @@ const props = withDefaults(defineProps<Props>(), {
   modelValue: ''
 });
 
-const emit = defineEmits(['blur', 'update:modelValue']);
+const emit = defineEmits(['blur', 'update:modelValue', 'update']);
 
 const inputValue = ref(props.modelValue);
 
@@ -25,6 +26,7 @@ watch(props, (newValue) => {
 watch(inputValue, (newValue) => {
   if ((newValue ? String(newValue).trim() : newValue) || newValue === 0) {
     emit('update:modelValue', newValue);
+    emit('update', newValue);
   }
 });
 

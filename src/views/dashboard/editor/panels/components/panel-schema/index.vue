@@ -1,19 +1,40 @@
 <template lang="pug">
 div(class = "editor-panel-schema")
-  Layout(v-model="data")
+  template(v-for="(item, idx) in propsTypes")
+    component(:is="getComponent(item.name)" :schema="item.schema" :v-model="propsData[item.key]" @update="onUpdate(item.key,$event)")
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { computed, reactive, markRaw } from 'vue';
+import { cloneDeep } from 'lodash';
 import Layout from './layout/index.vue';
-const data = reactive({
-  x: 0,
-  y: 0,
-  w: 100,
-  h: 100,
-  rotate: 0,
-  radius: [0, 0, 0, 0]
+import type { ComponentProps, SchemaKeysTypes } from './interface';
+const emit = defineEmits(['update']);
+
+interface Props {
+  propsData: ComponentProps;
+  propsTypes: SchemaKeysTypes;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  propsData: () => ({}),
+  propsTypes: () => []
 });
+
+const onUpdate = function (
+  key: string,
+  args: [key: string, value: string | number | boolean | undefined]
+) {
+  emit('update', `${key}.${args[0]}`, args[1]);
+};
+
+const schemaComponents = reactive({
+  [Layout.schema_name as string]: markRaw(Layout)
+});
+
+const getComponent = (schema_name: string) => {
+  return schemaComponents[schema_name];
+};
 </script>
 
 <style lang="scss">

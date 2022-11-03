@@ -2,12 +2,28 @@
 div.editor-right-panel
   .panel-tab_bar
     PanelTabBar
-  PanelSchema
+  PanelSchema(:propsData="currentNode.props" :propsTypes="propsTypes" @update="onUpdateNodeProps")
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import PanelTabBar from './components/panel-tab-bar/index.vue';
 import PanelSchema from './components/panel-schema/index.vue';
+import { useNodeContext } from './../hooks/node-context';
+import { useComponentContext } from './../hooks/component-context';
+
+const { getComponentPropsTypes } = useComponentContext();
+const { getSelectedNodes, getCurrentNode, updateNodeProps } = useNodeContext();
+
+const selectedNodes = getSelectedNodes();
+const currentNode = getCurrentNode();
+const propsTypes = computed(() => {
+  return getComponentPropsTypes(currentNode.value.schema);
+});
+
+const onUpdateNodeProps = (key: string, value: number | string | boolean) => {
+  updateNodeProps(currentNode.value.id, `${key}`, value);
+};
 </script>
 
 <style lang="scss">

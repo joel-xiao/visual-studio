@@ -29,15 +29,14 @@ interface SchemaArrayData extends defaultSchemaKeyData {
 export interface SchemaKeyTypes {
   [key: string]: SchemaKeyNumberData | SchemaKeyStringData | SchemaKeyBooleanData | SchemaArrayData;
 }
-export interface SchemaKeysTypes {
-  [key: string]: SchemaTypes;
-}
 export interface SchemaExport {
   name: string;
   label: string;
   key: string;
   schema: SchemaKeyTypes;
 }
+
+export type SchemaKeysTypes = SchemaExport[];
 
 export interface ComponentSchemaExport {
   name: string;

@@ -1,7 +1,7 @@
 <template lang="pug">
 BasicBox(ref='box' type="input")
   BasicIcon(:lock="lock")
-  BasicInput(:disabled="lock" v-bind="$attrs" @focus="onFocus" @blur="onBlur" @keydown="onKeyDown" @keyup="onKeyUp" @input="onInput" type="text" placeholder="")
+  BasicInput(:disabled="lock" v-bind="$attrs" @focus="onFocus" @blur="onBlur" @update="onUpdate" type="text" placeholder="")
 </template>
 
 <script lang="ts">
@@ -22,6 +22,8 @@ const props = withDefaults(defineProps<Props>(), {
   lock: false
 });
 
+const emit = defineEmits(['update']);
+
 const box = ref<null | InstanceType<typeof BasicBox>>(null);
 
 const onFocus = function () {
@@ -32,16 +34,8 @@ const onBlur = function () {
   box.value?.blur();
 };
 
-const onKeyDown = function () {
-  console.log('keydown');
-};
-
-const onKeyUp = function () {
-  console.log('keyup');
-};
-
-const onInput = function () {
-  console.log('input');
+const onUpdate = function (value: string | number) {
+  emit('update', value);
 };
 </script>
 

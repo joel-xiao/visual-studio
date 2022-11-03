@@ -2,14 +2,14 @@
 div(class="schema-radius")
   ul(class="schema-radius__options")
     li
-      Input(v-model="data.radius" :placeholder="data.isMore ? '' : '多个值'")
+      Input(v-model="data.radius" :placeholder="data.isMore ? '' : '多个值'" @update="onUpdate")
     template(v-if="data.isMore")
       li
-        Input(v-model="modelValue[1]")
+        Input(v-model="modelValue[1]" @update="onUpdate")
       li
-        Input(v-model="modelValue[2]")
+        Input(v-model="modelValue[2]" @update="onUpdate")
       li
-        Input(v-model="modelValue[3]")
+        Input(v-model="modelValue[3]" @update="onUpdate")
   div(class="schema-radius__button-switch")
     Button(v-model="data.isMore" type="status-button")
 
@@ -28,7 +28,11 @@ const props = withDefaults(defineProps<Props>(), {
   modelValue: () => [0, 0, 0, 0]
 });
 
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue', 'update']);
+
+const onUpdate = function () {
+  emit('update', props.modelValue);
+};
 
 const data = reactive({
   isMore: false,

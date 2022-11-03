@@ -150,13 +150,13 @@ export class CreateComponentContext {
   }
 
   #getComponentSchema(schema_path: string): ComponentSchemaExport {
-    return this.componentSchemas[schema_path].default;
+    return this.componentSchemas[schema_path]?.default || {};
   }
 
-  #getComponentPropsTypes(schema_path: string): SchemaKeysTypes {
+  #getComponentPropsTypes(schema_path: string) {
     const schemas = this.#getSchemas();
     const componentSchemas = this.#getComponentSchema(schema_path);
-    const propsTypes: SchemaKeysTypes = {};
+    const propsTypes: SchemaKeysTypes = [];
 
     if (
       componentSchemas &&
@@ -167,28 +167,28 @@ export class CreateComponentContext {
         .filter((schema) => schema && typeof schema === 'object' && !Array.isArray(schema))
         .forEach((component_schema) => {
           const schema = schemas[component_schema.schema];
-          const schema_data: SchemaKeyTypes | null =
-            !Array.isArray(schema) && typeof schema === 'object'
-              ? //@ts-ignore
-                schema[component_schema.type]
-              : null;
+          // const schema_data: SchemaKeyTypes | null =
+          //   !Array.isArray(schema) && typeof schema === 'object'
+          //     ? //@ts-ignore
+          //       schema[component_schema.type]
+          //     : null;
 
-          const propTypes: SchemaKeyTypes = {};
+          // const propTypes: SchemaKeyTypes = {};
 
-          const is_schema =
-            schema_data && !Array.isArray(schema_data) && typeof schema_data === 'object';
-          if (is_schema && schema_data) {
-            Object.keys(schema_data).forEach((key) => {
-              schema_data && (propTypes[key] = schema_data[key]);
-            });
-          }
+          // const is_schema =
+          //   schema_data && !Array.isArray(schema_data) && typeof schema_data === 'object';
+          // if (is_schema && schema_data) {
+          //   Object.keys(schema_data).forEach((key) => {
+          //     schema_data && (propTypes[key] = schema_data[key]);
+          //   });
+          // }
 
-          schema && schema.key && (propsTypes[schema.key] = propTypes);
+          propsTypes.push(schema);
         });
     }
     return readonly(propsTypes);
   }
-  getComponentPropsTypes(schema_path: string): SchemaKeysTypes {
+  getComponentPropsTypes(schema_path: string) {
     return this.#getComponentPropsTypes(schema_path);
   }
 

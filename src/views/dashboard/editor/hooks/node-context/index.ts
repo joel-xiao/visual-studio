@@ -1,4 +1,14 @@
-import { computed, reactive, ComputedRef, onBeforeUnmount, App } from 'vue';
+import {
+  watch,
+  computed,
+  readonly,
+  reactive,
+  Ref,
+  ref,
+  ComputedRef,
+  onBeforeUnmount,
+  App
+} from 'vue';
 import { getUuid } from '@a/utils/index';
 import type {
   EditorData,
@@ -13,6 +23,8 @@ import type {
 class CreateNodeContext {
   #data: EditorData;
   #nodes: ComputedRef<Node[]> | [];
+  #selectedNodes: ComputedRef<Node[]> | [];
+  #currentNode: Ref<Node>;
   #nodesTreeSource: TreeNode[];
   #nodesTree: ComputedRef<TreeNode[]> | [];
   #nodeInstances?: {
@@ -24,6 +36,8 @@ class CreateNodeContext {
   constructor(data: EditorData) {
     this.#data = data;
     this.#nodes = [];
+    this.#selectedNodes = [];
+    this.#currentNode = ref({} as Node);
     this.#nodesTreeSource = [];
     this.#nodesTree = [];
     this.#nodeInstances = {};
@@ -31,10 +45,13 @@ class CreateNodeContext {
 
     this.getNodeTree = this.getNodeTree.bind(this);
     this.getNodes = this.getNodes.bind(this);
+    this.getSelectedNodes = this.getSelectedNodes.bind(this);
+    this.getCurrentNode = this.getCurrentNode.bind(this);
     this.getRoot = this.getRoot.bind(this);
     this.getRootStyle = this.getRootStyle.bind(this);
     this.getNode = this.getNode.bind(this);
-    this.onUpdateNode = this.onUpdateNode.bind(this);
+    this.updateNode = this.updateNode.bind(this);
+    this.updateNodeProps = this.updateNodeProps.bind(this);
     this.onAddNode = this.onAddNode.bind(this);
     this.onSelectNode = this.onSelectNode.bind(this);
     this.addNodeInstance = this.addNodeInstance.bind(this);
@@ -94,8 +111,26 @@ class CreateNodeContext {
     this.#nodes = computed<Node[]>(() => this.#data.nodes.filter((node) => node.id !== 'root'));
   }
 
-  getNodes(): ComputedRef<Node[]> | [] {
-    return this.#nodes;
+  getNodes() {
+    return readonly(this.#nodes);
+  }
+
+  #createSelectedNodes() {
+    this.#selectedNodes = computed<Node[]>(() => this.#data.nodes.filter((node) => node.select));
+
+    watch(this.#selectedNodes, (newVal) => {
+      if (newVal.length <= 1) {
+        this.#currentNode.value = newVal[0] || ({} as Node);
+      }
+    });
+  }
+
+  getSelectedNodes() {
+    return readonly(this.#selectedNodes);
+  }
+
+  getCurrentNode() {
+    return this.#currentNode;
   }
 
   getRoot(): Node {
@@ -115,10 +150,10 @@ class CreateNodeContext {
 
   getNode(id: string): Node {
     const node: Node | undefined = this.#data.nodes.find((node) => node.id === id);
-    return node ? node : ({} as Node);
+    return readonly(node ? node : ({} as Node));
   }
 
-  onUpdateNode(id: string, delta: NodeDelta): void {
+  updateNode(id: string, delta: NodeDelta): void {
     const node = this.#data.nodes.find((node) => node.id === id);
     if (node && delta) {
       Object.keys(delta).forEach((key: string): void => {
@@ -126,6 +161,30 @@ class CreateNodeContext {
         node[key] = delta[key];
       });
     }
+  }
+
+  updateNodeProps(id: string, key: string, value: number | string | boolean | undefined): void {
+    const node = this.#data.nodes.find((node) => node.id === id);
+    if (node && key && value) {
+      const keyArr = key.split('.');
+      //@ts-ignore
+      let data = node?.props;
+      keyArr.forEach((k, i) => {
+        //@ts-ignore
+        if (typeof data === 'object' && i === keyArr.length - 1) {
+          //@ts-ignore
+          data[k] = value;
+          if (key.includes('layout.')) {
+            this.updateNode(id, { [k]: value });
+          }
+        } else {
+          //@ts-ignore
+          data = data[k];
+        }
+      });
+    }
+
+    console.log(this.#data.nodes);
   }
 
   #onAddNode(addNode: AddNode, container: string, pos: PointerPos): void {
@@ -147,8 +206,6 @@ class CreateNodeContext {
         select: false,
         lock: false
       };
-
-      console.log(node);
 
       node.x = pos.x - node.width / 2;
       node.y = pos.y - node.height / 2;
@@ -208,12 +265,14 @@ class CreateNodeContext {
 
   install(): void {
     this.#createNodes();
+    this.#createSelectedNodes();
     this.#createNodeTree();
     this.onSelectNode('root');
   }
 
   uninstall(): void {
     this.#nodes = [];
+    this.#selectedNodes = [];
     this.#nodesTreeSource = [];
     this.#nodesTree = [];
     this.#nodeInstances = undefined;
