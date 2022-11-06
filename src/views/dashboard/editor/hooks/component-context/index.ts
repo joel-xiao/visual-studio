@@ -34,6 +34,7 @@ export class CreateComponentContext {
     this.getUiLibrary = this.getUiLibrary.bind(this);
 
     this.getComponentProps = this.getComponentProps.bind(this);
+    this.formatterComponentProp = this.formatterComponentProp.bind(this);
     this.getComponentPropsTypes = this.getComponentPropsTypes.bind(this);
     this.createNodeComponent = this.createNodeComponent.bind(this);
   }
@@ -255,6 +256,24 @@ export class CreateComponentContext {
   }
   getComponentProps(schema_path: string) {
     return this.#getComponentProps(schema_path);
+  }
+  // formatter component prop is schema prop type
+  formatterComponentProp(
+    schema: SchemaKeyTypes,
+    opts: { key: string; value: string | number | boolean | undefined | null; unit?: string }
+  ): string | number | boolean | undefined | null {
+    let value = opts.value;
+    if (schema[opts.key]) {
+      if (schema[opts.key].type === Number) {
+        value = Number(value);
+        isNaN(value) && (value = opts.value);
+      } else if (schema[opts.key].type === String) {
+        value = value + '';
+      } else if (schema[opts.key].type === Boolean) {
+        value = !!value;
+      }
+    }
+    return value;
   }
 
   #getComponent(component_path: string): App {

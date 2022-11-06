@@ -4,8 +4,8 @@ ContainerLayout(keyValue="component-layout" class="component-layout")
     Input(v-model="modelValue.x" @update="onUpdate('x', $event)")
     Input(v-model="modelValue.y" @update="onUpdate('y', $event)")
   PropsItem
-    Input(v-model="modelValue.w" @update="onUpdate('w', $event)")
-    Input(v-model="modelValue.h" @update="onUpdate('h', $event)")
+    Input(v-model="modelValue.width" @update="onUpdate('width', $event)")
+    Input(v-model="modelValue.height" @update="onUpdate('height', $event)")
     Button(v-model="data.isLockScale" type="status-button")
   PropsItem
     Input(v-model="modelValue.rotate")
@@ -29,10 +29,8 @@ import Input from './../../../../components/basic/c-input/index.vue';
 import Button from './../../../../components/basic/c-button/index.vue';
 import Radius from './../radius/index.vue';
 import type { PanelSchemaLayout } from './interface';
-import type { SchemaKeyTypes } from './../interface';
 
 interface Props {
-  schema: SchemaKeyTypes;
   modelValue?: PanelSchemaLayout;
 }
 const props = withDefaults(defineProps<Props>(), {
@@ -40,8 +38,8 @@ const props = withDefaults(defineProps<Props>(), {
   modelValue: () => ({
     x: 0,
     y: 0,
-    w: 100,
-    h: 100,
+    width: 100,
+    height: 100,
     rotate: 0,
     radius: [0, 0, 0, 0]
   })

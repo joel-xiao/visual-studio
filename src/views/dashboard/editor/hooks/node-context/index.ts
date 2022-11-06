@@ -135,7 +135,7 @@ class CreateNodeContext {
 
   getRoot(): Node {
     const node: Node | undefined = this.#data.nodes.find((node) => node.id === 'root');
-    return node ? node : ({} as Node);
+    return readonly(node ? node : ({} as Node));
   }
 
   getRootStyle(): ComputedRef<{ width: string; height: string }> {
@@ -153,17 +153,43 @@ class CreateNodeContext {
     return readonly(node ? node : ({} as Node));
   }
 
-  updateNode(id: string, delta: NodeDelta): void {
+  /**
+   * @parma {
+   *  change_type: update_node_props | ''
+   * }
+   * **/
+  updateNode(id: string, delta: NodeDelta, change_type = ''): void {
     const node = this.#data.nodes.find((node) => node.id === id);
     if (node && delta) {
       Object.keys(delta).forEach((key: string): void => {
         // @ts-ignore
         node[key] = delta[key];
       });
+
+      this.#nodeInstances?.[node.id]?.updatePos?.();
+
+      // Node binds to  Pros Layout
+      if (change_type !== 'update_node_props') {
+        const type = 'update_node';
+        this.updateNodeProps(node.id, 'layout.x', node.x, type);
+        this.updateNodeProps(node.id, 'layout.y', node.y, type);
+        this.updateNodeProps(node.id, 'layout.width', node.width, type);
+        this.updateNodeProps(node.id, 'layout.height', node.height, type);
+      }
     }
   }
 
-  updateNodeProps(id: string, key: string, value: number | string | boolean | undefined): void {
+  /**
+   * @parma {
+   *  change_type: update_node | ''
+   * }
+   * **/
+  updateNodeProps(
+    id: string,
+    key: string,
+    value: number | string | boolean | undefined,
+    change_type = ''
+  ): void {
     const node = this.#data.nodes.find((node) => node.id === id);
     if (node && key && value) {
       const keyArr = key.split('.');
@@ -174,8 +200,13 @@ class CreateNodeContext {
         if (typeof data === 'object' && i === keyArr.length - 1) {
           //@ts-ignore
           data[k] = value;
-          if (key.includes('layout.')) {
-            this.updateNode(id, { [k]: value });
+
+          //  Pros Layout binds to  Node
+          if (change_type !== 'update_node') {
+            const keys = ['layout.x', 'layout.y', 'layout.width', 'layout.height'];
+            if (keys.some((r) => key && key.includes(r))) {
+              this.updateNode(id, { [k]: value }, 'update_node_props');
+            }
           }
         } else {
           //@ts-ignore
@@ -183,8 +214,6 @@ class CreateNodeContext {
         }
       });
     }
-
-    console.log(this.#data.nodes);
   }
 
   #onAddNode(addNode: AddNode, container: string, pos: PointerPos): void {

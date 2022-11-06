@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import type { ComponentProps } from './../../../schema/use/interface';
+import type { ComponentProps } from './../../interface';
 interface Props {
   data: ComponentProps;
 }

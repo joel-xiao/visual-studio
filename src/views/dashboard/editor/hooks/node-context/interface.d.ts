@@ -63,5 +63,6 @@ interface TreeNodeData {
 export type TreeNode = LayerData<TreeNodeData>;
 
 export interface NodeInstance {
-  setActive?: (val: boolean) => void;
+  setActive: (val: boolean) => void;
+  updatePos: () => void;
 }

@@ -19,19 +19,27 @@ const props = withDefaults(defineProps<Props>(), {
   data: () => ({ y2: 0, x2: 0, x: 0, y: 0 })
 });
 
+const emit = defineEmits(['resizing']);
+
 const dragData = reactive<Binding>({
-  initPos: props.data,
+  pos: props.data,
   disabled: false,
-  active: false
+  active: false,
+  onUp: (dargDataset: DargDataset) => {
+    emit('resizing', dargDataset);
+  }
 });
 
 const dragDataComputed = computed<Binding>(() => ({ ...dragData }));
-const emit = defineEmits(['resizing']);
 
 const setActive = function (val: boolean | undefined): void {
   dragData.active = !!val;
 };
-defineExpose({ setActive });
+
+const setPos = function (pos: DargDataset): void {
+  dragData.pos = pos;
+};
+defineExpose({ setActive, setPos });
 </script>
 
 <style lang="scss">

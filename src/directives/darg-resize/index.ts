@@ -14,6 +14,7 @@ export default {
       updated(el: HTMLElement, binding: DirectiveBinding<Binding>) {
         dragData[binding.instance?.$.uid || '']?.setActive(binding.value.active);
         dragData[binding.instance?.$.uid || '']?.setDisabled(binding.value.disabled);
+        dragData[binding.instance?.$.uid || '']?.setPos(binding.value.pos);
       },
       beforeUnmount: (el: HTMLElement, binding: DirectiveBinding): void => {
         dragData[binding.instance?.$.uid || '']?.uninstall();

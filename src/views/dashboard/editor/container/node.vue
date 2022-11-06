@@ -33,10 +33,18 @@ const dargDataset = readonly(
 );
 const resize = ref<null | InstanceType<typeof DragResize>>(null);
 
-const setActive = function setActive(val: boolean | undefined) {
+const setActive = function (val: boolean | undefined) {
   resize?.value?.setActive(val);
 };
-addNodeInstance(node.id, { setActive });
+const updatePos = function () {
+  resize?.value?.setPos({
+    x: node.x || 0,
+    y: node.y || 0,
+    x2: node.x + node.width,
+    y2: node.y + node.height
+  });
+};
+addNodeInstance(node.id, { setActive, updatePos });
 
 const onDown = function (): void {
   onSelectNode(node.id);

@@ -10,7 +10,7 @@ export class Drag {
   disabled: boolean;
   active: boolean;
   #moved: boolean;
-  callbackUp?: (() => void) | null;
+  callbackUp?: ((dargDataset: DargDataset) => void) | null;
   stickEl?: HTMLElement;
   sticks: string[];
   currentStick: string;
@@ -27,7 +27,7 @@ export class Drag {
     this.startPos = { x: 0, y: 0 };
 
     this.binding = {
-      initPos: { ...this.defaultPos },
+      pos: { ...this.defaultPos },
       cursorPos: null,
       resize: false,
       disabled: false,
@@ -57,7 +57,7 @@ export class Drag {
     this.el = el;
     this.el.classList.add('v-drag-resize');
 
-    this.binding.initPos && (this.defaultPos = { ...this.binding.initPos });
+    this.binding.pos && (this.defaultPos = { ...this.binding.pos });
     this.pos = { ...this.defaultPos };
     this.cursorPos = this.binding.cursorPos;
     this.resize = !!this.binding.resize;
@@ -89,7 +89,7 @@ export class Drag {
 
     this.setDisabled(this.disabled);
     this.setActive(this.active);
-    this.updateStyle(this.defaultPos);
+    this.setPos(this.defaultPos);
   }
 
   uninstall(): void {
@@ -124,6 +124,13 @@ export class Drag {
     this.stickEl?.classList[active ? 'add' : 'remove']('active');
     this.el?.classList[active ? 'add' : 'remove']('active');
     this.active = active;
+  }
+
+  setPos(pos: DargDataset): void {
+    if (!this.resize) return;
+    this.pos = { ...pos };
+    this.defaultPos = { ...this.pos };
+    this.updateStyle(this.defaultPos);
   }
 
   #setMoved(moved: boolean): void {
@@ -176,8 +183,7 @@ export class Drag {
     // document.documentElement.removeEventListener('touchend', onUp.bind(this), true);
     // document.documentElement.removeEventListener('touchcancel', onUp.bind(this), true);
     // document.documentElement.removeEventListener('touchstart', onUp.bind(this), true);
-
-    this.callbackUp?.();
+    this.callbackUp?.(this.defaultPos);
   }
 
   onDown(): void {
@@ -310,7 +316,7 @@ export const createDrag = function <T>(
 
   let drag: Drag | null = new Drag();
   drag?.install(el, {
-    initPos: pos,
+    pos: pos,
     cursorPos: event ? { x: event.x, y: event.y } : null,
     onUp: function () {
       app?.unmount();

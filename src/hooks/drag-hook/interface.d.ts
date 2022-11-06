@@ -12,10 +12,10 @@ export interface CursorPos {
 }
 
 export interface Binding {
-  initPos?: DargDataset;
+  pos?: DargDataset;
   cursorPos?: CursorPos | null;
   resize?: boolean;
   disabled?: boolean;
   active?: boolean;
-  onUp?: () => void;
+  onUp?: (dargDataset: DargDataset) => void;
 }

@@ -20,14 +20,13 @@ const schema: SchemaExport = {
       required: true,
       icon: 'y'
     },
-    w: {
+    width: {
       type: Number,
       default: 0,
       required: true,
       icon: 'width'
     },
-
-    h: {
+    height: {
       type: Number,
       default: 0,
       required: true,
