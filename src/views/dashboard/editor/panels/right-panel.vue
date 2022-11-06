@@ -22,7 +22,7 @@ const propsTypes = computed(() => {
 });
 
 const onUpdateNodeProps = (key: string, value: number | string | boolean) => {
-  updateNodeProps(currentNode.value.id, `${key}`, value);
+  updateNodeProps(currentNode.value.id, { key: `${key}`, value });
 };
 </script>
 

@@ -133,7 +133,7 @@ class CreateNodeContext {
     return this.#currentNode;
   }
 
-  getRoot(): Node {
+  getRoot() {
     const node: Node | undefined = this.#data.nodes.find((node) => node.id === 'root');
     return readonly(node ? node : ({} as Node));
   }
@@ -148,7 +148,7 @@ class CreateNodeContext {
     });
   }
 
-  getNode(id: string): Node {
+  getNode(id: string) {
     const node: Node | undefined = this.#data.nodes.find((node) => node.id === id);
     return readonly(node ? node : ({} as Node));
   }
@@ -170,49 +170,78 @@ class CreateNodeContext {
 
       // Node binds to  Pros Layout
       if (change_type !== 'update_node_props') {
-        const type = 'update_node';
-        this.updateNodeProps(node.id, 'layout.x', node.x, type);
-        this.updateNodeProps(node.id, 'layout.y', node.y, type);
-        this.updateNodeProps(node.id, 'layout.width', node.width, type);
-        this.updateNodeProps(node.id, 'layout.height', node.height, type);
+        this.updateNodeProps(node.id, undefined, 'update_node');
       }
     }
   }
 
   /**
    * @parma {
-   *  change_type: update_node | ''
+   *  change_type: update_node | on_add_node |  ''
    * }
    * **/
   updateNodeProps(
     id: string,
-    key: string,
-    value: number | string | boolean | undefined,
+    opts:
+      | undefined
+      | { key: string; value: number | string | boolean | undefined | number[] }
+      | { key: string; value: number | string | boolean | undefined | number[] }[],
     change_type = ''
   ): void {
     const node = this.#data.nodes.find((node) => node.id === id);
-    if (node && key && value) {
-      const keyArr = key.split('.');
-      //@ts-ignore
-      let data = node?.props;
-      keyArr.forEach((k, i) => {
-        //@ts-ignore
-        if (typeof data === 'object' && i === keyArr.length - 1) {
-          //@ts-ignore
-          data[k] = value;
+    if (!node) return;
 
-          //  Pros Layout binds to  Node
-          if (change_type !== 'update_node') {
-            const keys = ['layout.x', 'layout.y', 'layout.width', 'layout.height'];
-            if (keys.some((r) => key && key.includes(r))) {
-              this.updateNode(id, { [k]: value }, 'update_node_props');
-            }
-          }
-        } else {
+    // Pros Layout binds to  Node
+    if (!opts) {
+      switch (change_type) {
+        case 'update_node':
+          opts = [
+            { key: 'layout.x', value: node.x },
+            { key: 'layout.y', value: node.y },
+            { key: 'layout.width', value: node.width },
+            { key: 'layout.height', value: node.height }
+          ];
+          break;
+        case 'on_add_node':
+          opts = [
+            { key: 'layout.x', value: node.props.layout.x },
+            { key: 'layout.y', value: node.props.layout.y },
+            { key: 'layout.width', value: node.props.layout.width },
+            { key: 'layout.height', value: node.props.layout.height }
+          ];
+          break;
+        default:
+          break;
+      }
+    }
+
+    opts = Array.isArray(opts) ? opts : opts ? [opts] : [];
+    for (const opt of opts) {
+      const key = opt.key;
+      const value = opt.value;
+      if (key && value) {
+        const keyArr = key.split('.');
+        //@ts-ignore
+        let data = node?.props;
+        keyArr.forEach((k, i) => {
           //@ts-ignore
-          data = data[k];
-        }
-      });
+          if (typeof data === 'object' && i === keyArr.length - 1) {
+            //@ts-ignore
+            data[k] = value;
+
+            //  Pros Layout binds to  Node
+            if (change_type !== 'update_node') {
+              const keys = ['layout.x', 'layout.y', 'layout.width', 'layout.height'];
+              if (keys.some((r) => key && key.includes(r))) {
+                this.updateNode(id, { [k]: value }, 'update_node_props');
+              }
+            }
+          } else {
+            //@ts-ignore
+            data = data[k];
+          }
+        });
+      }
     }
   }
 
@@ -241,6 +270,7 @@ class CreateNodeContext {
 
       this.#data.nodes.push(node);
       this.#addTreeNode(node);
+      this.updateNodeProps(node.id, undefined, 'on_add_node');
     }
   }
 

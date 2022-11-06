@@ -1,7 +1,7 @@
 <template lang="pug">
 div(class = "editor-panel-schema")
   template(v-for="(item, idx) in propsTypes")
-    component(:is="getComponent(item.name)" :schema="item.schema" :v-model="propsData[item.key]" @update="onUpdate(item.key, item.schema, $event)")
+    component(:is="getComponent(item.name)" v-model="propsData[item.key]" @update="onUpdate(item.key, item.schema, $event)")
 </template>
 
 <script setup lang="ts">

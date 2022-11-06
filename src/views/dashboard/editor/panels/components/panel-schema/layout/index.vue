@@ -34,7 +34,6 @@ interface Props {
   modelValue?: PanelSchemaLayout;
 }
 const props = withDefaults(defineProps<Props>(), {
-  schema: () => ({}),
   modelValue: () => ({
     x: 0,
     y: 0,
