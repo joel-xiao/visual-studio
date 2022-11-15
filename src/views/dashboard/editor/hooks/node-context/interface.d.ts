@@ -1,4 +1,4 @@
-import type { LayerData } from './../../panels/components/panel-layer/interface';
+import type { LayerItemData } from './../../panels/components/panel-layer/interface';
 import type { ComponentProps } from './../component-context/interface';
 
 export interface PointerPos {
@@ -60,7 +60,7 @@ interface TreeNodeData {
   type: string;
 }
 
-export type TreeNode = LayerData<TreeNodeData>;
+export type TreeNode = LayerItemData;
 
 export interface NodeInstance {
   setActive: (val: boolean) => void;

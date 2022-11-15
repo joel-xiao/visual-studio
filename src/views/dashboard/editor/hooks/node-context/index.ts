@@ -295,7 +295,7 @@ class CreateNodeContext {
     });
 
     this.#nodesTreeSource.forEach((TreeNode) => {
-      if (id === TreeNode.data.id) {
+      if (id === TreeNode?.data?.id) {
         TreeNode.select = true;
       } else {
         TreeNode.select = false;

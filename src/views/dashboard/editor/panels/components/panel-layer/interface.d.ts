@@ -12,10 +12,6 @@ export interface LayerItemData {
   data?: { [key: string]: string | undefined | null | boolean | number };
 }
 
-export interface LayerData<T> extends LayerItemData {
-  data?: T;
-}
-
 export interface LayerItemMenu {
   name: string;
   icon: string;
