@@ -25,7 +25,8 @@
   },
   "lint-staged": {
     "./**/*.{js,jsx,ts,tsx,vue,html}": [
-      "npm run es:fix"
+      "npm run es:fix",
+      "npm run tsc"
     ],
     "./**/*.{css,less,scss}": [
       "npm run style:fix"
