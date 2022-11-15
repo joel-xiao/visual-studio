@@ -10,6 +10,7 @@ import { ref, reactive, markRaw, readonly, withDefaults, watch, onMounted } from
 import type { DargDataset } from '@d/darg-resize/interface';
 import { useNodeContext } from './../hooks/node-context';
 import { useComponentContext } from './../hooks/component-context';
+import type { ComponentProps } from './../hooks/component-context/interface';
 
 interface Props {
   id: string;
@@ -62,7 +63,7 @@ const onResizing = function (dargDataset: DargDataset): void {
 const { createNodeComponent } = useComponentContext();
 const vm = ref<HTMLElement>();
 onMounted(() => {
-  createNodeComponent(node.props, vm?.value, node.component);
+  createNodeComponent(node.props as ComponentProps, vm?.value, node.component);
 });
 </script>
 

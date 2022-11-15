@@ -9,9 +9,12 @@ export interface LayerItemData {
   handle?: boolean;
   parentId?: string | undefined | null;
   cascades?: LayerItemData[];
+  data?: { [key: string]: string | undefined | null | boolean | number };
+}
+
+export interface LayerData<T> extends LayerItemData {
   data?: T;
 }
-export type LayerData<T> = LayerItemData;
 
 export interface LayerItemMenu {
   name: string;

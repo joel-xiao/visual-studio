@@ -1,4 +1,3 @@
-ya
 <template lang="pug">
 div.editor-middle(
   ref="middleDom"
@@ -23,7 +22,7 @@ import ContainerNode from './node.vue';
 import { ref, reactive, computed, onMounted, watch } from 'vue';
 import { useDrag } from './../hooks/drag-context';
 import { useNodeContext } from './../hooks/node-context';
-import type { Node, BasicNode } from './../hooks/node-context/interface';
+import type { Node } from './../hooks/node-context/interface';
 import { useComponentContext } from './../hooks/component-context';
 import { useBindKeysContext } from './../hooks/bind-keys-context';
 import { createMiddleMask } from './../hooks/middle';
@@ -67,7 +66,7 @@ const { onDragenter, onDragover, dropHandler } = useDrag();
 
 const { getComponentProps } = useComponentContext();
 const onDrop = function (event: DragEvent): void {
-  dropHandler<BasicNode>(event, (node, pos) => {
+  dropHandler(event, (node, pos) => {
     const rect = middleContainerDom.value?.getBoundingClientRect() || { x: 0, y: 0 };
     onAddNode(
       {

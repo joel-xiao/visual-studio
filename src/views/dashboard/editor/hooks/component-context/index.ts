@@ -281,7 +281,7 @@ export class CreateComponentContext {
   }
 
   createNodeComponent(
-    props: ComponentProps,
+    props: ComponentProps | ComponentProps,
     parentEl: HTMLElement | undefined,
     component: string
   ): App {
