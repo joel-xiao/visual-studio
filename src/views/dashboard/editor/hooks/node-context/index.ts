@@ -267,7 +267,6 @@ class CreateNodeContext {
         type: '',
         x: 0,
         y: 0,
-        rotate: 0,
         z: 0,
         select: false,
         lock: false
