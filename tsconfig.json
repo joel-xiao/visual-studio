@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "target": "esnext",
+    "target": "ESNext",
     "useDefineForClassFields": true,
-    "module": "esnext",
+    "module": "ESNext",
     "moduleResolution": "node",
     "importHelpers": true,
     "strict": true,
@@ -23,7 +23,7 @@
       "@hooks/*": ["./src/hooks/*"]
     },
     "allowSyntheticDefaultImports": true,
-    "lib": ["esnext", "dom"],
+    "lib": ["ESNext", "DOM"],
     "skipLibCheck": true,
     "types": ["vite/client", "jest", "@types/node"]
   },

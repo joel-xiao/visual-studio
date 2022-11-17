@@ -8,7 +8,7 @@ ContainerLayout(keyValue="component-layout" class="component-layout")
     Input(v-model="modelValue.height" @update="onUpdate('height', $event)")
     Button(v-model="data.isLockScale" type="status-button")
   PropsItem
-    Input(v-model="modelValue.rotate")
+    Input(v-model="modelValue.rotate" @update="onUpdate('rotate', $event)")
     div(class="component-layout-rotate")
       Button(@click="onRotate('x')")
       Button(@click="onRotate('y')")
@@ -58,7 +58,6 @@ const onRotate = function (type: string) {
   let modelValue = reactive(props.modelValue);
   if (type === 'x') modelValue.rotate = 180 - modelValue.rotate;
   if (type === 'y') modelValue.rotate = -modelValue.rotate;
-  onUpdate('rotate', modelValue.rotate);
 };
 </script>
 
