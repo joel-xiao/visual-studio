@@ -202,13 +202,16 @@ class CreateNodeContext {
             { key: 'layout.height', value: node.height }
           ];
           break;
-        case 'on_add_node':
+        case 'on_add_node_size':
           opts = [
-            { key: 'layout.x', value: node.props.layout.x },
-            { key: 'layout.y', value: node.props.layout.y },
-            { key: 'layout.width', value: node.props.layout.width },
-            { key: 'layout.height', value: node.props.layout.height },
-            { key: 'layout.rotate', value: node.props.layout.rotate }
+            { key: 'layout.width', value: node.props.layout.width || node.width },
+            { key: 'layout.height', value: node.props.layout.height || node.height }
+          ];
+          break;
+        case 'on_add_node_pos':
+          opts = [
+            { key: 'layout.x', value: node.x },
+            { key: 'layout.y', value: node.y }
           ];
           break;
         default:
@@ -232,13 +235,7 @@ class CreateNodeContext {
 
             //  Pros Layout binds to  Node
             if (change_type !== 'update_node') {
-              const keys = [
-                'layout.x',
-                'layout.y',
-                'layout.width',
-                'layout.height',
-                'layout.rotate'
-              ];
+              const keys = ['layout.x', 'layout.y', 'layout.width', 'layout.height'];
               if (keys.some((r) => key && key.includes(r))) {
                 this.updateNode(id, { [k]: value }, 'update_node_props');
               }
@@ -272,12 +269,14 @@ class CreateNodeContext {
         lock: false
       };
 
+      this.#data.nodes.push(node);
+
+      this.updateNodeProps(node.id, undefined, 'on_add_node_size');
       node.x = pos.x - node.width / 2;
       node.y = pos.y - node.height / 2;
+      this.updateNodeProps(node.id, undefined, 'on_add_node_pos');
 
-      this.#data.nodes.push(node);
       this.#addTreeNode(node);
-      this.updateNodeProps(node.id, undefined, 'on_add_node');
     }
   }
 
