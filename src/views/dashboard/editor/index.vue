@@ -38,6 +38,7 @@ let data = reactive<EditorData>({
       name: '根容器',
       width: 1000,
       height: 600,
+      radius: [0, 0, 0, 0],
       type: '',
       x: 0,
       y: 0,

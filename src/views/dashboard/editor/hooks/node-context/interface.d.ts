@@ -27,6 +27,7 @@ export interface Node extends AddNode {
   type: string;
   width: number;
   height: number;
+  radius: number[];
   x: number;
   y: number;
   select?: boolean;

@@ -16,7 +16,7 @@ div(class="schema-radius")
 </template>
 
 <script setup lang="ts">
-import { reactive, watch } from 'vue';
+import { reactive, watch, nextTick } from 'vue';
 import Input from './../../../../components/basic/c-input/index.vue';
 import Button from './../../../../components/basic/c-button/index.vue';
 import type { PanelSchemaRadius } from './interface';
@@ -31,7 +31,9 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits(['update:modelValue', 'update']);
 
 const onUpdate = function () {
-  emit('update', props.modelValue);
+  nextTick(() => {
+    emit('update', props.modelValue);
+  });
 };
 
 const data = reactive({

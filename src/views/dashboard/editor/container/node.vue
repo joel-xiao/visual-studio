@@ -1,6 +1,6 @@
 <template lang="pug">
-DragResize(class="middle-node" ref="resize" :data="dargDataset" @resizing="onResizing" @mousedown.stop.prevent="onDown")
-  div.middle-node( ref="vm")
+DragResize(ref="resize" :data="dargDataset" @resizing="onResizing" @mousedown.stop.prevent="onDown")
+  div.middle-node( ref="vm" :style="nodeStyle")
 
 </template>
 
@@ -19,8 +19,9 @@ const props = withDefaults(defineProps<Props>(), {
   id: ''
 });
 
-const { getNode, updateNode, onSelectNode, addNodeInstance } = useNodeContext();
+const { getNode, getNodeStyle, updateNode, onSelectNode, addNodeInstance } = useNodeContext();
 const node = getNode(props.id);
+const nodeStyle = getNodeStyle(props.id);
 
 const dargDataset = readonly(
   reactive<DargDataset>(
@@ -70,6 +71,8 @@ onMounted(() => {
 <style lang="scss">
 #editor {
   .middle-node {
+    width: 100%;
+    height: 100%;
   }
 }
 </style>

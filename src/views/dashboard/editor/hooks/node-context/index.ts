@@ -50,6 +50,7 @@ class CreateNodeContext {
     this.getRoot = this.getRoot.bind(this);
     this.getRootStyle = this.getRootStyle.bind(this);
     this.getNode = this.getNode.bind(this);
+    this.getNodeStyle = this.getNodeStyle.bind(this);
     this.updateNode = this.updateNode.bind(this);
     this.updateNodeProps = this.updateNodeProps.bind(this);
     this.onAddNode = this.onAddNode.bind(this);
@@ -138,7 +139,7 @@ class CreateNodeContext {
     return readonly(node ? node : ({} as Node));
   }
 
-  getRootStyle(): ComputedRef<{ width: string; height: string }> {
+  getRootStyle() {
     const root = this.getRoot();
     return computed<{ width: string; height: string }>(() => {
       return {
@@ -151,6 +152,24 @@ class CreateNodeContext {
   getNode(id: string) {
     const node: Node | undefined = this.#data.nodes.find((node) => node.id === id);
     return readonly(node ? node : ({} as Node));
+  }
+
+  getNodeStyle(id: string) {
+    const node: Node | undefined = this.#data.nodes.find((node) => node.id === id);
+    return computed<{
+      'border-top-left-radius': string;
+      'border-top-right-radius': string;
+      'border-bottom-right-radius': string;
+      'border-bottom-left-radius': string;
+    }>(() => {
+      const radius = node?.radius.map((r) => (r || 0) + 'px') || [];
+      return {
+        'border-top-left-radius': radius[0] || '0px',
+        'border-top-right-radius': radius[1] || '0px',
+        'border-bottom-right-radius': radius[2] || '0px',
+        'border-bottom-left-radius': radius[3] || '0px'
+      };
+    });
   }
 
   /**
@@ -205,7 +224,8 @@ class CreateNodeContext {
         case 'on_add_node_size':
           opts = [
             { key: 'layout.width', value: node.props.layout.width || node.width },
-            { key: 'layout.height', value: node.props.layout.height || node.height }
+            { key: 'layout.height', value: node.props.layout.height || node.height },
+            { key: 'layout.radius', value: node.props.layout.radius || node.radius }
           ];
           break;
         case 'on_add_node_pos':
@@ -235,7 +255,13 @@ class CreateNodeContext {
 
             //  Pros Layout binds to  Node
             if (change_type !== 'update_node') {
-              const keys = ['layout.x', 'layout.y', 'layout.width', 'layout.height'];
+              const keys = [
+                'layout.x',
+                'layout.y',
+                'layout.width',
+                'layout.height',
+                'layout.radius'
+              ];
               if (keys.some((r) => key && key.includes(r))) {
                 this.updateNode(id, { [k]: value }, 'update_node_props');
               }
@@ -261,6 +287,7 @@ class CreateNodeContext {
         props: addNode.props,
         width: 400,
         height: 400,
+        radius: [0, 0, 0, 0],
         type: '',
         x: 0,
         y: 0,
