@@ -1,9 +1,10 @@
 import type { PanelSchemaLayout } from '../../panels/components/panel-schema/layout/interface';
 
 interface defaultSchemaKeyData {
+  key?: string;
   label?: string;
   icon?: string;
-  required: boolean;
+  ctrl: string;
 }
 
 interface SchemaKeyNumberData extends defaultSchemaKeyData {
@@ -13,7 +14,7 @@ interface SchemaKeyNumberData extends defaultSchemaKeyData {
 
 interface SchemaKeyStringData extends defaultSchemaKeyData {
   type: StringConstructor;
-  default: number;
+  default: string;
 }
 
 interface SchemaKeyBooleanData extends defaultSchemaKeyData {
@@ -26,17 +27,31 @@ interface SchemaArrayData extends defaultSchemaKeyData {
   default: number[];
 }
 
-export interface SchemaKeyTypes {
-  [key: string]: SchemaKeyNumberData | SchemaKeyStringData | SchemaKeyBooleanData | SchemaArrayData;
-}
-export interface SchemaExport {
+export type SchemaKeyTypes =
+  | {
+      [key: string]:
+        | SchemaKeyNumberData
+        | SchemaKeyStringData
+        | SchemaKeyBooleanData
+        | SchemaArrayData;
+    }
+  | (SchemaKeyNumberData | SchemaKeyStringData | SchemaKeyBooleanData | SchemaArrayData)[][];
+
+export interface SchemaExportDefault {
   name: string;
   label: string;
   key: string;
+}
+export interface SchemaExport extends SchemaExportDefault {
   schema: SchemaKeyTypes;
 }
 
 export type SchemaKeysTypes = SchemaExport[];
+
+export interface SchemaPropTypes extends SchemaExportDefault {
+  schema: SchemaKeyTypes;
+}
+export type SchemaPropsTypes = SchemaPropTypes[];
 
 export interface ComponentSchemaExport {
   name: string;
@@ -45,7 +60,6 @@ export interface ComponentSchemaExport {
   schemas: {
     type: string;
     schema: string;
-    required: boolean;
     default: PanelSchemaLayout;
   }[];
 }

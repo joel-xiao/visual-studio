@@ -11,38 +11,38 @@ const schema: SchemaExport = {
     x: {
       type: Number,
       default: 0,
-      required: true,
-      icon: 'x'
+      icon: 'x',
+      ctrl: 'input'
     },
     y: {
       type: Number,
       default: 0,
-      required: true,
-      icon: 'y'
+      icon: 'y',
+      ctrl: 'input'
     },
     width: {
       type: Number,
       default: 0,
-      required: true,
-      icon: 'width'
+      icon: 'width',
+      ctrl: 'input'
     },
     height: {
       type: Number,
       default: 0,
-      required: true,
-      icon: 'width'
+      icon: 'width',
+      ctrl: 'input'
     },
     rotate: {
       type: Number,
       default: 0,
-      required: true,
-      icon: 'rotate'
+      icon: 'rotate',
+      ctrl: 'input'
     },
     radius: {
       type: Array,
       default: [0, 0, 0, 0],
-      required: true,
-      icon: 'radius'
+      icon: 'radius',
+      ctrl: ''
     }
   }
 };

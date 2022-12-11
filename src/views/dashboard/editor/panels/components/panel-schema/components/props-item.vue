@@ -3,6 +3,11 @@ div(class="schema-props-item" :class="itemClass")
   slot
 </template>
 
+<script lang="ts">
+export default {
+  component_name: 'PANEL_PROPS_ITEM'
+};
+</script>
 <script setup lang="ts">
 import { ref } from 'vue';
 

@@ -5,8 +5,9 @@ import { createComponent } from '@hooks/vue-hooks';
 import type { ComponentData } from './../../panels/components/panel-component/interface';
 import type {
   SchemaExport,
-  SchemaKeysTypes,
   SchemaKeyTypes,
+  SchemaPropsTypes,
+  SchemaPropTypes,
   ComponentSchemaExport,
   ComponentProp,
   ComponentProps,
@@ -157,7 +158,7 @@ export class CreateComponentContext {
   #getComponentPropsTypes(schema_path: string) {
     const schemas = this.#getSchemas();
     const componentSchemas = this.#getComponentSchema(schema_path);
-    const propsTypes: SchemaKeysTypes = [];
+    const propsTypes: SchemaPropsTypes = [];
 
     if (
       componentSchemas &&
@@ -168,23 +169,13 @@ export class CreateComponentContext {
         .filter((schema) => schema && typeof schema === 'object' && !Array.isArray(schema))
         .forEach((component_schema) => {
           const schema = schemas[component_schema.schema];
-          // const schema_data: SchemaKeyTypes | null =
-          //   !Array.isArray(schema) && typeof schema === 'object'
-          //     ? //@ts-ignore
-          //       schema[component_schema.type]
-          //     : null;
-
-          // const propTypes: SchemaKeyTypes = {};
-
-          // const is_schema =
-          //   schema_data && !Array.isArray(schema_data) && typeof schema_data === 'object';
-          // if (is_schema && schema_data) {
-          //   Object.keys(schema_data).forEach((key) => {
-          //     schema_data && (propTypes[key] = schema_data[key]);
-          //   });
-          // }
-
-          propsTypes.push(schema);
+          propsTypes.push({
+            name: schema.name,
+            label: schema.label,
+            key: schema.key,
+            //@ts-ignore
+            schema: schema[component_schema.type]
+          });
         });
     }
     return readonly(propsTypes);
@@ -212,8 +203,9 @@ export class CreateComponentContext {
                 schema[component_schema.type]
               : null;
 
-          const is_schema =
-            schema_data && !Array.isArray(schema_data) && typeof schema_data === 'object';
+          const is_array_schema = schema_data && Array.isArray(schema_data);
+          const is_object_schema =
+            schema_data && !is_array_schema && typeof schema_data === 'object';
 
           const is_component_schema_default =
             component_schema &&
@@ -234,19 +226,52 @@ export class CreateComponentContext {
 
           const prop: ComponentProp = {};
 
-          if (is_schema && component_schema_name) {
+          if (component_schema_name) {
             const component_schema_default: ComponentProp = component_schema.default;
-            Object.keys(schema_data).forEach((key) => {
-              if (is_component_schema_default_object) {
-                //@ts-ignore
-                prop[key] = component_schema_default[key] || schema_data[key].default;
-              } else if (is_component_schema_default) {
-                //@ts-ignore
-                prop[key] = component_schema_default || schema_data[key].default;
-              } else {
-                prop[key] = schema_data[key].default;
-              }
-            });
+            if (is_object_schema) {
+              Object.keys(schema_data).forEach((key) => {
+                if (!key) {
+                  console.warn(
+                    'Schema Key of Editor is null',
+                    'schema name=' + schema.name,
+                    'component_schema type=' + component_schema.type
+                  );
+                  return;
+                }
+                if (is_component_schema_default_object) {
+                  //@ts-ignore
+                  prop[key] = component_schema_default[key] || schema_data[key].default;
+                } else if (is_component_schema_default) {
+                  //@ts-ignore
+                  prop[key] = component_schema_default || schema_data[key].default;
+                } else {
+                  prop[key] = schema_data[key].default;
+                }
+              });
+            } else if (is_array_schema) {
+              schema_data.forEach((r_arr) => {
+                Array.isArray(r_arr) &&
+                  r_arr.forEach((item) => {
+                    if (!item.key) {
+                      console.warn(
+                        'Schema Key of Editor is null',
+                        'schema name=' + schema.name,
+                        'component_schema type=' + component_schema.type
+                      );
+                      return;
+                    }
+                    if (is_component_schema_default_object) {
+                      //@ts-ignore
+                      prop[item.key] = component_schema_default[item.key] || item.default;
+                    } else if (is_component_schema_default) {
+                      //@ts-ignore
+                      prop[item.key] = component_schema_default || item.default;
+                    } else {
+                      prop[item.key] = item.default;
+                    }
+                  });
+              });
+            }
           }
 
           schema && schema.key && (props[schema.key] = prop);
@@ -257,19 +282,34 @@ export class CreateComponentContext {
   getComponentProps(schema_path: string) {
     return this.#getComponentProps(schema_path);
   }
+
   // formatter component prop is schema prop type
   formatterComponentProp(
     schema: SchemaKeyTypes,
     opts: { key: string; value: string | number | boolean | undefined | null; unit?: string }
   ): string | number | boolean | undefined | null {
     let value = opts.value;
-    if (schema[opts.key]) {
-      if (schema[opts.key].type === Number) {
+
+    const is_array_schema = schema && Array.isArray(schema);
+    const is_object_schema = schema && !is_array_schema && typeof schema === 'object';
+
+    let schema_prop;
+    if (is_object_schema) {
+      schema_prop = schema[opts.key];
+    } else if (is_array_schema) {
+      Array.isArray(schema) &&
+        schema.forEach((r_arr) => {
+          schema_prop = r_arr.find((item) => item.key === opts.key);
+        });
+    }
+
+    if (schema_prop) {
+      if (schema_prop.type === Number) {
         value = Number(value);
         isNaN(value) && (value = opts.value);
-      } else if (schema[opts.key].type === String) {
+      } else if (schema_prop.type === String) {
         value = value + '';
-      } else if (schema[opts.key].type === Boolean) {
+      } else if (schema_prop.type === Boolean) {
         value = !!value;
       }
     }

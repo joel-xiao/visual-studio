@@ -1,9 +1,13 @@
 import type {
   ComponentProps as _ComponentProps,
-  SchemaKeysTypes as _SchemaKeysTypes,
+  ComponentProp as _ComponentProp,
+  SchemaPropsTypes as _SchemaPropsTypes,
+  SchemaPropTypes as _SchemaPropTypes,
   SchemaKeyTypes as _SchemaKeyTypes
 } from './../../../hooks/component-context/interface';
 
 export type ComponentProps = _ComponentProps;
-export type SchemaKeysTypes = _SchemaKeysTypes;
+export type ComponentProp = _ComponentProp;
+export type SchemaPropsTypes = _SchemaPropsTypes;
+export type SchemaPropTypes = _SchemaPropTypes;
 export type SchemaKeyTypes = _SchemaKeyTypes;

@@ -1,5 +1,5 @@
 <template lang="pug">
-ContainerLayout(keyValue="component-layout" class="component-layout")
+PropsLayout(keyValue="component-layout" class="component-layout")
   PropsItem
     Input(v-model="modelValue.x" @update="onUpdate('x', $event)")
     Input(v-model="modelValue.y" @update="onUpdate('y', $event)")
@@ -23,7 +23,7 @@ export default {
 </script>
 <script setup lang="ts">
 import { reactive, watch } from 'vue';
-import ContainerLayout from '../components/container-layout.vue';
+import PropsLayout from '../components/props-layout.vue';
 import PropsItem from './../components/props-item.vue';
 import Input from './../../../../components/basic/c-input/index.vue';
 import Button from './../../../../components/basic/c-button/index.vue';

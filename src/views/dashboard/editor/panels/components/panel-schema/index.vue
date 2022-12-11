@@ -1,20 +1,23 @@
 <template lang="pug">
 div(class = "editor-panel-schema")
   template(v-for="(item, idx) in propsTypes")
-    component(:is="getComponent(item.name)" v-model="propsData[item.key]" @update="onUpdate(item.key, item.schema, $event)")
+    template(v-if="isComponent(item.name)")
+      component(:is="getComponent(item.name)" v-model="propsData[item.key]" @update="onUpdate(item.key, item.schema, $event)")
+    template(v-else)
+      component(:is="getComponent('PANEL_PROPS_WRAP')" :keyValue="item.key" :propsType="item" v-model="propsData[item.key]" @update="onUpdate(item.key, item.schema, $event)")
 </template>
 
 <script setup lang="ts">
 import { computed, reactive, markRaw } from 'vue';
-import { cloneDeep } from 'lodash';
+import PropsWarp from './props-warp.vue';
 import Layout from './layout/index.vue';
-import type { ComponentProps, SchemaKeysTypes, SchemaKeyTypes } from './interface';
+import type { ComponentProps, SchemaPropsTypes, SchemaKeyTypes } from './interface';
 import { useComponentContext } from '../../../hooks/component-context';
 const emit = defineEmits(['update']);
 
 interface Props {
   propsData: ComponentProps;
-  propsTypes: SchemaKeysTypes;
+  propsTypes: SchemaPropsTypes;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -39,12 +42,17 @@ const onUpdate = function (
   );
 };
 
-const schemaComponents = reactive({
-  [Layout.schema_name as string]: markRaw(Layout)
+const components = reactive({
+  [Layout.schema_name as string]: markRaw(Layout),
+  [PropsWarp.component_name as string]: markRaw(PropsWarp)
 });
 
+const isComponent = (schema_name: string) => {
+  return !!components[schema_name];
+};
+
 const getComponent = (schema_name: string) => {
-  return schemaComponents[schema_name];
+  return components[schema_name];
 };
 </script>
 
