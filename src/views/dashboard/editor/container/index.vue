@@ -2,15 +2,15 @@
 div.editor-middle(
   ref="middleDom"
   id="editor-middle"
+  @drop="onDrop"
+  @dragenter="onDragenter"
+  @dragover="onDragover"
+  @mousewheel="onWheel"
   )
   div.editor-middle-container(
     ref="middleContainerDom"
     id="editor-middle-container"
     :style="rootStyle"
-    @drop="onDrop"
-    @dragenter="onDragenter"
-    @dragover="onDragover"
-    @mousewheel="onWheel"
     @mousedown.self="onDown")
     GridLine
     ContainerNode(v-for="(node, idx) in nodes" :key="node.id" :id="node.id")
