@@ -1,7 +1,7 @@
 <template lang="pug">
 PropsLayout(:keyValue="'props-warp-' + keyValue" :label="propsType.label")
-  PropsItem(v-for="(props, idx) in Schema" :key="idx")
-    PropsCtrl(v-for="(prop, ctrl_idx) in props" :key="ctrl_idx" :ctrl="prop.ctrl" v-model="modelValue[prop.key]" @update="onUpdate('x', $event)")
+  PropsItem(v-for="(props, idx) in Schema" :key="idx" :gridTemplateColumns="getGridTemplateColumns(idx)")
+    PropsCtrl(v-for="(prop, ctrl_idx) in props" :key="ctrl_idx" :ctrl="prop.ctrl" :ctrlType="prop.ctrl_type" v-model="modelValue[prop.key]" @update="onUpdate(prop.key, $event)")
 </template>
 
 <script lang="ts">
@@ -39,6 +39,14 @@ const Schema = computed(() => {
   let schema = Array.isArray(props.propsType.schema) ? props.propsType.schema : [];
   return schema.filter((schema) => Array.isArray(schema));
 });
+
+const getGridTemplateColumns = computed(() => {
+  return (idx: number) => {
+    return Array.isArray(Schema.value[idx]) ? Schema.value[idx].map((prop) => prop?.size) : [];
+  };
+});
+
+console.log(Schema, props.modelValue);
 
 const onUpdate = function (key: string, value: string | number | boolean | undefined | number[]) {
   emit('update', [key, value]);

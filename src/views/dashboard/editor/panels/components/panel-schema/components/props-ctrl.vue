@@ -1,5 +1,5 @@
 <template lang="pug">
-component(v-if="isComponent(ctrl)" :is="getComponent(ctrl)" v-bind="$attrs")
+component(v-if="isComponent(ctrl)" :is="getComponent(ctrl)" :type="ctrlType" v-bind="$attrs")
 </template>
 
 <script lang="ts">
@@ -15,10 +15,12 @@ import Button from './../../../../components/basic/c-button/index.vue';
 
 interface Props {
   ctrl: string;
+  ctrlType: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  ctrl: ''
+  ctrl: '',
+  ctrlType: ''
 });
 
 const components = reactive({

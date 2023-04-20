@@ -1,5 +1,5 @@
 <template lang="pug">
-BasicBox(v-bind="$attrs" :type="type || ''" @click="onClick")
+BasicBox(v-bind="$attrs" :type="type || 'button'" @click="onClick")
   BasicIcon
 </template>
 

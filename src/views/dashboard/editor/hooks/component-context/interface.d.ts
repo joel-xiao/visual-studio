@@ -5,6 +5,8 @@ interface defaultSchemaKeyData {
   label?: string;
   icon?: string;
   ctrl: string;
+  ctrl_type?: string;
+  size?: string;
 }
 
 interface SchemaKeyNumberData extends defaultSchemaKeyData {
@@ -27,15 +29,27 @@ interface SchemaArrayData extends defaultSchemaKeyData {
   default: number[];
 }
 
+interface SchemaFunctionData extends defaultSchemaKeyData {
+  type: FunctionConstructor;
+  default: () => void;
+}
+
 export type SchemaKeyTypes =
   | {
       [key: string]:
         | SchemaKeyNumberData
         | SchemaKeyStringData
         | SchemaKeyBooleanData
-        | SchemaArrayData;
+        | SchemaArrayData
+        | SchemaFunctionData;
     }
-  | (SchemaKeyNumberData | SchemaKeyStringData | SchemaKeyBooleanData | SchemaArrayData)[][];
+  | (
+      | SchemaKeyNumberData
+      | SchemaKeyStringData
+      | SchemaKeyBooleanData
+      | SchemaArrayData
+      | SchemaFunctionData
+    )[][];
 
 export interface SchemaExportDefault {
   name: string;

@@ -38,6 +38,15 @@ const schema: SchemaExport = {
         default: 0,
         icon: 'height',
         ctrl: 'input'
+      },
+      {
+        key: '',
+        type: Function,
+        default: () => {},
+        icon: '',
+        ctrl: 'button',
+        ctrl_type: 'status-button',
+        size: 'right'
       }
     ],
     [
@@ -47,6 +56,22 @@ const schema: SchemaExport = {
         default: 0,
         icon: 'rotate',
         ctrl: 'input'
+      },
+      {
+        key: '',
+        type: Function,
+        default: () => {},
+        icon: '',
+        ctrl: 'button',
+        size: 'small'
+      },
+      {
+        key: '',
+        type: Function,
+        default: () => {},
+        icon: '',
+        ctrl: 'button',
+        size: 'small'
       }
     ],
     [
