@@ -61,10 +61,10 @@ const onResizing = function (dargDataset: DargDataset): void {
   });
 };
 
-const { createNodeComponent } = useComponentContext();
+const { createNodeComponentApp } = useComponentContext();
 const vm = ref<HTMLElement>();
 onMounted(() => {
-  createNodeComponent(node.props as ComponentProps, vm?.value, node.component);
+  createNodeComponentApp(node.props as ComponentProps, vm?.value, node.component);
 });
 </script>
 

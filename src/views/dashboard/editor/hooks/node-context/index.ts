@@ -161,13 +161,21 @@ class CreateNodeContext {
       'border-top-right-radius': string;
       'border-bottom-right-radius': string;
       'border-bottom-left-radius': string;
+      width: string;
+      height: string;
+      overflow: string;
     }>(() => {
       const radius = node?.radius.map((r) => (r || 0) + 'px') || [];
+      const width = (node?.width || 0) + 'px';
+      const height = (node?.height || 0) + 'px';
       return {
         'border-top-left-radius': radius[0] || '0px',
         'border-top-right-radius': radius[1] || '0px',
         'border-bottom-right-radius': radius[2] || '0px',
-        'border-bottom-left-radius': radius[3] || '0px'
+        'border-bottom-left-radius': radius[3] || '0px',
+        width: width,
+        height: height,
+        overflow: 'hidden'
       };
     });
   }

@@ -1,5 +1,5 @@
 import { onBeforeUnmount } from 'vue';
-import { App, readonly } from 'vue';
+import { App, readonly, h } from 'vue';
 import { cloneDeep } from 'lodash';
 import { createComponent } from '@hooks/vue-hooks';
 import type { ComponentData } from './../../panels/components/panel-component/interface';
@@ -38,6 +38,7 @@ export class CreateComponentContext {
     this.formatterComponentProp = this.formatterComponentProp.bind(this);
     this.getComponentPropsTypes = this.getComponentPropsTypes.bind(this);
     this.createNodeComponent = this.createNodeComponent.bind(this);
+    this.createNodeComponentApp = this.createNodeComponentApp.bind(this);
   }
 
   #install() {
@@ -320,7 +321,13 @@ export class CreateComponentContext {
     return this.components[component_path].default;
   }
 
-  createNodeComponent(
+  createNodeComponent(props: ComponentProps | ComponentProps, component: string) {
+    return h(this.#getComponent(component), {
+      data: props
+    });
+  }
+
+  createNodeComponentApp(
     props: ComponentProps | ComponentProps,
     parentEl: HTMLElement | undefined,
     component: string
