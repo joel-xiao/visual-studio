@@ -1,5 +1,5 @@
 import { onBeforeUnmount } from 'vue';
-import { App, readonly, h } from 'vue';
+import { App, readonly, createVNode } from 'vue';
 import { cloneDeep } from 'lodash';
 import { createComponent } from '@hooks/vue-hooks';
 import type { ComponentData } from './../../panels/components/panel-component/interface';
@@ -322,7 +322,7 @@ export class CreateComponentContext {
   }
 
   createNodeComponent(props: ComponentProps | ComponentProps, component: string) {
-    return h(this.#getComponent(component), {
+    return createVNode(this.#getComponent(component), {
       data: props
     });
   }
