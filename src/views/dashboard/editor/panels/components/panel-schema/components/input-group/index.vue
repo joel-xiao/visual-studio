@@ -1,6 +1,6 @@
 <template lang="pug">
-div(class="schema-radius")
-  ul(class="schema-radius__options")
+div(class="schema-input-group")
+  ul(class="schema-input-group__options")
     li
       Input(v-model="data.radius" :placeholder="data.isMore ? '' : '多个值'" @update="onUpdate")
     template(v-if="data.isMore")
@@ -10,15 +10,14 @@ div(class="schema-radius")
         Input(v-model="modelValue[2]" @update="onUpdate")
       li
         Input(v-model="modelValue[3]" @update="onUpdate")
-  div(class="schema-radius__button-switch")
+  div(class="schema-input-group__button-switch")
     Button(v-model="data.isMore" type="status-button")
-
 </template>
 
 <script setup lang="ts">
-import { reactive, watch, nextTick } from 'vue';
-import Input from './../../../../components/basic/c-input/index.vue';
-import Button from './../../../../components/basic/c-button/index.vue';
+import { reactive, watchEffect, nextTick } from 'vue';
+import Input from './../../../../../components/basic/c-input/index.vue';
+import Button from './../../../../../components/basic/c-button/index.vue';
 import type { PanelSchemaRadius } from './interface';
 
 interface Props {
@@ -41,9 +40,9 @@ const data = reactive({
   radius: props.modelValue[0] + ''
 });
 
-watch(data, (newValue) => {
+watchEffect(() => {
   if (data.isMore) {
-    let radius = Number(newValue.radius);
+    let radius = Number(data.radius);
     radius = isNaN(radius) ? 0 : radius;
     emit('update:modelValue', [
       radius,
@@ -52,15 +51,15 @@ watch(data, (newValue) => {
       props.modelValue[3]
     ]);
   } else {
-    const isRadius = newValue.radius.includes(',');
+    const isRadius = data.radius.includes(',');
     if (!isRadius) {
-      let radius = Number(newValue.radius);
+      let radius = Number(data.radius);
       radius = isNaN(radius) ? 0 : radius;
       emit('update:modelValue', [radius, radius, radius, radius]);
     } else {
-      let radius = newValue.radius
+      let radius = data.radius
         .split(',')
-        .map((r) => Number(newValue.radius))
+        .map((r) => Number(data.radius))
         .map((r) => (isNaN(r) ? 0 : r));
 
       if (radius.length === 2) {
@@ -76,13 +75,13 @@ watch(data, (newValue) => {
 </script>
 
 <style lang="scss">
-.editor-panel-schema .schema-radius {
+.editor-panel-schema .schema-input-group {
   display: grid;
   grid-template-rows: auto;
   grid-template-columns: 1fr 30px;
   grid-gap: 6px;
 
-  & > .schema-radius__options {
+  & > .schema-input-group__options {
     display: grid;
     width: 100%;
     grid-template-columns: 1fr 1fr;
@@ -90,7 +89,7 @@ watch(data, (newValue) => {
     grid-gap: 6px;
   }
 
-  & > .schema-radius__button-switch {
+  & > .schema-input-group__button-switch {
     display: grid;
     grid-template-rows: auto;
     grid-template-columns: auto;

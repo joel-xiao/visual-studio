@@ -1,5 +1,13 @@
 import type { PanelSchemaLayout } from '../../panels/components/panel-schema/layout/interface';
 
+export type ComponentProp =
+  | PanelSchemaLayout
+  | { [key: string]: number | string | number[] | boolean | undefined };
+
+export interface ComponentProps {
+  [key: string]: ComponentProp;
+}
+
 interface defaultSchemaKeyData {
   key?: string;
   label?: string;
@@ -7,6 +15,8 @@ interface defaultSchemaKeyData {
   ctrl: string;
   ctrl_type?: string;
   size?: string;
+  click?: (props: ComponentProp) => void;
+  change?: (props: ComponentProp) => void;
 }
 
 interface SchemaKeyNumberData extends defaultSchemaKeyData {
@@ -34,22 +44,14 @@ interface SchemaFunctionData extends defaultSchemaKeyData {
   default: () => void;
 }
 
-export type SchemaKeyTypes =
-  | {
-      [key: string]:
-        | SchemaKeyNumberData
-        | SchemaKeyStringData
-        | SchemaKeyBooleanData
-        | SchemaArrayData
-        | SchemaFunctionData;
-    }
-  | (
-      | SchemaKeyNumberData
-      | SchemaKeyStringData
-      | SchemaKeyBooleanData
-      | SchemaArrayData
-      | SchemaFunctionData
-    )[][];
+export type SchemaKeyType =
+  | SchemaKeyNumberData
+  | SchemaKeyStringData
+  | SchemaKeyBooleanData
+  | SchemaArrayData
+  | SchemaFunctionData;
+
+export type SchemaKeyTypes = { [key: string]: SchemaKeyType } | SchemaKeyType[][];
 
 export interface SchemaExportDefault {
   name: string;
@@ -76,14 +78,6 @@ export interface ComponentSchemaExport {
     schema: string;
     default: PanelSchemaLayout;
   }[];
-}
-
-export type ComponentProp =
-  | PanelSchemaLayout
-  | { [key: string]: number | string | number[] | boolean | undefined };
-
-export interface ComponentProps {
-  [key: string]: ComponentProp;
 }
 
 export interface UseUILibraryComponent {

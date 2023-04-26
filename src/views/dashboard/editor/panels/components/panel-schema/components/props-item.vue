@@ -1,5 +1,5 @@
 <template lang="pug">
-div(class="schema-props-item" :class="itemClass" :style="style")
+div(class="schema-props-item" :style="style")
   slot
 </template>
 
@@ -13,43 +13,36 @@ import { ref, computed } from 'vue';
 
 interface Props {
   type?: string;
-  gridTemplateColumns: string[];
+  gridTemplateColumns?: string[];
 }
 const props = withDefaults(defineProps<Props>(), {
   type: '',
-  gridTemplateColumns: []
+  gridTemplateColumns: () => []
 });
-
-const itemClass = ref<string>('');
-switch (props.type) {
-  case 'radius':
-    itemClass.value = 'radius_more';
-    break;
-  default:
-    itemClass.value = '';
-    break;
-}
 
 const gridTemplateOption: { [key: string]: string } = {
   right: '30px',
   small: '0.25fr',
   default: '0.5fr',
-  large: '1fr'
+  large: '1fr',
+  largely: '1fr'
 };
 
 const style = computed(() => {
-  let style = {
-    '--grid-template-columns': props.gridTemplateColumns.length
-      ? [
-          ...props.gridTemplateColumns
-            .filter((column) => column !== 'right')
-            .map((column) => column || 'default'),
-          'right'
-        ]
-          .map((column) => gridTemplateOption[column])
-          .join(' ')
-      : ' 0.5fr 0.5fr 30px'
-  };
+  let style = { '--grid-template-columns': ' 0.5fr 0.5fr 30px' };
+
+  if (props.gridTemplateColumns.length) {
+    let columns = props.gridTemplateColumns;
+    if (columns.length > 1 && !columns.some((column) => column === 'largely'))
+      columns = [
+        ...columns.filter((column) => column !== 'right').map((column) => column || 'default'),
+        'right'
+      ];
+
+    style['--grid-template-columns'] = columns
+      .map((column) => gridTemplateOption[column])
+      .join(' ');
+  }
 
   return style;
 });
@@ -57,7 +50,7 @@ const style = computed(() => {
 
 <style lang="scss">
 .editor-panel-schema .schema-props-item {
-  height: 30px;
+  min-height: 30px;
   width: 100%;
   display: grid;
   grid-gap: 6px;
@@ -67,13 +60,5 @@ const style = computed(() => {
   align-items: center;
   font-weight: 600;
   color: var(--color-text-secondary);
-
-  &.radius_more {
-    -webkit-box-align: start;
-    -ms-flex-align: start;
-    align-items: start;
-    height: auto;
-    grid-template-columns: 1fr !important;
-  }
 }
 </style>

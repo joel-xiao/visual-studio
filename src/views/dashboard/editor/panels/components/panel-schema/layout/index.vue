@@ -12,13 +12,13 @@ PropsLayout(keyValue="component-layout" class="component-layout")
     div(class="component-layout-rotate")
       Button(@click="onRotate('x')")
       Button(@click="onRotate('y')")
-  PropsItem(type="radius")
+  PropsItem(:gridTemplateColumns="['largely']")
     Radius(v-model="modelValue.radius" @update="onUpdate('radius', $event)")
 </template>
 
 <script lang="ts">
 export default {
-  schema_name: 'COMMON_LAYOUT'
+  schema_name: 'COMMON_OLD_LAYOUT'
 };
 </script>
 <script setup lang="ts">
@@ -27,7 +27,7 @@ import PropsLayout from '../components/props-layout.vue';
 import PropsItem from './../components/props-item.vue';
 import Input from './../../../../components/basic/c-input/index.vue';
 import Button from './../../../../components/basic/c-button/index.vue';
-import Radius from './../radius/index.vue';
+import Radius from './../components/input-group/index.vue';
 import type { PanelSchemaLayout } from './interface';
 
 interface Props {

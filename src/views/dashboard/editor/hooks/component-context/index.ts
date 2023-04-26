@@ -298,10 +298,7 @@ export class CreateComponentContext {
     if (is_object_schema) {
       schema_prop = schema[opts.key];
     } else if (is_array_schema) {
-      Array.isArray(schema) &&
-        schema.forEach((r_arr) => {
-          schema_prop = r_arr.find((item) => item.key === opts.key);
-        });
+      schema_prop = schema.flatMap((arr) => arr).find((item) => item.key === opts.key);
     }
 
     if (schema_prop) {

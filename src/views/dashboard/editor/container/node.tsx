@@ -1,17 +1,5 @@
 import type { DefineComponent } from 'vue';
-import {
-  defineComponent,
-  h,
-  isVNode,
-  ref,
-  reactive,
-  markRaw,
-  readonly,
-  withDefaults,
-  watch,
-  onMounted,
-  withModifiers
-} from 'vue';
+import { defineComponent, ref, readonly, withModifiers } from 'vue';
 
 import DragResize from './components/drag-resize.vue';
 import type { DargDataset } from '@d/darg-resize/interface';

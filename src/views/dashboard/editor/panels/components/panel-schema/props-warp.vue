@@ -1,7 +1,7 @@
 <template lang="pug">
 PropsLayout(:keyValue="'props-warp-' + keyValue" :label="propsType.label")
   PropsItem(v-for="(props, idx) in Schema" :key="idx" :gridTemplateColumns="getGridTemplateColumns(idx)")
-    PropsCtrl(v-for="(prop, ctrl_idx) in props" :key="ctrl_idx" :ctrl="prop.ctrl" :ctrlType="prop.ctrl_type" v-model="modelValue[prop.key]" @update="onUpdate(prop.key, $event)")
+    PropsCtrl(v-for="(prop, ctrl_idx) in props" :key="ctrl_idx" :dataType="prop.type" :ctrl="prop.ctrl" :ctrlType="prop.ctrl_type" v-model="modelValue[prop.key]" @update="onUpdate(prop.key, $event)" @click="onClick(prop)" )
 </template>
 
 <script lang="ts">
@@ -13,7 +13,7 @@ export default {
 import PropsLayout from './components/props-layout.vue';
 import PropsItem from './components/props-item.vue';
 import PropsCtrl from './components/props-ctrl.vue';
-import type { ComponentProp, SchemaPropTypes } from './interface';
+import type { ComponentProp, SchemaPropTypes, SchemaKeyType } from './interface';
 import { computed } from 'vue';
 
 interface Props {
@@ -46,10 +46,12 @@ const getGridTemplateColumns = computed(() => {
   };
 });
 
-console.log(Schema, props.modelValue);
-
 const onUpdate = function (key: string, value: string | number | boolean | undefined | number[]) {
   emit('update', [key, value]);
+};
+
+const onClick = function (propSchema: SchemaKeyType) {
+  propSchema.click?.(props.modelValue);
 };
 </script>
 

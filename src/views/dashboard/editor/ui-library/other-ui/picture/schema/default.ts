@@ -16,18 +16,6 @@ const schema: ComponentSchemaExport = {
         rotate: 0,
         radius: [0, 0, 0, 0]
       }
-    },
-    {
-      type: 'schema',
-      schema: 'COMMON_LAYER',
-      default: {
-        x: 0,
-        y: 0,
-        width: 300,
-        height: 300,
-        rotate: 0,
-        radius: [0, 0, 0, 0]
-      }
     }
   ]
 };

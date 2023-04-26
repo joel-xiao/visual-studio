@@ -9,10 +9,8 @@ export default {
 };
 </script>
 <script setup lang="ts">
-import { reactive, markRaw } from 'vue';
-import Input from './../../../../components/basic/c-input/index.vue';
-import Button from './../../../../components/basic/c-button/index.vue';
-
+import { reactive, markRaw, defineAsyncComponent } from 'vue';
+import type { Component } from 'vue';
 interface Props {
   ctrl: string;
   ctrlType: string;
@@ -23,9 +21,14 @@ const props = withDefaults(defineProps<Props>(), {
   ctrlType: ''
 });
 
-const components = reactive({
-  ['input' as string]: markRaw(Input),
-  ['button' as string]: markRaw(Button)
+const componentImport = (url: string) => {
+  return defineAsyncComponent(() => import(url));
+};
+
+const components = reactive<{ [key: string]: Component }>({
+  ['input']: markRaw(componentImport('./../../../../components/basic/c-input/index.vue')),
+  ['button']: markRaw(componentImport('./../../../../components/basic/c-button/index.vue')),
+  ['input-group']: markRaw(componentImport('./input-group/index.vue'))
 });
 
 const isComponent = (schema_name: string) => {

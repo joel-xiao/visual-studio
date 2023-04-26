@@ -8,7 +8,8 @@ div(class = "editor-panel-schema")
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, markRaw } from 'vue';
+import { computed, reactive, markRaw, watchEffect, ref } from 'vue';
+import { cloneDeep } from 'lodash';
 import PropsWarp from './props-warp.vue';
 import Layout from './layout/index.vue';
 import type { ComponentProps, SchemaPropsTypes, SchemaKeyTypes } from './interface';
