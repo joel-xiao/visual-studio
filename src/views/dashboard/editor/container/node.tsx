@@ -62,7 +62,8 @@ const ContainerNode = /*#__PURE__*/ defineComponent({
             ref={resize}
             data={dargDataset}
             onResizing={onResizing}
-            onMousedown={withModifiers(onDown, ['stop', 'prevent'])}>
+            // onMousedown={() => withModifiers(onDown, ['stop', 'prevent'])}
+          >
             <div class="modal-node" style={nodeStyle.value}>
               {createNodeComponent(node.props as ComponentProps, node.component)}
             </div>

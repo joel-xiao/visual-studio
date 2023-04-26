@@ -32,7 +32,8 @@ axios.defaults.baseURL = '/api';
 axios.defaults.timeout = 10000;
 axios.defaults.headers.post['Content-Type'] = 'application/json;charset=UTF-8';
 axios.interceptors.request.use(
-  (config): AxiosRequestConfig<object> => {
+  // (config): AxiosRequestConfig<object> => {
+  (config) => {
     const token = window.sessionStorage.getItem('token');
     if (token) {
       // @ts-ignore

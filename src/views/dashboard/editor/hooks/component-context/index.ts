@@ -1,5 +1,4 @@
-import { onBeforeUnmount } from 'vue';
-import { App, readonly, createVNode } from 'vue';
+import { App, readonly, createVNode, onBeforeUnmount } from 'vue';
 import { cloneDeep } from 'lodash';
 import { createComponent } from '@hooks/vue-hooks';
 import type { ComponentData } from './../../panels/components/panel-component/interface';
@@ -42,12 +41,17 @@ export class CreateComponentContext {
   }
 
   #install() {
-    Object.values(import.meta.globEager('./../../schema/**/*.ts')).forEach((schema) => {
-      schema.default && (this.#schemas[schema.default.name] = readonly(schema.default));
+    Object.values(
+      import.meta.glob<SchemaExport>(['./../../schema/**/*.ts', '!./../../schema/**/*.d.ts'], {
+        eager: true,
+        import: 'default'
+      })
+    ).forEach((schema) => {
+      schema && (this.#schemas[schema.name] = schema);
     });
 
-    this.components = import.meta.globEager('./../../ui-library/*/*/index.vue');
-    this.componentSchemas = import.meta.globEager('./../../ui-library/*/*/schema/*.ts');
+    this.components = import.meta.glob(['./../../ui-library/*/*/index.vue'], { eager: true });
+    this.componentSchemas = import.meta.glob('./../../ui-library/*/*/schema/*.ts', { eager: true });
   }
   install() {
     this.#install();
@@ -111,8 +115,12 @@ export class CreateComponentContext {
   }
 
   getUiLibrary(): ComponentData[] {
-    this.UILibraryComponentUses = import.meta.globEager('./../../ui-library/*/*/use.ts');
-    this.UILibraryUses = import.meta.globEager('./../../ui-library/*/use.ts');
+    this.UILibraryComponentUses = import.meta.glob('./../../ui-library/*/*/use.ts', {
+      eager: true
+    });
+    this.UILibraryUses = import.meta.glob('./../../ui-library/*/use.ts', {
+      eager: true
+    });
 
     const children: ComponentData[] = [];
     for (const path of Object.keys(this.UILibraryUses)) {
@@ -314,8 +322,8 @@ export class CreateComponentContext {
     return value;
   }
 
-  #getComponent(component_path: string): App {
-    return this.components[component_path].default;
+  #getComponent(component_path: string) {
+    return this.components[component_path];
   }
 
   createNodeComponent(props: ComponentProps | ComponentProps, component: string) {
