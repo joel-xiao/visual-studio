@@ -76,7 +76,7 @@ export interface ComponentSchemaExport {
   schemas: {
     type: string;
     schema: string;
-    default: PanelSchemaLayout;
+    default: ComponentProp;
   }[];
 }
 
