@@ -10,9 +10,10 @@ const navList: navData[] = reactive(
   markRaw([
     { label: '可视化', id: 'dashboard' },
     { label: '网页', id: 'web' },
+    { label: '3D', id: '3d' },
     { label: '数据', id: 'data' }
-    // { label: "我的资产", id: 'com' },
-    // { label: "教程",id: 'case' },
+    // { label: '我的资产', id: 'com' },
+    // { label: '教程', id: 'case' }
   ])
 );
 
