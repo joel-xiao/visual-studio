@@ -48,8 +48,7 @@ export type SchemaKeyType =
   | SchemaKeyNumberData
   | SchemaKeyStringData
   | SchemaKeyBooleanData
-  | SchemaArrayData
-  | SchemaFunctionData;
+  | SchemaArrayData;
 
 export type SchemaKeyTypes = { [key: string]: SchemaKeyType } | SchemaKeyType[][];
 

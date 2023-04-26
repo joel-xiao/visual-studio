@@ -65,7 +65,9 @@ const schema: SchemaExport = {
         ctrl: 'button',
         size: 'small',
         click: (props) => {
-          props.rotate = 180 - props.rotate;
+          if (typeof props.rotate === 'number') {
+            props.rotate = 180 - props.rotate;
+          }
         }
       },
       {
@@ -76,7 +78,9 @@ const schema: SchemaExport = {
         ctrl: 'button',
         size: 'small',
         click: (props) => {
-          props.rotate = -props.rotate;
+          if (typeof props.rotate === 'number') {
+            props.rotate = 180 - props.rotate;
+          }
         }
       }
     ],
