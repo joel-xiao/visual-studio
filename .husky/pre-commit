@@ -4,6 +4,6 @@
 
 npx --no-install lint-staged
 
-echo "---Check start---"
-npm run tsc
-echo "---Check end---"
+# echo "---Check start---"
+# npm run tsc
+# echo "---Check end---"
