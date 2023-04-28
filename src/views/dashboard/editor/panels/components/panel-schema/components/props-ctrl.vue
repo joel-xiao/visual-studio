@@ -22,7 +22,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const componentImport = (url: string) => {
-  return defineAsyncComponent(() => import(url));
+  return defineAsyncComponent(() => import(/* @vite-ignore */ url));
 };
 
 const components = reactive<{ [key: string]: Component }>({
