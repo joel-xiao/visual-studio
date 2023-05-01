@@ -50,7 +50,10 @@ export class CreateComponentContext {
       schema && (this.#schemas[schema.name] = schema);
     });
 
-    this.components = import.meta.glob(['./../../ui-library/*/*/index.vue'], { eager: true });
+    this.components = import.meta.glob(['./../../ui-library/*/*/index.vue'], {
+      eager: true,
+      import: 'default'
+    });
     this.componentSchemas = import.meta.glob('./../../ui-library/*/*/schema/*.ts', { eager: true });
   }
   install() {
