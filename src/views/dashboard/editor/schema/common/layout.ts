@@ -5,7 +5,7 @@ const SCHEMA_KEY = 'layout';
 
 const schema: SchemaExport = {
   name: SCHEMA_NAME,
-  label: SCHEMA_LABEL,
+  label: '', // SCHEMA_LABEL,
   key: SCHEMA_KEY,
   schema: [
     [

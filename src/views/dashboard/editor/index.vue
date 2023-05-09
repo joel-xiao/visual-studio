@@ -15,13 +15,10 @@ import RightPanel from './panels/right-panel.vue';
 import MiddleContainer from './container/index.vue';
 
 import { reactive } from 'vue';
-import { useDashboardStore } from '@/store/dashboard';
 import { createNodeContext } from './hooks/node-context';
 import type { EditorData } from './hooks/node-context/interface';
 import { createBindKeysContext } from './hooks/bind-keys-context';
 import { createComponentContext } from './hooks/component-context';
-
-const { saveCurrentNode } = useDashboardStore();
 
 let data = reactive<EditorData>({
   folder: '',
