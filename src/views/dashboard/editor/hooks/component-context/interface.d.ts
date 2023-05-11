@@ -14,7 +14,7 @@ interface defaultSchemaKeyData {
   icon?: string;
   ctrl: string;
   ctrl_type?: string;
-  size?: string;
+  size?: 'default' | 'small' | 'large' | 'largely' | 'right';
   click?: (props: ComponentProp) => void;
   change?: (props: ComponentProp) => void;
 }
