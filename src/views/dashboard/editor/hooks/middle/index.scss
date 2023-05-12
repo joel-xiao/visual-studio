@@ -1,15 +1,22 @@
-.editor-middle-mask {
-  position: absolute;
-  inset: 0;
-  display: none;
-  cursor: grab;
+/**
+* @description: Editor Middle Mask CSS
+* @author: Joel
+*/
 
-  &.show {
-    display: block;
+#editor {
+  .editor-middle-mask {
+    position: absolute;
+    inset: 0;
+    display: none;
     cursor: grab;
-  }
 
-  &.down {
-    cursor: grabbing;
+    &.show {
+      display: block;
+      cursor: grab;
+    }
+
+    &.down {
+      cursor: grabbing;
+    }
   }
 }

@@ -147,7 +147,7 @@ div#dashboard-my-project
           transition: all 0.2s;
 
           &:hover {
-            color: var(--dashboard-main-color);
+            /* color: var(--dashboard-main-color); */
           }
 
           &.active {

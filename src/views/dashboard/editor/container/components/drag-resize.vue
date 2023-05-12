@@ -44,7 +44,6 @@ defineExpose({ setActive, setPos });
 
 <style lang="scss">
 .editor-drag-resize {
-  --drag-resize-color: hsl(260, 100%, 66%);
   .editor-drag-resize-container {
     width: 100%;
     height: 100%;
