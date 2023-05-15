@@ -118,7 +118,7 @@ div#dashboard-my-project
       width: 264px;
       height: 100%;
       padding: 8px;
-      background: var(--theme-color-left-bar-bg);
+      background: var(--color-left-bar-bg);
       z-index: 1;
 
       .manage-title {

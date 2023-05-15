@@ -93,7 +93,7 @@ transition(name='c-click-menu-fade')
     border-radius: var(--border-radius-4);
 
     &:hover {
-      background: var(--color-blue-700);
+      background: var(--theme-color-blue-700);
       .menu-item-label,
       .menu-item-icon {
         color: var(--color-text-primary-white);
