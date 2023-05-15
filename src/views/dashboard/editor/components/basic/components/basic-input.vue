@@ -15,7 +15,7 @@ const props = withDefaults(defineProps<Props>(), {
   dataType: String
 });
 
-const emit = defineEmits(['blur', 'update:modelValue', 'update']);
+const emit = defineEmits(['focus', 'blur', 'update:modelValue', 'update']);
 
 const inputValue = ref(props.modelValue);
 
@@ -44,7 +44,7 @@ watchEffect(() => {
 
 const onFocus = function (event: Event) {
   focus.value = true;
-  emit('blur', event);
+  emit('focus', event);
 };
 
 const onBlur = function (event: Event) {
