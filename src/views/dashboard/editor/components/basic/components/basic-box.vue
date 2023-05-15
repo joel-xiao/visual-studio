@@ -29,16 +29,10 @@ watch(model, (newValue) => {
   emit('update:modelValue', newValue);
 });
 
-const boxStyle = computed(() => {
-  console.log({
-    [props.type + '-box']: !!props.type,
-    active: model.value
-  });
-  return {
-    [props.type + '-box']: !!props.type,
-    active: model.value
-  };
-});
+const boxStyle = computed(() => ({
+  [props.type + '-box']: !!props.type,
+  active: model.value
+}));
 
 const onMouseDown = function () {
   if (props.type === 'button') {
@@ -104,7 +98,7 @@ defineExpose({ focus, blur });
       box-shadow: 0 0 0 1px var(--color-tran-12) inset;
     }
     &.active {
-      background: var(--theme-color-blue-700);
+      background: var(--color-blue-700);
       color: var(--color-text-primary-white);
     }
   }
