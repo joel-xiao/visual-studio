@@ -67,7 +67,7 @@ const onMenuCommand = function (cmd: LayerItemMenu): void {
 };
 
 const onCommand = function (
-  event: { path: HTMLElement[] },
+  event: { composedPath: () => HTMLElement[] },
   cmd: LayerItemMenu,
   item: LayerItemData
 ): void {

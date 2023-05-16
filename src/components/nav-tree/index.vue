@@ -71,7 +71,7 @@ const onMenuCommand = function (cmd: TreeItemMenu): void {
 };
 
 const onCommand = function (
-  event: { path: HTMLElement[] },
+  event: { composedPath: () => HTMLElement[] },
   cmd: TreeItemMenu,
   item: TreeItemData
 ): void {
