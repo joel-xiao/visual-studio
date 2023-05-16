@@ -75,7 +75,7 @@ const onCommand = function (
   commandData.item = item;
 
   if (cmd?.children?.length) {
-    onContentMenuShow(true, event.path[1]);
+    onContentMenuShow(true, event.composedPath()[1]);
     return;
   }
   onContentMenuShow(false);

@@ -7,7 +7,7 @@ div#dashboard(class="not-select")
 
 <style lang="scss">
 #dashboard {
-  background: var(--color-main);
+  background: var(--db-color-main);
   position: relative;
   width: 100%;
   height: 100%;

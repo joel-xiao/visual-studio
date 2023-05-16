@@ -1,3 +1,8 @@
+/**
+ * @description: Global util
+ * @author: Joel
+ */
+
 export const getPlatform = function (): string | undefined {
   const isWin = navigator.platform === 'Win32' || navigator.platform === 'Windows';
   if (isWin) return 'Win';

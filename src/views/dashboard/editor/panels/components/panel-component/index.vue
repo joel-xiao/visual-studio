@@ -98,7 +98,7 @@ provide('getType', getCurrentType);
         justify-content: space-between;
 
         &:hover {
-          background: var(--color-tran-6);
+          background: var(--theme-color-tran-6);
         }
 
         .master-collapse__title__text {

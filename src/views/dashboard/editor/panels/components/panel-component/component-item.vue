@@ -71,7 +71,7 @@ div.component-box__container(v-for="(item, idx) in data.children" v-show="data.c
       align-items: center;
       height: 30px;
       &:hover {
-        background: var(--color-tran-6);
+        background: var(--theme-color-tran-6);
       }
 
       .component-box__title__text {
@@ -100,7 +100,7 @@ div.component-box__container(v-for="(item, idx) in data.children" v-show="data.c
           width: 4px;
           height: 4px;
           border-radius: 2px;
-          background-color: var(--color-tran-30);
+          background-color: var(--theme-color-tran-30);
           margin: 3px 10px 3px 3px;
         }
       }

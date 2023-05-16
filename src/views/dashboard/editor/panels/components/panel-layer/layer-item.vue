@@ -53,7 +53,7 @@ const onCommand = function (event: PointerEvent, cmd: LayerItemMenu, item: Layer
 .editor-panel-layer {
   .layer-item {
     &.layer-item_check {
-      background: var(--color-select-light);
+      background: var(--db-editor-color-select-light);
       border-radius: 6px;
       overflow: hidden;
     }
@@ -66,7 +66,7 @@ const onCommand = function (event: PointerEvent, cmd: LayerItemMenu, item: Layer
       padding-right: 4px;
       padding-left: 4px;
       overflow: hidden;
-      color: var(--color-text-primary);
+      color: var(--theme-color-text-primary);
       border-radius: 6px;
 
       .layer-item-left {
@@ -93,12 +93,12 @@ const onCommand = function (event: PointerEvent, cmd: LayerItemMenu, item: Layer
           left: -12px;
           width: 6px;
           height: 6px;
-          background: var(--color-tran-12);
+          background: var(--theme-color-tran-12);
           border-radius: 2px;
         }
 
         .name-icon {
-          color: var(--color-tran-50);
+          color: var(--theme-color-tran-50);
         }
 
         .name-icon-margin {
@@ -119,11 +119,11 @@ const onCommand = function (event: PointerEvent, cmd: LayerItemMenu, item: Layer
 
       &:hover,
       &.hover {
-        background: var(--color-tran-6);
+        background: var(--theme-color-tran-6);
 
         .layer-item-left {
           .name-icon {
-            color: var(--color-text-primary);
+            color: var(--theme-color-text-primary);
           }
         }
 
@@ -133,11 +133,11 @@ const onCommand = function (event: PointerEvent, cmd: LayerItemMenu, item: Layer
       }
 
       &.active {
-        background-color: var(--color-select);
+        background-color: var(--db-editor-color-select);
 
         .layer-item-left {
           .name-icon {
-            color: var(--color-text-bold);
+            color: var(--theme-color-text-bold);
           }
         }
       }

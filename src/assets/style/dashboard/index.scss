@@ -4,118 +4,40 @@
 */
 
 #dashboard {
-  /* Theme color table ------ Start ------ */
-  --theme-color: 0, 0%, 100%;
-  --theme-light-600: 24%;
-  --theme-light-700: 19%;
-  --theme-light-800: 13%;
-  --theme-light-900: 3%;
+  // Color
+  --db-color-main: var(--color-gray-800);
+  --db-color-bg-dark: #080808;
 
-  --theme-color-gray-0: hsla(0, 0%, 100%, 0);
-  --theme-color-gray-100: hsla(0, 0%, 100%, 0.06);
-  --theme-color-gray-200: hsla(0, 0%, 100%, 0.08);
-  --theme-color-gray-300: hsla(0, 0%, 100%, 0.12);
-  --theme-color-gray-400: hsla(0, 0%, 100%, 0.18);
-  --theme-color-gray-500: hsla(0, 0%, 100%, 0.18);
-  --theme-color-gray-600: hsla(0, 0%, 100%, 0.3);
-  --theme-color-gray-700: hsla(0, 0%, 100%, 0.5);
-  --theme-color-gray-800: hsla(0, 0%, 100%, 0.85);
-  --theme-color-gray-900: hsla(0, 0%, 100%, 0.9);
-  --theme-color-gray-1000: #fff;
+  // Font color
+  color: var(--theme-color-text);
 
-  --theme-color-white: #fff;
-  --theme-color-blue-600: #507afc;
-  --theme-color-blue-700: #3662ec;
-  --theme-color-blue-800: #2151e7;
-  --theme-color-blue-900: #324894;
+  /* Dashboard Main ------ Start ------ */
 
-  --color-tran-6: hsla(var(--theme-color), 0.06);
-  --color-tran-8: hsla(var(--theme-color), 0.08);
-  --color-tran-10: hsla(var(--theme-color), 0.1);
-  --color-tran-12: hsla(var(--theme-color), 0.12);
-  --color-tran-15: hsla(var(--theme-color), 0.15);
-  --color-tran-18: hsla(var(--theme-color), 0.18);
-  --color-tran-24: hsla(var(--theme-color), 0.24);
-  --color-tran-30: hsla(var(--theme-color), 0.3);
-  --color-tran-40: hsla(var(--theme-color), 0.4);
-  --color-tran-50: hsla(var(--theme-color), 0.5);
-  --color-tran-85: hsla(var(--theme-color), 0.9);
-  --color-tran-100: rgb(255 255 255 / 100%);
+  // Border color
+  --db-main-border-black: rgb(8 8 8);
 
-  --color-gray-700: hsla(0, 0%, var(--theme-light-700), 1);
-  --color-gray-800: hsla(0, 0%, var(--theme-light-800), 1);
-  --color-gray-900: hsla(0, 0%, var(--theme-light-900), 1);
+  // Bar color
+  --db-main-color-left-bar-bg: #262626;
 
-  --color-real-gray-100: #fff;
-  --color-real-gray-200: #e6e6e6;
-  --color-real-gray-300: #bbb;
-  --color-real-gray-400: #8f8f8f;
-  --color-real-gray-500: #5c5c5c;
-  --color-real-gray-600: #3d3d3d;
-  --color-real-gray-700: #303030;
-  --color-real-gray-800: #212121;
-  --color-real-gray-900: #080808;
+  // card color
+  --db-main-color-canvas-bg: #2c2c2c;
 
-  /* Theme color table ------ End ------ */
+  /* Dashboard Main ------ End ------ */
 
-  --border-black: rgb(8 8 8);
+  /* Dashboard Editor ------ Start ------ */
 
-  --color-text: var(--color-tran-85);
-  --color-text-primary: var(--theme-color-gray-800);
-  --color-text-primary-white: hsla(0, 0%, 100%, 0.85);
-  --color-text-secondary: var(--theme-color-gray-700);
-  --color-text-secondary-white: hsla(0, 0%, 100%, 0.5);
-  --color-text-bold: var(--theme-color-gray-1000);
-  --color-text-bold-white: #fff;
+  // Select color
+  --db-editor-color-select: rgba(54, 98, 236, 0.3);
+  --db-editor-color-select-light: rgba(54, 98, 236, 0.15);
 
-  --color-button-normal-bg: var(--theme-color-blue-700);
-  --color-button-normal-bg-hover: var(--theme-color-blue-800);
-  --color-button-normal-bg-pressing: var(--theme-color-blue-600);
-
-  // Font size
-  --m-font-size-xs: 12px;
-  --m-font-size-sm: 13px;
-  --m-font-size-md: 14px;
-  --m-font-size-lg: 18px;
-
-  // Border shadow
-  --shadow-s: 0 2px 6px rgba(0, 0, 0, 0.1);
-  --shadow-m: 0 5px 10px rgba(0, 0, 0, 0.15);
-
-  // Border radius
-  --border-radius-8: 8px;
-  --border-radius-6: 6px;
-  --border-radius-4: 4px;
-
-  // Border radius class
-  .border-radius-8 {
-    border-radius: var(--border-radius-8);
-  }
-
-  .border-radius-6 {
-    border-radius: var(--border-radius-6);
-  }
-
-  .border-radius-4 {
-    border-radius: var(--border-radius-4);
-  }
-
-  --color-left-bar-bg: #262626;
-  --color-main: var(--color-gray-800);
-  --color-canvas-bg: #2c2c2c;
-  --color-border: var(--theme-color-gray-100);
-
-  --color-input-background: var(--color-tran-8);
-  --color-focus-border: var(--theme-color-blue-700);
-  --color-button-secondary-bg-hover: var(--theme-color-gray-300);
-  --color-button-secondary-bg-active: var(--theme-color-gray-200);
-
-  --color-select: rgba(54, 98, 236, 0.3);
-  --color-select-light: rgba(54, 98, 236, 0.15);
-
-  // Default font color
-  color: var(--color-text);
+  // Button/Input color
+  --db-editor-color-input-background: var(--theme-color-tran-8);
+  --db-editor-color-button-focus-border: var(--theme-color-blue-700);
+  --db-editor-color-button-bg-hover: var(--theme-color-gray-300);
+  --db-editor-color-button-bg-active: var(--theme-color-gray-200);
 
   // Drag the color of the dashboard component
   --drag-resize-color: hsl(260, 100%, 66%);
+
+  /* Dashboard Editor ------ End ------ */
 }

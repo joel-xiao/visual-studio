@@ -46,14 +46,14 @@ span(class='c-icon-font' :class="[button ? 'button' : '', block ? 'block' : '', 
     width: 20px;
     height: 20px;
     margin: 2px;
-    color: var(--color-tran-85);
+    color: var(--theme-color-tran-85);
     transition: all 0.15s;
     &:hover {
-      background-color: var(--color-tran-6);
+      background-color: var(--theme-color-tran-6);
     }
     &.active {
-      color: var(--color-tran-85);
-      background: var(--color-tran-12);
+      color: var(--theme-color-tran-85);
+      background: var(--theme-color-tran-12);
     }
   }
 

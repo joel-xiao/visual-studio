@@ -30,9 +30,9 @@ const props = withDefaults(defineProps<Props>(), {
       border-radius: var(--border-radius-6);
       overflow: hidden;
       &:hover {
-        background: var(--color-canvas-bg);
+        background: var(--db-main-color-canvas-bg);
         .item-card-cover_mask {
-          border: 1px solid var(--color-border);
+          border: 1px solid var(--theme-color-border);
         }
       }
 
@@ -46,7 +46,7 @@ const props = withDefaults(defineProps<Props>(), {
         .item-card-cover_mask {
           border-radius: var(--border-radius-4);
           overflow: hidden;
-          background: var(--color-canvas-bg);
+          background: var(--db-main-color-canvas-bg);
           width: 100%;
           height: 100%;
           display: flex;
@@ -67,7 +67,7 @@ const props = withDefaults(defineProps<Props>(), {
 
         .name {
           font-weight: bold;
-          color: var(--color-tran-85);
+          color: var(--theme-color-tran-85);
         }
       }
     }

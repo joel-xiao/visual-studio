@@ -65,7 +65,7 @@ const onCommand = function (event: PointerEvent, cmd: TreeItemMenu, item: TreeIt
       padding-left: 4px;
       margin: 4px 0;
       overflow: hidden;
-      color: var(--color-tran-85);
+      color: var(--theme-color-tran-85);
       border-radius: var(--border-radius-6);
 
       .tree-item-left {
@@ -91,12 +91,12 @@ const onCommand = function (event: PointerEvent, cmd: TreeItemMenu, item: TreeIt
           left: -12px;
           width: 8px;
           height: 8px;
-          background: var(--color-tran-12);
+          background: var(--theme-color-tran-12);
           border-radius: 2px;
         }
 
         .name-icon {
-          color: var(--color-tran-50);
+          color: var(--theme-color-tran-50);
         }
 
         .name-icon-margin {
@@ -120,7 +120,7 @@ const onCommand = function (event: PointerEvent, cmd: TreeItemMenu, item: TreeIt
 
         .tree-item-left {
           .name-icon {
-            color: var(--color-tran-85);
+            color: var(--theme-color-tran-85);
           }
         }
 
@@ -134,7 +134,7 @@ const onCommand = function (event: PointerEvent, cmd: TreeItemMenu, item: TreeIt
 
         .tree-item-left {
           .name-icon {
-            color: var(--color-text-bold);
+            color: var(--theme-color-text-bold);
           }
         }
       }

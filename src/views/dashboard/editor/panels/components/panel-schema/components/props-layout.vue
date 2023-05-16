@@ -51,7 +51,7 @@ onMounted(() => {
     .schema-props-layout_title-text {
       font-weight: 600;
       font-size: 12px;
-      color: var(--color-text-primary);
+      color: var(--theme-color-text-primary);
     }
     .schema-props-layout_title-right_content {
     }

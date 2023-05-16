@@ -43,7 +43,7 @@ const onNavSelect = function (nav: navData): void {
     align-items: center;
     height: 42px;
     padding: 0 20px;
-    border-bottom: 1px solid var(--border-black);
+    border-bottom: 1px solid var(--db-main-border-black);
 
     .nav-content {
       display: flex;
@@ -51,25 +51,25 @@ const onNavSelect = function (nav: navData): void {
       height: 32px;
       padding: 3px;
       overflow: hidden;
-      background-color: var(--color-bg-dark);
+      background-color: var(--db-color-bg-dark);
       border-radius: var(--border-radius-8);
 
       .nav-content-span {
         display: flex;
         align-items: center;
         padding: 0 20px;
-        color: var(--color-tran-50);
+        color: var(--theme-color-tran-50);
         cursor: pointer;
         border-radius: var(--border-radius-6);
         transition: all 0.2s;
 
         &:hover {
-          color: var(--color-tran-85);
+          color: var(--theme-color-tran-85);
         }
 
         &.active {
-          color: var(--color-tran-85);
-          background: var(--color-tran-12);
+          color: var(--theme-color-tran-85);
+          background: var(--theme-color-tran-12);
         }
       }
     }

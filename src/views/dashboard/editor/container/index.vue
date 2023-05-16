@@ -92,7 +92,7 @@ const onDrop = function (event: DragEvent): void {
     background-color: var(--theme-color-canvas-bg);
     .editor-middle-container {
       position: absolute;
-      background-color: var(--color-bg-dark);
+      background-color: var(--db-color-bg-dark);
     }
     .editor-middle-container-mask {
       position: absolute;

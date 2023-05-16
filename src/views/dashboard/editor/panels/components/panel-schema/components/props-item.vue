@@ -59,6 +59,6 @@ const style = computed(() => {
   -ms-flex-align: center;
   align-items: center;
   font-weight: 600;
-  color: var(--color-text-secondary);
+  color: var(--theme-color-text-secondary);
 }
 </style>

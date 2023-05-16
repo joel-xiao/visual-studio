@@ -118,7 +118,7 @@ div#dashboard-my-project
       width: 264px;
       height: 100%;
       padding: 8px;
-      background: var(--color-left-bar-bg);
+      background: var(--db-main-color-left-bar-bg);
       z-index: 1;
 
       .manage-title {
@@ -209,7 +209,7 @@ div#dashboard-my-project
           h2 {
             max-width: 200px;
             font-size: 16px;
-            color: var(--color-text);
+            color: var(--theme-color-text);
           }
 
           span.projects-sum {

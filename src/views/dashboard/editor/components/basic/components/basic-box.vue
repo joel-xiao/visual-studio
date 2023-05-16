@@ -78,35 +78,35 @@ defineExpose({ focus, blur });
   align-items: center;
 
   &.button-box {
-    background: var(--color-input-background);
+    background: var(--db-editor-color-input-background);
     &:hover {
-      background: var(--color-button-secondary-bg-hover);
+      background: var(--db-editor-color-button-bg-hover);
     }
 
     &.active {
-      background: var(--color-button-secondary-bg-active);
+      background: var(--db-editor-color-button-bg-active);
     }
   }
 
   &.status-button-box {
     height: 30px;
     width: 30px;
-    box-shadow: 0 0 0 1px var(--color-tran-6) inset;
+    box-shadow: 0 0 0 1px var(--theme-color-tran-6) inset;
     color: var(--theme-color-gray-800);
 
     &:hover {
-      box-shadow: 0 0 0 1px var(--color-tran-12) inset;
+      box-shadow: 0 0 0 1px var(--theme-color-tran-12) inset;
     }
     &.active {
       background: var(--color-blue-700);
-      color: var(--color-text-primary-white);
+      color: var(--theme-color-text-primary-white);
     }
   }
 
   &.input-box {
-    background: var(--color-input-background);
+    background: var(--db-editor-color-input-background);
     &.active {
-      box-shadow: 0 0 0 2px var(--color-focus-border) inset;
+      box-shadow: 0 0 0 2px var(--db-editor-color-button-focus-border) inset;
     }
   }
 }

@@ -28,7 +28,7 @@ const iconClass = computed(() => ({
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
-  color: var(--color-text-primary);
+  color: var(--theme-color-text-primary);
 
   &.lock {
     opacity: 0.5;

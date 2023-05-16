@@ -39,7 +39,7 @@ const onSelect = function (tab: Tab): void {
       justify-content: center;
       align-items: center;
       padding: 0 6px;
-      color: var(--color-text-secondary);
+      color: var(--theme-color-text-secondary);
 
       &:not(:last-child) {
         margin-right: 12px;
@@ -47,7 +47,7 @@ const onSelect = function (tab: Tab): void {
 
       &:hover,
       &.active {
-        color: var(--color-text-bold);
+        color: var(--theme-color-text-bold);
         color: #fff;
         font-weight: 600;
       }

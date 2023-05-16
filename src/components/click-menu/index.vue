@@ -81,7 +81,7 @@ transition(name='c-click-menu-fade')
   width: 196px;
   padding: 6px;
   background: var(--color-gray-700);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--theme-color-border);
   border-radius: var(--border-radius-6);
   box-shadow: var(--shadow-m);
 
@@ -96,7 +96,7 @@ transition(name='c-click-menu-fade')
       background: var(--theme-color-blue-700);
       .menu-item-label,
       .menu-item-icon {
-        color: var(--color-text-primary-white);
+        color: var(--theme-color-text-primary-white);
       }
     }
 
@@ -106,7 +106,7 @@ transition(name='c-click-menu-fade')
 
     .menu-item-label,
     .menu-item-icon {
-      color: var(--color-text-primary);
+      color: var(--theme-color-text-primary);
     }
 
     .menu-item-label {
