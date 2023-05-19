@@ -1,21 +1,20 @@
 import { onUnmounted, onMounted, Ref, reactive, nextTick } from 'vue';
 import { cloneDeep } from 'lodash';
-import { RulerConfig, RulerDOMRect, callbackUpdate } from './interface';
+import { RulerConfig, RulerSetting, RulerDOMRect } from './interface';
 
 class Ruler {
   #parentEl?: Element | null;
   #rulerXEl?: HTMLCanvasElement;
   #rulerYEl?: HTMLCanvasElement;
-  #config: RulerConfig;
-  #callbackUpdates: callbackUpdate[];
-  constructor() {
-    this.#callbackUpdates = [];
-
+  #config: Readonly<RulerConfig>;
+  #setting: Readonly<RulerSetting>;
+  constructor(setting?: RulerSetting) {
+    this.#setting = setting || {};
     this.#config = {
       interval: 5,
       scale: 20,
       scaleTranslate: 4,
-      offset: 16,
+      offset: this.#setting.size || 16,
       color: '#fff',
       deputyColor: '#fff',
       lineWidth: 1,
@@ -177,25 +176,13 @@ class Ruler {
 
   #updateRulerStyle() {
     const els = [this.#rulerXEl, this.#rulerYEl];
+    const setting = this.#setting;
     els.forEach((el) => {
       if (!el) return;
-      el.style.position = 'absolute';
-      el.style.left = '0px';
-      el.style.top = '0px';
+      el.style.position = 'relative';
+      el.style.left = (setting.left || 0) + 'px';
+      el.style.top = (setting.top || 0) + 'px';
     });
-  }
-
-  addRulerUpdated(fn: callbackUpdate): void {
-    this.#callbackUpdates.push(fn);
-  }
-
-  removeRulerUpdate(fn: callbackUpdate): void {
-    const idx: number = this.#callbackUpdates.findIndex((r) => r === fn);
-    idx && this.#callbackUpdates.splice(idx, 1);
-  }
-
-  #rulerUpdate(event: KeyboardEvent, isBoolean: boolean): void {
-    this.#callbackUpdates.forEach((callback) => callback({ ...this.#config }));
   }
 
   onResize(event: Event): void {
@@ -234,8 +221,8 @@ class Ruler {
 }
 
 let ruler: Ruler | undefined;
-export const createRulerContext = function (parentEl: Ref<Element>): Ruler {
-  ruler = new Ruler();
+export const createRulerContext = function (parentEl: Ref<Element>, setting?: RulerSetting): Ruler {
+  ruler = new Ruler(setting);
   onMounted(() => {
     ruler?.install(parentEl.value);
   });

@@ -1,10 +1,10 @@
 <template lang="pug">
-div#editor(ref='editorRef')
-  //- MiddleContainer(:nodes="nodes")
-  //- NavPanel
-  //- //- ToolbarPanel
-  //- LeftPanel
-  //- RightPanel
+div#editor(ref='editorRef' :style="editorStyle")
+  MiddleContainer
+  NavPanel
+  //- ToolbarPanel
+  LeftPanel
+  RightPanel
 </template>
 
 <script setup lang="ts">
@@ -15,11 +15,12 @@ import RightPanel from './panels/right-panel.vue';
 import MiddleContainer from './container/index.vue';
 
 import { ref, reactive } from 'vue';
+import { useLayout } from './hooks/layout';
 import { createNodeContext } from './hooks/node-context';
 import type { EditorData } from './hooks/node-context/interface';
 import { createBindKeysContext } from './hooks/bind-keys-context';
 import { createComponentContext } from './hooks/component-context';
-import { createRulerContext } from './hooks/ruler';
+import { createRulerContext } from './hooks/ruler-context';
 
 let data = reactive<EditorData>({
   folder: '',
@@ -54,16 +55,23 @@ const init = function (editorData: EditorData): void {
 
 defineExpose({ init });
 
+//  Get Layout Config
+let { getLayoutConfig } = useLayout();
+const layout = getLayoutConfig();
+
 // Create  Node
-const myNodeContext = createNodeContext(data);
-const nodes = myNodeContext.getNodes();
+createNodeContext(data);
 
 // Create Bind Keys Context
 createBindKeysContext();
 
 // Create Ruler Context
 const editorRef = ref();
-createRulerContext(editorRef);
+createRulerContext(editorRef, {
+  left: layout.left_menu_width,
+  top: layout.nav_bar_height + layout.tool_bar_height,
+  size: 16
+});
 
 // Create Component Context
 createComponentContext();
@@ -71,11 +79,11 @@ createComponentContext();
 
 <style lang="scss">
 #editor {
-  --db-editor-nav-bar-height: 42px;
-  --db-editor-tool-bar-height: 0px;
-  --db-editor-tab-bar-height: 42px;
-  --db-editor-left-menu-width: 241px;
-  --db-editor-right-menu-width: 252px;
+  --db-editor-nav-bar-height: v-bind(`${layout.nav_bar_height}px`);
+  --db-editor-tool-bar-height: v-bind(`${layout.tool_bar_height}px`);
+  --db-editor-tab-bar-height: v-bind(`${layout.tab_bar_height}px`);
+  --db-editor-left-menu-width: v-bind(`${layout.left_menu_width}px`);
+  --db-editor-right-menu-width: v-bind(`${layout.right_menu_width}px`);
   position: relative;
   width: 100%;
   height: 100%;

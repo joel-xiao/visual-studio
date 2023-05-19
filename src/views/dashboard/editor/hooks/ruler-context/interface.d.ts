@@ -10,8 +10,12 @@ export type RulerConfig = {
   fontSize: string;
 };
 
-export type RulerDOMRect = DOMRect | { width: number; height: number };
-
-type callbackUpdate = {
-  (bindKeys: RulerConfig): void;
+export type RulerSetting = {
+  left?: number;
+  right?: number;
+  bottom?: number;
+  top?: number;
+  size?: number;
 };
+
+export type RulerDOMRect = DOMRect | { width: number; height: number };

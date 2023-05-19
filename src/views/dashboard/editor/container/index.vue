@@ -22,21 +22,17 @@ import ContainerNode from './node.vue';
 import { ref, reactive, computed, onMounted, watch } from 'vue';
 import { useDrag } from './../hooks/drag-context';
 import { useNodeContext } from './../hooks/node-context';
-import type { Node } from './../hooks/node-context/interface';
 import { useComponentContext } from './../hooks/component-context';
 import { useBindKeysContext } from './../hooks/bind-keys-context';
 import { createMiddleMask } from './../hooks/middle';
 
-interface Props {
-  nodes: Node[];
-}
-const props = withDefaults(defineProps<Props>(), {
-  nodes: () => []
-});
+// interface Props {}
+// const props = withDefaults(defineProps<Props>(), {});
 
 const { addBindKeysUpdated } = useBindKeysContext();
 
-const { getRoot, getRootStyle, onSelectNode, onAddNode } = useNodeContext();
+const { getRoot, getNodes, getRootStyle, onSelectNode, onAddNode } = useNodeContext();
+const nodes = getNodes();
 const root = getRoot();
 const rootStyle = getRootStyle();
 
