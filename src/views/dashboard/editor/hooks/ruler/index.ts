@@ -1,15 +1,14 @@
-import { onUnmounted, reactive, nextTick } from 'vue';
+import { onUnmounted, onMounted, Ref, reactive, nextTick } from 'vue';
 import { cloneDeep } from 'lodash';
 import { RulerConfig, RulerDOMRect, callbackUpdate } from './interface';
 
 class Ruler {
-  #parentEl: Element | string;
+  #parentEl?: Element | null;
   #rulerXEl?: HTMLCanvasElement;
   #rulerYEl?: HTMLCanvasElement;
   #config: RulerConfig;
   #callbackUpdates: callbackUpdate[];
-  constructor(parentEl: Element | string) {
-    this.#parentEl = parentEl;
+  constructor() {
     this.#callbackUpdates = [];
 
     this.#config = {
@@ -26,14 +25,12 @@ class Ruler {
   }
 
   #draw() {
-    const rect: RulerDOMRect = (typeof this.#parentEl === 'string'
-      ? document.querySelector(this.#parentEl)
-      : this.#parentEl
-    )?.getBoundingClientRect() || {
+    const rect: RulerDOMRect = this.#parentEl?.getBoundingClientRect() || {
       width: window.innerWidth,
       height: window.innerHeight
     };
 
+    this.onResize = this.onResize.bind(this);
     this.#drawX(rect);
     this.#drawY(rect);
   }
@@ -68,9 +65,9 @@ class Ruler {
   #drawX(rect: RulerDOMRect) {
     const config = cloneDeep({
       ...this.#config,
-      width: rect.width,
-      height: this.#config.offset,
-      size: rect.width
+      width: this.#config.offset,
+      height: rect.height,
+      size: rect.height
     });
 
     if (!this.#rulerXEl) return;
@@ -128,9 +125,9 @@ class Ruler {
   #drawY(rect: RulerDOMRect) {
     const config = cloneDeep({
       ...this.#config,
-      width: this.#config.offset,
-      height: rect.height,
-      size: rect.height
+      width: rect.width,
+      height: this.#config.offset,
+      size: rect.width
     });
 
     if (!this.#rulerYEl) return;
@@ -178,6 +175,16 @@ class Ruler {
     });
   }
 
+  #updateRulerStyle() {
+    const els = [this.#rulerXEl, this.#rulerYEl];
+    els.forEach((el) => {
+      if (!el) return;
+      el.style.position = 'absolute';
+      el.style.left = '0px';
+      el.style.top = '0px';
+    });
+  }
+
   addRulerUpdated(fn: callbackUpdate): void {
     this.#callbackUpdates.push(fn);
   }
@@ -191,35 +198,47 @@ class Ruler {
     this.#callbackUpdates.forEach((callback) => callback({ ...this.#config }));
   }
 
-  onKeyDown(event: KeyboardEvent): void {
-    this.#rulerUpdate(event, true);
-  }
-  onKeyUp(event: KeyboardEvent): void {
-    this.#rulerUpdate(event, false);
+  onResize(event: Event): void {
+    this.#draw();
   }
 
-  install(): void {
-    this.#install();
+  install(parentEl: Element | string): void {
+    this.#install(parentEl);
   }
-  #install(): void {
-    this.#rulerXEl = document.createElement('canvas');
+  #install(parentEl: Element | string): void {
+    this.#parentEl = typeof parentEl === 'string' ? document.querySelector(parentEl) : parentEl;
+
     this.#rulerYEl = document.createElement('canvas');
+    this.#rulerXEl = document.createElement('canvas');
+    this.#updateRulerStyle();
+
+    if (this.#parentEl) {
+      this.#parentEl.appendChild(this.#rulerYEl);
+      this.#parentEl.appendChild(this.#rulerXEl);
+    }
     this.#draw();
+
+    document.addEventListener('resize', this.onResize);
   }
 
   uninstall(): void {
     this.#uninstall();
   }
   #uninstall(): void {
-    this.#rulerXEl = undefined;
+    document.removeEventListener('resize', this.onResize);
+    this.#rulerXEl?.remove();
+    this.#rulerXEl?.remove();
     this.#rulerYEl = undefined;
+    this.#rulerXEl = undefined;
   }
 }
 
 let ruler: Ruler | undefined;
-export const createRulerContext = function (parentEl: Element | string): Ruler {
-  ruler = new Ruler(parentEl);
-  ruler.install();
+export const createRulerContext = function (parentEl: Ref<Element>): Ruler {
+  ruler = new Ruler();
+  onMounted(() => {
+    ruler?.install(parentEl.value);
+  });
   onUnmounted(() => {
     ruler?.uninstall();
     ruler = undefined;

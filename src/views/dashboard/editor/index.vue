@@ -1,11 +1,10 @@
 <template lang="pug">
-div#editor
+div#editor(ref='editorRef')
   //- MiddleContainer(:nodes="nodes")
   //- NavPanel
   //- //- ToolbarPanel
   //- LeftPanel
   //- RightPanel
-  RulerPanel
 </template>
 
 <script setup lang="ts">
@@ -13,14 +12,14 @@ import NavPanel from './panels/nav-panel.vue';
 // import ToolbarPanel from './panels/toolbar-panel.vue';
 import LeftPanel from './panels/left-panel.vue';
 import RightPanel from './panels/right-panel.vue';
-import RulerPanel from './panels/components/panel-ruler/index.vue';
 import MiddleContainer from './container/index.vue';
 
-import { reactive } from 'vue';
+import { ref, reactive } from 'vue';
 import { createNodeContext } from './hooks/node-context';
 import type { EditorData } from './hooks/node-context/interface';
 import { createBindKeysContext } from './hooks/bind-keys-context';
 import { createComponentContext } from './hooks/component-context';
+import { createRulerContext } from './hooks/ruler';
 
 let data = reactive<EditorData>({
   folder: '',
@@ -52,6 +51,7 @@ let data = reactive<EditorData>({
 const init = function (editorData: EditorData): void {
   data = editorData;
 };
+
 defineExpose({ init });
 
 // Create  Node
@@ -60,6 +60,10 @@ const nodes = myNodeContext.getNodes();
 
 // Create Bind Keys Context
 createBindKeysContext();
+
+// Create Ruler Context
+const editorRef = ref();
+createRulerContext(editorRef);
 
 // Create Component Context
 createComponentContext();
