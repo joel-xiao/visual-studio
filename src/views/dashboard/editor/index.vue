@@ -70,7 +70,7 @@ const editorRef = ref();
 createRulerContext(editorRef, {
   left: layout.left_menu_width,
   top: layout.nav_bar_height + layout.tool_bar_height,
-  size: 16
+  size: layout.ruler_size
 });
 
 // Create Component Context

@@ -7,7 +7,7 @@ const layoutConfig = readonly(
     tab_bar_height: 42,
     left_menu_width: 241,
     right_menu_width: 252,
-    ruler: 16
+    ruler_size: 16
   })
 );
 const getLayoutConfig = function () {
