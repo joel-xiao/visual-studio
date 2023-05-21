@@ -229,7 +229,7 @@ class Ruler {
 }
 
 let ruler: Ruler | undefined;
-export const createRulerContext = function (parentEl: Ref<Element>, setting?: RulerSetting): Ruler {
+export const createRuler = function (parentEl: Ref<Element>, setting?: RulerSetting): Ruler {
   ruler = new Ruler(setting);
   onMounted(() => {
     ruler?.install(parentEl.value);
@@ -241,6 +241,6 @@ export const createRulerContext = function (parentEl: Ref<Element>, setting?: Ru
   return ruler;
 };
 
-export const useRulerContext = function (): Ruler {
+export const useRuler = function (): Ruler {
   return ruler as Ruler;
 };

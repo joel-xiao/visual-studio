@@ -20,7 +20,7 @@ import { createNodeContext } from './hooks/node-context';
 import type { EditorData } from './hooks/node-context/interface';
 import { createBindKeysContext } from './hooks/bind-keys-context';
 import { createComponentContext } from './hooks/component-context';
-import { createRulerContext } from './hooks/ruler-context';
+import { createRuler } from './hooks/ruler';
 
 let data = reactive<EditorData>({
   folder: '',
@@ -67,7 +67,7 @@ createBindKeysContext();
 
 // Create Ruler Context
 const editorRef = ref();
-createRulerContext(editorRef, {
+createRuler(editorRef, {
   left: layout.left_menu_width,
   top: layout.nav_bar_height + layout.tool_bar_height,
   size: layout.ruler_size

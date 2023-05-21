@@ -1,7 +1,7 @@
 import { readonly, markRaw } from 'vue';
 
 const config: {
-  readonly [key: string]: { [key: string]: number | string };
+  readonly [key: string]: { [key: string]: number };
 } = markRaw(
   readonly({
     layout: {
@@ -14,8 +14,8 @@ const config: {
     }
   })
 );
-const getConfig = function (type?: string) {
-  return type ? config[type] : config;
+const getConfig = function (type: string) {
+  return config[type];
 };
 
 export const useConfig = function () {
