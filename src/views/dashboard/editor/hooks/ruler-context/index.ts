@@ -7,14 +7,22 @@ class Ruler {
   #rulerXEl?: HTMLCanvasElement;
   #rulerYEl?: HTMLCanvasElement;
   #config: Readonly<RulerConfig>;
-  #setting: Readonly<RulerSetting>;
+  #setting: Readonly<Required<RulerSetting>>;
   constructor(setting?: RulerSetting) {
-    this.#setting = setting || {};
+    this.#setting = {
+      left: 0,
+      right: 0,
+      bottom: 0,
+      top: 0,
+      size: 16
+    };
+    this.#setting = Object.assign(this.#setting, setting || {});
+
     this.#config = {
       interval: 5,
       scale: 20,
       scaleTranslate: 4,
-      offset: this.#setting.size || 16,
+      offset: this.#setting.size,
       color: '#fff',
       deputyColor: '#fff',
       lineWidth: 1,
