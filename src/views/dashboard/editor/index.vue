@@ -15,7 +15,7 @@ import RightPanel from './panels/right-panel.vue';
 import MiddleContainer from './container/index.vue';
 
 import { ref, reactive } from 'vue';
-import { useLayout } from './hooks/layout';
+import { useConfig } from './config';
 import { createNodeContext } from './hooks/node-context';
 import type { EditorData } from './hooks/node-context/interface';
 import { createBindKeysContext } from './hooks/bind-keys-context';
@@ -56,8 +56,8 @@ const init = function (editorData: EditorData): void {
 defineExpose({ init });
 
 //  Get Layout Config
-let { getLayoutConfig } = useLayout();
-const layout = getLayoutConfig();
+let { getConfig } = useConfig();
+const layout = getConfig('layout');
 
 // Create  Node
 createNodeContext(data);

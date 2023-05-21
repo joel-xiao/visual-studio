@@ -1,0 +1,27 @@
+import { readonly, markRaw } from 'vue';
+
+const config: {
+  readonly [key: string]: { [key: string]: number | string };
+} = markRaw(
+  readonly({
+    layout: {
+      nav_bar_height: 42,
+      tool_bar_height: 0,
+      tab_bar_height: 42,
+      left_menu_width: 241,
+      right_menu_width: 252,
+      ruler_size: 16
+    }
+  })
+);
+const getConfig = function (type?: string) {
+  return type ? config[type] : config;
+};
+
+export const useConfig = function () {
+  return readonly(
+    markRaw({
+      getConfig
+    })
+  );
+};
