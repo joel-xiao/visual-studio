@@ -70,6 +70,7 @@ const editorRef = ref();
 createRuler(editorRef, {
   left: layout.left_menu_width,
   top: layout.nav_bar_height + layout.tool_bar_height,
+  right: layout.right_menu_width,
   size: layout.ruler_size
 });
 

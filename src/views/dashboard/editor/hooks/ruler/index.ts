@@ -29,6 +29,8 @@ class Ruler {
       deputyLineWidth: 0.5,
       fontSize: '9px'
     };
+
+    this.onResize = this.onResize.bind(this);
   }
 
   #draw() {
@@ -36,8 +38,9 @@ class Ruler {
       width: window.innerWidth,
       height: window.innerHeight
     };
+    rect.width = rect.width - (this.#setting.left + this.#setting.right);
+    rect.height = rect.height - (this.#setting.top + this.#setting.bottom);
 
-    this.onResize = this.onResize.bind(this);
     this.#drawX(rect);
     this.#drawY(rect);
   }
@@ -185,9 +188,10 @@ class Ruler {
   #updateRulerStyle() {
     const els = [this.#rulerXEl, this.#rulerYEl];
     const setting = this.#setting;
+    console.log(setting);
     els.forEach((el) => {
       if (!el) return;
-      el.style.position = 'relative';
+      el.style.position = 'absolute';
       el.style.left = (setting.left || 0) + 'px';
       el.style.top = (setting.top || 0) + 'px';
     });
