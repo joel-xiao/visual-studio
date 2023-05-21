@@ -1,7 +1,7 @@
-interface Pos {
+export type Pos = {
   x: number;
   y: number;
-}
+};
 
 interface MaskBinding {
   defaultPos?: Pos;
@@ -12,7 +12,7 @@ interface MaskBinding {
 import './index.scss';
 
 export class MiddleMask {
-  el?: HTMLElement;
+  parentEl?: HTMLElement;
   disabled: boolean;
   active: boolean;
   callbackUp?: (() => void) | null;
@@ -41,15 +41,15 @@ export class MiddleMask {
   }
 
   install(
-    el: HTMLElement | undefined,
+    parentEl: HTMLElement | undefined,
     binding: MaskBinding | null = this.binding,
     key: string
   ): void {
-    if (!el) {
+    if (!parentEl) {
       console.warn('el of ContainerMask class is not HTMLElement', 'key=' + key);
       return;
     }
-    this.el = el;
+    this.parentEl = parentEl;
 
     binding &&
       Object.keys(binding).forEach((key) => {
@@ -65,7 +65,7 @@ export class MiddleMask {
     this.maskEl = document.createElement('div');
     this.maskEl.classList.add('editor-middle-mask');
     this.maskEl.addEventListener('mousedown', this.onMaskDown, true);
-    this.el?.appendChild(this.maskEl);
+    this.parentEl?.appendChild(this.maskEl);
 
     this.callbackUpdated?.(this.defaultPos);
   }
@@ -74,7 +74,7 @@ export class MiddleMask {
     this.maskEl?.removeEventListener('mousedown', this.onMaskDown, true);
     this.maskEl?.remove();
     this.maskEl = undefined;
-    this.el = undefined;
+    this.parentEl = undefined;
     this.callbackUp = null;
     this.callbackUpdated = null;
   }
@@ -141,7 +141,7 @@ export class MiddleMask {
   }
 
   updateStyle(pos: Pos): void {
-    // if (!this.disabled && this.el) {
+    // if (!this.disabled && this.parentEl) {
     // }
   }
 

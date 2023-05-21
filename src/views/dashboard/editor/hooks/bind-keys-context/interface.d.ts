@@ -5,6 +5,6 @@ export interface ComBindKeys {
   isAlt: boolean;
 }
 
-export interface callbackUpdate {
+export interface CallbackUpdate {
   (bindKeys: ComBindKeys): void;
 }

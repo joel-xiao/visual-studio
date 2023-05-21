@@ -1,7 +1,8 @@
 export type RulerConfig = {
   interval: number;
   scale: number;
-  scaleTranslate: number;
+  textTranslateLeft: number;
+  textTranslateTop: number;
   offset: number;
   color: string;
   deputyColor: string;
@@ -17,5 +18,12 @@ export type RulerSetting = {
   top?: number;
   size?: number;
 };
+
+export type RulerPos = {
+  x: number;
+  y: number;
+};
+
+RulerPos;
 
 export type RulerDOMRect = DOMRect | { width: number; height: number };

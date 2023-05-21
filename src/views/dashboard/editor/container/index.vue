@@ -1,6 +1,6 @@
 <template lang="pug">
 div.editor-middle(
-  ref="middleDom"
+  ref="middleEl"
   id="editor-middle"
   @drop="onDrop"
   @dragenter="onDragenter"
@@ -8,7 +8,7 @@ div.editor-middle(
   @mousewheel="onWheel"
   )
   div.editor-middle-container(
-    ref="middleContainerDom"
+    ref="containerEl"
     id="editor-middle-container"
     :style="rootStyle"
     @mousedown.self="onDown")
@@ -24,12 +24,11 @@ import { useDrag } from './../hooks/drag-context';
 import { useNodeContext } from './../hooks/node-context';
 import { useComponentContext } from './../hooks/component-context';
 import { useBindKeysContext } from './../hooks/bind-keys-context';
-import { createMiddleMask } from './../hooks/middle';
+import { useRuler } from './../hooks/ruler';
+import { createMiddleMask, useMiddle } from './../hooks/middle';
 
 // interface Props {}
 // const props = withDefaults(defineProps<Props>(), {});
-
-const { addBindKeysUpdated } = useBindKeysContext();
 
 const { getRoot, getNodes, getRootStyle, onSelectNode, onAddNode } = useNodeContext();
 const nodes = getNodes();
@@ -40,9 +39,17 @@ const onDown = function (): void {
   onSelectNode(root.id);
 };
 
-const middleDom = ref<HTMLElement>();
-const middleContainerDom = ref<HTMLElement>();
-const middleMask = createMiddleMask(middleDom, middleContainerDom, 'editor-middle-mask');
+const middleEl = ref<HTMLElement>();
+const containerEl = ref<HTMLElement>();
+const middleMask = createMiddleMask(middleEl, containerEl, 'editor-middle-mask');
+
+const { updateRulerPos } = useRuler();
+const { addMiddleMoveUpdated } = useMiddle();
+addMiddleMoveUpdated((pos) => {
+  updateRulerPos(pos);
+});
+
+const { addBindKeysUpdated } = useBindKeysContext();
 addBindKeysUpdated((bindKeys) => {
   middleMask?.setDisabled(!bindKeys.isSpace);
 });
@@ -63,7 +70,7 @@ const { onDragenter, onDragover, dropHandler } = useDrag();
 const { getComponentProps } = useComponentContext();
 const onDrop = function (event: DragEvent): void {
   dropHandler(event, (node, pos) => {
-    const rect = middleContainerDom.value?.getBoundingClientRect() || { x: 0, y: 0 };
+    const rect = containerEl.value?.getBoundingClientRect() || { x: 0, y: 0 };
     onAddNode(
       {
         ...node,

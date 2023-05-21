@@ -1,6 +1,6 @@
 import { onUnmounted, onMounted, Ref, reactive, nextTick } from 'vue';
 import { cloneDeep } from 'lodash';
-import { RulerConfig, RulerSetting, RulerDOMRect } from './interface';
+import { RulerConfig, RulerSetting, RulerDOMRect, RulerPos } from './interface';
 
 class Ruler {
   #parentEl?: Element | null;
@@ -21,7 +21,8 @@ class Ruler {
     this.#config = {
       interval: 5,
       scale: 20,
-      scaleTranslate: 4,
+      textTranslateLeft: 4,
+      textTranslateTop: 2,
       offset: this.#setting.size,
       color: '#fff',
       deputyColor: '#fff',
@@ -29,8 +30,6 @@ class Ruler {
       deputyLineWidth: 0.5,
       fontSize: '9px'
     };
-
-    this.onResize = this.onResize.bind(this);
   }
 
   #draw() {
@@ -110,10 +109,10 @@ class Ruler {
           if (i !== 0) {
             const scaleNumber = String(scales[i]);
             const tx = parseFloat(config.fontSize),
-              ty = y - config.scaleTranslate;
+              ty = y - config.textTranslateLeft;
             ctx.translate(tx, ty);
             ctx.rotate((-90 * Math.PI) / 180);
-            ctx.fillText(scaleNumber, 0, 0);
+            ctx.fillText(scaleNumber, 0, config.textTranslateTop);
             ctx.rotate((90 * Math.PI) / 180);
             ctx.translate(-tx, -ty);
           }
@@ -168,7 +167,11 @@ class Ruler {
           ctx.lineTo(x, y2_max);
           if (i !== 0) {
             const scaleNumber = String(scales[i]);
-            ctx.fillText(scaleNumber, x + config.scaleTranslate, parseFloat(config.fontSize));
+            ctx.fillText(
+              scaleNumber,
+              x + config.textTranslateLeft,
+              parseFloat(config.fontSize) + config.textTranslateTop
+            );
           }
         } else if (i % (config.scale / 2) === 0) {
           ctx.lineWidth = config.lineWidth;
@@ -188,7 +191,6 @@ class Ruler {
   #updateRulerStyle() {
     const els = [this.#rulerXEl, this.#rulerYEl];
     const setting = this.#setting;
-    console.log(setting);
     els.forEach((el) => {
       if (!el) return;
       el.style.position = 'absolute';
@@ -197,8 +199,15 @@ class Ruler {
     });
   }
 
-  onResize(event: Event): void {
+  #onResize(event: Event): void {
     this.#draw();
+  }
+
+  updateRulerPos(pos: RulerPos) {
+    this.#updateRulerPos(pos);
+  }
+  #updateRulerPos(pos: RulerPos) {
+    console.log(pos);
   }
 
   install(parentEl: Element | string): void {
@@ -217,14 +226,14 @@ class Ruler {
     }
     this.#draw();
 
-    document.addEventListener('resize', this.onResize);
+    document.addEventListener('resize', this.#onResize);
   }
 
   uninstall(): void {
     this.#uninstall();
   }
   #uninstall(): void {
-    document.removeEventListener('resize', this.onResize);
+    document.removeEventListener('resize', this.#onResize);
     this.#rulerXEl?.remove();
     this.#rulerXEl?.remove();
     this.#rulerYEl = undefined;

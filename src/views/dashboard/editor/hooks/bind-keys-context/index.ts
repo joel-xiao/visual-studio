@@ -1,10 +1,10 @@
 import { onUnmounted, reactive } from 'vue';
 import { getPlatform } from '@a/utils/index';
-import type { ComBindKeys, callbackUpdate } from './interface';
+import type { ComBindKeys, CallbackUpdate } from './interface';
 
 class BindKeys {
   #comBindKeys: ComBindKeys;
-  #callbackUpdates: callbackUpdate[];
+  #callbackUpdates: CallbackUpdate[];
   constructor() {
     this.#comBindKeys = reactive({
       isSpace: false,
@@ -30,11 +30,11 @@ class BindKeys {
     return this.#comBindKeys;
   }
 
-  addBindKeysUpdated(fn: callbackUpdate): void {
+  addBindKeysUpdated(fn: CallbackUpdate): void {
     this.#callbackUpdates.push(fn);
   }
 
-  removeBindKeysUpdate(fn: callbackUpdate): void {
+  removeBindKeysUpdate(fn: CallbackUpdate): void {
     const idx: number = this.#callbackUpdates.findIndex((r) => r === fn);
     idx && this.#callbackUpdates.splice(idx, 1);
   }
