@@ -3,7 +3,7 @@ export type RulerConfig = {
   scale: number;
   textTranslateLeft: number;
   textTranslateTop: number;
-  offset: number;
+  size: number;
   color: string;
   deputyColor: string;
   lineWidth: number;

@@ -3,11 +3,15 @@ import { cloneDeep } from 'lodash';
 import { RulerConfig, RulerSetting, RulerDOMRect, RulerPos } from './interface';
 
 class Ruler {
+  #config: Readonly<RulerConfig>;
+  #setting: Readonly<Required<RulerSetting>>;
   #parentEl?: Element | null;
   #rulerXEl?: HTMLCanvasElement;
   #rulerYEl?: HTMLCanvasElement;
-  #config: Readonly<RulerConfig>;
-  #setting: Readonly<Required<RulerSetting>>;
+  #translate: {
+    x: number;
+    y: number;
+  };
   constructor(setting?: RulerSetting) {
     this.#setting = {
       left: 0,
@@ -23,13 +27,20 @@ class Ruler {
       scale: 20,
       textTranslateLeft: 4,
       textTranslateTop: 2,
-      offset: this.#setting.size,
+      size: this.#setting.size,
       color: '#fff',
       deputyColor: '#fff',
       lineWidth: 1,
       deputyLineWidth: 0.5,
       fontSize: '9px'
     };
+
+    this.#translate = {
+      x: 0,
+      y: 0
+    };
+
+    this.setRulerTranslate = this.setRulerTranslate.bind(this);
   }
 
   #draw() {
@@ -44,16 +55,26 @@ class Ruler {
     this.#drawY(rect);
   }
 
-  #getScales(size: number, interval: number): number[] {
-    const scales: number[] = [];
-    for (let i = 0; i < size; i++) {
-      const prev_scale = scales[scales.length - 1] || 0;
-      if (interval + prev_scale === i || prev_scale === 0) scales.push(i);
+  #getScales(long_size: number, interval: number, offset: number) {
+    const is_negative = offset < 0;
+    const offset_abs = Math.abs(offset);
+    long_size = long_size + offset_abs;
+    const scales: { is_continue: boolean; sum: number }[] = [];
+    for (let i = 0; i < long_size; i++) {
+      const prev_scale = scales[scales.length - 1]?.sum || 0;
+      if (interval + prev_scale === i || prev_scale === 0)
+        scales.push({
+          is_continue: is_negative && i < offset_abs ? true : false,
+          sum: i
+        });
     }
     return scales;
   }
 
-  #getLineRect(i: number): {
+  #getLineRect(
+    i: number,
+    offset: number
+  ): {
     start: number;
     lineStart: number;
     lineEnd: number;
@@ -64,19 +85,19 @@ class Ruler {
       fontSize: parseFloat(this.#config.fontSize)
     };
     return {
-      start: config.offset + i * config.interval,
-      lineStart: config.offset,
-      lineEnd: config.offset - (config.offset - config.fontSize / 2 - 2),
-      deputyLineEnd: config.offset - (config.offset - config.fontSize - 2)
+      start: offset + i * config.interval,
+      lineStart: config.size,
+      lineEnd: config.size - (config.size - config.fontSize / 2 - 2),
+      deputyLineEnd: config.size - (config.size - config.fontSize - 2)
     };
   }
 
   #drawX(rect: RulerDOMRect) {
     const config = cloneDeep({
       ...this.#config,
-      width: this.#config.offset,
+      width: this.#config.size,
       height: rect.height,
-      size: rect.height
+      long_size: rect.height
     });
 
     if (!this.#rulerXEl) return;
@@ -91,9 +112,12 @@ class Ruler {
       ctx.clearRect(0, 0, config.width, config.height);
       ctx.font = config.fontSize;
 
-      const scales = this.#getScales(config.size, config.interval);
+      const scales = this.#getScales(config.long_size, config.interval, this.#translate.y);
       for (let i = 0; i < scales.length; i++) {
-        const lineRect = this.#getLineRect(i);
+        const scale = scales[i];
+        if (scale.is_continue) continue;
+
+        const lineRect = this.#getLineRect(i, this.#translate.y);
         const x = lineRect.lineStart;
         const y = lineRect.start;
         const x2 = lineRect.deputyLineEnd;
@@ -107,7 +131,7 @@ class Ruler {
           ctx.lineTo(x2_max, y);
 
           if (i !== 0) {
-            const scaleNumber = String(scales[i]);
+            const scaleNumber = String(scale.sum);
             const tx = parseFloat(config.fontSize),
               ty = y - config.textTranslateLeft;
             ctx.translate(tx, ty);
@@ -135,8 +159,8 @@ class Ruler {
     const config = cloneDeep({
       ...this.#config,
       width: rect.width,
-      height: this.#config.offset,
-      size: rect.width
+      height: this.#config.size,
+      long_size: rect.width
     });
 
     if (!this.#rulerYEl) return;
@@ -151,9 +175,12 @@ class Ruler {
       ctx.clearRect(0, 0, config.width, config.height);
       ctx.font = config.fontSize;
 
-      const scales = this.#getScales(config.size, config.interval);
+      const scales = this.#getScales(config.long_size, config.interval, this.#translate.x);
       for (let i = 0; i < scales.length; i++) {
-        const lineRect = this.#getLineRect(i);
+        const scale = scales[i];
+        if (scale.is_continue) continue;
+
+        const lineRect = this.#getLineRect(i, this.#translate.x);
         const x = lineRect.start;
         const y = lineRect.lineStart;
         const y2 = lineRect.deputyLineEnd;
@@ -166,7 +193,7 @@ class Ruler {
           ctx.fillStyle = config.color;
           ctx.lineTo(x, y2_max);
           if (i !== 0) {
-            const scaleNumber = String(scales[i]);
+            const scaleNumber = String(scale.sum);
             ctx.fillText(
               scaleNumber,
               x + config.textTranslateLeft,
@@ -203,11 +230,13 @@ class Ruler {
     this.#draw();
   }
 
-  updateRulerPos(pos: RulerPos) {
-    this.#updateRulerPos(pos);
+  setRulerTranslate(pos: RulerPos) {
+    this.#setRulerTranslate(pos);
   }
-  #updateRulerPos(pos: RulerPos) {
-    console.log(pos);
+  #setRulerTranslate(pos: RulerPos) {
+    this.#translate.x = pos.x;
+    this.#translate.y = pos.y;
+    this.#draw();
   }
 
   install(parentEl: Element | string): void {

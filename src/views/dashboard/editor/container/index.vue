@@ -43,10 +43,10 @@ const middleEl = ref<HTMLElement>();
 const containerEl = ref<HTMLElement>();
 const middleMask = createMiddleMask(middleEl, containerEl, 'editor-middle-mask');
 
-const { updateRulerPos } = useRuler();
+const { setRulerTranslate } = useRuler();
 const { addMiddleMoveUpdated } = useMiddle();
 addMiddleMoveUpdated((pos) => {
-  updateRulerPos(pos);
+  setRulerTranslate(pos);
 });
 
 const { addBindKeysUpdated } = useBindKeysContext();

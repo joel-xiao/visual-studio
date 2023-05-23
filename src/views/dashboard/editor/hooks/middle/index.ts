@@ -1,5 +1,31 @@
 import { Ref, onMounted, onBeforeUnmount, readonly, markRaw } from 'vue';
 import { MiddleMask, Pos } from './middle-mask';
+
+type CallbackUpdate = (pos: Pos) => void;
+const callbackUpdates: CallbackUpdate[] = [];
+
+const addMiddleMoveUpdated = function (fn: CallbackUpdate): void {
+  callbackUpdates.push(fn);
+};
+
+const removeMiddleMoveUpdate = function (fn: CallbackUpdate): void {
+  const idx: number = callbackUpdates.findIndex((r) => r === fn);
+  idx && callbackUpdates.splice(idx, 1);
+};
+
+const onMiddleMoveUpdate = function (pos: Pos): void {
+  callbackUpdates.forEach((callback) => callback({ ...pos }));
+};
+
+export const useMiddle = function () {
+  return readonly(
+    markRaw({
+      addMiddleMoveUpdated,
+      removeMiddleMoveUpdate
+    })
+  );
+};
+
 type Rect = DOMRect | { width: number; height: number };
 
 export const createMiddleMask = function (
@@ -42,29 +68,4 @@ export const createMiddleMask = function (
   });
 
   return middleMask;
-};
-
-type CallbackUpdate = (bindKeys: Pos) => void;
-const callbackUpdates: CallbackUpdate[] = [];
-
-const addMiddleMoveUpdated = function (fn: CallbackUpdate): void {
-  callbackUpdates.push(fn);
-};
-
-const removeMiddleMoveUpdate = function (fn: CallbackUpdate): void {
-  const idx: number = callbackUpdates.findIndex((r) => r === fn);
-  idx && callbackUpdates.splice(idx, 1);
-};
-
-const onMiddleMoveUpdate = function (pos: Pos): void {
-  callbackUpdates.forEach((callback) => callback({ ...pos }));
-};
-
-export const useMiddle = function () {
-  return readonly(
-    markRaw({
-      addMiddleMoveUpdated,
-      removeMiddleMoveUpdate
-    })
-  );
 };
