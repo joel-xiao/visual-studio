@@ -57,17 +57,38 @@ class Ruler {
 
   #getScales(long_size: number, interval: number, offset: number) {
     const is_negative = offset < 0;
-    const offset_abs = Math.abs(offset);
-    long_size = long_size + offset_abs;
-    const scales: { is_continue: boolean; sum: number }[] = [];
+    const abs_offset = Math.abs(offset);
+    long_size = long_size + (is_negative ? abs_offset : offset);
+
+    const scales: { is_continue: boolean; sum: number; i: number }[] = [];
+    let idx = 0;
     for (let i = 0; i < long_size; i++) {
       const prev_scale = scales[scales.length - 1]?.sum || 0;
-      if (interval + prev_scale === i || prev_scale === 0)
+      if (interval + prev_scale === i || prev_scale === 0) {
         scales.push({
-          is_continue: is_negative && i < offset_abs ? true : false,
-          sum: i
+          is_continue: is_negative && i < abs_offset ? true : false,
+          sum: i,
+          i: idx
         });
+        idx += 1;
+      }
     }
+
+    if (!is_negative) {
+      let idx = 0;
+      for (let i = 0; i < abs_offset; i++) {
+        const prev_scale = scales[0]?.sum || 0;
+        if (-interval + prev_scale === -i || prev_scale === 0) {
+          scales.unshift({
+            is_continue: false,
+            sum: -i,
+            i: idx
+          });
+          idx -= 1;
+        }
+      }
+    }
+
     return scales;
   }
 
@@ -113,8 +134,9 @@ class Ruler {
       ctx.font = config.fontSize;
 
       const scales = this.#getScales(config.long_size, config.interval, this.#translate.y);
-      for (let i = 0; i < scales.length; i++) {
-        const scale = scales[i];
+      for (let idx = 0; idx < scales.length; idx++) {
+        const scale = scales[idx];
+        const i = scale.i;
         if (scale.is_continue) continue;
 
         const lineRect = this.#getLineRect(i, this.#translate.y);
@@ -176,8 +198,9 @@ class Ruler {
       ctx.font = config.fontSize;
 
       const scales = this.#getScales(config.long_size, config.interval, this.#translate.x);
-      for (let i = 0; i < scales.length; i++) {
-        const scale = scales[i];
+      for (let idx = 0; idx < scales.length; idx++) {
+        const scale = scales[idx];
+        const i = scale.i;
         if (scale.is_continue) continue;
 
         const lineRect = this.#getLineRect(i, this.#translate.x);
