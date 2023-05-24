@@ -56,9 +56,9 @@ class Ruler {
   }
 
   #getScales(long_size: number, interval: number, offset: number) {
-    const is_negative = offset < 0;
+    const is_offset_negative = offset < 0;
     const abs_offset = Math.abs(offset);
-    long_size = long_size + (is_negative ? abs_offset : offset);
+    long_size = long_size + (is_offset_negative ? abs_offset : offset);
 
     const scales: { is_continue: boolean; sum: number; i: number }[] = [];
     let idx = 0;
@@ -66,7 +66,7 @@ class Ruler {
       const prev_scale = scales[scales.length - 1]?.sum || 0;
       if (interval + prev_scale === i || prev_scale === 0) {
         scales.push({
-          is_continue: is_negative && i < abs_offset ? true : false,
+          is_continue: is_offset_negative && i < abs_offset ? true : false,
           sum: i,
           i: idx
         });
@@ -74,7 +74,7 @@ class Ruler {
       }
     }
 
-    if (!is_negative) {
+    if (!is_offset_negative) {
       let idx = 0;
       for (let i = 0; i < abs_offset; i++) {
         const prev_scale = scales[0]?.sum || 0;
@@ -89,7 +89,7 @@ class Ruler {
       }
     }
 
-    return scales;
+    return scales.filter((scale) => !scale.is_continue);
   }
 
   #getLineRect(
@@ -137,8 +137,6 @@ class Ruler {
       for (let idx = 0; idx < scales.length; idx++) {
         const scale = scales[idx];
         const i = scale.i;
-        if (scale.is_continue) continue;
-
         const lineRect = this.#getLineRect(i, this.#translate.y);
         const x = lineRect.lineStart;
         const y = lineRect.start;
@@ -201,7 +199,6 @@ class Ruler {
       for (let idx = 0; idx < scales.length; idx++) {
         const scale = scales[idx];
         const i = scale.i;
-        if (scale.is_continue) continue;
 
         const lineRect = this.#getLineRect(i, this.#translate.x);
         const x = lineRect.start;
