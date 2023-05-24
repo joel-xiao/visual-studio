@@ -44,7 +44,7 @@ const containerEl = ref<HTMLElement>();
 const middleMask = createMiddleMask(middleEl, containerEl, 'editor-middle-mask');
 
 const { setRulerTranslate, setRulerScale } = useRuler();
-const { addMiddleMoveUpdated } = useMiddle();
+const { addMiddleMoveUpdated, setMiddlePosDelta } = useMiddle();
 addMiddleMoveUpdated((pos) => {
   setRulerTranslate(pos);
 });
@@ -63,7 +63,37 @@ const wheelData = computed<{ x: number; y: number }>(() => {
 
 let scale = 1;
 const onWheel = function (event: WheelEvent): void {
+  event.preventDefault();
   let { isCtrl } = getBindKeys();
+  let is_shrink = false;
+  let scale_size = 0.1;
+  if (event.deltaY < -4) {
+    scale -= scale_size;
+    is_shrink = true;
+  } else if (event.deltaY > 4) {
+    scale += scale_size;
+    is_shrink = false;
+  }
+  if (scale < scale_size) {
+    scale = scale_size;
+    return;
+  }
+  setRulerScale(scale);
+
+  if (containerEl.value) {
+    let rect = containerEl.value.getBoundingClientRect();
+    containerEl.value.style.scale = `${scale}`;
+    containerEl.value.style.transformOrigin = `${(event.x - rect.left) / scale}px ${
+      (event.y - rect.top) / scale
+    }px`;
+
+    let x = (root.width * scale_size) / 2;
+    let y = (root.height * scale_size) / 2;
+    setMiddlePosDelta({
+      x: is_shrink ? -x : x,
+      y: is_shrink ? -y : y
+    });
+  }
   console.log(isCtrl, event.deltaY, event.deltaX, event.detail);
 };
 

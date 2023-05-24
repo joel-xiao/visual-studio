@@ -43,16 +43,15 @@ class BindKeys {
     event = event || window.event;
     const code = event.keyCode || event.which || event.charCode;
     const key = (event.key && event.key.trim()) || event.code;
-    console.log(key);
     const platform = getPlatform();
     if (key === 'Shift') {
       event.preventDefault();
       if (this.#comBindKeys.isShift === isBoolean) return;
       this.#comBindKeys.isShift = isBoolean;
-    } else if (key === 'Ctrl' || key === 'Meta') {
+    } else if (key === 'Control' || key === 'Meta') {
       event.preventDefault();
-      if (this.#comBindKeys.isShift === isBoolean) return;
-      this.#comBindKeys.isShift = isBoolean;
+      if (this.#comBindKeys.isCtrl === isBoolean) return;
+      this.#comBindKeys.isCtrl = isBoolean;
     } else if (key === 'Alt') {
       event.preventDefault();
       if (this.#comBindKeys.isAlt === isBoolean) return;

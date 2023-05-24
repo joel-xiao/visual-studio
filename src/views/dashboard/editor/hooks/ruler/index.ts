@@ -50,6 +50,10 @@ class Ruler {
   }
 
   #getScales(long_size: number, interval: number, offset: number) {
+    interval = Math.round(interval / this.#scale);
+    long_size = Math.round(long_size / this.#scale);
+    offset = Math.round(offset / this.#scale);
+    console.log(interval, long_size, offset);
     const is_offset_negative = offset < 0;
     const abs_offset = Math.abs(offset);
     long_size = long_size + (is_offset_negative ? abs_offset : offset);
@@ -258,6 +262,7 @@ class Ruler {
   }
   #setRulerScale(scale: number) {
     this.#scale = scale;
+    this.#draw();
   }
 
   install(parentEl: Element | string): void {
