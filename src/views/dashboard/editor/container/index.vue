@@ -87,8 +87,8 @@ const onWheel = function (event: WheelEvent): void {
       (event.y - rect.top) / scale
     }px`;
 
-    let x = (root.width * scale_size) / 2;
-    let y = (root.height * scale_size) / 2;
+    let x = (root.width * scale_size) / scale / 2;
+    let y = (root.height * scale_size) / scale / 2;
     setMiddlePosDelta({
       x: is_shrink ? -x : x,
       y: is_shrink ? -y : y
