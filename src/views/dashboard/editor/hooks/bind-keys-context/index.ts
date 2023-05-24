@@ -1,4 +1,4 @@
-import { onUnmounted, reactive } from 'vue';
+import { onUnmounted, markRaw } from 'vue';
 import { getPlatform } from '@a/utils/index';
 import type { ComBindKeys, CallbackUpdate } from './interface';
 
@@ -6,7 +6,7 @@ class BindKeys {
   #comBindKeys: ComBindKeys;
   #callbackUpdates: CallbackUpdate[];
   constructor() {
-    this.#comBindKeys = reactive({
+    this.#comBindKeys = markRaw({
       isSpace: false,
       isShift: false,
       isCtrl: false,
@@ -42,16 +42,14 @@ class BindKeys {
   #comBindKeysUpdate(event: KeyboardEvent, isBoolean: boolean): void {
     event = event || window.event;
     const code = event.keyCode || event.which || event.charCode;
-    const key = event.code || event.key;
+    const key = (event.key && event.key.trim()) || event.code;
+    console.log(key);
     const platform = getPlatform();
-    // if (code === 16) {
-    //   saveComBindKeys({ isShift: isBoolean });
-    // } else if (code === 18) {
-    //   saveComBindKeys({ isAlt: isBoolean });
-    // } else if (code === 32) {
-    //   saveComBindKeys({ isSpace: isBoolean });
-    // }
     if (key === 'Shift') {
+      event.preventDefault();
+      if (this.#comBindKeys.isShift === isBoolean) return;
+      this.#comBindKeys.isShift = isBoolean;
+    } else if (key === 'Ctrl' || key === 'Meta') {
       event.preventDefault();
       if (this.#comBindKeys.isShift === isBoolean) return;
       this.#comBindKeys.isShift = isBoolean;

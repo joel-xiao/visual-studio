@@ -43,13 +43,13 @@ const middleEl = ref<HTMLElement>();
 const containerEl = ref<HTMLElement>();
 const middleMask = createMiddleMask(middleEl, containerEl, 'editor-middle-mask');
 
-const { setRulerTranslate } = useRuler();
+const { setRulerTranslate, setRulerScale } = useRuler();
 const { addMiddleMoveUpdated } = useMiddle();
 addMiddleMoveUpdated((pos) => {
   setRulerTranslate(pos);
 });
 
-const { addBindKeysUpdated } = useBindKeysContext();
+const { addBindKeysUpdated, getBindKeys } = useBindKeysContext();
 addBindKeysUpdated((bindKeys) => {
   middleMask?.setDisabled(!bindKeys.isSpace);
 });
@@ -61,8 +61,10 @@ const wheelData = computed<{ x: number; y: number }>(() => {
   };
 });
 
+let scale = 1;
 const onWheel = function (event: WheelEvent): void {
-  console.log(event);
+  let { isCtrl } = getBindKeys();
+  console.log(isCtrl, event.deltaY, event.deltaX, event.detail);
 };
 
 const { onDragenter, onDragover, dropHandler } = useDrag();

@@ -1,4 +1,4 @@
-import { onUnmounted, onMounted, Ref, reactive, nextTick } from 'vue';
+import { onUnmounted, onMounted, Ref, nextTick } from 'vue';
 import { cloneDeep } from 'lodash';
 import { RulerConfig, RulerSetting, RulerDOMRect, RulerPos } from './interface';
 
@@ -12,14 +12,9 @@ class Ruler {
     x: number;
     y: number;
   };
+  #scale: number;
   constructor(setting?: RulerSetting) {
-    this.#setting = {
-      left: 0,
-      right: 0,
-      bottom: 0,
-      top: 0,
-      size: 16
-    };
+    this.#setting = { left: 0, right: 0, bottom: 0, top: 0, size: 16 };
     this.#setting = Object.assign(this.#setting, setting || {});
 
     this.#config = {
@@ -35,12 +30,11 @@ class Ruler {
       fontSize: '9px'
     };
 
-    this.#translate = {
-      x: 0,
-      y: 0
-    };
+    this.#translate = { x: 0, y: 0 };
+    this.#scale = 1;
 
     this.setRulerTranslate = this.setRulerTranslate.bind(this);
+    this.setRulerScale = this.setRulerScale.bind(this);
   }
 
   #draw() {
@@ -257,6 +251,13 @@ class Ruler {
     this.#translate.x = pos.x;
     this.#translate.y = pos.y;
     this.#draw();
+  }
+
+  setRulerScale(scale: number) {
+    this.#setRulerScale(scale);
+  }
+  #setRulerScale(scale: number) {
+    this.#scale = scale;
   }
 
   install(parentEl: Element | string): void {
