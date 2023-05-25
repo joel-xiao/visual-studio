@@ -21,9 +21,11 @@ export class MiddleMask {
   #defaultPos: Pos;
   #startPos: { x: number; y: number };
   #pos: Pos;
+  #scaleOffset: Pos;
   #binding: MaskBinding;
   constructor() {
     this.#defaultPos = { x: 0, y: 0 };
+    this.#scaleOffset = { ...this.#defaultPos };
     this.#pos = { ...this.#defaultPos };
     this.#startPos = { ...this.#defaultPos };
 
@@ -38,7 +40,8 @@ export class MiddleMask {
     this.onMaskDown = this.onMaskDown.bind(this);
     this.onUp = this.onUp.bind(this);
     this.onMove = this.onMove.bind(this);
-    this.setPosDelta = this.setPosDelta.bind(this);
+    this.setMiddleScaleOffset = this.setMiddleScaleOffset.bind(this);
+    this.getMiddleScaleOffset = this.getMiddleScaleOffset.bind(this);
   }
 
   install(
@@ -68,7 +71,7 @@ export class MiddleMask {
     this.#maskEl.addEventListener('mousedown', this.onMaskDown, true);
     this.#parentEl?.appendChild(this.#maskEl);
 
-    this.callbackUpdated?.(this.#defaultPos);
+    this.#updatePos();
   }
 
   uninstall(): void {
@@ -124,34 +127,42 @@ export class MiddleMask {
     // document.documentElement.removeEventListener('touchcancel', onUp.bind(this), true);
     // document.documentElement.removeEventListener('touchstart', onUp.bind(this), true);
 
-    this.updateStyle(this.#defaultPos);
+    this.#updatePos();
     this.callbackUp?.();
-    this.callbackUpdated?.(this.#defaultPos);
   }
 
   onMove(event: MouseEvent): void {
     this.#prevent(event);
     this.#pos.x = this.#defaultPos.x + (event.x - this.#startPos.x);
     this.#pos.y = this.#defaultPos.y + (event.y - this.#startPos.y);
-    this.updateStyle(this.#pos);
-    this.callbackUpdated?.(this.#pos);
+    this.#updatePos();
   }
 
-  setPosDelta(pos: Pos) {
-    this.#setPosDelta(pos);
+  setMiddleScaleOffset(pos: Pos) {
+    this.#setMiddleScaleOffset(pos);
   }
-  #setPosDelta(pos: Pos) {
-    this.#pos.x += pos.x;
-    this.#pos.y += pos.y;
-    this.updateStyle(this.#pos);
-    this.callbackUpdated?.(this.#pos);
+  #setMiddleScaleOffset(pos: Pos) {
+    this.#scaleOffset.x = pos.x;
+    this.#scaleOffset.y = pos.y;
+    this.#updatePos();
+  }
+
+  getMiddleScaleOffset() {
+    return this.#getMiddleScaleOffset();
+  }
+  #getMiddleScaleOffset() {
+    return this.#scaleOffset;
   }
 
   #prevent(event: MouseEvent): void {
     event.preventDefault();
   }
 
-  updateStyle(pos: Pos): void {
+  #updatePos(): void {
+    this.callbackUpdated?.({
+      x: this.#pos.x + this.#scaleOffset.x,
+      y: this.#pos.y + this.#scaleOffset.y
+    });
     // if (!this.#disabled && this.#parentEl) {
     // }
   }

@@ -61,9 +61,15 @@ const onMiddleMoveUpdate = function (pos: Pos): void {
   callbackUpdates.forEach((callback) => callback({ ...pos }));
 };
 
-const setMiddlePosDelta = function (pos: Pos): void {
-  console.log(middleMask);
-  middleMask?.setPosDelta(pos);
+const setMiddleScale = function (scale: number): void {
+  // middleMask?.setMiddleScale(scale);
+};
+const setMiddleScaleOffset = function (pos: Pos): void {
+  middleMask?.setMiddleScaleOffset(pos);
+};
+
+const getMiddleScaleOffset = function (): Pos {
+  return middleMask?.getMiddleScaleOffset() || { x: 0, y: 0 };
 };
 
 export const useMiddle = function () {
@@ -71,7 +77,9 @@ export const useMiddle = function () {
     markRaw({
       addMiddleMoveUpdated,
       removeMiddleMoveUpdate,
-      setMiddlePosDelta
+      setMiddleScale,
+      setMiddleScaleOffset,
+      getMiddleScaleOffset
     })
   );
 };

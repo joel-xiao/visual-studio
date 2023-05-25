@@ -12,6 +12,10 @@ class Ruler {
     x: number;
     y: number;
   };
+  #scaleTranslate: {
+    x: number;
+    y: number;
+  };
   #scale: number;
   constructor(setting?: RulerSetting) {
     this.#setting = { left: 0, right: 0, bottom: 0, top: 0, size: 16 };
@@ -31,10 +35,13 @@ class Ruler {
     };
 
     this.#translate = { x: 0, y: 0 };
+    this.#scaleTranslate = { x: 0, y: 0 };
     this.#scale = 1;
 
     this.setRulerTranslate = this.setRulerTranslate.bind(this);
     this.setRulerScale = this.setRulerScale.bind(this);
+    this.setRulerScaleTranslate = this.setRulerScaleTranslate.bind(this);
+    this.setRulerScaleTranslateDelta = this.setRulerScaleTranslateDelta.bind(this);
   }
 
   #draw() {
@@ -131,7 +138,11 @@ class Ruler {
       ctx.clearRect(0, 0, config.width, config.height);
       ctx.font = config.fontSize;
 
-      const scales = this.#getScales(config.long_size, config.interval, this.#translate.y);
+      const scales = this.#getScales(
+        config.long_size,
+        config.interval,
+        this.#translate.y + this.#scaleTranslate.y
+      );
       for (let idx = 0; idx < scales.length; idx++) {
         const scale = scales[idx];
         const i = scale.i;
@@ -193,7 +204,11 @@ class Ruler {
       ctx.clearRect(0, 0, config.width, config.height);
       ctx.font = config.fontSize;
 
-      const scales = this.#getScales(config.long_size, config.interval, this.#translate.x);
+      const scales = this.#getScales(
+        config.long_size,
+        config.interval,
+        this.#translate.x + this.#scaleTranslate.x
+      );
       for (let idx = 0; idx < scales.length; idx++) {
         const scale = scales[idx];
         const i = scale.i;
@@ -262,6 +277,24 @@ class Ruler {
   }
   #setRulerScale(scale: number) {
     this.#scale = scale;
+    this.#draw();
+  }
+
+  setRulerScaleTranslate(pos: RulerPos) {
+    this.#setRulerScaleTranslate(pos);
+  }
+  #setRulerScaleTranslate(pos: RulerPos) {
+    this.#scaleTranslate.x = pos.x;
+    this.#scaleTranslate.y = pos.y;
+    this.#draw();
+  }
+
+  setRulerScaleTranslateDelta(pos: RulerPos) {
+    this.#setRulerScaleTranslateDelta(pos);
+  }
+  #setRulerScaleTranslateDelta(pos: RulerPos) {
+    this.#scaleTranslate.x += pos.x;
+    this.#scaleTranslate.y += pos.y;
     this.#draw();
   }
 
