@@ -64,6 +64,7 @@ const wheelData = computed<{ x: number; y: number }>(() => {
 
 let scale = 1;
 const onWheel = function (e: WheelEvent): void {
+  // return;
   e.preventDefault();
   let { isCtrl } = getBindKeys();
   if (isCtrl) {
