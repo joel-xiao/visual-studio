@@ -1,52 +1,40 @@
+import './container-overlay.scss';
+
 export type Pos = {
   x: number;
   y: number;
 };
 
-interface MaskBinding {
+export type CallbackUpdate = (pos: Pos) => void;
+
+interface OverlayBinding {
   defaultPos?: Pos;
   onUp?: () => void;
   onUpdated?: (pos: Pos) => void;
 }
-
-import './index.scss';
-
-export class MiddleMask {
+export class ContainerOverlay {
   #parentEl?: HTMLElement;
-  #disabled: boolean;
-  #active: boolean;
-  callbackUp?: (() => void) | null;
-  callbackUpdated?: ((pos: Pos) => void) | null;
+  #disabled = true;
+  #active = false;
+  #callbackUpdates: CallbackUpdate[] = [];
   #maskEl?: HTMLElement;
-  #defaultPos: Pos;
-  #startPos: { x: number; y: number };
-  #pos: Pos;
-  #scaleOffset: Pos;
-  #binding: MaskBinding;
+  #defaultPos: Pos = { x: 0, y: 0 };
+  #startPos: Pos = { x: 0, y: 0 };
+  #pos: Pos = { x: 0, y: 0 };
+  #scaleOffset: Pos = { x: 0, y: 0 };
+  #binding: OverlayBinding = { defaultPos: { x: 0, y: 0 } };
   constructor() {
-    this.#defaultPos = { x: 0, y: 0 };
-    this.#scaleOffset = { ...this.#defaultPos };
-    this.#pos = { ...this.#defaultPos };
-    this.#startPos = { ...this.#defaultPos };
-
-    this.#binding = {
-      defaultPos: { ...this.#defaultPos }
-    };
-
-    this.#disabled = true;
-    this.#active = false;
-
     this.setDisabled = this.setDisabled.bind(this);
     this.onMaskDown = this.onMaskDown.bind(this);
     this.onUp = this.onUp.bind(this);
     this.onMove = this.onMove.bind(this);
-    this.setMiddleScaleOffset = this.setMiddleScaleOffset.bind(this);
-    this.getMiddleScaleOffset = this.getMiddleScaleOffset.bind(this);
+    this.setContainerScaleOffset = this.setContainerScaleOffset.bind(this);
+    this.getContainerScaleOffset = this.getContainerScaleOffset.bind(this);
   }
 
   install(
     parentEl: HTMLElement | undefined,
-    binding: MaskBinding | null = this.#binding,
+    binding: OverlayBinding | null = this.#binding,
     key: string
   ): void {
     if (!parentEl) {
@@ -63,11 +51,9 @@ export class MiddleMask {
 
     this.#binding.defaultPos && (this.#defaultPos = { ...this.#binding.defaultPos });
     this.#pos = { ...this.#defaultPos };
-    this.callbackUp = this.#binding.onUp;
-    this.callbackUpdated = this.#binding.onUpdated;
 
     this.#maskEl = document.createElement('div');
-    this.#maskEl.classList.add('editor-middle-mask');
+    this.#maskEl.classList.add('editor-container-overlay');
     this.#maskEl.addEventListener('mousedown', this.onMaskDown, true);
     this.#parentEl?.appendChild(this.#maskEl);
 
@@ -79,8 +65,6 @@ export class MiddleMask {
     this.#maskEl?.remove();
     this.#maskEl = undefined;
     this.#parentEl = undefined;
-    this.callbackUp = null;
-    this.callbackUpdated = null;
   }
 
   setDisabled(disabled: boolean): void {
@@ -128,7 +112,6 @@ export class MiddleMask {
     // document.documentElement.removeEventListener('touchstart', onUp.bind(this), true);
 
     this.#updatePos();
-    this.callbackUp?.();
   }
 
   onMove(event: MouseEvent): void {
@@ -138,19 +121,19 @@ export class MiddleMask {
     this.#updatePos();
   }
 
-  setMiddleScaleOffset(pos: Pos) {
-    this.#setMiddleScaleOffset(pos);
+  setContainerScaleOffset(pos: Pos) {
+    this.#setContainerScaleOffset(pos);
   }
-  #setMiddleScaleOffset(pos: Pos) {
+  #setContainerScaleOffset(pos: Pos) {
     this.#scaleOffset.x = pos.x;
     this.#scaleOffset.y = pos.y;
     this.#updatePos();
   }
 
-  getMiddleScaleOffset() {
-    return this.#getMiddleScaleOffset();
+  getContainerScaleOffset() {
+    return this.#getContainerScaleOffset();
   }
-  #getMiddleScaleOffset() {
+  #getContainerScaleOffset() {
     return this.#scaleOffset;
   }
 
@@ -159,15 +142,26 @@ export class MiddleMask {
   }
 
   #updatePos(): void {
-    this.callbackUpdated?.({
-      x: this.#pos.x + this.#scaleOffset.x,
-      y: this.#pos.y + this.#scaleOffset.y
-    });
+    this.#callbackUpdates.forEach((callback) =>
+      callback({
+        x: this.#pos.x + this.#scaleOffset.x,
+        y: this.#pos.y + this.#scaleOffset.y
+      })
+    );
     // if (!this.#disabled && this.#parentEl) {
     // }
   }
 
   get getPos(): Pos {
     return this.#pos;
+  }
+
+  addContainerMoveUpdated(fn: CallbackUpdate): void {
+    this.#callbackUpdates.push(fn);
+  }
+
+  removeContainerMoveUpdate(fn: CallbackUpdate): void {
+    const idx: number = this.#callbackUpdates.findIndex((r) => r === fn);
+    idx && this.#callbackUpdates.splice(idx, 1);
   }
 }

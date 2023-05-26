@@ -1,15 +1,15 @@
 <template lang="pug">
-div.editor-middle(
+div.editor-container(
   ref="middleEl"
-  id="editor-middle"
+  id="editor-container"
   @drop="onDrop"
   @dragenter="onDragenter"
   @dragover="onDragover"
   @mousewheel="onWheel"
   )
-  div.editor-middle-container(
+  div.editor-container-root(
     ref="containerEl"
-    id="editor-middle-container"
+    id="editor-container-root"
     :style="rootStyle"
     @mousedown.self="onDown")
     GridLine
@@ -19,13 +19,13 @@ div.editor-middle(
 <script setup lang="ts">
 import GridLine from './components/grid-line.vue';
 import ContainerNode from './node.vue';
-import { ref, reactive, computed, onMounted, watch } from 'vue';
+import { ref, reactive, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useDrag } from './../hooks/drag-context';
 import { useNodeContext } from './../hooks/node-context';
 import { useComponentContext } from './../hooks/component-context';
 import { useBindKeysContext } from './../hooks/bind-keys-context';
-import { useRuler } from './../hooks/ruler';
-import { createMiddleMask, useMiddle } from './../hooks/middle';
+import { useRuler } from './../hooks/ruler-context';
+import { removeContainer, useContainer } from './mixins/container';
 
 // interface Props {}
 // const props = withDefaults(defineProps<Props>(), {});
@@ -41,53 +41,34 @@ const onDown = function (): void {
 
 const middleEl = ref<HTMLElement>();
 const containerEl = ref<HTMLElement>();
-const middleMask = createMiddleMask(middleEl, containerEl, 'editor-middle-mask');
+
+// Create Container Mixin
+let { addScaleEvent, addMoveEvent, addMoveUpdated, setOverlayDisabled } = useContainer();
+onMounted(() => {
+  addScaleEvent({
+    parentEl: middleEl.value as HTMLElement,
+    containerEl: containerEl.value as HTMLElement
+  });
+
+  addMoveEvent({
+    parentEl: middleEl.value as HTMLElement,
+    containerEl: containerEl.value as HTMLElement
+  });
+});
+
+onBeforeUnmount(() => {
+  removeContainer();
+});
 
 const { setRulerTranslate, setRulerScale, setRulerScaleTranslateDelta } = useRuler();
-const { addMiddleMoveUpdated, setMiddleScale, setMiddleScaleOffset, getMiddleScaleOffset } =
-  useMiddle();
-addMiddleMoveUpdated((pos) => {
+addMoveUpdated((pos) => {
   setRulerTranslate(pos);
 });
 
-const { addBindKeysUpdated, getBindKeys } = useBindKeysContext();
+const { addBindKeysUpdated } = useBindKeysContext();
 addBindKeysUpdated((bindKeys) => {
-  middleMask?.setDisabled(!bindKeys.isSpace);
+  setOverlayDisabled(!bindKeys.isSpace);
 });
-
-const wheelData = computed<{ x: number; y: number }>(() => {
-  return {
-    x: 0,
-    y: 0
-  };
-});
-
-let scale = 1;
-const onWheel = function (e: WheelEvent): void {
-  // return;
-  e.preventDefault();
-  let { isCtrl } = getBindKeys();
-  if (isCtrl) {
-    let ratio = 1.1;
-    if (e.deltaY > 0) {
-      ratio = 0.9;
-    }
-    scale = scale * ratio;
-    let ratio_scale = ratio - 1;
-    const origin = {
-      x: ratio_scale * root.width * 0.5,
-      y: ratio_scale * root.height * 0.5
-    };
-    let { x, y } = getMiddleScaleOffset();
-    x -= ratio_scale * (e.clientX - x - (window.innerWidth - root.width) * 0.5) - origin.x;
-    y -= ratio_scale * (e.clientY - y - (window.innerHeight - root.height) * 0.5) - origin.y;
-    setMiddleScaleOffset({ x, y });
-    // setMiddleScale(scale);
-    if (containerEl.value) {
-      containerEl.value.style.scale = `${scale}`;
-    }
-  }
-};
 
 const { onDragenter, onDragover, dropHandler } = useDrag();
 
@@ -109,7 +90,7 @@ const onDrop = function (event: DragEvent): void {
 
 <style lang="scss">
 #editor {
-  .editor-middle {
+  .editor-container {
     z-index: 0;
     position: absolute;
     top: calc(var(--db-editor-nav-bar-height) + var(--db-editor-tool-bar-height));
@@ -117,11 +98,11 @@ const onDrop = function (event: DragEvent): void {
     right: var(--db-editor-right-menu-width);
     bottom: 0px;
     background-color: var(--db-editor-color-canvas-bg);
-    .editor-middle-container {
+    .editor-container-root {
       position: absolute;
       background-color: var(--db-color-bg-dark);
     }
-    .editor-middle-container-mask {
+    .editor-container-root-mask {
       position: absolute;
       left: 0;
       right: 0;

@@ -16,6 +16,7 @@ src-tauri
 *.md
 *.log
 *.lock
+*.yaml
 *.mjs
 *.cjs
 *.ico

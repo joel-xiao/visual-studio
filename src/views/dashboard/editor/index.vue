@@ -1,6 +1,6 @@
 <template lang="pug">
 div#editor(ref='editorRef' :style="editorStyle")
-  MiddleContainer
+  Container
   NavPanel
   //- ToolbarPanel
   LeftPanel
@@ -12,7 +12,7 @@ import NavPanel from './panels/nav-panel.vue';
 // import ToolbarPanel from './panels/toolbar-panel.vue';
 import LeftPanel from './panels/left-panel.vue';
 import RightPanel from './panels/right-panel.vue';
-import MiddleContainer from './container/index.vue';
+import Container from './container/index.vue';
 
 import { ref, reactive } from 'vue';
 import { useConfig } from './config';
@@ -20,7 +20,7 @@ import { createNodeContext } from './hooks/node-context';
 import type { EditorData } from './hooks/node-context/interface';
 import { createBindKeysContext } from './hooks/bind-keys-context';
 import { createComponentContext } from './hooks/component-context';
-import { createRuler } from './hooks/ruler';
+import { createRuler } from './hooks/ruler-context';
 
 let data = reactive<EditorData>({
   folder: '',
