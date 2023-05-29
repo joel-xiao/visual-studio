@@ -1,79 +1,99 @@
-import './container-overlay.scss';
+import './overlay.scss';
+import { readonly, Raw, markRaw } from 'vue';
 
-export type Pos = {
-  x: number;
-  y: number;
-};
+export type Pos = { x: number; y: number };
+
+type Rect = DOMRect | { width: number; height: number };
 
 export type CallbackUpdate = (pos: Pos) => void;
 
-interface OverlayBinding {
-  defaultPos?: Pos;
-  onUp?: () => void;
-  onUpdated?: (pos: Pos) => void;
-}
-export class ContainerOverlay {
-  #parentEl?: HTMLElement;
+type OverlayOption = {
+  parentEl: HTMLElement;
+  containerEl: HTMLElement;
+  key: string;
+};
+
+class Overlay {
   #disabled = true;
   #active = false;
   #callbackUpdates: CallbackUpdate[] = [];
-  #maskEl?: HTMLElement;
+  #overlayEl?: HTMLElement;
   #defaultPos: Pos = { x: 0, y: 0 };
   #startPos: Pos = { x: 0, y: 0 };
   #pos: Pos = { x: 0, y: 0 };
   #scaleOffset: Pos = { x: 0, y: 0 };
-  #binding: OverlayBinding = { defaultPos: { x: 0, y: 0 } };
+  #option?: OverlayOption;
   constructor() {
+    this.install = this.install.bind(this);
+
     this.setDisabled = this.setDisabled.bind(this);
     this.onMaskDown = this.onMaskDown.bind(this);
     this.onUp = this.onUp.bind(this);
     this.onMove = this.onMove.bind(this);
-    this.setContainerScaleOffset = this.setContainerScaleOffset.bind(this);
-    this.getContainerScaleOffset = this.getContainerScaleOffset.bind(this);
+
+    this.updatePos = this.updatePos.bind(this);
+    this.addMoveUpdated = this.addMoveUpdated.bind(this);
+    this.removeMoveUpdate = this.removeMoveUpdate.bind(this);
+
+    this.setScaleOffset = this.setScaleOffset.bind(this);
+    this.getScaleOffset = this.getScaleOffset.bind(this);
   }
 
-  install(
-    parentEl: HTMLElement | undefined,
-    binding: OverlayBinding | null = this.#binding,
-    key: string
-  ): void {
-    if (!parentEl) {
-      console.warn('el of ContainerMask class is not HTMLElement', 'key=' + key);
+  install(opt: OverlayOption): void {
+    this.#option = opt;
+    if (!opt.parentEl) {
+      console.warn('el of Overlay class is not parentEl', 'key=' + this.#option.key);
       return;
     }
-    this.#parentEl = parentEl;
 
-    binding &&
-      Object.keys(binding).forEach((key) => {
-        //@ts-ignore
-        this.#binding[key] = binding[key];
-      });
+    if (!opt.containerEl) {
+      console.warn('el of Overlay class is not containerEl', 'key=' + this.#option.key);
+      return;
+    }
 
-    this.#binding.defaultPos && (this.#defaultPos = { ...this.#binding.defaultPos });
-    this.#pos = { ...this.#defaultPos };
+    this.#initPos(opt);
 
-    this.#maskEl = document.createElement('div');
-    this.#maskEl.classList.add('editor-container-overlay');
-    this.#maskEl.addEventListener('mousedown', this.onMaskDown, true);
-    this.#parentEl?.appendChild(this.#maskEl);
+    this.#overlayEl = document.createElement('div');
+    this.#overlayEl.classList.add('editor-overlay');
+    this.#overlayEl.addEventListener('mousedown', this.onMaskDown, true);
+    this.#option?.parentEl?.appendChild(this.#overlayEl);
 
     this.#updatePos();
   }
 
   uninstall(): void {
-    this.#maskEl?.removeEventListener('mousedown', this.onMaskDown, true);
-    this.#maskEl?.remove();
-    this.#maskEl = undefined;
-    this.#parentEl = undefined;
+    this.#overlayEl?.removeEventListener('mousedown', this.onMaskDown, true);
+    this.#overlayEl?.remove();
+    this.#overlayEl = undefined;
+    this.#option = undefined;
+  }
+
+  #initPos(opt: OverlayOption) {
+    const containerRect: Rect = opt.containerEl.getBoundingClientRect() || {
+      width: 0,
+      height: 0
+    };
+    const parentRect: Rect = opt.parentEl.getBoundingClientRect() || containerRect;
+
+    const defaultPos = {
+      x: (parentRect.width - containerRect.width) / 2,
+      y: (parentRect.height - containerRect.height) / 2
+    };
+    defaultPos.x < 0 && (defaultPos.x = 0);
+    defaultPos.y < 0 && (defaultPos.y = 0);
+
+    this.#defaultPos = defaultPos;
+
+    this.#pos = { ...this.#defaultPos };
   }
 
   setDisabled(disabled: boolean): void {
     this.#disabled = disabled;
-    this.#maskEl?.classList[disabled ? 'remove' : 'add']('show');
+    this.#overlayEl?.classList[disabled ? 'remove' : 'add']('show');
   }
 
   #setActive(active: boolean): void {
-    this.#maskEl?.classList[active ? 'add' : 'remove']('down');
+    this.#overlayEl?.classList[active ? 'add' : 'remove']('down');
     this.#active = active;
   }
 
@@ -121,19 +141,19 @@ export class ContainerOverlay {
     this.#updatePos();
   }
 
-  setContainerScaleOffset(pos: Pos) {
-    this.#setContainerScaleOffset(pos);
+  setScaleOffset(pos: Pos) {
+    this.#setScaleOffset(pos);
   }
-  #setContainerScaleOffset(pos: Pos) {
+  #setScaleOffset(pos: Pos) {
     this.#scaleOffset.x = pos.x;
     this.#scaleOffset.y = pos.y;
     this.#updatePos();
   }
 
-  getContainerScaleOffset() {
-    return this.#getContainerScaleOffset();
+  getScaleOffset() {
+    return this.#getScaleOffset();
   }
-  #getContainerScaleOffset() {
+  #getScaleOffset() {
     return this.#scaleOffset;
   }
 
@@ -141,6 +161,9 @@ export class ContainerOverlay {
     event.preventDefault();
   }
 
+  updatePos() {
+    this.#updatePos();
+  }
   #updatePos(): void {
     this.#callbackUpdates.forEach((callback) =>
       callback({
@@ -148,7 +171,7 @@ export class ContainerOverlay {
         y: this.#pos.y + this.#scaleOffset.y
       })
     );
-    // if (!this.#disabled && this.#parentEl) {
+    // if (!this.#disabled && this.#option?.parentEl) {
     // }
   }
 
@@ -156,12 +179,35 @@ export class ContainerOverlay {
     return this.#pos;
   }
 
-  addContainerMoveUpdated(fn: CallbackUpdate): void {
+  addMoveUpdated(fn: CallbackUpdate): void {
     this.#callbackUpdates.push(fn);
   }
 
-  removeContainerMoveUpdate(fn: CallbackUpdate): void {
+  removeMoveUpdate(fn: CallbackUpdate): void {
     const idx: number = this.#callbackUpdates.findIndex((r) => r === fn);
     idx && this.#callbackUpdates.splice(idx, 1);
   }
 }
+
+let overlay: Readonly<Raw<Overlay>> | undefined;
+const createOverlay = function () {
+  if (!overlay) overlay = readonly(markRaw(new Overlay()));
+  return overlay;
+};
+export const removeOverlay = function () {
+  overlay?.uninstall();
+  overlay = undefined;
+};
+export const useOverlay = function () {
+  overlay = createOverlay();
+  return readonly(
+    markRaw({
+      addOverlay: overlay.install,
+      overlayUpdatePos: overlay.updatePos,
+      addOverlayMoveUpdated: overlay.addMoveUpdated,
+      setOverlayDisabled: overlay.setDisabled,
+      getScaleOffset: overlay.getScaleOffset,
+      setScaleOffset: overlay.setScaleOffset
+    })
+  );
+};

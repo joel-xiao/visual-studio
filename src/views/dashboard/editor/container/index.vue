@@ -25,6 +25,7 @@ import { useNodeContext } from './../hooks/node-context';
 import { useComponentContext } from './../hooks/component-context';
 import { useBindKeysContext } from './../hooks/bind-keys-context';
 import { useRuler } from './../hooks/ruler-context';
+import { useOverlay } from './../hooks/overlay-context';
 import { removeContainer, useContainer } from './mixins/container';
 
 // interface Props {}
@@ -42,18 +43,29 @@ const onDown = function (): void {
 const middleEl = ref<HTMLElement>();
 const containerEl = ref<HTMLElement>();
 
-// Create Container Mixin
-let { addScaleEvent, addMoveEvent, addMoveUpdated, setOverlayDisabled } = useContainer();
+// Use Overlay Hook
+const { addOverlayMoveUpdated, overlayUpdatePos, addOverlay, setOverlayDisabled } = useOverlay();
+
+// Use Container Mixin
+let { addScaleEvent } = useContainer();
+
 onMounted(() => {
   addScaleEvent({
     parentEl: middleEl.value as HTMLElement,
     containerEl: containerEl.value as HTMLElement
   });
 
-  addMoveEvent({
+  addOverlay({
     parentEl: middleEl.value as HTMLElement,
-    containerEl: containerEl.value as HTMLElement
+    containerEl: containerEl.value as HTMLElement,
+    key: 'editor-container-overlay'
   });
+
+  addOverlayMoveUpdated((pos) => {
+    if (containerEl.value) containerEl.value.style.translate = `${pos.x}px ${pos.y}px`;
+  });
+
+  overlayUpdatePos();
 });
 
 onBeforeUnmount(() => {
@@ -61,7 +73,7 @@ onBeforeUnmount(() => {
 });
 
 const { setRulerTranslate, setRulerScale, setRulerScaleTranslateDelta } = useRuler();
-addMoveUpdated((pos) => {
+addOverlayMoveUpdated((pos) => {
   setRulerTranslate(pos);
 });
 
