@@ -57,15 +57,10 @@ class Ruler {
   }
 
   #getScales(long_size: number, interval: number, offset: number) {
-    long_size = Math.ceil(long_size / this.#scale);
-
-    const scale_interval = interval / this.#scale;
-    let idx_interval = this.#scale > 1 && scale_interval < interval ? this.#scale : 1;
-    idx_interval = Math.round(idx_interval);
-    if (idx_interval < 1) idx_interval = 1;
-    // interval = Math.ceil(scale_interval);
-
-    offset = Math.floor(long_size / this.#scale);
+    interval = Math.round(interval / this.#scale);
+    long_size = Math.round(long_size / this.#scale);
+    offset = Math.round(offset / this.#scale);
+    console.log(interval, long_size, offset);
     const is_offset_negative = offset < 0;
     const abs_offset = Math.abs(offset);
     long_size = long_size + (is_offset_negative ? abs_offset : offset);
@@ -80,7 +75,7 @@ class Ruler {
           sum: i,
           i: idx
         });
-        idx += idx_interval;
+        idx += 1;
       }
     }
 
@@ -94,7 +89,7 @@ class Ruler {
             sum: -i,
             i: idx
           });
-          idx -= idx_interval;
+          idx -= 1;
         }
       }
     }
@@ -121,10 +116,6 @@ class Ruler {
       lineEnd: config.size - (config.size - config.fontSize / 2 - 2),
       deputyLineEnd: config.size - (config.size - config.fontSize - 2)
     };
-  }
-
-  #getConfigScale() {
-    return this.#config.scale;
   }
 
   #drawX(rect: RulerDOMRect) {
@@ -163,7 +154,7 @@ class Ruler {
 
         ctx.beginPath();
         ctx.moveTo(x, y);
-        if (i % this.#getConfigScale() === 0) {
+        if (i % config.scale === 0) {
           ctx.lineWidth = config.lineWidth;
           ctx.fillStyle = config.color;
           ctx.lineTo(x2_max, y);
@@ -178,7 +169,7 @@ class Ruler {
             ctx.rotate((90 * Math.PI) / 180);
             ctx.translate(-tx, -ty);
           }
-        } else if (i % (this.#getConfigScale() / 2) === 0) {
+        } else if (i % (config.scale / 2) === 0) {
           ctx.lineWidth = config.lineWidth;
           ctx.strokeStyle = config.color;
           ctx.lineTo(x2, y);
@@ -230,7 +221,7 @@ class Ruler {
 
         ctx.beginPath();
         ctx.moveTo(x, y);
-        if (i % this.#getConfigScale() === 0) {
+        if (i % config.scale === 0) {
           ctx.lineWidth = config.lineWidth;
           ctx.fillStyle = config.color;
           ctx.lineTo(x, y2_max);
@@ -242,7 +233,7 @@ class Ruler {
               parseFloat(config.fontSize) + config.textTranslateTop
             );
           }
-        } else if (i % (this.#getConfigScale() / 2) === 0) {
+        } else if (i % (config.scale / 2) === 0) {
           ctx.lineWidth = config.lineWidth;
           ctx.strokeStyle = config.color;
           ctx.lineTo(x, y2);
