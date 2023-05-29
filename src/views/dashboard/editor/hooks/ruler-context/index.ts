@@ -146,7 +146,7 @@ class Ruler {
       for (let idx = 0; idx < scales.length; idx++) {
         const scale = scales[idx];
         const i = scale.i;
-        const lineRect = this.#getLineRect(i, this.#translate.y);
+        const lineRect = this.#getLineRect(i, this.#translate.y + this.#scaleTranslate.y);
         const x = lineRect.lineStart;
         const y = lineRect.start;
         const x2 = lineRect.deputyLineEnd;
@@ -213,7 +213,7 @@ class Ruler {
         const scale = scales[idx];
         const i = scale.i;
 
-        const lineRect = this.#getLineRect(i, this.#translate.x);
+        const lineRect = this.#getLineRect(i, this.#translate.x + this.#scaleTranslate.x);
         const x = lineRect.start;
         const y = lineRect.lineStart;
         const y2 = lineRect.deputyLineEnd;

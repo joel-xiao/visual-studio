@@ -61,10 +61,6 @@ onMounted(() => {
     key: 'editor-container-overlay'
   });
 
-  addOverlayMoveUpdated((pos) => {
-    if (containerEl.value) containerEl.value.style.translate = `${pos.x}px ${pos.y}px`;
-  });
-
   overlayUpdatePos();
 });
 

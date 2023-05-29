@@ -5,7 +5,9 @@ export type Pos = { x: number; y: number };
 
 type Rect = DOMRect | { width: number; height: number };
 
-export type CallbackUpdate = (pos: Pos) => void;
+export type CallbackUpdate = (
+  pos: Pos & { scaleOffsetX: number; scaleOffsetY: number; translateX: number; translateY: number }
+) => void;
 
 type OverlayOption = {
   parentEl: HTMLElement;
@@ -167,10 +169,20 @@ class Overlay {
   #updatePos(): void {
     this.#callbackUpdates.forEach((callback) =>
       callback({
-        x: this.#pos.x + this.#scaleOffset.x,
-        y: this.#pos.y + this.#scaleOffset.y
+        x: this.#pos.x,
+        y: this.#pos.y,
+        scaleOffsetX: this.#scaleOffset.x,
+        scaleOffsetY: this.#scaleOffset.y,
+        translateX: this.#pos.x + this.#scaleOffset.x,
+        translateY: this.#pos.y + this.#scaleOffset.y
       })
     );
+
+    if (this.#option) {
+      this.#option.containerEl.style.translate = `${this.#pos.x + this.#scaleOffset.x}px ${
+        this.#pos.y + this.#scaleOffset.y
+      }px`;
+    }
     // if (!this.#disabled && this.#option?.parentEl) {
     // }
   }
