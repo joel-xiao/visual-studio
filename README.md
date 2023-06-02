@@ -93,6 +93,9 @@ npm run tauri dev or yarn tauri dev or pnpm tauri dev
 
 ## 提交更改
 
+请点击这里查看
+[提交规则](https://github.com/xiaowenlong1022/visual-studio/blob/main/.commitlintrc.js)。
+
 ```bash
 # pull
 git pull --rebase
