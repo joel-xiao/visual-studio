@@ -270,7 +270,7 @@ class CreateNodeContext {
     }
   }
 
-  #onAddNode(addNode: AddNode, container: string, pos: PointerPos): void {
+  #onAddNode(addNode: AddNode, container: string, pos: PointerPos) {
     if (addNode instanceof Object) {
       const node: Node = {
         container: container,
@@ -299,16 +299,17 @@ class CreateNodeContext {
       this.updateNodeProps(node.id, undefined, 'on_add_node_pos');
 
       this.#addTreeNode(node);
+      return node;
     }
   }
 
-  onAddNode(nodes: AddNode[] | AddNode, container: string, pos: PointerPos): void {
+  onAddNode(nodes: AddNode[] | AddNode, container: string, pos: PointerPos) {
     if (Array.isArray(nodes)) {
       nodes.forEach((node: AddNode) => {
         this.#onAddNode(node, container, pos);
       });
     } else if (nodes instanceof Object) {
-      this.#onAddNode(nodes, container, pos);
+      return this.#onAddNode(nodes, container, pos);
     }
   }
 

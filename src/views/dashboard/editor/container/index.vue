@@ -19,7 +19,7 @@ div.editor-container(
 <script setup lang="ts">
 import GridLine from './components/grid-line.vue';
 import ContainerNode from './node.vue';
-import { ref, reactive, computed, onMounted, onBeforeUnmount } from 'vue';
+import { ref, nextTick, onMounted, onBeforeUnmount } from 'vue';
 import { useDrag } from './../hooks/drag-context';
 import { useNodeContext } from './../hooks/node-context';
 import { useComponentContext } from './../hooks/component-context';
@@ -82,17 +82,21 @@ const { onDragenter, onDragover, dropHandler } = useDrag();
 
 const { getComponentProps } = useComponentContext();
 const onDrop = function (event: DragEvent): void {
-  dropHandler(event, (node, pos) => {
+  dropHandler(event, (newNode, pos) => {
     const rect = containerEl.value?.getBoundingClientRect() || { x: 0, y: 0 };
     let scale = getScale();
-    onAddNode(
+    let node = onAddNode(
       {
-        ...node,
-        props: getComponentProps(node.schema)
+        ...newNode,
+        props: getComponentProps(newNode.schema)
       },
       'root',
       { x: (pos.x - rect.x) / scale, y: (pos.y - rect.y) / scale }
     );
+
+    nextTick(() => {
+      node && onSelectNode(node.id);
+    });
   });
 };
 </script>
