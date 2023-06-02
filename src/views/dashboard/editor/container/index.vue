@@ -47,7 +47,7 @@ const containerEl = ref<HTMLElement>();
 const { addOverlayMoveUpdated, overlayUpdatePos, addOverlay, setOverlayDisabled } = useOverlay();
 
 // Use Container Mixin
-let { addScaleEvent } = useContainer();
+let { addScaleEvent, getScale } = useContainer();
 
 onMounted(() => {
   addScaleEvent({
@@ -84,13 +84,14 @@ const { getComponentProps } = useComponentContext();
 const onDrop = function (event: DragEvent): void {
   dropHandler(event, (node, pos) => {
     const rect = containerEl.value?.getBoundingClientRect() || { x: 0, y: 0 };
+    let scale = getScale();
     onAddNode(
       {
         ...node,
         props: getComponentProps(node.schema)
       },
       'root',
-      { x: pos.x - rect.x, y: pos.y - rect.y }
+      { x: (pos.x - rect.x) / scale, y: (pos.y - rect.y) / scale }
     );
   });
 };

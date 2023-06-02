@@ -21,6 +21,8 @@ class Container {
     this.addScaleEvent = this.addScaleEvent.bind(this);
     this.removeScaleEvent = this.removeScaleEvent.bind(this);
     this.onWheel = this.onWheel.bind(this);
+
+    this.getScale = this.getScale.bind(this);
   }
 
   uninstall() {
@@ -71,6 +73,10 @@ class Container {
       if (this.#option?.containerEl) this.#option.containerEl.style.scale = `${this.#scale}`;
     }
   }
+
+  getScale() {
+    return this.#scale;
+  }
 }
 
 let container: Readonly<Raw<Container>> | undefined;
@@ -87,7 +93,8 @@ export const useContainer = function () {
   return readonly(
     markRaw({
       addScaleEvent: container.addScaleEvent,
-      removeScaleEvent: container.removeScaleEvent
+      removeScaleEvent: container.removeScaleEvent,
+      getScale: container.getScale
     })
   );
 };
