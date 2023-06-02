@@ -1,5 +1,5 @@
 export type RulerConfig = {
-  interval: number;
+  intervalPixel: number;
   scale: number;
   textTranslateLeft: number;
   textTranslateTop: number;
