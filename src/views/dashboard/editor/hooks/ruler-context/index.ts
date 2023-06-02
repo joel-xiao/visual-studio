@@ -1,43 +1,28 @@
-import { onUnmounted, onMounted, Ref, nextTick } from 'vue';
+import { Ref, nextTick } from 'vue';
 import { cloneDeep } from 'lodash';
 import { RulerConfig, RulerSetting, RulerDOMRect, RulerPos } from './interface';
 
 class Ruler {
-  #config: Readonly<RulerConfig>;
-  #setting: Readonly<Required<RulerSetting>>;
+  #config: Readonly<RulerConfig> = {
+    intervalPixel: 5,
+    scale: 20,
+    textTranslateLeft: 4,
+    textTranslateTop: 2,
+    color: '#fff',
+    deputyColor: '#fff',
+    lineWidth: 1,
+    deputyLineWidth: 0.5,
+    fontSize: '9px'
+  };
+  #setting: Readonly<Required<RulerSetting>> = { left: 0, right: 0, bottom: 0, top: 0, size: 16 };
   #parentEl?: Element | null;
   #rulerXEl?: HTMLCanvasElement;
   #rulerYEl?: HTMLCanvasElement;
-  #translate: {
-    x: number;
-    y: number;
-  };
-  #scaleTranslate: {
-    x: number;
-    y: number;
-  };
-  #scale: number;
-  constructor(setting?: RulerSetting) {
-    this.#setting = { left: 0, right: 0, bottom: 0, top: 0, size: 16 };
-    this.#setting = Object.assign(this.#setting, setting || {});
-
-    this.#config = {
-      intervalPixel: 5,
-      scale: 20,
-      textTranslateLeft: 4,
-      textTranslateTop: 2,
-      size: this.#setting.size,
-      color: '#fff',
-      deputyColor: '#fff',
-      lineWidth: 1,
-      deputyLineWidth: 0.5,
-      fontSize: '9px'
-    };
-
-    this.#translate = { x: 0, y: 0 };
-    this.#scaleTranslate = { x: 0, y: 0 };
-    this.#scale = 1;
-
+  #translate = { x: 0, y: 0 };
+  #scaleTranslate = { x: 0, y: 0 };
+  #scale = 1;
+  constructor() {
+    this.addRuler = this.addRuler.bind(this);
     this.setRulerTranslate = this.setRulerTranslate.bind(this);
     this.setRulerScale = this.setRulerScale.bind(this);
     this.setRulerScaleTranslate = this.setRulerScaleTranslate.bind(this);
@@ -143,24 +128,31 @@ class Ruler {
       fontSize: parseFloat(this.#config.fontSize)
     };
     return {
-      start: offset + pixel,
-      lineStart: config.size,
-      lineEnd: config.size - (config.size - config.fontSize / 2 - 2),
-      deputyLineEnd: config.size - (config.size - config.fontSize - 2)
+      start: offset + pixel - this.#setting.size,
+      lineStart: this.#setting.size,
+      lineEnd: this.#setting.size - (this.#setting.size - config.fontSize / 2 - 2),
+      deputyLineEnd: this.#setting.size - (this.#setting.size - config.fontSize - 2)
     };
   }
 
   #drawX(rect: RulerDOMRect) {
     const config = cloneDeep({
       ...this.#config,
-      width: this.#config.size,
-      height: rect.height,
+      width: this.#setting.size,
+      height: rect.height - this.#setting.size,
       long_size: rect.height
     });
 
     if (!this.#rulerXEl) return;
-    this.#rulerXEl.width = config.width;
-    this.#rulerXEl.height = config.height;
+    this.#updateRulerStyle(
+      {
+        width: config.width,
+        height: config.height,
+        top: this.#setting.size + this.#setting.top,
+        left: this.#setting.left
+      },
+      this.#rulerXEl
+    );
 
     nextTick(() => {
       if (!this.#rulerXEl) return;
@@ -190,16 +182,14 @@ class Ruler {
           ctx.fillStyle = config.color;
           ctx.lineTo(x2_max, y);
 
-          if (scale.pixel !== 0) {
-            const scaleNumber = String(scale.sum);
-            const tx = parseFloat(config.fontSize),
-              ty = y - config.textTranslateLeft;
-            ctx.translate(tx, ty);
-            ctx.rotate((-90 * Math.PI) / 180);
-            ctx.fillText(scaleNumber, 0, config.textTranslateTop);
-            ctx.rotate((90 * Math.PI) / 180);
-            ctx.translate(-tx, -ty);
-          }
+          const scaleNumber = String(scale.sum);
+          const tx = parseFloat(config.fontSize),
+            ty = y - config.textTranslateLeft;
+          ctx.translate(tx, ty);
+          ctx.rotate((-90 * Math.PI) / 180);
+          ctx.fillText(scaleNumber, 0, config.textTranslateTop);
+          ctx.rotate((90 * Math.PI) / 180);
+          ctx.translate(-tx, -ty);
         } else if (scale.size === 'min') {
           ctx.lineWidth = config.lineWidth;
           ctx.strokeStyle = config.color;
@@ -218,14 +208,21 @@ class Ruler {
   #drawY(rect: RulerDOMRect) {
     const config = cloneDeep({
       ...this.#config,
-      width: rect.width,
-      height: this.#config.size,
+      width: rect.width - this.#setting.size,
+      height: this.#setting.size,
       long_size: rect.width
     });
 
     if (!this.#rulerYEl) return;
-    this.#rulerYEl.width = config.width;
-    this.#rulerYEl.height = config.height;
+    this.#updateRulerStyle(
+      {
+        width: config.width,
+        height: config.height,
+        top: this.#setting.top,
+        left: this.#setting.size + this.#setting.left
+      },
+      this.#rulerYEl
+    );
 
     nextTick(() => {
       if (!this.#rulerYEl) return;
@@ -255,14 +252,13 @@ class Ruler {
           ctx.lineWidth = config.lineWidth;
           ctx.fillStyle = config.color;
           ctx.lineTo(x, y2_max);
-          if (scale.pixel !== 0) {
-            const scaleNumber = String(scale.sum);
-            ctx.fillText(
-              scaleNumber,
-              x + config.textTranslateLeft,
-              parseFloat(config.fontSize) + config.textTranslateTop
-            );
-          }
+
+          const scaleNumber = String(scale.sum);
+          ctx.fillText(
+            scaleNumber,
+            x + config.textTranslateLeft,
+            parseFloat(config.fontSize) + config.textTranslateTop
+          );
         } else if (scale.size === 'min') {
           ctx.lineWidth = config.lineWidth;
           ctx.strokeStyle = config.color;
@@ -278,15 +274,16 @@ class Ruler {
     });
   }
 
-  #updateRulerStyle() {
-    const els = [this.#rulerXEl, this.#rulerYEl];
-    const setting = this.#setting;
-    els.forEach((el) => {
-      if (!el) return;
-      el.style.position = 'absolute';
-      el.style.left = (setting.left || 0) + 'px';
-      el.style.top = (setting.top || 0) + 'px';
-    });
+  #updateRulerStyle(
+    config: { left: number; top: number; height: number; width: number },
+    el: HTMLCanvasElement
+  ) {
+    if (!el) return;
+    el.style.position = 'absolute';
+    el.style.left = (config.left || 0) + 'px';
+    el.style.top = (config.top || 0) + 'px';
+    el.width = config.width || 0;
+    el.height = config.height || 0;
   }
 
   #onResize(event: Event): void {
@@ -328,15 +325,15 @@ class Ruler {
     this.#draw();
   }
 
-  install(parentEl: Element | string): void {
-    this.#install(parentEl);
+  addRuler(parentEl: Element | string, setting?: RulerSetting): void {
+    this.#addRuler(parentEl, setting);
   }
-  #install(parentEl: Element | string): void {
-    this.#parentEl = typeof parentEl === 'string' ? document.querySelector(parentEl) : parentEl;
+  #addRuler(parentEl: Element | string, setting?: RulerSetting): void {
+    this.#setting = Object.assign(this.#setting, setting || {});
 
+    this.#parentEl = typeof parentEl === 'string' ? document.querySelector(parentEl) : parentEl;
     this.#rulerYEl = document.createElement('canvas');
     this.#rulerXEl = document.createElement('canvas');
-    this.#updateRulerStyle();
 
     if (this.#parentEl) {
       this.#parentEl.appendChild(this.#rulerYEl);
@@ -360,18 +357,17 @@ class Ruler {
 }
 
 let ruler: Ruler | undefined;
-export const createRuler = function (parentEl: Ref<Element>, setting?: RulerSetting): Ruler {
-  ruler = new Ruler(setting);
-  onMounted(() => {
-    ruler?.install(parentEl.value);
-  });
-  onUnmounted(() => {
-    ruler?.uninstall();
-    ruler = undefined;
-  });
+const createRuler = function () {
+  if (!ruler) ruler = new Ruler();
   return ruler;
 };
 
-export const useRuler = function (): Ruler {
-  return ruler as Ruler;
+export const removeRuler = function () {
+  ruler?.uninstall();
+  ruler = undefined;
+};
+
+export const useRuler = function () {
+  ruler = createRuler();
+  return ruler;
 };

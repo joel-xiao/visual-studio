@@ -1,14 +1,4 @@
-import {
-  watch,
-  computed,
-  readonly,
-  reactive,
-  Ref,
-  ref,
-  ComputedRef,
-  onBeforeUnmount,
-  App
-} from 'vue';
+import { watch, computed, readonly, reactive, Ref, ref, ComputedRef, App } from 'vue';
 import { getUuid } from '@a/utils/index';
 import type {
   EditorData,
@@ -21,28 +11,19 @@ import type {
 } from './interface';
 
 class CreateNodeContext {
-  #data: EditorData;
-  #nodes: ComputedRef<Node[]> | [];
-  #selectedNodes: ComputedRef<Node[]> | [];
-  #currentNode: Ref<Node>;
-  #nodesTreeSource: TreeNode[];
-  #nodesTree: ComputedRef<TreeNode[]> | [];
+  #data?: EditorData;
+  #nodes: ComputedRef<Node[]> | [] = [];
+  #selectedNodes: ComputedRef<Node[]> | [] = [];
+  #currentNode: Ref<Node> = ref({} as Node);
+  #nodesTreeSource: TreeNode[] = [];
+  #nodesTree: ComputedRef<TreeNode[]> | [] = [];
   #nodeInstances?: {
     [nodeId: string]: NodeInstance;
-  };
+  } = {};
   #nodeComponentInstances?: {
     [nodeId: string]: App | undefined;
-  };
-  constructor(data: EditorData) {
-    this.#data = data;
-    this.#nodes = [];
-    this.#selectedNodes = [];
-    this.#currentNode = ref({} as Node);
-    this.#nodesTreeSource = [];
-    this.#nodesTree = [];
-    this.#nodeInstances = {};
-    this.#nodeComponentInstances = {};
-
+  } = {};
+  constructor() {
     this.getNodeTree = this.getNodeTree.bind(this);
     this.getNodes = this.getNodes.bind(this);
     this.getSelectedNodes = this.getSelectedNodes.bind(this);
@@ -68,7 +49,7 @@ class CreateNodeContext {
 
   #createNodeTree(): void {
     this.#nodesTreeSource = reactive<TreeNode[]>([]);
-    this.#data.nodes.forEach((node) => {
+    this.#data?.nodes.forEach((node) => {
       this.#addTreeNode(node);
     });
 
@@ -109,7 +90,11 @@ class CreateNodeContext {
   }
 
   #createNodes() {
-    this.#nodes = computed<Node[]>(() => this.#data.nodes.filter((node) => node.id !== 'root'));
+    this.#nodes = this.#data
+      ? computed<Node[]>(() =>
+          this.#data ? this.#data.nodes.filter((node) => node.id !== 'root') : []
+        )
+      : [];
   }
 
   getNodes() {
@@ -117,7 +102,9 @@ class CreateNodeContext {
   }
 
   #createSelectedNodes() {
-    this.#selectedNodes = computed<Node[]>(() => this.#data.nodes.filter((node) => node.select));
+    this.#selectedNodes = computed<Node[]>(() =>
+      this.#data ? this.#data.nodes.filter((node) => node.select) : []
+    );
 
     watch(this.#selectedNodes, (newVal) => {
       if (newVal.length <= 1) {
@@ -135,7 +122,7 @@ class CreateNodeContext {
   }
 
   getRoot() {
-    const node: Node | undefined = this.#data.nodes.find((node) => node.id === 'root');
+    const node: Node | undefined = this.#data?.nodes.find((node) => node.id === 'root');
     return readonly(node ? node : ({} as Node));
   }
 
@@ -150,12 +137,12 @@ class CreateNodeContext {
   }
 
   getNode(id: string) {
-    const node: Node | undefined = this.#data.nodes.find((node) => node.id === id);
+    const node: Node | undefined = this.#data?.nodes.find((node) => node.id === id);
     return readonly(node ? node : ({} as Node));
   }
 
   getNodeStyle(id: string) {
-    const node: Node | undefined = this.#data.nodes.find((node) => node.id === id);
+    const node: Node | undefined = this.#data?.nodes.find((node) => node.id === id);
     return computed<{
       'border-top-left-radius': string;
       'border-top-right-radius': string;
@@ -186,7 +173,7 @@ class CreateNodeContext {
    * }
    * **/
   updateNode(id: string, delta: NodeDelta, change_type = ''): void {
-    const node = this.#data.nodes.find((node) => node.id === id);
+    const node = this.#data?.nodes.find((node) => node.id === id);
     if (node && delta) {
       Object.keys(delta).forEach((key: string): void => {
         // @ts-ignore
@@ -215,7 +202,7 @@ class CreateNodeContext {
       | { key: string; value: number | string | boolean | undefined | number[] }[],
     change_type = ''
   ): void {
-    const node = this.#data.nodes.find((node) => node.id === id);
+    const node = this.#data?.nodes.find((node) => node.id === id);
     if (!node) return;
 
     // Pros Layout binds to  Node
@@ -304,7 +291,7 @@ class CreateNodeContext {
         lock: false
       };
 
-      this.#data.nodes.push(node);
+      this.#data?.nodes.push(node);
 
       this.updateNodeProps(node.id, undefined, 'on_add_node_size');
       node.x = pos.x - node.width / 2;
@@ -326,7 +313,7 @@ class CreateNodeContext {
   }
 
   onSelectNode(id: string): void {
-    this.#data.nodes.forEach((node) => {
+    this.#data?.nodes.forEach((node) => {
       if (id === node.id) {
         node.select = true;
       } else {
@@ -363,7 +350,8 @@ class CreateNodeContext {
     }
   }
 
-  install(): void {
+  install(data: EditorData): void {
+    this.#data = data;
     this.#createNodes();
     this.#createSelectedNodes();
     this.#createNodeTree();
@@ -380,17 +368,19 @@ class CreateNodeContext {
   }
 }
 
-let myNodeContext: CreateNodeContext;
+let myNodeContext: CreateNodeContext | undefined;
 
-export const createNodeContext = function (data: EditorData): CreateNodeContext {
-  myNodeContext = new CreateNodeContext(data);
-  myNodeContext.install();
-  onBeforeUnmount(() => {
-    myNodeContext.uninstall();
-  });
+const createNodeContext = function (): CreateNodeContext {
+  if (!myNodeContext) myNodeContext = new CreateNodeContext();
   return myNodeContext;
 };
 
-export const useNodeContext = function (): CreateNodeContext {
+export const removeNodeContext = function () {
+  myNodeContext?.uninstall();
+  myNodeContext = undefined;
+};
+
+export const useNodeContext = function () {
+  myNodeContext = createNodeContext();
   return myNodeContext;
 };

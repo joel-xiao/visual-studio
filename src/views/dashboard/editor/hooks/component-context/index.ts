@@ -1,4 +1,4 @@
-import { App, readonly, createVNode, onBeforeUnmount } from 'vue';
+import { App, readonly, createVNode } from 'vue';
 import { cloneDeep } from 'lodash';
 import { createComponent } from '@hooks/vue-hooks';
 import type { ComponentData } from './../../panels/components/panel-component/interface';
@@ -351,17 +351,21 @@ export class CreateComponentContext {
   }
 }
 
-let myComponentContext: CreateComponentContext;
-
-export const createComponentContext = function (): CreateComponentContext {
-  myComponentContext = new CreateComponentContext();
-  myComponentContext.install();
-  onBeforeUnmount(() => {
-    myComponentContext.uninstall();
-  });
+let myComponentContext: CreateComponentContext | undefined;
+export const createComponentContext = function () {
+  if (!myComponentContext) {
+    myComponentContext = new CreateComponentContext();
+    myComponentContext.install();
+  }
   return myComponentContext;
 };
 
-export const useComponentContext = function (): CreateComponentContext {
+export const removeComponentContext = function () {
+  myComponentContext?.uninstall();
+  myComponentContext = undefined;
+};
+
+export const useComponentContext = function () {
+  myComponentContext = createComponentContext();
   return myComponentContext;
 };

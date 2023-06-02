@@ -14,13 +14,13 @@ import LeftPanel from './panels/left-panel.vue';
 import RightPanel from './panels/right-panel.vue';
 import Container from './container/index.vue';
 
-import { ref, reactive } from 'vue';
+import { ref, reactive, onMounted, onUnmounted } from 'vue';
 import { useConfig } from './config';
-import { createNodeContext } from './hooks/node-context';
+import { useNodeContext, removeNodeContext } from './hooks/node-context';
 import type { EditorData } from './hooks/node-context/interface';
-import { createBindKeysContext } from './hooks/bind-keys-context';
-import { createComponentContext } from './hooks/component-context';
-import { createRuler } from './hooks/ruler-context';
+import { createBindKeysContext, removeBindKeysContext } from './hooks/bind-keys-context';
+import { createComponentContext, removeComponentContext } from './hooks/component-context';
+import { useRuler, removeRuler } from './hooks/ruler-context';
 
 let data = reactive<EditorData>({
   folder: '',
@@ -60,22 +60,38 @@ let { getConfig } = useConfig();
 const layout = getConfig('layout');
 
 // Create  Node
-createNodeContext(data);
+const { install: initEditorData } = useNodeContext();
+initEditorData(data);
+onUnmounted(() => {
+  removeNodeContext();
+});
 
 // Create Bind Keys Context
 createBindKeysContext();
+onUnmounted(() => {
+  removeBindKeysContext();
+});
 
 // Create Ruler Context
 const editorRef = ref();
-createRuler(editorRef, {
-  left: layout.left_menu_width,
-  top: layout.nav_bar_height + layout.tool_bar_height,
-  right: layout.right_menu_width,
-  size: layout.ruler_size
+const { addRuler } = useRuler();
+onMounted(() => {
+  addRuler(editorRef.value, {
+    left: layout.left_menu_width,
+    top: layout.nav_bar_height + layout.tool_bar_height,
+    right: layout.right_menu_width,
+    size: layout.ruler_size
+  });
+});
+onUnmounted(() => {
+  removeRuler();
 });
 
 // Create Component Context
 createComponentContext();
+onUnmounted(() => {
+  removeComponentContext();
+});
 </script>
 
 <style lang="scss">

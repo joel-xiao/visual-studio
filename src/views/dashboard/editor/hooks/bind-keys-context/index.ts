@@ -1,4 +1,4 @@
-import { onUnmounted, markRaw } from 'vue';
+import { markRaw } from 'vue';
 import { getPlatform } from '@a/utils/index';
 import type { ComBindKeys, CallbackUpdate } from './interface';
 
@@ -91,15 +91,18 @@ class BindKeys {
 
 let bindKeys: BindKeys | undefined;
 export const createBindKeysContext = function (): BindKeys {
-  bindKeys = new BindKeys();
-  bindKeys.install();
-  onUnmounted(() => {
-    bindKeys?.uninstall();
-    bindKeys = undefined;
-  });
+  if (!bindKeys) {
+    bindKeys = new BindKeys();
+    bindKeys.install();
+  }
   return bindKeys;
+};
+export const removeBindKeysContext = function () {
+  bindKeys?.uninstall();
+  bindKeys = undefined;
 };
 
 export const useBindKeysContext = function (): BindKeys {
-  return bindKeys as BindKeys;
+  bindKeys = createBindKeysContext();
+  return bindKeys;
 };
