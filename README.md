@@ -7,6 +7,8 @@
 
 <!-- **[English](README.md) | 简体中文** -->
 
+[DEMO](https://visual-studio-one.vercel.app/)
+
 🥳 `Tauri` + `Vue3` + `Vite2` + `Ts` + `Pinia` + `TsLint` + `EsLint` + `StyleLint` + `Prettier` +
 `CommitLint` + `husky` + `lint-staged`
 
