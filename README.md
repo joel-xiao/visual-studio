@@ -41,8 +41,8 @@ git clone https://github.com/xiaowenlong1022/visual-studio.git
 # enter the project directory
 cd visual-studio
 
-# switch the dev
-git switch dev
+# switch the main
+git switch main
 
 # install dependency
 npm install or yarn or pnpm
