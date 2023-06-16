@@ -1,8 +1,8 @@
 import { readonly, Raw, markRaw } from 'vue';
-import { useBindKeysContext } from './../../hooks/bind-keys-context';
-import { useOverlay } from './../../hooks/overlay-context';
-import { useRuler } from './../../hooks/ruler-context';
-import { useNodeContext } from './../../hooks/node-context';
+import { useBindKeysContext } from '../bind-keys-context';
+import { useOverlay } from '../overlay-context';
+import { useRuler } from '../ruler-context';
+import { useNodeContext } from '../node-context';
 
 type ContainerOption = {
   parentEl: HTMLElement;

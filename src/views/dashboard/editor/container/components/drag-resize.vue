@@ -9,11 +9,10 @@ div(
 
 <script setup lang="ts">
 import { ref, reactive, computed, readonly, markRaw, withDefaults } from 'vue';
-
-import type { DargDataset, Binding } from '@d/darg-resize/interface';
+import type { DragDataset, Binding } from '@d/drag-resize/interface';
 
 interface Props {
-  data: DargDataset;
+  data: DragDataset;
 }
 const props = withDefaults(defineProps<Props>(), {
   data: () => ({ y2: 0, x2: 0, x: 0, y: 0 })
@@ -25,8 +24,9 @@ const dragData = reactive<Binding>({
   pos: props.data,
   disabled: false,
   active: false,
-  onUp: (dargDataset: DargDataset) => {
-    emit('resizing', dargDataset);
+  scale: 1,
+  onUp: (dragDataset: DragDataset) => {
+    emit('resizing', dragDataset);
   }
 });
 
@@ -36,10 +36,15 @@ const setActive = function (val: boolean | undefined): void {
   dragData.active = !!val;
 };
 
-const setPos = function (pos: DargDataset): void {
+const setPos = function (pos: DragDataset): void {
   dragData.pos = pos;
 };
-defineExpose({ setActive, setPos });
+
+const setScale = function (scale: number) {
+  dragData.scale = scale;
+};
+
+defineExpose({ setActive, setPos, setScale });
 </script>
 
 <style lang="scss">

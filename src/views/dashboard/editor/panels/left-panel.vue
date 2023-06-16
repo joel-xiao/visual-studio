@@ -18,7 +18,7 @@ div.editor-left-panel
     )
     div.panel-component-tab_bar
       PanelTabBar(:data="componentTabBars" v-model="componentTab")
-    PanelComponent( :darg="true" :data="componentData" @drag-start="onDragStart" @drag-stop="onDragStop")
+    PanelComponent( :drag="true" :data="componentData" @drag-start="onDragStart" @drag-stop="onDragStop")
 
 </template>
 

@@ -1,5 +1,5 @@
 import { createApp } from 'vue';
-export interface DargDataset {
+export interface DragDataset {
   y2: number;
   x2: number;
   x: number;
@@ -12,10 +12,11 @@ export interface CursorPos {
 }
 
 export interface Binding {
-  pos?: DargDataset;
+  pos?: DragDataset;
   cursorPos?: CursorPos | null;
   resize?: boolean;
   disabled?: boolean;
   active?: boolean;
-  onUp?: (dargDataset: DargDataset) => void;
+  scale?: number;
+  onUp?: (dragDataset: DragDataset) => void;
 }

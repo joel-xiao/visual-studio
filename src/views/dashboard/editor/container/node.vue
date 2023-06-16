@@ -1,5 +1,5 @@
 <template lang="pug">
-DragResize(ref="resize" :data="dargDataset" @resizing="onResizing" @mousedown.stop.prevent="onDown")
+DragResize(ref="resize" :data="dragDataset" @resizing="onResizing" @mousedown.stop.prevent="onDown")
   div.middle-node( ref="vm" :style="nodeStyle")
 
 </template>
@@ -7,10 +7,11 @@ DragResize(ref="resize" :data="dargDataset" @resizing="onResizing" @mousedown.st
 <script setup lang="ts">
 import DragResize from './components/drag-resize.vue';
 import { ref, reactive, markRaw, readonly, withDefaults, watch, onMounted } from 'vue';
-import type { DargDataset } from '@d/darg-resize/interface';
+import type { DragDataset } from '@d/drag-resize/interface';
 import { useNodeContext } from './../hooks/node-context';
 import { useComponentContext } from './../hooks/component-context';
 import type { ComponentProps } from './../hooks/component-context/interface';
+import { useContainer } from '../hooks/container';
 
 interface Props {
   id: string;
@@ -23,8 +24,9 @@ const { getNode, getNodeStyle, updateNode, onSelectNode, addNodeInstance } = use
 const node = getNode(props.id);
 const nodeStyle = getNodeStyle(props.id);
 
-const dargDataset = readonly(
-  reactive<DargDataset>(
+const { getScale } = useContainer();
+const dragDataset = readonly(
+  reactive<DragDataset>(
     markRaw({
       x: node.x || 0,
       y: node.y || 0,
@@ -46,18 +48,20 @@ const updatePos = function () {
     y2: node.y + node.height
   });
 };
+
 addNodeInstance(node.id, { setActive, updatePos });
 
 const onDown = function (): void {
+  resize?.value?.setScale(getScale());
   onSelectNode(node.id);
 };
 
-const onResizing = function (dargDataset: DargDataset): void {
+const onResizing = function (dragDataset: DragDataset): void {
   updateNode(node.id, {
-    x: dargDataset.x,
-    y: dargDataset.y,
-    width: dargDataset.x2 - dargDataset.x,
-    height: dargDataset.y2 - dargDataset.y
+    x: dragDataset.x,
+    y: dragDataset.y,
+    width: dragDataset.x2 - dragDataset.x,
+    height: dragDataset.y2 - dragDataset.y
   });
 };
 

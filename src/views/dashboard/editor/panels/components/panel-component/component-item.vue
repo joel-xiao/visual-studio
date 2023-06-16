@@ -4,12 +4,12 @@ import type { ComponentData } from './interface';
 
 interface Props {
   data?: ComponentData | { name?: string };
-  darg: boolean | undefined | null;
+  drag: boolean | undefined | null;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   data: () => ({}),
-  darg: false
+  drag: false
 });
 
 const emit = defineEmits(['arrow', 'drag-start', 'drag-stop']);
@@ -35,7 +35,7 @@ div.component-box__container(v-for="(item, idx) in data.children" v-show="data.c
   template(v-if="data.component")
     div.component-box__swapper(:class="typeof getType === 'function' ? getType() : ''")
       div.component-item__content(
-        :draggable="darg ? true : false"
+        :draggable="drag ? true : false"
         @dragstart="onDragStart($event, item)"
         @dragend="onDragStop"
         @dragover="onDrag"
@@ -53,10 +53,10 @@ div.component-box__container(v-for="(item, idx) in data.children" v-show="data.c
       div.component-box__title__text {{ item.name }}
 
   template(v-if="!item.component")
-    ComponentItem(:data="item" :darg="darg" @drag-start="onDragStart"  @drag-stop="onDragStop" v-if="Array.isArray(item.children) && item.children.length > 0")
+    ComponentItem(:data="item" :drag="drag" @drag-start="onDragStart"  @drag-stop="onDragStop" v-if="Array.isArray(item.children) && item.children.length > 0")
   template(v-else)
     div.component-box__list
-      ComponentItem(:data="item" :darg="darg" @drag-start="onDragStart"  @drag-stop="onDragStop" v-if="Array.isArray(item.children) && item.children.length > 0")
+      ComponentItem(:data="item" :drag="drag" @drag-start="onDragStart"  @drag-stop="onDragStop" v-if="Array.isArray(item.children) && item.children.length > 0")
 </template>
 
 <style lang="scss">

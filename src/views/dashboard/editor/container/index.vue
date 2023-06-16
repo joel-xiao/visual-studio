@@ -26,7 +26,7 @@ import { useComponentContext } from './../hooks/component-context';
 import { useBindKeysContext } from './../hooks/bind-keys-context';
 import { useRuler } from './../hooks/ruler-context';
 import { useOverlay } from './../hooks/overlay-context';
-import { removeContainer, useContainer } from './mixins/container';
+import { removeContainer, useContainer } from '../hooks/container';
 
 // interface Props {}
 // const props = withDefaults(defineProps<Props>(), {});

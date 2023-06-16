@@ -12,7 +12,7 @@ div(class='editor-panel-component')
       div(class="master-collapse__title" @click="onArrow(item)")
         div.master-collapse__title__text {{ item.name }}
         Icon(src="icon-shouqi2" class="arrow" :class="{ 'active': item.AFold }")
-      ComponentItem(:data="item" :darg="!!darg" @arrow="onArrow" @drag-start="onDragStart" @drag-stop="onDragStop")
+      ComponentItem(:data="item" :drag="!!drag" @arrow="onArrow" @drag-start="onDragStart" @drag-stop="onDragStop")
 
 
 
@@ -25,12 +25,12 @@ import ComponentItem from './component-item.vue';
 
 interface Props {
   data?: ComponentData[];
-  darg?: boolean | undefined | null;
+  drag?: boolean | undefined | null;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   data: () => [],
-  darg: true
+  drag: true
 });
 
 const emit = defineEmits(['drag-start', 'drag-stop']);

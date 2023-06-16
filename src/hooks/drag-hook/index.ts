@@ -1,6 +1,6 @@
 import { Component, App } from 'vue';
 import { createComponent } from './../vue-hooks';
-import type { DargDataset, CursorPos, Binding } from './interface';
+import type { DragDataset, CursorPos, Binding } from './interface';
 
 import './drag.scss';
 
@@ -10,13 +10,14 @@ export class Drag {
   disabled: boolean;
   active: boolean;
   #moved: boolean;
-  callbackUp?: ((dargDataset: DargDataset) => void) | null;
+  #scale = 1;
+  callbackUp?: ((dragDataset: DragDataset) => void) | null;
   stickEl?: HTMLElement;
   sticks: string[];
   currentStick: string;
-  defaultPos: DargDataset;
+  defaultPos: DragDataset;
   startPos: { x: number; y: number };
-  pos: DargDataset;
+  pos: DragDataset;
   cursorPos?: CursorPos | null;
   binding: Binding;
   constructor() {
@@ -126,11 +127,15 @@ export class Drag {
     this.active = active;
   }
 
-  setPos(pos: DargDataset): void {
+  setPos(pos: DragDataset): void {
     if (!this.resize) return;
     this.pos = { ...pos };
     this.defaultPos = { ...this.pos };
     this.updateStyle(this.defaultPos);
+  }
+
+  setScale(scale: number): void {
+    this.#scale = scale;
   }
 
   #setMoved(moved: boolean): void {
@@ -205,45 +210,34 @@ export class Drag {
     this.prevent(event);
 
     const stick: string = this.currentStick;
-    const defaultPos: DargDataset = this.defaultPos;
+    const defaultPos: DragDataset = this.defaultPos;
+
+    const diff_x: number = (event.x - this.startPos.x) / this.#scale;
+    const diff_y: number = (event.y - this.startPos.y) / this.#scale;
     if (stick === 'body') {
-      const diff_x: number = event.x - this.startPos.x;
-      const diff_y: number = event.y - this.startPos.y;
       this.pos.x = defaultPos.x + diff_x;
       this.pos.y = defaultPos.y + diff_y;
       this.pos.x2 = defaultPos.x2 + diff_x;
       this.pos.y2 = defaultPos.y2 + diff_y;
     } else if (stick === 'tl') {
-      const diff_x: number = event.x - this.startPos.x;
-      const diff_y: number = event.y - this.startPos.y;
       this.pos.x = defaultPos.x + diff_x;
       this.pos.y = defaultPos.y + diff_y;
     } else if (stick === 'tr') {
-      const diff_x = event.x - this.startPos.x;
-      const diff_y = event.y - this.startPos.y;
       this.pos.x2 = defaultPos.x2 + diff_x;
       this.pos.y = defaultPos.y + diff_y;
     } else if (stick === 'br') {
-      const diff_x = event.x - this.startPos.x;
-      const diff_y = event.y - this.startPos.y;
       this.pos.x2 = defaultPos.x2 + diff_x;
       this.pos.y2 = defaultPos.y2 + diff_y;
     } else if (stick === 'bl') {
-      const diff_x = event.x - this.startPos.x;
-      const diff_y = event.y - this.startPos.y;
       this.pos.x = defaultPos.x + diff_x;
       this.pos.y2 = defaultPos.y2 + diff_y;
     } else if (stick === 'tm') {
-      const diff_y = event.y - this.startPos.y;
       this.pos.y = defaultPos.y + diff_y;
     } else if (stick === 'rm') {
-      const diff_x = event.x - this.startPos.x;
       this.pos.x2 = defaultPos.x2 + diff_x;
     } else if (stick === 'bm') {
-      const diff_y = event.y - this.startPos.y;
       this.pos.y2 = defaultPos.y2 + diff_y;
     } else if (stick === 'lm') {
-      const diff_x = event.x - this.startPos.x;
       this.pos.x = defaultPos.x + diff_x;
     }
 
@@ -254,7 +248,7 @@ export class Drag {
     event.preventDefault();
   }
 
-  updateStyle(pos: DargDataset): void {
+  updateStyle(pos: DragDataset): void {
     let diff_rotate_x = 0;
     let diff_rotate_y = 0;
     let rotate = '';
@@ -300,7 +294,7 @@ export const createDrag = function <T>(
     return;
   }
 
-  let pos: DargDataset | undefined = undefined;
+  let pos: DragDataset | undefined = undefined;
   let currentTarget: HTMLElement | void;
   if (event) {
     currentTarget = event.currentTarget as HTMLElement;

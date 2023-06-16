@@ -1,5 +1,5 @@
 <template lang="pug">
-div#editor(ref='editorRef' :style="editorStyle")
+div#editor(ref='editorRef')
   Container
   NavPanel
   //- ToolbarPanel

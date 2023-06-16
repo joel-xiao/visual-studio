@@ -2,7 +2,7 @@ import type { DefineComponent } from 'vue';
 import { defineComponent, ref, readonly, withModifiers } from 'vue';
 
 import DragResize from './components/drag-resize.vue';
-import type { DargDataset } from '@d/darg-resize/interface';
+import type { DragDataset } from '@d/drag-resize/interface';
 import { useNodeContext } from './../hooks/node-context';
 import { useComponentContext } from './../hooks/component-context';
 import type { ComponentProps } from './../hooks/component-context/interface';
@@ -20,7 +20,7 @@ const ContainerNode = /*#__PURE__*/ defineComponent({
     const node = getNode(props.id);
     const nodeStyle = getNodeStyle(props.id);
 
-    const dargDataset = readonly({
+    const dragDataset = readonly({
       x: node.x || 0,
       y: node.y || 0,
       x2: node.x + node.width,
@@ -45,12 +45,12 @@ const ContainerNode = /*#__PURE__*/ defineComponent({
       onSelectNode(node.id);
     };
 
-    const onResizing = function (dargDataset: DargDataset): void {
+    const onResizing = function (dragDataset: DragDataset): void {
       updateNode(node.id, {
-        x: dargDataset.x,
-        y: dargDataset.y,
-        width: dargDataset.x2 - dargDataset.x,
-        height: dargDataset.y2 - dargDataset.y
+        x: dragDataset.x,
+        y: dragDataset.y,
+        width: dragDataset.x2 - dragDataset.x,
+        height: dragDataset.y2 - dragDataset.y
       });
     };
 
@@ -60,7 +60,7 @@ const ContainerNode = /*#__PURE__*/ defineComponent({
         <>
           <DragResize
             ref={resize}
-            data={dargDataset}
+            data={dragDataset}
             onResizing={onResizing}
             // onMousedown={() => withModifiers(onDown, ['stop', 'prevent'])}
           >
