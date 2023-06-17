@@ -107,7 +107,7 @@ module.exports = {
     'no-lonely-if': 1, // 禁止 if 作为唯一的语句出现在 else 语句中.如果一个if陈述是该else块中唯一的陈述，那么使用一个else if表格通常会更清晰。
     'array-callback-return': 1, // 强制数组方法的回调函数中有 return 语句,Array有几种过滤，映射和折叠的方法。如果我们忘记return在这些回调中写入语句，那可能是一个错误。
     'no-irregular-whitespace': 1, // 禁止在字符串和注释之外不规则的空白
-    'no-use-before-define': 1, // 禁止在变量定义之前使用它们
+    'no-use-before-define': 0, // 禁止在变量定义之前使用它们
     'no-useless-concat': 1, // 禁止不必要的字符串字面量或模板字面量的连接
     '@typescript-eslint/no-explicit-any': 2,
     '@typescript-eslint/ban-ts-comment': 0, // @ts-ignore
