@@ -89,21 +89,21 @@ const componentData = reactive<ComponentData[]>(getUiLibrary());
   .editor-left-panel {
     position: absolute;
     left: 0px;
-    top: var(--nav-bar-height);
+    top: var(--db-editor-nav-bar-height);
     bottom: 0px;
-    width: var(--left-menu-width);
-    border-right: 1px solid var(--theme-color-canvas);
-    background-color: var(--editor-panel-bg-color);
+    width: var(--db-editor-left-menu-width);
+    border-right: 1px solid var(--db-editor-color-canvas);
+    background-color: var(--db-editor-color-panel-bg);
     .panel-tab_bar {
-      border-bottom: 1px solid var(--theme-color-canvas);
+      border-bottom: 1px solid var(--db-editor-color-canvas);
       padding: 0 12px 0 6px;
-      height: var(--tab-bar-height);
+      height: var(--db-editor-tab-bar-height);
     }
     .panel-component {
       .panel-component-tab_bar {
-        border-bottom: 1px solid var(--theme-color-canvas);
+        border-bottom: 1px solid var(--db-editor-color-canvas);
         padding: 0 12px 0 6px;
-        height: var(--tab-bar-height);
+        height: var(--db-editor-tab-bar-height);
         .tab_bar-title {
         }
       }

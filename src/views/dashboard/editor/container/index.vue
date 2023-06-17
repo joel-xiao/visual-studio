@@ -85,11 +85,11 @@ const onDrop = function (event: DragEvent): void {
   .editor-middle {
     z-index: 0;
     position: absolute;
-    top: calc(var(--nav-bar-height) + var(--tool-bar-height));
-    left: var(--left-menu-width);
-    right: var(--right-menu-width);
+    top: calc(var(--db-editor-nav-bar-height) + var(--db-editor-tool-bar-height));
+    left: var(--db-editor-left-menu-width);
+    right: var(--db-editor-right-menu-width);
     bottom: 0px;
-    background-color: var(--theme-color-canvas-bg);
+    background-color: var(--db-editor-color-canvas-bg);
     .editor-middle-container {
       position: absolute;
       background-color: var(--db-color-bg-dark);

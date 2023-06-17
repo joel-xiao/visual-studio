@@ -57,9 +57,9 @@ const onShare = function (): void {
 <style lang="scss">
 #editor {
   .editor-nav-panel {
-    border-bottom: 1px solid var(--theme-color-canvas);
+    border-bottom: 1px solid var(--db-editor-color-canvas);
     width: 100%;
-    height: var(--nav-bar-height);
+    height: var(--db-editor-nav-bar-height);
     padding: 0 6px;
     display: flex;
     align-items: center;
@@ -67,7 +67,7 @@ const onShare = function (): void {
     position: absolute;
     top: 0;
     left: 0;
-    background-color: var(--editor-panel-bg-color);
+    background-color: var(--db-editor-color-panel-bg);
 
     .nav-panel-left,
     .nav-panel-right {

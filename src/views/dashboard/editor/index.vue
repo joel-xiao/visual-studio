@@ -1,10 +1,11 @@
 <template lang="pug">
 div#editor
-  MiddleContainer(:nodes="nodes")
-  NavPanel
-  //- ToolbarPanel
-  LeftPanel
-  RightPanel
+  //- MiddleContainer(:nodes="nodes")
+  //- NavPanel
+  //- //- ToolbarPanel
+  //- LeftPanel
+  //- RightPanel
+  RulerPanel
 </template>
 
 <script setup lang="ts">
@@ -12,6 +13,7 @@ import NavPanel from './panels/nav-panel.vue';
 // import ToolbarPanel from './panels/toolbar-panel.vue';
 import LeftPanel from './panels/left-panel.vue';
 import RightPanel from './panels/right-panel.vue';
+import RulerPanel from './panels/components/panel-ruler/index.vue';
 import MiddleContainer from './container/index.vue';
 
 import { reactive } from 'vue';
@@ -65,14 +67,11 @@ createComponentContext();
 
 <style lang="scss">
 #editor {
-  --nav-bar-height: 42px;
-  --tool-bar-height: 0px;
-  --tab-bar-height: 42px;
-  --left-menu-width: 241px;
-  --right-menu-width: 252px;
-  --theme-color-canvas: var(--theme-color-real-gray-900);
-  --theme-color-canvas-bg: #262626;
-  --editor-panel-bg-color: var(--db-color-main);
+  --db-editor-nav-bar-height: 42px;
+  --db-editor-tool-bar-height: 0px;
+  --db-editor-tab-bar-height: 42px;
+  --db-editor-left-menu-width: 241px;
+  --db-editor-right-menu-width: 252px;
   position: relative;
   width: 100%;
   height: 100%;

@@ -30,7 +30,7 @@ const props = withDefaults(defineProps<Props>(), {
       border-radius: var(--border-radius-6);
       overflow: hidden;
       &:hover {
-        background: var(--db-main-color-canvas-bg);
+        background: var(--db-main-color-card-bg);
         .item-card-cover_mask {
           border: 1px solid var(--theme-color-border);
         }
@@ -46,7 +46,7 @@ const props = withDefaults(defineProps<Props>(), {
         .item-card-cover_mask {
           border-radius: var(--border-radius-4);
           overflow: hidden;
-          background: var(--db-main-color-canvas-bg);
+          background: var(--db-main-color-card-bg);
           width: 100%;
           height: 100%;
           display: flex;

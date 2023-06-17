@@ -20,7 +20,7 @@
   --db-main-color-left-bar-bg: #262626;
 
   // card color
-  --db-main-color-canvas-bg: #2c2c2c;
+  --db-main-color-card-bg: #2c2c2c;
 
   /* Dashboard Main ------ End ------ */
 
@@ -35,6 +35,11 @@
   --db-editor-color-button-focus-border: var(--theme-color-blue-700);
   --db-editor-color-button-bg-hover: var(--theme-color-gray-300);
   --db-editor-color-button-bg-active: var(--theme-color-gray-200);
+
+  // Canvas color
+  --db-editor-color-canvas: var(--theme-color-real-gray-900);
+  --db-editor-color-canvas-bg: #262626;
+  --db-editor-color-panel-bg: var(--db-color-main);
 
   // Drag the color of the dashboard component
   --drag-resize-color: hsl(260, 100%, 66%);
