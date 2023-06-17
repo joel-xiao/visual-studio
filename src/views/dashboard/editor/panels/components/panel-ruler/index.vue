@@ -10,7 +10,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  axis: () => 'y'
+  axis: () => 'x'
 });
 
 const config = reactive({
@@ -22,13 +22,13 @@ const config = reactive({
   h: 0,
   interval: 5,
   scale: 20,
-
-  offset: 20,
+  scaleTranslate: 4,
+  offset: 16,
   color: '#fff',
   deputyColor: '#fff',
   lineWidth: 1,
   deputyLineWidth: 0.5,
-  fontSize: 12
+  fontSize: 9
 });
 const rulerRef = ref();
 
@@ -48,7 +48,7 @@ function draw() {
       config.height = rect.height;
       config.size = rect.height;
       nextTick(() => {
-        // drawX();
+        drawX();
       });
       break;
     case 'y':
@@ -64,7 +64,54 @@ function draw() {
   }
 }
 
-// function drawX() {}
+function drawX() {
+  let ctx = rulerRef.value.getContext('2d');
+
+  ctx.clearRect(0, 0, config.width, config.height);
+  ctx.font = config.fontSize;
+
+  let scales: number[] = [];
+  for (let i = 0; i < config.size; i++) {
+    let prev_scale = scales[scales.length - 1] || 0;
+    if (config.interval + prev_scale === i || prev_scale === 0) scales.push(i);
+  }
+
+  for (let i = 0; i < scales.length; i++) {
+    let x = config.offset;
+    let y = config.offset + i * config.interval;
+    let x2 = config.offset - (config.offset - config.fontSize - 2);
+    let x2_max = config.offset - (config.offset - config.fontSize / 2 - 2);
+
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    if (i % config.scale === 0) {
+      ctx.lineWidth = config.lineWidth;
+      ctx.fillStyle = config.color;
+      ctx.lineTo(x2_max, y);
+
+      if (i !== 0) {
+        let scaleNumber = scales[i];
+        let tx = config.fontSize,
+          ty = y - config.scaleTranslate;
+        ctx.translate(tx, ty);
+        ctx.rotate((-90 * Math.PI) / 180);
+        ctx.fillText(scaleNumber, 0, 0);
+        ctx.rotate((90 * Math.PI) / 180);
+        ctx.translate(-tx, -ty);
+      }
+    } else if (i % (config.scale / 2) === 0) {
+      ctx.lineWidth = config.lineWidth;
+      ctx.strokeStyle = config.color;
+      ctx.lineTo(x2, y);
+    } else {
+      ctx.lineWidth = config.deputyLineWidth;
+      ctx.strokeStyle = config.deputyColor;
+      ctx.lineTo(x2, y);
+    }
+    ctx.stroke();
+  }
+  ctx.restore();
+}
 
 function drawY() {
   let ctx = rulerRef.value.getContext('2d');
@@ -79,28 +126,33 @@ function drawY() {
   }
 
   for (let i = 0; i < scales.length; i++) {
-    let x = i * config.interval;
-    let y = config.offset / 3.5;
+    let x = config.offset + i * config.interval;
+    let y = config.offset;
+    let y2 = config.offset - (config.offset - config.fontSize - 2);
+    let y2_max = config.offset - (config.offset - config.fontSize / 2 - 2);
 
     ctx.beginPath();
-    ctx.moveTo(x, 0);
+    ctx.moveTo(x, y);
     if (i % config.scale === 0) {
       ctx.lineWidth = config.lineWidth;
       ctx.fillStyle = config.color;
-      let scaleNumber = scales[i];
-      ctx.fillText(scaleNumber, x + 4, config.offset - 5);
-      ctx.lineTo(x, config.offset / 1.6);
+      ctx.lineTo(x, y2_max);
+      if (i !== 0) {
+        let scaleNumber = scales[i];
+        ctx.fillText(scaleNumber, x + config.scaleTranslate, config.fontSize);
+      }
     } else if (i % (config.scale / 2) === 0) {
       ctx.lineWidth = config.lineWidth;
       ctx.strokeStyle = config.color;
-      ctx.lineTo(x, y);
+      ctx.lineTo(x, y2);
     } else {
       ctx.lineWidth = config.deputyLineWidth;
       ctx.strokeStyle = config.deputyColor;
-      ctx.lineTo(x, y);
+      ctx.lineTo(x, y2);
     }
     ctx.stroke();
   }
+  ctx.restore();
 }
 </script>
 
