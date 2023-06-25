@@ -44,8 +44,8 @@ class Container {
 
     const { getBindKeys } = useBindKeysContext();
     const { getRoot } = useNodeContext();
-    const { getScaleOffset, setScaleOffset } = useOverlay();
-    const { setRulerScaleTranslate, setRulerScale } = useRuler();
+    const { getScaleOffset, setScaleOffset, getPos } = useOverlay();
+    const { setRulerScaleOffset, setRulerScale } = useRuler();
 
     const { isCtrl } = getBindKeys();
     const root = getRoot();
@@ -57,20 +57,36 @@ class Container {
       }
       this.#scale = this.#scale * ratio;
       const ratio_scale = ratio - 1;
-      const origin = {
-        x: ratio_scale * root.width * 0.5,
-        y: ratio_scale * root.height * 0.5
-      };
-      // let { x, y } = getScaleOffset() || { x: 0, y: 0 };
-      // x -= ratio_scale * (e.clientX - x - (window.innerWidth - root.width) * 0.5) - origin.x;
-      // y -= ratio_scale * (e.clientY - y - (window.innerHeight - root.height) * 0.5) - origin.y;
-      // setScaleOffset({ x, y });
-      setRulerScaleTranslate({
-        x: ((1 - this.#scale) * root.width) / 2,
-        y: ((1 - this.#scale) * root.height) / 2
-      });
-      setRulerScale(this.#scale);
-      if (this.#option?.containerEl) this.#option.containerEl.style.scale = `${this.#scale}`;
+
+      if (this.#option?.containerEl) {
+        this.#option.containerEl.style.transformOrigin = `0px 0px`;
+        this.#option.containerEl.style.scale = `${this.#scale}`;
+      }
+
+      if (this.#option?.containerEl && this.#option?.parentEl) {
+        const parent_rect = this.#option.parentEl.getBoundingClientRect();
+        // Current position after dragging.
+        const container_pos = getPos();
+        // The current offset position of the scaled container canvas.
+        const { x, y } = getScaleOffset() || { x: 0, y: 0 };
+        // Calculate the actual position of the container canvas
+        const container_rect = {
+          left: x + parent_rect.x + container_pos.x,
+          top: y + parent_rect.y + container_pos.y
+        };
+        // Calculate the position of the mouse pointer in the canvas.
+        const disX = e.clientX - container_rect.left;
+        const disY = e.clientY - container_rect.top;
+
+        const offset = {
+          x: x - disX * ratio_scale,
+          y: y - disY * ratio_scale
+        };
+
+        setScaleOffset(offset);
+        setRulerScaleOffset(offset);
+        setRulerScale(this.#scale);
+      }
     }
   }
 

@@ -18,15 +18,15 @@ class Ruler {
   #parentEl?: Element | null;
   #rulerXEl?: HTMLCanvasElement;
   #rulerYEl?: HTMLCanvasElement;
-  #translate = { x: 0, y: 0 };
-  #scaleTranslate = { x: 0, y: 0 };
+  #pos = { x: 0, y: 0 };
+  #scaleOffset = { x: 0, y: 0 };
   #scale = 1;
   constructor() {
     this.addRuler = this.addRuler.bind(this);
-    this.setRulerTranslate = this.setRulerTranslate.bind(this);
+    this.setRulerPos = this.setRulerPos.bind(this);
     this.setRulerScale = this.setRulerScale.bind(this);
-    this.setRulerScaleTranslate = this.setRulerScaleTranslate.bind(this);
-    this.setRulerScaleTranslateDelta = this.setRulerScaleTranslateDelta.bind(this);
+    this.setRulerScaleOffset = this.setRulerScaleOffset.bind(this);
+    this.setRulerScaleOffsetDelta = this.setRulerScaleOffsetDelta.bind(this);
   }
 
   #draw() {
@@ -165,11 +165,11 @@ class Ruler {
       const scales = this.#getScales(
         config.long_size,
         config.intervalPixel,
-        this.#translate.y + this.#scaleTranslate.y
+        this.#pos.y + this.#scaleOffset.y
       );
       for (let idx = 0; idx < scales.length; idx++) {
         const scale = scales[idx];
-        const lineRect = this.#getLineRect(scale.pixel, this.#translate.y + this.#scaleTranslate.y);
+        const lineRect = this.#getLineRect(scale.pixel, this.#pos.y + this.#scaleOffset.y);
         const x = lineRect.lineStart;
         const y = lineRect.start;
         const x2 = lineRect.deputyLineEnd;
@@ -235,12 +235,12 @@ class Ruler {
       const scales = this.#getScales(
         config.long_size,
         config.intervalPixel,
-        this.#translate.x + this.#scaleTranslate.x
+        this.#pos.x + this.#scaleOffset.x
       );
       for (let idx = 0; idx < scales.length; idx++) {
         const scale = scales[idx];
 
-        const lineRect = this.#getLineRect(scale.pixel, this.#translate.x + this.#scaleTranslate.x);
+        const lineRect = this.#getLineRect(scale.pixel, this.#pos.x + this.#scaleOffset.x);
         const x = lineRect.start;
         const y = lineRect.lineStart;
         const y2 = lineRect.deputyLineEnd;
@@ -290,12 +290,12 @@ class Ruler {
     this.#draw();
   }
 
-  setRulerTranslate(pos: RulerPos) {
-    this.#setRulerTranslate(pos);
+  setRulerPos(pos: RulerPos) {
+    this.#setRulerPos(pos);
   }
-  #setRulerTranslate(pos: RulerPos) {
-    this.#translate.x = pos.x;
-    this.#translate.y = pos.y;
+  #setRulerPos(pos: RulerPos) {
+    this.#pos.x = pos.x;
+    this.#pos.y = pos.y;
     this.#draw();
   }
 
@@ -307,21 +307,21 @@ class Ruler {
     this.#draw();
   }
 
-  setRulerScaleTranslate(pos: RulerPos) {
-    this.#setRulerScaleTranslate(pos);
+  setRulerScaleOffset(pos: RulerPos) {
+    this.#setRulerScaleOffset(pos);
   }
-  #setRulerScaleTranslate(pos: RulerPos) {
-    this.#scaleTranslate.x = pos.x;
-    this.#scaleTranslate.y = pos.y;
+  #setRulerScaleOffset(pos: RulerPos) {
+    this.#scaleOffset.x = pos.x;
+    this.#scaleOffset.y = pos.y;
     this.#draw();
   }
 
-  setRulerScaleTranslateDelta(pos: RulerPos) {
-    this.#setRulerScaleTranslateDelta(pos);
+  setRulerScaleOffsetDelta(pos: RulerPos) {
+    this.#setRulerScaleOffsetDelta(pos);
   }
-  #setRulerScaleTranslateDelta(pos: RulerPos) {
-    this.#scaleTranslate.x += pos.x;
-    this.#scaleTranslate.y += pos.y;
+  #setRulerScaleOffsetDelta(pos: RulerPos) {
+    this.#scaleOffset.x += pos.x;
+    this.#scaleOffset.y += pos.y;
     this.#draw();
   }
 

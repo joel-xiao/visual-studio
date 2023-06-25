@@ -37,6 +37,8 @@ class Overlay {
     this.addMoveUpdated = this.addMoveUpdated.bind(this);
     this.removeMoveUpdate = this.removeMoveUpdate.bind(this);
 
+    this.getPos = this.getPos.bind(this);
+
     this.setScaleOffset = this.setScaleOffset.bind(this);
     this.getScaleOffset = this.getScaleOffset.bind(this);
   }
@@ -187,7 +189,7 @@ class Overlay {
     // }
   }
 
-  get getPos(): Pos {
+  getPos(): Pos {
     return this.#pos;
   }
 
@@ -218,6 +220,7 @@ export const useOverlay = function () {
       overlayUpdatePos: overlay.updatePos,
       addOverlayMoveUpdated: overlay.addMoveUpdated,
       setOverlayDisabled: overlay.setDisabled,
+      getPos: overlay.getPos,
       getScaleOffset: overlay.getScaleOffset,
       setScaleOffset: overlay.setScaleOffset
     })

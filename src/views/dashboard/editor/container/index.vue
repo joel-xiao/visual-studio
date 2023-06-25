@@ -5,7 +5,6 @@ div.editor-container(
   @drop="onDrop"
   @dragenter="onDragenter"
   @dragover="onDragover"
-  @mousewheel="onWheel"
   )
   div.editor-container-root(
     ref="containerEl"
@@ -68,9 +67,9 @@ onBeforeUnmount(() => {
   removeContainer();
 });
 
-const { setRulerTranslate, setRulerScale, setRulerScaleTranslateDelta } = useRuler();
+const { setRulerPos } = useRuler();
 addOverlayMoveUpdated((pos) => {
-  setRulerTranslate(pos);
+  setRulerPos(pos);
 });
 
 const { addBindKeysUpdated } = useBindKeysContext();
