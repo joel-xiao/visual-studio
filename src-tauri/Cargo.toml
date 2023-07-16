@@ -2,7 +2,7 @@
 name = "visual"
 version = "0.1.0"
 description = "A Visual Studio"
-authors = ["you"]
+authors = ["The visual xiao"]
 license = ""
 repository = ""
 default-run = "visual"

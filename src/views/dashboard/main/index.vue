@@ -1,17 +1,20 @@
 <script setup lang="ts">
-import MyDashboard from './my-dashboard.vue';
-import { ref, reactive, markRaw } from 'vue';
+import { ref, reactive, markRaw, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+const router = useRouter();
+const route = useRoute();
 
 interface navData {
   label: string;
   id: string;
+  path: string;
 }
 const navList: navData[] = reactive(
   markRaw([
-    { label: '可视化', id: 'dashboard' },
-    { label: '网页', id: 'web' },
-    { label: '3D', id: '3d' },
-    { label: '数据', id: 'data' }
+    { label: '可视化', id: 'dashboard-projects', path: '/dashboard/main/projects' },
+    { label: '网页', id: 'web', path: '' },
+    { label: '3D', id: '3d', path: '' },
+    { label: '数据', id: 'dashboard-data', path: '/dashboard/main/data' }
     // { label: '我的资产', id: 'com' },
     // { label: '教程', id: 'case' }
   ])
@@ -20,7 +23,16 @@ const navList: navData[] = reactive(
 const currentNav = ref<navData>(navList[0]);
 const onNavSelect = function (nav: navData): void {
   currentNav.value = nav;
+  nav.path && router.push(nav.path);
 };
+
+onMounted(() => {
+  initCurrentNav();
+});
+function initCurrentNav() {
+  const nav = navList.find((nav) => nav.id === route.name);
+  if (nav) onNavSelect(nav);
+}
 </script>
 
 <template lang="pug">
@@ -29,7 +41,7 @@ const onNavSelect = function (nav: navData): void {
     span.nav-content-span(@click="onNavSelect(item)" :class="{ active: currentNav.id === item.id }" :key="item.id" v-for="(item, idx) in navList")
       | {{ item.label }}
 .dashboard-content
-  MyDashboard(v-show="currentNav.id === 'dashboard'")
+  router-view
 </template>
 
 <style lang="scss">

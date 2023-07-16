@@ -9,7 +9,7 @@ import type { App } from 'vue';
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    redirect: '/dashboard/main',
+    redirect: '/dashboard/main/projects',
     name: 'Home',
     component: layout,
     children: [
@@ -22,7 +22,21 @@ const routes: Array<RouteRecordRaw> = [
             path: '/main',
             name: 'dashboard-main',
             component: () =>
-              import(/* webpackChunkName: "dashboard" */ '@v/dashboard/main/index.vue')
+              import(/* webpackChunkName: "dashboard" */ '@v/dashboard/main/index.vue'),
+            children: [
+              {
+                path: '/projects',
+                name: 'dashboard-projects',
+                component: () =>
+                  import(/* webpackChunkName: "dashboard" */ '@v/dashboard/main/my-dashboard.vue')
+              },
+              {
+                path: '/data',
+                name: 'dashboard-data',
+                component: () =>
+                  import(/* webpackChunkName: "dashboard" */ '@v/dashboard/main/my-data.vue')
+              }
+            ]
           },
           {
             path: '/editor',

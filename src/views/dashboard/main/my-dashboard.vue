@@ -57,7 +57,7 @@ const newProjectList: newProjectData[] = reactive(
 
 let { saveCrumbs } = useDashboardStore();
 
-const onNewProject = function (): void {
+function onNewProject(): void {
   let project: TreeItemData = { name: '未命名', id: '2all', sum: 0 };
   if (currentFolder.value.children) {
     currentFolder.value.AFold = true;
@@ -65,7 +65,7 @@ const onNewProject = function (): void {
   }
   saveCrumbs([...(currentFolder.value?.cascades || []), project]);
   router.push('/dashboard/editor');
-};
+}
 
 let projects = ref<IVisualProjectsResponse['data']>([]);
 visual.getVisualProjects('23').then((res) => {
