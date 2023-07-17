@@ -103,7 +103,7 @@ div#dashboard-my-project
     div.projects-content
       ItemCard(v-for="(item, idx) in projects" :data="item" :key="item.id + '_' + idx")
 
-  Loading
+  //- Loading
 
 </template>
 
