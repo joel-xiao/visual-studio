@@ -10,10 +10,10 @@ n-card(class="item-card" :bordered="false" content-style="padding: 6px;")
 </template>
 <script lang="ts" setup>
 import { ref, reactive, withDefaults } from 'vue';
-import type { ItemCard } from './item-card.d';
+import type { IItemCard } from './types.d';
 
 interface Props {
-  data: ItemCard;
+  data: IItemCard;
 }
 
 const props = withDefaults(defineProps<Props>(), {

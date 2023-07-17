@@ -85,6 +85,10 @@ const onCommand = function (
   onContentMenuShow(false);
   onMenuCommand(cmd);
 };
+
+defineExpose({
+  setSelect: onNavSelect
+});
 </script>
 
 <template lang="pug">
