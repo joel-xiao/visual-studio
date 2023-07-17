@@ -1,8 +1,6 @@
 import { readonly, Raw, markRaw } from 'vue';
-import { useBindKeysContext } from '../bind-keys-context';
 import { useOverlay } from '../overlay-context';
 import { useRuler } from '../ruler-context';
-import { useNodeContext } from '../node-context';
 
 type ContainerOption = {
   parentEl: HTMLElement;
@@ -41,52 +39,44 @@ class Container {
 
   onWheel(e: WheelEvent): void {
     e.preventDefault();
-
-    const { getBindKeys } = useBindKeysContext();
-    const { getRoot } = useNodeContext();
     const { getScaleOffset, setScaleOffset, getPos } = useOverlay();
     const { setRulerScaleOffset, setRulerScale } = useRuler();
 
-    const { isCtrl } = getBindKeys();
-    const root = getRoot();
+    let ratio = 1.1;
+    if (e.deltaY > 0) {
+      ratio = 0.9;
+    }
+    this.#scale = this.#scale * ratio;
+    const ratio_scale = ratio - 1;
 
-    if (isCtrl) {
-      let ratio = 1.1;
-      if (e.deltaY > 0) {
-        ratio = 0.9;
-      }
-      this.#scale = this.#scale * ratio;
-      const ratio_scale = ratio - 1;
+    if (this.#option?.containerEl) {
+      this.#option.containerEl.style.transformOrigin = `0px 0px`;
+      this.#option.containerEl.style.scale = `${this.#scale}`;
+    }
 
-      if (this.#option?.containerEl) {
-        this.#option.containerEl.style.transformOrigin = `0px 0px`;
-        this.#option.containerEl.style.scale = `${this.#scale}`;
-      }
+    if (this.#option?.containerEl && this.#option?.parentEl) {
+      const parent_rect = this.#option.parentEl.getBoundingClientRect();
+      // Current position after dragging.
+      const container_pos = getPos();
+      // The current offset position of the scaled container canvas.
+      const { x, y } = getScaleOffset() || { x: 0, y: 0 };
+      // Calculate the actual position of the container canvas
+      const container_rect = {
+        left: x + parent_rect.x + container_pos.x,
+        top: y + parent_rect.y + container_pos.y
+      };
+      // Calculate the position of the mouse pointer in the canvas.
+      const disX = e.clientX - container_rect.left;
+      const disY = e.clientY - container_rect.top;
 
-      if (this.#option?.containerEl && this.#option?.parentEl) {
-        const parent_rect = this.#option.parentEl.getBoundingClientRect();
-        // Current position after dragging.
-        const container_pos = getPos();
-        // The current offset position of the scaled container canvas.
-        const { x, y } = getScaleOffset() || { x: 0, y: 0 };
-        // Calculate the actual position of the container canvas
-        const container_rect = {
-          left: x + parent_rect.x + container_pos.x,
-          top: y + parent_rect.y + container_pos.y
-        };
-        // Calculate the position of the mouse pointer in the canvas.
-        const disX = e.clientX - container_rect.left;
-        const disY = e.clientY - container_rect.top;
+      const offset = {
+        x: x - disX * ratio_scale,
+        y: y - disY * ratio_scale
+      };
 
-        const offset = {
-          x: x - disX * ratio_scale,
-          y: y - disY * ratio_scale
-        };
-
-        setScaleOffset(offset);
-        setRulerScaleOffset(offset);
-        setRulerScale(this.#scale);
-      }
+      setScaleOffset(offset);
+      setRulerScaleOffset(offset);
+      setRulerScale(this.#scale);
     }
   }
 
