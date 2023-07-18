@@ -1,23 +1,29 @@
 <script lang="ts" setup>
-import { withDefaults } from 'vue';
+import { reactive, withDefaults } from 'vue';
 
 interface Props {
   src?: string;
   button?: boolean;
   block?: boolean;
-  size?: string;
+  size?: 'small' | '';
+  fontSize?: string | number;
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   src: '',
   button: false,
   block: false,
-  size: ''
+  size: '',
+  fontSize: ''
+});
+
+const Style = reactive({
+  fontSize: props.fontSize
 });
 </script>
 
 <template lang="pug">
-span(class='c-icon-font' :class="[button ? 'button' : '', block ? 'block' : '', size]")
+span(class='c-icon-font' :style="Style" :class="[button ? 'button' : '', block ? 'block' : '', size]")
   i(class='icon-font' :class='src')
 </template>
 

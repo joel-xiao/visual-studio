@@ -21,6 +21,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits(['select', 'command']);
 
 const onSelect = function (item: TreeItemData): void {
+  onArrow(item);
   emit('select', item);
 };
 
@@ -28,10 +29,10 @@ const treeItemStyle: { paddingLeft?: string } = reactive({});
 treeItemStyle.paddingLeft = 24 + props.recursion * 16 + 'px';
 
 // const AFold = ref<boolean>(false);
-const onArrow = function (item: TreeItemData): void {
+function onArrow(item: TreeItemData): void {
   item.AFold = !item.AFold;
   // AFold.value = item.AFold;
-};
+}
 
 const onCommand = function (event: PointerEvent, cmd: TreeItemMenu, item: TreeItemData): void {
   emit('command', event, cmd, item);
@@ -48,7 +49,7 @@ const onCommand = function (event: PointerEvent, cmd: TreeItemMenu, item: TreeIt
       span.tree-item-labe {{ item.name }}
     .tree-item-handle(v-if="item.handle !== false")
       Icon(button v-for="cmd in itemMenus" :key="cmd.id" :class="cmd.id" @click.stop.prevent="onCommand($event, cmd, item)" :src="cmd.icon")
-  .tree-item-swapper(v-if="!!item?.children?.length" v-show="item.AFold")
+  .tree-item-swapper(v-if="!!item?.children?.length" :class="{expand: item.AFold}" :style="{'--tree-item-sum': item?.children?.length || item?.children?.length}")
     TreeItem(:recursion="recursion + 1" @select="onSelect" @command="onCommand" :data="item.children" :itemIcon="itemIcon" :itemMenus="itemMenus" :currentNav="currentNav")
 </template>
 
@@ -77,7 +78,6 @@ const onCommand = function (event: PointerEvent, cmd: TreeItemMenu, item: TreeIt
         .arrow {
           position: absolute;
           left: -20px;
-          cursor: pointer;
           transition: transform 0.2s;
           opacity: 0.6;
 
@@ -137,6 +137,25 @@ const onCommand = function (event: PointerEvent, cmd: TreeItemMenu, item: TreeIt
             color: var(--theme-color-text-bold);
           }
         }
+      }
+    }
+
+    .tree-item-swapper {
+      height: 0;
+      opacity: 0.2;
+      overflow: hidden;
+      transition: 0.1s;
+      &.expand {
+        opacity: 1;
+        height: 100%;
+      }
+    }
+  }
+
+  &.small {
+    .tree-item {
+      .tree-item-nav {
+        height: 42px;
       }
     }
   }

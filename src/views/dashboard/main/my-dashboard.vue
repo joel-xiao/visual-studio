@@ -44,22 +44,22 @@ function initLayout() {
     { name: '添加组', id: 'add', icon: 'icon-jiahao', disabled: true }
   ]);
 
-  // layoutRef.value.setButtons([
-  //   { name: 'PC端创建', id: 'web', icon: 'new-project-web.png' },
-  //   { name: '移动端创建', id: 'mobile', icon: 'new-project-mobile.png' }
-  // ]);
+  layoutRef.value.setButtons([
+    { name: '可视化', id: 'new', icon: '' }
+    // { name: 'PC端', id: 'web', icon: 'new-project-web.png' },
+    // { name: '移动端', id: 'mobile', icon: 'new-project-mobile.png' }
+  ]);
 }
 
 let { saveCrumbs } = useDashboardStore();
-function onNewProject(opt: LayoutCreateProject) {
-  console.log(opt.folder?.cascades);
+function onButtonClick(opt: LayoutCreateProject) {
   saveCrumbs(opt.folder?.cascades);
   router.push('/dashboard/editor');
 }
 </script>
 
 <template lang="pug">
-MainLayout(ref="layoutRef" @create-project="onNewProject")
+MainLayout(ref="layoutRef" @button-click="onButtonClick")
 </template>
 
 <style lang="scss"></style>

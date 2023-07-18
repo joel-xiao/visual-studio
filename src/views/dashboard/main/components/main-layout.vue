@@ -12,7 +12,7 @@ import type {
 } from './types.d';
 
 const emits = defineEmits<{
-  (e: 'create-project', data: LayoutCreateProject): void;
+  (e: 'button-click', data: LayoutCreateProject): void;
 }>();
 
 let option = reactive<ILayoutOption>({});
@@ -66,20 +66,22 @@ function clearButtons() {
   buttons.value = [];
 }
 
-const projects = ref<ILayoutProject[]>([]);
-
-function onNewProject(): void {
+function onButton(item: ILayoutNewProjectData): void {
   let project: ITreeItemData = { name: '未命名', id: getUuid(), sum: 0 };
   if (currentFolder.value?.children) {
     currentFolder.value.AFold = true;
-    // currentFolder.value.children.push(project);
+    currentFolder.value.children.push(project);
     currentFolder.value.cascades.push(project);
     projects.value.push(project);
   }
-  emits('create-project', {
-    folder: currentFolder.value
+  emits('button-click', {
+    folder: currentFolder.value,
+    project,
+    item
   });
 }
+
+const projects = ref<ILayoutProject[]>([]);
 
 defineExpose({
   setOption,
@@ -111,12 +113,13 @@ div#dashboard-my-project
     div.new-projects
       div.new-project(
           v-for="(item, idx) in buttons"
+          @click="onButton(item)"
           :key="item.id")
           img(v-if="item.icon" :src="'@a/img/dashboard/main/' + item.icon")
           span.ellipsis.project-type {{item.name}}
+          Icon(src='icon-jiahao' font-size="16px")
 
     div.projects-search
-      n-button(type="primary" @click.stop.prevent="onNewProject") 新建
       div.search
         NInput(placeholder="搜索")
           template(#prefix)
@@ -131,9 +134,6 @@ div#dashboard-my-project
 
     div.projects-content
       ItemCard(v-for="(item, idx) in projects" :data="item" :key="item.id + '_' + idx")
-
-
-  div(class='project-right-content right')
   //- Loading
 
 </template>
@@ -145,27 +145,23 @@ div#dashboard-my-project
     width: 100%;
     height: 100%;
 
-    .project-manage,
-    .project-right-content {
+    .project-manage {
       width: 264px;
       height: 100%;
       padding: 8px;
       background: var(--db-main-color-left-bar-bg);
       z-index: 1;
+      .manage-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 56px;
+        padding: 0 30px 0 24px;
+        font-size: 14px;
+        color: #fff;
+        border-bottom: 1px solid #27343e;
 
-      .project-manage {
-        .manage-title {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          height: 56px;
-          padding: 0 30px 0 24px;
-          font-size: 14px;
-          color: #fff;
-          border-bottom: 1px solid #27343e;
-
-          .add-group {
-          }
+        .add-group {
         }
       }
     }
@@ -201,15 +197,16 @@ div#dashboard-my-project
 
     .project-screen-list {
       z-index: 0;
-      width: calc(100% - (264px + 264px));
+      width: calc(100% - 264px);
       height: 100%;
-      padding: 10px 16px;
+      padding: 24px 32px;
+      position: relative;
 
       .new-projects {
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
-        margin-bottom: 12px;
+        margin-bottom: 24px;
 
         .new-project {
           position: relative;
@@ -217,32 +214,24 @@ div#dashboard-my-project
           flex-direction: row;
           align-items: center;
           justify-content: space-between;
-          width: 258px;
-          height: 78px;
-          margin-top: 4px;
-          margin-right: 10px;
+          width: 284px;
+          border-radius: 8px;
+          height: 64px;
+          margin-right: 16px;
+          box-sizing: border-box;
+          padding: 0 16px;
           color: #fff;
           vertical-align: middle;
-          cursor: pointer;
-          background: #22272e;
-          border: 1px solid #39414d;
+          border: 1px solid var(--theme-color-border);
+          transition: all 0.2s;
 
           &:hover {
-            border-color: var(--dashboard-main-color);
-
-            &::after {
-              position: absolute;
-              top: 0;
-              left: 0;
-              width: 100%;
-              height: 100%;
-              content: ' ';
-              background: rgb(36 131 255 / 8%);
-            }
+            background-color: var(--theme-color-gray-100);
           }
 
           img {
-            height: 100%;
+            max-height: 100%;
+            max-width: 58px;
           }
 
           .project-type {
@@ -257,13 +246,11 @@ div#dashboard-my-project
         display: flex;
         align-items: center;
         height: 32px;
-
-        .n-button {
-          width: 113px;
-        }
+        position: absolute;
+        top: -40px;
+        left: 36px;
         .search {
-          width: 100%;
-          padding-left: 16px;
+          width: 340px;
           height: 100%;
           .n-input {
             height: 100%;

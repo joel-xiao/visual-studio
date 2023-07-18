@@ -1,7 +1,7 @@
 <script setup lang="ts"></script>
 
 <template lang="pug">
-n-card(class="item-card" :bordered="false" content-style="padding: 6px;")
+div(class="item-card")
   div.item-card-cover
     div.item-card-cover_mask
       img(:src="data?.icon")
@@ -25,10 +25,13 @@ const props = withDefaults(defineProps<Props>(), {
   #dashboard-my-project {
     .item-card {
       max-width: 300px;
+      width: 100%;
       min-height: 240px;
       max-height: 240px;
       border-radius: var(--border-radius-6);
       overflow: hidden;
+      padding: 6px;
+      transition: 0.2s;
       &:hover {
         background: var(--db-main-color-card-bg);
         .item-card-cover_mask {

@@ -7,11 +7,13 @@ interface Props {
   data?: TreeItemData[];
   itemMenus?: TreeItemMenu[];
   itemIcon?: string;
+  size?: 'small' | '';
 }
 const props = withDefaults(defineProps<Props>(), {
   data: () => [],
   itemMenus: () => [],
-  itemIcon: ''
+  itemIcon: '',
+  size: ''
 });
 
 const emit = defineEmits(['select', 'command']);
@@ -92,7 +94,7 @@ defineExpose({
 </script>
 
 <template lang="pug">
-div(class='c-nav-tree')
+div(class='c-nav-tree' :class="size")
   TreeItem(
     @select="onNavSelect"
     @command="onCommand"

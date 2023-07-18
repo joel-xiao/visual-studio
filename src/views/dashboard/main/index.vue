@@ -12,8 +12,8 @@ interface navData {
 const navList: navData[] = reactive(
   markRaw([
     { label: '可视化', id: 'dashboard-projects', path: '/dashboard/main/projects' },
-    { label: '网页', id: 'web', path: '' },
-    { label: '3D', id: '3d', path: '' },
+    // { label: '网页', id: 'web', path: '' },
+    // { label: '3D', id: '3d', path: '' },
     { label: '数据', id: 'dashboard-data', path: '/dashboard/main/data' }
     // { label: '我的资产', id: 'com' },
     // { label: '教程', id: 'case' }
@@ -53,7 +53,7 @@ function initCurrentNav() {
   .dashboard-header {
     display: flex;
     align-items: center;
-    height: 42px;
+    height: 47px;
     padding: 0 20px;
     border-bottom: 1px solid var(--db-main-border-black);
 
@@ -71,7 +71,6 @@ function initCurrentNav() {
         align-items: center;
         padding: 0 20px;
         color: var(--theme-color-tran-50);
-        cursor: pointer;
         border-radius: var(--border-radius-6);
         transition: all 0.2s;
 

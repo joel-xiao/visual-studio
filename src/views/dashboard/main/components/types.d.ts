@@ -31,4 +31,8 @@ export interface ILayoutProject {
   folderId: string;
 }
 
-export type LayoutCreateProject = { folder: ITreeItemData | undefined };
+export type LayoutCreateProject = {
+  folder: ITreeItemData | undefined;
+  project: ILayoutProject;
+  item: ILayoutNewProjectData;
+};

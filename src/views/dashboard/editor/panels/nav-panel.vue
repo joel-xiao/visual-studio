@@ -117,7 +117,6 @@ const onShare = function (): void {
         align-items: center;
         padding: 0 20px;
         color: var(--theme-color-tran-50);
-        cursor: pointer;
         border-radius: var(--border-radius-6);
         transition: all 0.2s;
 
