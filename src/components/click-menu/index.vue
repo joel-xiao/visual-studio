@@ -5,12 +5,14 @@ import type { ClickMenu } from './interface';
 interface Props {
   data?: ClickMenu[];
   modelValue: boolean;
+  size?: 'small' | '';
   x: number;
   y: number;
 }
 const props = withDefaults(defineProps<Props>(), {
   data: () => [],
   modelValue: false,
+  size: '',
   x: 0,
   y: 0
 });
@@ -56,6 +58,7 @@ transition(name='c-click-menu-fade')
     div.content-menu-item(v-for="(item) in data" :key="item.id" @click.prevent="onMenuCommand(item)")
       Icon(
         class="menu-item-icon"
+        :size="size"
         :src="item.icon")
       span(class="menu-item-label") {{ item.name }}
 </template>

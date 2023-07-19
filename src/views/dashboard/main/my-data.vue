@@ -23,9 +23,24 @@ function initLayout() {
       id: '123',
       sum: 0,
       children: [
-        { name: '全部数据', id: '1all', sum: 0 },
-        { name: '未分组', id: '1no-group', sum: 0 },
-        { name: '其他', id: '1123', sum: 0 }
+        {
+          name: '汇总数据',
+          id: '1all',
+          prefix: '<span class="data-type get">GET</span>',
+          handle: false
+        },
+        {
+          name: 'i爱吃醋你时序',
+          id: '1no-group',
+          prefix: '<span class="data-type post">POST</span>',
+          handle: false
+        },
+        {
+          name: '啊数据啊就',
+          id: '1123',
+          prefix: '<span class="data-type get">GET</span>',
+          handle: false
+        }
       ]
     }
   ]);
@@ -46,7 +61,8 @@ function initLayout() {
 
   layoutRef.value.setButtons([
     { name: 'POST', id: 'post', icon: '' },
-    { name: 'GET', id: 'get', icon: '' }
+    { name: 'GET', id: 'get', icon: '' },
+    { name: '导入', id: 'import', icon: '' }
   ]);
 }
 
@@ -61,4 +77,16 @@ function onNewProject(opt: LayoutCreateProject) {
 MainLayout(ref="layoutRef" @create-project="onNewProject")
 </template>
 
-<style lang="scss"></style>
+<style lang="scss">
+.data-type {
+  font-weight: 600;
+  display: block;
+  width: 34px;
+  &.get {
+    color: #4caf50;
+  }
+  &.post {
+    color: #fa8c16;
+  }
+}
+</style>

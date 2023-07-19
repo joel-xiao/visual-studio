@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { reactive, withDefaults } from 'vue';
+import { computed, reactive, withDefaults } from 'vue';
 
 interface Props {
   src?: string;
@@ -20,11 +20,16 @@ const props = withDefaults(defineProps<Props>(), {
 const Style = reactive({
   fontSize: props.fontSize
 });
+
+const isIcon = computed(() => {
+  return !props.src?.includes('.');
+});
 </script>
 
 <template lang="pug">
-span(class='c-icon-font' :style="Style" :class="[button ? 'button' : '', block ? 'block' : '', size]")
-  i(class='icon-font' :class='src')
+span(class='c-icon-font' :style="Style" :class="[button ? 'button' : '', block ? 'block' : '', size, !isIcon ? 'img' : '']")
+  i(class='icon-font' :class='src' v-if="isIcon")
+  img(class='icon-img' v-else :src="src")
 </template>
 
 <style lang="scss">
@@ -33,6 +38,8 @@ span(class='c-icon-font' :style="Style" :class="[button ? 'button' : '', block ?
   overflow: hidden;
   border-radius: 4px;
   overflow: hidden;
+  display: flex;
+  justify-content: center;
 
   .icon-font {
     display: flex;
@@ -42,10 +49,20 @@ span(class='c-icon-font' :style="Style" :class="[button ? 'button' : '', block ?
     height: 100%;
   }
 
+  .icon-img {
+    max-width: 100%;
+    width: calc(100% - 2px);
+    max-height: 100%;
+  }
+
   &.block {
     width: 20px;
     height: 20px;
     margin: 2px;
+  }
+
+  &.img {
+    margin: 0px 8px;
   }
 
   &.button {
@@ -64,8 +81,8 @@ span(class='c-icon-font' :style="Style" :class="[button ? 'button' : '', block ?
   }
 
   &.small {
-    width: 30px;
-    height: 30px;
+    width: 24px;
+    height: 24px;
     font-size: 14px;
   }
 }

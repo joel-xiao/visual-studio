@@ -104,7 +104,8 @@ div#dashboard-my-project
   div(class='project-manage left')
     NavTree(
       :data="folderTree"
-      itemIcon="icon-wenjianjia"
+      itemIcon="image/dashboard/my-main/folder.svg"
+      size='small'
       :itemMenus="folderMenus"
       ref="navRef"
       @select="selectFolder")

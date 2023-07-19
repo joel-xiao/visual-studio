@@ -8,6 +8,7 @@ export interface TreeItemData {
   handle?: boolean;
   parentId?: string;
   cascades?: TreeItemData[];
+  prefix?: string;
 }
 
 export interface TreeItemMenu {

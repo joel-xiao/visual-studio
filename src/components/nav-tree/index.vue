@@ -13,7 +13,7 @@ const props = withDefaults(defineProps<Props>(), {
   data: () => [],
   itemMenus: () => [],
   itemIcon: '',
-  size: ''
+  size: 'small'
 });
 
 const emit = defineEmits(['select', 'command']);
@@ -99,6 +99,7 @@ div(class='c-nav-tree' :class="size")
     @select="onNavSelect"
     @command="onCommand"
     :data="tree"
+    :size="size"
     :itemIcon="itemIcon"
     :itemMenus="itemMenus"
     :currentNav="currentNav")

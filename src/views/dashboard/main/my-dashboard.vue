@@ -45,7 +45,8 @@ function initLayout() {
   ]);
 
   layoutRef.value.setButtons([
-    { name: '可视化', id: 'new', icon: '' }
+    { name: '可视化', id: 'new', icon: '' },
+    { name: '导入', id: 'import', icon: '' }
     // { name: 'PC端', id: 'web', icon: 'new-project-web.png' },
     // { name: '移动端', id: 'mobile', icon: 'new-project-mobile.png' }
   ]);

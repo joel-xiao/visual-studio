@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, reactive, withDefaults } from 'vue';
+import { ref, reactive, withDefaults, computed } from 'vue';
 import type { TreeItemData, TreeItemMenu } from './interface';
 
 interface Props {
@@ -7,6 +7,7 @@ interface Props {
   data?: TreeItemData[];
   itemIcon?: string;
   itemMenus: TreeItemMenu[];
+  size?: 'small' | '';
   currentNav?: TreeItemData | null;
 }
 
@@ -15,6 +16,7 @@ const props = withDefaults(defineProps<Props>(), {
   data: () => [],
   itemIcon: '',
   itemMenus: () => [],
+  size: '',
   currentNav: null
 });
 
@@ -25,8 +27,20 @@ const onSelect = function (item: TreeItemData): void {
   emit('select', item);
 };
 
+const IsDot = computed(() => {
+  return props.data.some((item) => item.children?.length);
+});
+
+const IsPrefix = computed(() => {
+  return props.data.some((item) => !!item.prefix);
+});
+
+const IsArrow = function (item: TreeItemData) {
+  return item?.children?.length;
+};
+
 const treeItemStyle: { paddingLeft?: string } = reactive({});
-treeItemStyle.paddingLeft = 24 + props.recursion * 16 + 'px';
+treeItemStyle.paddingLeft = (IsPrefix.value ? 10 : 24) + props.recursion * 16 + 'px';
 
 // const AFold = ref<boolean>(false);
 function onArrow(item: TreeItemData): void {
@@ -42,15 +56,16 @@ const onCommand = function (event: PointerEvent, cmd: TreeItemMenu, item: TreeIt
 .tree-item(v-for="item in data" :key="item.id")
   .tree-item-nav(@click="onSelect(item)" :class="{ active: currentNav?.id === item.id }" :style="treeItemStyle")
     .tree-item-left
-      Icon.arrow(block src="icon-shouqi2" :class="{ active: item.AFold }" v-if="item?.children?.length" @click.stop="onArrow(item)")
-      span.dot(v-else)
-      Icon.name-icon( block v-if="item.icon || itemIcon" :src="item.icon || itemIcon")
+      Icon.arrow(block src="icon-shouqi2" :size="size" :class="{ active: item.AFold }" v-if="IsArrow(item)" @click.stop="onArrow(item)")
+      span.dot(v-else-if="IsDot")
+      Icon.name-icon(block v-if="(item.icon || itemIcon) && !item.prefix" :src="item.icon || itemIcon")
+      span(v-else-if="item.prefix" class="name-prefix" v-html="item.prefix")
       span.name-icon-margin(v-else)
       span.tree-item-labe {{ item.name }}
     .tree-item-handle(v-if="item.handle !== false")
-      Icon(button v-for="cmd in itemMenus" :key="cmd.id" :class="cmd.id" @click.stop.prevent="onCommand($event, cmd, item)" :src="cmd.icon")
+      Icon(button :size="size" v-for="cmd in itemMenus" :key="cmd.id" :class="cmd.id" @click.stop.prevent="onCommand($event, cmd, item)" :src="cmd.icon")
   .tree-item-swapper(v-if="!!item?.children?.length" :class="{expand: item.AFold}" :style="{'--tree-item-sum': item?.children?.length || item?.children?.length}")
-    TreeItem(:recursion="recursion + 1" @select="onSelect" @command="onCommand" :data="item.children" :itemIcon="itemIcon" :itemMenus="itemMenus" :currentNav="currentNav")
+    TreeItem(:recursion="recursion + 1" :size="size" @select="onSelect" @command="onCommand" :data="item.children" :itemIcon="itemIcon" :itemMenus="itemMenus" :currentNav="currentNav")
 </template>
 
 <style lang="scss">
@@ -97,6 +112,10 @@ const onCommand = function (event: PointerEvent, cmd: TreeItemMenu, item: TreeIt
 
         .name-icon {
           color: var(--theme-color-tran-50);
+        }
+
+        .name-prefix {
+          padding: 0 6px;
         }
 
         .name-icon-margin {
@@ -155,7 +174,7 @@ const onCommand = function (event: PointerEvent, cmd: TreeItemMenu, item: TreeIt
   &.small {
     .tree-item {
       .tree-item-nav {
-        height: 42px;
+        height: 40px;
       }
     }
   }
