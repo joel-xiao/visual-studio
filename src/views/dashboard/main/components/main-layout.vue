@@ -128,8 +128,8 @@ div#dashboard-my-project
 
     div.project-header
       div.project-title
-        h2.ellipsis {{ currentFolder?.name || '' }}
-        span.projects-sum
+        h2.ellipsis {{ currentFolder?.cascades ? currentFolder?.cascades.map( item => item.name).join(' / ') : '' }}
+        span.projects-sum(v-if="currentFolder?.sum")
           span.projects-number {{ currentFolder?.sum || '0' }}
           |个
 
@@ -277,7 +277,6 @@ div#dashboard-my-project
           flex: none;
 
           h2 {
-            max-width: 200px;
             font-size: 16px;
             color: var(--theme-color-text);
           }
