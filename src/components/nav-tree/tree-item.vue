@@ -22,8 +22,8 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits(['select', 'command']);
 
-const onSelect = function (item: TreeItemData): void {
-  onArrow(item);
+const onSelect = function (item: TreeItemData, isTop: boolean): void {
+  if (!isTop) onArrow(item);
   emit('select', item);
 };
 
@@ -54,7 +54,7 @@ const onCommand = function (event: PointerEvent, cmd: TreeItemMenu, item: TreeIt
 </script>
 <template lang="pug">
 .tree-item(v-for="item in data" :key="item.id")
-  .tree-item-nav(@click="onSelect(item)" :class="{ active: currentNav?.id === item.id }" :style="treeItemStyle")
+  .tree-item-nav(@click="onSelect(item)" :class="{ active: currentNav === item }" :style="treeItemStyle")
     .tree-item-left
       Icon.arrow(block src="icon-shouqi2" :size="size" :class="{ active: item.AFold }" v-if="IsArrow(item)" @click.stop="onArrow(item)")
       span.dot(v-else-if="IsDot")
@@ -65,7 +65,7 @@ const onCommand = function (event: PointerEvent, cmd: TreeItemMenu, item: TreeIt
     .tree-item-handle(v-if="item.handle !== false")
       Icon(button :size="size" v-for="cmd in itemMenus" :key="cmd.id" :class="cmd.id" @click.stop.prevent="onCommand($event, cmd, item)" :src="cmd.icon")
   .tree-item-swapper(v-if="!!item?.children?.length" :class="{expand: item.AFold}" :style="{'--tree-item-sum': item?.children?.length || item?.children?.length}")
-    TreeItem(:recursion="recursion + 1" :size="size" @select="onSelect" @command="onCommand" :data="item.children" :itemIcon="itemIcon" :itemMenus="itemMenus" :currentNav="currentNav")
+    TreeItem(:recursion="recursion + 1" :size="size" @select="onSelect($event, true)" @command="onCommand" :data="item.children" :itemIcon="itemIcon" :itemMenus="itemMenus" :currentNav="currentNav")
 </template>
 
 <style lang="scss">

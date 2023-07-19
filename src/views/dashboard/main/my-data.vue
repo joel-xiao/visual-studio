@@ -23,23 +23,32 @@ function initLayout() {
       id: '123',
       sum: 0,
       children: [
+        { name: '全部数据', id: 'all', sum: 0, handle: false },
+        { name: '未分组', id: 'no-group', sum: 0, handle: false },
         {
-          name: '汇总数据',
-          id: '1all',
-          prefix: '<span class="data-type get">GET</span>',
-          handle: false
-        },
-        {
-          name: 'i爱吃醋你时序',
-          id: '1no-group',
-          prefix: '<span class="data-type post">POST</span>',
-          handle: false
-        },
-        {
-          name: '啊数据啊就',
-          id: '1123',
-          prefix: '<span class="data-type get">GET</span>',
-          handle: false
+          name: 'xiao',
+          id: '123',
+          sum: 0,
+          children: [
+            {
+              name: '汇总数据',
+              id: '1all',
+              prefix: '<span class="data-type get">GET</span>',
+              handle: false
+            },
+            {
+              name: 'i爱吃醋你时序',
+              id: '1no-group',
+              prefix: '<span class="data-type post">POST</span>',
+              handle: false
+            },
+            {
+              name: '啊数据啊就',
+              id: '1123',
+              prefix: '<span class="data-type get">GET</span>',
+              handle: false
+            }
+          ]
         }
       ]
     }
