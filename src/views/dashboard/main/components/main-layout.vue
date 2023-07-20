@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import ItemCard from './item-card.vue';
 import { ref, reactive, markRaw, defineEmits } from 'vue';
 import { getUuid } from '@a/utils/index';
 import type {
@@ -7,8 +6,7 @@ import type {
   ITreeItemData,
   ILayoutOption,
   ILayoutNewProjectData,
-  LayoutCreateProject,
-  ILayoutProject
+  LayoutCreateProject
 } from './types.d';
 
 const emits = defineEmits<{
@@ -72,7 +70,6 @@ function onButton(item: ILayoutNewProjectData): void {
     currentFolder.value.AFold = true;
     currentFolder.value.children.push(project);
     currentFolder.value.cascades.push(project);
-    projects.value.push(project);
   }
   emits('button-click', {
     folder: currentFolder.value,
@@ -80,8 +77,6 @@ function onButton(item: ILayoutNewProjectData): void {
     item
   });
 }
-
-const projects = ref<ILayoutProject[]>([]);
 
 defineExpose({
   setOption,
@@ -134,7 +129,7 @@ div#dashboard-my-project
           |个
 
     div.projects-content
-      ItemCard(v-for="(item, idx) in projects" :data="item" :key="item.id + '_' + idx")
+      slot(name="content")
   //- Loading
 
 </template>
@@ -147,7 +142,7 @@ div#dashboard-my-project
     height: 100%;
 
     .project-manage {
-      width: 264px;
+      width: 300px;
       height: 100%;
       padding: 8px;
       background: var(--db-main-color-left-bar-bg);
@@ -198,7 +193,7 @@ div#dashboard-my-project
 
     .project-screen-list {
       z-index: 0;
-      width: calc(100% - 264px);
+      width: calc(100% - 300px);
       height: 100%;
       padding: 24px 32px;
       position: relative;
@@ -208,6 +203,8 @@ div#dashboard-my-project
         flex-direction: row;
         flex-wrap: wrap;
         margin-bottom: 24px;
+        row-gap: 16px;
+        column-gap: 16px;
 
         .new-project {
           position: relative;
@@ -218,15 +215,15 @@ div#dashboard-my-project
           width: 284px;
           border-radius: 8px;
           height: 64px;
-          margin-right: 16px;
           box-sizing: border-box;
           padding: 0 16px;
-          color: #fff;
+          color: var(--theme-color-text-bold);
           vertical-align: middle;
           border: 1px solid var(--theme-color-border);
           transition: all 0.2s;
 
           &:hover {
+            border: 1px solid var(--theme-color-gray-100);
             background-color: var(--theme-color-gray-100);
           }
 
@@ -284,17 +281,12 @@ div#dashboard-my-project
           span.projects-sum {
             padding-left: 6px;
             font-size: 14px;
-            color: #bcc9d4;
             letter-spacing: 1px;
             .projects-number {
               padding: 0 2px;
             }
           }
         }
-      }
-
-      .projects-content {
-        display: flex;
       }
     }
   }

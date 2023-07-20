@@ -92,10 +92,10 @@ MainLayout(ref="layoutRef" @create-project="onNewProject")
   display: block;
   width: 34px;
   &.get {
-    color: #4caf50;
+    color: var(--db-main-color-get);
   }
   &.post {
-    color: #fa8c16;
+    color: var(--db-main-color-post);
   }
 }
 </style>

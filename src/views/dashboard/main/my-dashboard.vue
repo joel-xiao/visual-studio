@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import MainLayout from './components/main-layout.vue';
+import ItemCard from './components/item-card.vue';
 import { ref, reactive, markRaw, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import type { LayoutCreateProject } from './components/types';
+import type { LayoutCreateProject, ILayoutProject } from './components/types';
 import { useDashboardStore } from '@/store/dashboard';
 import visual from '@s/visual/visual';
 import type { IVisualProjectsResponse } from '@s/visual/types';
@@ -57,10 +58,14 @@ function onButtonClick(opt: LayoutCreateProject) {
   saveCrumbs(opt.folder?.cascades);
   router.push('/dashboard/editor');
 }
+
+const projects = ref<ILayoutProject[]>([]);
 </script>
 
 <template lang="pug">
 MainLayout(ref="layoutRef" @button-click="onButtonClick")
+  content
+    ItemCard(v-for="(item, idx) in projects" :data="item" :key="item.id + '_' + idx")
 </template>
 
 <style lang="scss"></style>

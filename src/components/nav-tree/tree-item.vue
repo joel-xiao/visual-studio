@@ -167,6 +167,8 @@ const onCommand = function (event: PointerEvent, cmd: TreeItemMenu, item: TreeIt
       &.expand {
         opacity: 1;
         height: 100%;
+        overflow: auto;
+        margin-top: -4px;
       }
     }
   }
