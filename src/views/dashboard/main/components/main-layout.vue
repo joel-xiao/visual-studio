@@ -97,6 +97,9 @@ defineExpose({
 <template lang="pug">
 div#dashboard-my-project
   div(class='project-manage left')
+    div.manage-title
+      span 我的项目
+      Icon(src="icon-jiahao" class="add-group" button size="small")
     NavTree(
       :data="folderTree"
       itemIcon="image/dashboard/my-main/folder.svg"
@@ -117,7 +120,7 @@ div#dashboard-my-project
 
     div.projects-search
       div.search
-        NInput(placeholder="搜索")
+        NInput(placeholder="搜索项目...")
           template(#prefix)
             Icon(src='icon-sousuo')
 
@@ -148,16 +151,27 @@ div#dashboard-my-project
       background: var(--db-main-color-left-bar-bg);
       z-index: 1;
       .manage-title {
+        height: 40px;
         display: flex;
-        align-items: center;
         justify-content: space-between;
-        height: 56px;
-        padding: 0 30px 0 24px;
+        align-items: center;
         font-size: 14px;
-        color: #fff;
-        border-bottom: 1px solid #27343e;
+        padding-right: 4px;
+        padding-left: 20px;
+        color: var(--theme-color-tran-85);
+        border-radius: var(--border-radius-6);
 
         .add-group {
+          opacity: 0;
+          transition: opacity 0.15s;
+        }
+
+        &:hover {
+          background-color: var(--theme-color-gray-100);
+
+          .add-group {
+            opacity: 1;
+          }
         }
       }
     }
