@@ -2,12 +2,13 @@
 import TreeItem from './tree-item.vue';
 import { ref, reactive, computed, withDefaults, onUnmounted } from 'vue';
 import type { TreeItemData, TreeItemMenu } from './interface';
+import type { Size } from './../types.d';
 
 interface Props {
   data?: TreeItemData[];
   itemMenus?: TreeItemMenu[];
   itemIcon?: string;
-  size?: 'small' | '';
+  size?: Size;
 }
 const props = withDefaults(defineProps<Props>(), {
   data: () => [],

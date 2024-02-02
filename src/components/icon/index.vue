@@ -1,11 +1,12 @@
 <script lang="ts" setup>
+import type { Size } from './../types.d';
 import { computed, reactive, withDefaults } from 'vue';
 
 interface Props {
   src?: string;
   button?: boolean;
   block?: boolean;
-  size?: 'small' | '';
+  size?: Size;
   fontSize?: string | number;
 }
 

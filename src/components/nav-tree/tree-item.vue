@@ -1,13 +1,14 @@
 <script lang="ts" setup>
 import { ref, reactive, withDefaults, computed } from 'vue';
 import type { TreeItemData, TreeItemMenu } from './interface';
+import type { Size } from './../types.d';
 
 interface Props {
   recursion?: number;
   data?: TreeItemData[];
   itemIcon?: string;
   itemMenus: TreeItemMenu[];
-  size?: 'small' | '';
+  size?: Size;
   currentNav?: TreeItemData | null;
 }
 
