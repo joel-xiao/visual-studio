@@ -2,19 +2,19 @@
 svg(class="grid" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg")
   defs
     pattern(id="smallGrid"
-        width="7.236328125"
-        height="7.236328125"
+        width="1"
+        height="1"
         patternUnits="userSpaceOnUse")
-      path(d="M 7.236328125 0 L 0 0 0 7.236328125"
+      path(d="M 1 0 L 0 0 0 1"
           fill="none"
-          stroke="rgba(255, 255, 255, 0.16)"
-          stroke-width="1")
-    pattern(id="grid" width="36.181640625" height="36.181640625" patternUnits="userSpaceOnUse")
-      rect(width="36.181640625" height="36.181640625" fill="url(#smallGrid)")
-      path(d="M 36.181640625 0 L 0 0 0 36.181640625"
+          stroke="#fff"
+          stroke-width="0.001")
+    pattern(id="grid" width="1" height="1" patternUnits="userSpaceOnUse")
+      rect(width="1" height="1" fill="url(#smallGrid)")
+      path(d="M 1 0 L 0 0 0 1"
         fill="none"
-        stroke="rgba(255, 255, 255, 0.16)"
-        stroke-width="1" )
+        stroke="#fff"
+        stroke-width="0.001")
   rect(width="100%" height="100%" fill="url(#grid)")
 </template>
 
