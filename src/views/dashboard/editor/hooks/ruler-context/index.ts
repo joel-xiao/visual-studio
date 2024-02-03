@@ -24,7 +24,7 @@ class Ruler {
   #parentEl?: Element | null;
   #rulerXEl?: HTMLCanvasElement;
   #rulerYEl?: HTMLCanvasElement;
-  #rulerRectEl?: Element;
+  #rulerRectEl?: HTMLDivElement;
   #pos = { x: 0, y: 0 };
   #scaleOffset = { x: 0, y: 0 };
   #scale = 1;
@@ -277,21 +277,28 @@ class Ruler {
 
   #drawRect() {
     if (!this.#rulerRectEl) return;
-    this.#updateRulerStyle(
-      {
-        width: this.#setting.size,
-        height: this.#setting.size,
-        top: this.#setting.top,
-        left: this.#setting.left
-      },
-      this.#rulerRectEl,
-      'Rect'
-    );
+    const config = {
+      width: this.#setting.size,
+      height: this.#setting.size,
+      top: this.#setting.top,
+      left: this.#setting.left
+    };
+
+    const el = this.#rulerRectEl;
+    el.style.position = 'absolute';
+    el.style.boxSizing = 'border-box';
+    el.style.borderRight = this.#config.border;
+    el.style.borderBottom = this.#config.border;
+    el.style.backgroundColor = this.#config.background;
+    el.style.left = (config.left || 0) + 'px';
+    el.style.top = (config.top || 0) + 'px';
+    el.style.width = (config.width || 0) + 'px';
+    el.style.height = (config.height || 0) + 'px';
   }
 
   #updateRulerStyle(
     config: { left: number; top: number; height: number; width: number },
-    el: HTMLCanvasElement | Element,
+    el: HTMLCanvasElement,
     type: string
   ) {
     if (!el) return;
@@ -299,9 +306,6 @@ class Ruler {
       el.style.borderBottom = this.#config.background;
     } else if (type === 'X') {
       el.style.borderRight = this.#config.border;
-    } else if (type === 'Rect') {
-      el.style.borderRight = this.#config.border;
-      el.style.borderBottom = this.#config.border;
     }
 
     el.style.boxSizing = 'border-box';
@@ -309,8 +313,6 @@ class Ruler {
     el.style.position = 'absolute';
     el.style.left = (config.left || 0) + 'px';
     el.style.top = (config.top || 0) + 'px';
-    el.style.width = (config.width || 0) + 'px';
-    el.style.width = (config.height || 0) + 'px';
     el.width = config.width || 0;
     el.height = config.height || 0;
   }
