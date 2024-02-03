@@ -41,9 +41,12 @@
   --db-editor-color-button-bg-active: var(--theme-color-gray-200);
 
   // Canvas color
-  --db-editor-color-canvas: var(--color-gray-800);
+  --db-editor-color-canvas: var(--theme-color-real-gray-900);
   --db-editor-color-canvas-bg: #262626;
   --db-editor-color-panel-bg: var(--db-color-main);
+
+  // Root color
+  --db-editor-color-root-bg: var(--color-gray-800);
 
   // Drag the color of the dashboard component
   --drag-resize-color: hsl(260, 100%, 66%);

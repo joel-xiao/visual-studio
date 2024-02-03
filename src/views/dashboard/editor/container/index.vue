@@ -112,7 +112,7 @@ const onDrop = function (event: DragEvent): void {
     background-color: var(--db-editor-color-canvas-bg);
     .editor-container-root {
       position: absolute;
-      background-color: var(--db-editor-color-canvas);
+      background-color: var(--db-editor-color-root-bg);
     }
     .editor-container-root-mask {
       position: absolute;
