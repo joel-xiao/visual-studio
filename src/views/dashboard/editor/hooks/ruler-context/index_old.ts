@@ -4,8 +4,8 @@ import { RulerConfig, RulerSetting, RulerDOMRect, RulerPos } from './interface';
 
 class Ruler {
   #config: Readonly<RulerConfig> = {
-    intervalPixel: 50,
-    scale: 1,
+    intervalPixel: 5,
+    scale: 20,
     textTranslateLeft: 4,
     textTranslateTop: 2,
     color: '#fff',
@@ -41,7 +41,17 @@ class Ruler {
     this.#drawY(rect);
   }
 
+  #getStepByZoom(zoom: number) {
+    const steps = [1, 2, 5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000];
+    const step = 50 / zoom;
+    for (let i = 0, len = steps.length; i < len; i++) {
+      if (steps[i] >= step) return steps[i];
+    }
+    return steps[0];
+  }
+
   #getScales(long_size: number, intervalPixel: number, offset: number) {
+    console.log(this.#scale, this.#getStepByZoom(this.#scale), long_size);
     let scale = this.#config.scale;
     let pixel = intervalPixel;
 
@@ -51,11 +61,9 @@ class Ruler {
       pixel = intervalPixel;
       intervalPixel = Math.round(intervalPixel / this.#scale);
     } else {
-      long_size = Math.ceil(long_size / this.#scale);
+      long_size = Math.ceil(long_size * this.#scale);
       scale = Math.ceil(this.#config.scale / this.#scale);
       pixel = intervalPixel * this.#scale;
-      intervalPixel = Math.ceil(intervalPixel / this.#scale);
-      console.log(intervalPixel);
     }
 
     offset = Math.ceil(offset / this.#scale);
@@ -112,6 +120,7 @@ class Ruler {
         }
       }
     }
+
     return scales;
   }
 

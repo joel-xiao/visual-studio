@@ -4,8 +4,6 @@ import { RulerConfig, RulerSetting, RulerDOMRect, RulerPos } from './interface';
 
 class Ruler {
   #config: Readonly<RulerConfig> = {
-    intervalPixel: 5,
-    scale: 20,
     textTranslateLeft: 4,
     textTranslateTop: 2,
     color: '#fff',
@@ -41,73 +39,48 @@ class Ruler {
     this.#drawY(rect);
   }
 
-  #getScales(long_size: number, intervalPixel: number, offset: number) {
-    let scale = this.#config.scale;
-    let pixel = intervalPixel;
-
-    if (this.#scale <= 1) {
-      long_size = Math.ceil(long_size / this.#scale);
-      scale = this.#config.scale;
-      pixel = intervalPixel;
-      intervalPixel = Math.round(intervalPixel / this.#scale);
-    } else {
-      long_size = Math.ceil(long_size * this.#scale);
-      scale = Math.ceil(this.#config.scale / this.#scale);
-      pixel = intervalPixel * this.#scale;
+  #getStepByZoom(zoom: number) {
+    const steps = [1, 2, 5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000];
+    const step = 50 / zoom;
+    for (let i = 0, len = steps.length; i < len; i++) {
+      if (steps[i] >= step) return steps[i];
     }
+    return steps[0];
+  }
 
-    offset = Math.ceil(offset / this.#scale);
-    const is_offset_negative = offset < 0;
-    const abs_offset = Math.abs(offset);
-    long_size = long_size + (is_offset_negative ? abs_offset : -offset);
-
+  #getScales(long_size: number, offset: number) {
+    const step = this.#getStepByZoom(this.#scale);
     const scales: {
-      sum: number;
-      i: number;
+      number: number;
       size: 'max' | 'min' | 'else';
       pixel: number;
     }[] = [];
-    let _pixel = 0;
-    let scaleCount = 0;
-    for (let i = 0; i < long_size; i++) {
-      const prev_scale = scales[scales.length - 1]?.i || 0;
-      if (intervalPixel + prev_scale === i || prev_scale === 0) {
-        scales.push({
-          sum: i,
-          i: i,
-          size:
-            scaleCount % scale === 0 || scale === 1
-              ? 'max'
-              : scale % 2 === 0 && scaleCount % Math.ceil(scale / 2) === 0
-              ? 'min'
-              : 'else',
-          pixel: _pixel
-        });
-        _pixel += pixel;
-        scaleCount++;
-      }
+
+    if (this.#scale <= 1) {
+      long_size = Math.ceil(long_size / this.#scale);
+      offset = Math.ceil(offset / this.#scale);
     }
 
-    if (!is_offset_negative) {
-      let _pixel = 0;
-      let scaleCount = 0;
-      for (let i = 0; i < abs_offset; i++) {
-        const prev_scale = scales[0]?.i || 0;
-        if (-intervalPixel + prev_scale === -i || prev_scale === 0) {
-          scales.unshift({
-            sum: -i,
-            i: -i,
-            size:
-              scaleCount % scale === 0 || scale === 1
-                ? 'max'
-                : scale % 2 === 0 && scaleCount % Math.ceil(scale / 2) === 0
-                ? 'min'
-                : 'else',
-            pixel: _pixel
-          });
-          _pixel -= pixel;
-          scaleCount--;
-        }
+    let currentStep = 0;
+    while (currentStep <= long_size) {
+      scales.push({
+        number: currentStep,
+        size: 'max',
+        pixel: currentStep * this.#scale
+      });
+      currentStep = currentStep + step;
+    }
+
+    const is_offset_negative = offset > 0;
+    if (is_offset_negative) {
+      let currentStep = 0;
+      while (currentStep >= -offset) {
+        scales.push({
+          number: currentStep,
+          size: 'max',
+          pixel: currentStep * this.#scale
+        });
+        currentStep = currentStep - step;
       }
     }
 
@@ -162,11 +135,7 @@ class Ruler {
       ctx.clearRect(0, 0, config.width, config.height);
       ctx.font = config.fontSize;
 
-      const scales = this.#getScales(
-        config.long_size,
-        config.intervalPixel,
-        this.#pos.y + this.#scaleOffset.y
-      );
+      const scales = this.#getScales(config.long_size, this.#pos.y + this.#scaleOffset.y);
       for (let idx = 0; idx < scales.length; idx++) {
         const scale = scales[idx];
         const lineRect = this.#getLineRect(scale.pixel, this.#pos.y + this.#scaleOffset.y);
@@ -182,7 +151,7 @@ class Ruler {
           ctx.fillStyle = config.color;
           ctx.lineTo(x2_max, y);
 
-          const scaleNumber = String(scale.sum);
+          const scaleNumber = String(scale.number);
           const tx = parseFloat(config.fontSize),
             ty = y - config.textTranslateLeft;
           ctx.translate(tx, ty);
@@ -232,11 +201,7 @@ class Ruler {
       ctx.clearRect(0, 0, config.width, config.height);
       ctx.font = config.fontSize;
 
-      const scales = this.#getScales(
-        config.long_size,
-        config.intervalPixel,
-        this.#pos.x + this.#scaleOffset.x
-      );
+      const scales = this.#getScales(config.long_size, this.#pos.x + this.#scaleOffset.x);
       for (let idx = 0; idx < scales.length; idx++) {
         const scale = scales[idx];
 
@@ -253,7 +218,7 @@ class Ruler {
           ctx.fillStyle = config.color;
           ctx.lineTo(x, y2_max);
 
-          const scaleNumber = String(scale.sum);
+          const scaleNumber = String(scale.number);
           ctx.fillText(
             scaleNumber,
             x + config.textTranslateLeft,

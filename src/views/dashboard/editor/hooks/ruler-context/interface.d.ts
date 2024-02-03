@@ -1,6 +1,6 @@
 export type RulerConfig = {
-  intervalPixel: number;
-  scale: number;
+  intervalPixel?: number;
+  scale?: number;
   textTranslateLeft: number;
   textTranslateTop: number;
   color: string;

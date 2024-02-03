@@ -11,6 +11,8 @@ type Rect = DOMRect | { width: number; height: number };
 
 class Container {
   #scale = 1;
+  #maxScale = 256;
+  #minScale = 0.02;
   #option?: ContainerOption;
 
   constructor() {
@@ -46,7 +48,14 @@ class Container {
     if (e.deltaY > 0) {
       ratio = 0.9;
     }
-    this.#scale = this.#scale * ratio;
+    const scale = this.#scale * ratio;
+
+    // Limit the maximum and minimum zoom
+    if (scale > this.#maxScale || scale < this.#minScale) {
+      return;
+    }
+
+    this.#scale = scale;
     const ratio_scale = ratio - 1;
 
     if (this.#option?.containerEl) {
