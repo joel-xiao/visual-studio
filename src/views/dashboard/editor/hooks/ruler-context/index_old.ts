@@ -9,7 +9,7 @@
 //     textTranslateLeft: 4,
 //     textMargin: 2,
 //     color: '#fff',
-//     deputyColor: '#fff',
+//     lineColor: '#fff',
 //     lineWidth: 1,
 //     deputyLineWidth: 0.5,
 //     fontSize: '9px'
@@ -196,7 +196,7 @@
 //           ctx.lineTo(x2, y);
 //         } else {
 //           ctx.lineWidth = config.deputyLineWidth;
-//           ctx.strokeStyle = config.deputyColor;
+//           ctx.strokeStyle = config.lineColor;
 //           ctx.lineTo(x2, y);
 //         }
 //         ctx.stroke();
@@ -265,7 +265,7 @@
 //           ctx.lineTo(x, y2);
 //         } else {
 //           ctx.lineWidth = config.deputyLineWidth;
-//           ctx.strokeStyle = config.deputyColor;
+//           ctx.strokeStyle = config.lineColor;
 //           ctx.lineTo(x, y2);
 //         }
 //         ctx.stroke();

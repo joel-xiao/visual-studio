@@ -10,7 +10,7 @@ const config: {
       tab_bar_height: 42,
       left_menu_width: 241,
       right_menu_width: 252,
-      ruler_size: 22
+      ruler_size: 18
     }
   })
 );

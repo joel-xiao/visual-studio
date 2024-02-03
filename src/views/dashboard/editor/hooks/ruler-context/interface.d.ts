@@ -1,8 +1,10 @@
 export type RulerConfig = {
   textTranslateLeft: number;
-  textMargin: number;
+  textMargin: number[];
+  border: string;
+  background: string;
   color: string;
-  deputyColor: string;
+  lineColor: string;
   lineWidth: number;
   deputyLineWidth: number;
   fontSize: string;

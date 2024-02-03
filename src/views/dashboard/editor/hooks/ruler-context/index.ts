@@ -5,9 +5,11 @@ import { RulerConfig, RulerSetting, RulerDOMRect, RulerPos } from './interface';
 class Ruler {
   #config: Readonly<RulerConfig> = {
     textTranslateLeft: 0,
-    textMargin: 5,
-    color: '#fff',
-    deputyColor: '#fff',
+    textMargin: [3, 0, 7, 0],
+    border: '1px solid #212121',
+    background: '#303030',
+    color: '#6f6f6f',
+    lineColor: '#6f6f6f',
     lineWidth: 1,
     deputyLineWidth: 0.5,
     fontSize: '9px'
@@ -17,11 +19,12 @@ class Ruler {
     right: 0,
     bottom: 0,
     top: 0,
-    size: 22
+    size: 18
   };
   #parentEl?: Element | null;
   #rulerXEl?: HTMLCanvasElement;
   #rulerYEl?: HTMLCanvasElement;
+  #rulerRectEl?: Element;
   #pos = { x: 0, y: 0 };
   #scaleOffset = { x: 0, y: 0 };
   #scale = 1;
@@ -43,6 +46,7 @@ class Ruler {
 
     this.#drawX(rect);
     this.#drawY(rect);
+    this.#drawRect();
   }
 
   #getStepByZoom(zoom: number) {
@@ -60,6 +64,7 @@ class Ruler {
     const scales: {
       number: number;
       numberOffset: number;
+      opacity: string;
       size: 'max' | 'min' | 'else';
       pixel: number;
     }[] = [];
@@ -74,6 +79,7 @@ class Ruler {
       scales.push({
         number: currentStep,
         numberOffset: getNumberOffset(currentStep, fontSize),
+        opacity: '',
         size: 'max',
         pixel: currentStep * this.#scale
       });
@@ -87,6 +93,7 @@ class Ruler {
         scales.push({
           number: currentStep,
           numberOffset: getNumberOffset(currentStep, fontSize),
+          opacity: '',
           size: 'max',
           pixel: currentStep * this.#scale
         });
@@ -116,6 +123,7 @@ class Ruler {
       return -textOffset;
     }
 
+    scales[scales.length - 1].opacity = '80';
     return scales;
   }
 
@@ -127,8 +135,8 @@ class Ruler {
     return {
       start: offset + pixel - this.#setting.size,
       lineStart: this.#setting.size,
-      lineEnd: this.#setting.size - config.fontSize + this.#config.textMargin,
-      deputyLineEnd: this.#setting.size - config.fontSize + this.#config.textMargin
+      lineEnd: this.#setting.size - config.fontSize + this.#config.textMargin[2],
+      deputyLineEnd: this.#setting.size - config.fontSize + this.#config.textMargin[2]
     };
   }
 
@@ -148,7 +156,8 @@ class Ruler {
         top: this.#setting.size + this.#setting.top,
         left: this.#setting.left
       },
-      this.#rulerXEl
+      this.#rulerXEl,
+      'X'
     );
 
     nextTick(() => {
@@ -157,7 +166,7 @@ class Ruler {
       if (!ctx) return;
 
       ctx.clearRect(0, 0, config.width, config.height);
-      ctx.font = config.fontSize;
+      ctx.font = config.fontSize + 'Microsoft YaHei';
 
       const scales = this.#getScales(config.long_size, this.#pos.y + this.#scaleOffset.y);
       for (let idx = 0; idx < scales.length; idx++) {
@@ -172,8 +181,8 @@ class Ruler {
         ctx.moveTo(x, y);
         if (scale.size === 'max') {
           ctx.lineWidth = config.lineWidth;
-          ctx.fillStyle = config.color;
-          ctx.strokeStyle = config.color;
+          ctx.fillStyle = config.color + scale.opacity;
+          ctx.strokeStyle = config.lineColor + scale.opacity;
           ctx.lineTo(x2_max, y);
 
           const scaleNumber = String(scale.number);
@@ -181,16 +190,16 @@ class Ruler {
             ty = y - config.textTranslateLeft - scale.numberOffset;
           ctx.translate(tx, ty);
           ctx.rotate((-90 * Math.PI) / 180);
-          ctx.fillText(scaleNumber, 0, config.textMargin);
+          ctx.fillText(scaleNumber, 0, config.textMargin[0]);
           ctx.rotate((90 * Math.PI) / 180);
           ctx.translate(-tx, -ty);
         } else if (scale.size === 'min') {
           ctx.lineWidth = config.lineWidth;
-          ctx.strokeStyle = config.color;
+          ctx.strokeStyle = config.lineColor + scale.opacity;
           ctx.lineTo(x2, y);
         } else {
           ctx.lineWidth = config.deputyLineWidth;
-          ctx.strokeStyle = config.deputyColor;
+          ctx.strokeStyle = config.lineColor + scale.opacity;
           ctx.lineTo(x2, y);
         }
         ctx.stroke();
@@ -215,7 +224,8 @@ class Ruler {
         top: this.#setting.top,
         left: this.#setting.size + this.#setting.left
       },
-      this.#rulerYEl
+      this.#rulerYEl,
+      'Y'
     );
 
     nextTick(() => {
@@ -224,7 +234,7 @@ class Ruler {
       if (!ctx) return;
 
       ctx.clearRect(0, 0, config.width, config.height);
-      ctx.font = config.fontSize;
+      ctx.font = config.fontSize + 'Microsoft YaHei';
 
       const scales = this.#getScales(config.long_size, this.#pos.x + this.#scaleOffset.x);
       for (let idx = 0; idx < scales.length; idx++) {
@@ -240,23 +250,23 @@ class Ruler {
         ctx.moveTo(x, y);
         if (scale.size === 'max') {
           ctx.lineWidth = config.lineWidth;
-          ctx.fillStyle = config.color;
-          ctx.strokeStyle = config.color;
+          ctx.fillStyle = config.color + scale.opacity;
+          ctx.strokeStyle = config.lineColor + scale.opacity;
           ctx.lineTo(x, y2_max);
 
           const scaleNumber = String(scale.number);
           ctx.fillText(
             scaleNumber,
             x + scale.numberOffset + config.textTranslateLeft,
-            parseFloat(config.fontSize) + config.textMargin
+            parseFloat(config.fontSize) + config.textMargin[0]
           );
         } else if (scale.size === 'min') {
           ctx.lineWidth = config.lineWidth;
-          ctx.strokeStyle = config.color;
+          ctx.strokeStyle = config.lineColor + scale.opacity;
           ctx.lineTo(x, y2);
         } else {
           ctx.lineWidth = config.deputyLineWidth;
-          ctx.strokeStyle = config.deputyColor;
+          ctx.strokeStyle = config.lineColor + scale.opacity;
           ctx.lineTo(x, y2);
         }
         ctx.stroke();
@@ -265,14 +275,42 @@ class Ruler {
     });
   }
 
+  #drawRect() {
+    if (!this.#rulerRectEl) return;
+    this.#updateRulerStyle(
+      {
+        width: this.#setting.size,
+        height: this.#setting.size,
+        top: this.#setting.top,
+        left: this.#setting.left
+      },
+      this.#rulerRectEl,
+      'Rect'
+    );
+  }
+
   #updateRulerStyle(
     config: { left: number; top: number; height: number; width: number },
-    el: HTMLCanvasElement
+    el: HTMLCanvasElement,
+    type: string
   ) {
     if (!el) return;
+    if (type === 'Y') {
+      el.style.borderBottom = this.#config.background;
+    } else if (type === 'X') {
+      el.style.borderRight = this.#config.border;
+    } else if (type === 'Rect') {
+      el.style.borderRight = this.#config.border;
+      el.style.borderBottom = this.#config.border;
+    }
+
+    el.style.boxSizing = 'border-box';
+    el.style.backgroundColor = this.#config.background;
     el.style.position = 'absolute';
     el.style.left = (config.left || 0) + 'px';
     el.style.top = (config.top || 0) + 'px';
+    el.style.width = (config.width || 0) + 'px';
+    el.style.height = (config.height || 0) + 'px';
     el.width = config.width || 0;
     el.height = config.height || 0;
   }
@@ -325,10 +363,12 @@ class Ruler {
     this.#parentEl = typeof parentEl === 'string' ? document.querySelector(parentEl) : parentEl;
     this.#rulerYEl = document.createElement('canvas');
     this.#rulerXEl = document.createElement('canvas');
+    this.#rulerRectEl = document.createElement('div');
 
     if (this.#parentEl) {
       this.#parentEl.appendChild(this.#rulerYEl);
       this.#parentEl.appendChild(this.#rulerXEl);
+      this.#parentEl.appendChild(this.#rulerRectEl);
     }
     this.#draw();
 
