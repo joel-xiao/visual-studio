@@ -291,7 +291,7 @@ class Ruler {
 
   #updateRulerStyle(
     config: { left: number; top: number; height: number; width: number },
-    el: HTMLCanvasElement,
+    el: HTMLCanvasElement | Element,
     type: string
   ) {
     if (!el) return;
@@ -310,7 +310,7 @@ class Ruler {
     el.style.left = (config.left || 0) + 'px';
     el.style.top = (config.top || 0) + 'px';
     el.style.width = (config.width || 0) + 'px';
-    el.style.height = (config.height || 0) + 'px';
+    el.style.width = (config.height || 0) + 'px';
     el.width = config.width || 0;
     el.height = config.height || 0;
   }
