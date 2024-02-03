@@ -4,15 +4,21 @@ import { RulerConfig, RulerSetting, RulerDOMRect, RulerPos } from './interface';
 
 class Ruler {
   #config: Readonly<RulerConfig> = {
-    textTranslateLeft: 4,
-    textTranslateTop: 2,
+    textTranslateLeft: 0,
+    textMargin: 5,
     color: '#fff',
     deputyColor: '#fff',
     lineWidth: 1,
     deputyLineWidth: 0.5,
     fontSize: '9px'
   };
-  #setting: Readonly<Required<RulerSetting>> = { left: 0, right: 0, bottom: 0, top: 0, size: 16 };
+  #setting: Readonly<Required<RulerSetting>> = {
+    left: 0,
+    right: 0,
+    bottom: 0,
+    top: 0,
+    size: 22
+  };
   #parentEl?: Element | null;
   #rulerXEl?: HTMLCanvasElement;
   #rulerYEl?: HTMLCanvasElement;
@@ -50,8 +56,10 @@ class Ruler {
 
   #getScales(long_size: number, offset: number) {
     const step = this.#getStepByZoom(this.#scale);
+    const fontSize = parseFloat(this.#config.fontSize);
     const scales: {
       number: number;
+      numberOffset: number;
       size: 'max' | 'min' | 'else';
       pixel: number;
     }[] = [];
@@ -65,6 +73,7 @@ class Ruler {
     while (currentStep <= long_size) {
       scales.push({
         number: currentStep,
+        numberOffset: getNumberOffset(currentStep, fontSize),
         size: 'max',
         pixel: currentStep * this.#scale
       });
@@ -77,6 +86,7 @@ class Ruler {
       while (currentStep >= -offset) {
         scales.push({
           number: currentStep,
+          numberOffset: getNumberOffset(currentStep, fontSize),
           size: 'max',
           pixel: currentStep * this.#scale
         });
@@ -84,18 +94,32 @@ class Ruler {
       }
     }
 
+    function getNumberOffset(number: number, fontSize: number) {
+      const textOffsets: { [key: string]: number } = {
+        '-': 0,
+        '1': 0,
+        '2': 0,
+        '3': 0,
+        '4': 0,
+        '5': 2,
+        '6': 0,
+        '7': 0,
+        '8': 0,
+        '9': 0,
+        '0': 2
+      };
+      let textOffset = 0;
+
+      for (const text of number + '') {
+        textOffset += fontSize / 2 - textOffsets[text];
+      }
+      return -textOffset;
+    }
+
     return scales;
   }
 
-  #getLineRect(
-    pixel: number,
-    offset: number
-  ): {
-    start: number;
-    lineStart: number;
-    lineEnd: number;
-    deputyLineEnd: number;
-  } {
+  #getLineRect(pixel: number, offset: number) {
     const config = {
       ...this.#config,
       fontSize: parseFloat(this.#config.fontSize)
@@ -103,8 +127,8 @@ class Ruler {
     return {
       start: offset + pixel - this.#setting.size,
       lineStart: this.#setting.size,
-      lineEnd: this.#setting.size - (this.#setting.size - config.fontSize / 2 - 2),
-      deputyLineEnd: this.#setting.size - (this.#setting.size - config.fontSize - 2)
+      lineEnd: this.#setting.size - config.fontSize + this.#config.textMargin,
+      deputyLineEnd: this.#setting.size - config.fontSize + this.#config.textMargin
     };
   }
 
@@ -149,14 +173,15 @@ class Ruler {
         if (scale.size === 'max') {
           ctx.lineWidth = config.lineWidth;
           ctx.fillStyle = config.color;
+          ctx.strokeStyle = config.color;
           ctx.lineTo(x2_max, y);
 
           const scaleNumber = String(scale.number);
           const tx = parseFloat(config.fontSize),
-            ty = y - config.textTranslateLeft;
+            ty = y - config.textTranslateLeft - scale.numberOffset;
           ctx.translate(tx, ty);
           ctx.rotate((-90 * Math.PI) / 180);
-          ctx.fillText(scaleNumber, 0, config.textTranslateTop);
+          ctx.fillText(scaleNumber, 0, config.textMargin);
           ctx.rotate((90 * Math.PI) / 180);
           ctx.translate(-tx, -ty);
         } else if (scale.size === 'min') {
@@ -216,13 +241,14 @@ class Ruler {
         if (scale.size === 'max') {
           ctx.lineWidth = config.lineWidth;
           ctx.fillStyle = config.color;
+          ctx.strokeStyle = config.color;
           ctx.lineTo(x, y2_max);
 
           const scaleNumber = String(scale.number);
           ctx.fillText(
             scaleNumber,
-            x + config.textTranslateLeft,
-            parseFloat(config.fontSize) + config.textTranslateTop
+            x + scale.numberOffset + config.textTranslateLeft,
+            parseFloat(config.fontSize) + config.textMargin
           );
         } else if (scale.size === 'min') {
           ctx.lineWidth = config.lineWidth;

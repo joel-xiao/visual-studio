@@ -7,7 +7,7 @@
 //     intervalPixel: 5,
 //     scale: 20,
 //     textTranslateLeft: 4,
-//     textTranslateTop: 2,
+//     textMargin: 2,
 //     color: '#fff',
 //     deputyColor: '#fff',
 //     lineWidth: 1,
@@ -187,7 +187,7 @@
 //             ty = y - config.textTranslateLeft;
 //           ctx.translate(tx, ty);
 //           ctx.rotate((-90 * Math.PI) / 180);
-//           ctx.fillText(scaleNumber, 0, config.textTranslateTop);
+//           ctx.fillText(scaleNumber, 0, config.textMargin);
 //           ctx.rotate((90 * Math.PI) / 180);
 //           ctx.translate(-tx, -ty);
 //         } else if (scale.size === 'min') {
@@ -257,7 +257,7 @@
 //           ctx.fillText(
 //             scaleNumber,
 //             x + config.textTranslateLeft,
-//             parseFloat(config.fontSize) + config.textTranslateTop
+//             parseFloat(config.fontSize) + config.textMargin
 //           );
 //         } else if (scale.size === 'min') {
 //           ctx.lineWidth = config.lineWidth;
