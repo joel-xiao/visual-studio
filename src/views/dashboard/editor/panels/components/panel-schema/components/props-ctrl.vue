@@ -21,14 +21,24 @@ const props = withDefaults(defineProps<Props>(), {
   ctrlType: ''
 });
 
-const componentImport = (url: string) => {
-  return defineAsyncComponent(() => import(/* @vite-ignore */ url));
-};
+// const componentImport = (url: string) => {
+//   return defineAsyncComponent(() => import(/* @vite-ignore */ url));
+// };
+
+// const components = reactive<{ [key: string]: Component }>({
+//   ['input']: markRaw(componentImport('./../../../../components/basic/c-input/index.vue')),
+//   ['button']: markRaw(componentImport('./../../../../components/basic/c-button/index.vue')),
+//   ['input-group']: markRaw(componentImport('./input-group/index.vue'))
+// });
 
 const components = reactive<{ [key: string]: Component }>({
-  ['input']: markRaw(componentImport('./../../../../components/basic/c-input/index.vue')),
-  ['button']: markRaw(componentImport('./../../../../components/basic/c-button/index.vue')),
-  ['input-group']: markRaw(componentImport('./input-group/index.vue'))
+  ['input']: markRaw(
+    defineAsyncComponent(() => import('./../../../../components/basic/c-input/index.vue'))
+  ),
+  ['button']: markRaw(
+    defineAsyncComponent(() => import('./../../../../components/basic/c-button/index.vue'))
+  ),
+  ['input-group']: markRaw(defineAsyncComponent(() => import('./input-group/index.vue')))
 });
 
 const isComponent = (schema_name: string) => {
