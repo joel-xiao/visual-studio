@@ -54,8 +54,8 @@ const getCurrentType = function (): string {
 const onSwitchType = function (): void {
   currentType.value =
     currentType.value.id === 'icon'
-      ? { icon: 'icon', id: 'list' }
-      : { icon: 'icon-sousuo', id: 'icon' };
+      ? { icon: 'icon-small-view', id: 'list' }
+      : { icon: 'icon-list-view', id: 'icon' };
 };
 onSwitchType();
 

@@ -6,6 +6,48 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "10538252",
+      "name": "预览",
+      "font_class": "yulan",
+      "unicode": "ea0c",
+      "unicode_decimal": 59916
+    },
+    {
+      "icon_id": "15816240",
+      "name": "042方块",
+      "font_class": "small-view",
+      "unicode": "e7bc",
+      "unicode_decimal": 59324
+    },
+    {
+      "icon_id": "35783950",
+      "name": "列表查看",
+      "font_class": "list-view",
+      "unicode": "e610",
+      "unicode_decimal": 58896
+    },
+    {
+      "icon_id": "11448884",
+      "name": "文件夹",
+      "font_class": "wenjianjia1",
+      "unicode": "e80c",
+      "unicode_decimal": 59404
+    },
+    {
+      "icon_id": "21721551",
+      "name": "文件类型-标准图-文件夹",
+      "font_class": "wenjianleixing-biaozhuntu-wenjianjia",
+      "unicode": "e6a5",
+      "unicode_decimal": 59045
+    },
+    {
+      "icon_id": "21721572",
+      "name": "文件类型-缩略图-文件夹",
+      "font_class": "wenjianleixing-suolvetu-wenjianjia",
+      "unicode": "e6a9",
+      "unicode_decimal": 59049
+    },
+    {
       "icon_id": "6129076",
       "name": "41向上、收起",
       "font_class": "shouqi2",
@@ -53,13 +95,6 @@
       "font_class": "jiahao",
       "unicode": "e614",
       "unicode_decimal": 58900
-    },
-    {
-      "icon_id": "2815733",
-      "name": "文件夹",
-      "font_class": "wenjianjia",
-      "unicode": "e600",
-      "unicode_decimal": 58880
     },
     {
       "icon_id": "5387380",

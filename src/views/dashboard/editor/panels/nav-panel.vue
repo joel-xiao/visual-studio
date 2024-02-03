@@ -12,10 +12,9 @@ div.editor-nav-panel
       | {{ item.label }}
   .nav-panel-right
     n-button(type="primary" size="small" class="share-btn" @click="onShare")
-      Icon(src="icon-sousuo" class="share-btn-icon")
       | 分享
     n-button(tertiary circle size="small" class="preview-button-icon")
-      Icon(size="small" src="icon-sousuo")
+      Icon(size="small" src="icon-yulan")
 </template>
 
 <script setup lang="ts">
