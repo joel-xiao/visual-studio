@@ -41,17 +41,7 @@ class Ruler {
     this.#drawY(rect);
   }
 
-  #getStepByZoom(zoom: number) {
-    const steps = [1, 2, 5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000];
-    const step = 50 / zoom;
-    for (let i = 0, len = steps.length; i < len; i++) {
-      if (steps[i] >= step) return steps[i];
-    }
-    return steps[0];
-  }
-
   #getScales(long_size: number, intervalPixel: number, offset: number) {
-    console.log(this.#scale, this.#getStepByZoom(this.#scale), long_size);
     let scale = this.#config.scale;
     let pixel = intervalPixel;
 
