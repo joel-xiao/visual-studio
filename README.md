@@ -36,7 +36,7 @@
 
 ```bash
 # clone the project
-git clone https://github.com/xiaowenlong1022/visual-studio.git
+git clone git@github.com:joel-xiao/visual-studio.git
 
 # enter the project directory
 cd visual-studio
