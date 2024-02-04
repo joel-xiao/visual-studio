@@ -330,40 +330,40 @@ createDrag<T>(
   event
 );
 */
-export const createDrag = function <T>(
-  parentEl: HTMLElement | undefined,
-  comp: Component,
-  prop: T,
-  event: MouseEvent | void
-): void {
-  if (!parentEl) {
-    console.error('parentEl not defined for createDrag function');
-    return;
-  }
+// export const createDrag = function <T>(
+//   parentEl: HTMLElement | undefined,
+//   comp: Component,
+//   prop: T,
+//   event: MouseEvent | void
+// ): void {
+//   if (!parentEl) {
+//     console.error('parentEl not defined for createDrag function');
+//     return;
+//   }
 
-  let pos: DragDataset | undefined = undefined;
-  let currentTarget: HTMLElement | void;
-  if (event) {
-    currentTarget = event.currentTarget as HTMLElement;
-    const rect: DOMRect = currentTarget.getBoundingClientRect();
-    pos = { x: rect.x, y: rect.y, x2: rect.x + rect.width, y2: rect.y + rect.height };
-  }
+//   let pos: DragDataset | undefined = undefined;
+//   let currentTarget: HTMLElement | void;
+//   if (event) {
+//     currentTarget = event.currentTarget as HTMLElement;
+//     const rect: DOMRect = currentTarget.getBoundingClientRect();
+//     pos = { x: rect.x, y: rect.y, x2: rect.x + rect.width, y2: rect.y + rect.height };
+//   }
 
-  let app: App | null = createComponent<T>('createDrag', parentEl, comp, {
-    ...prop,
-    element: currentTarget?.cloneNode(true) as HTMLElement
-  });
-  const el: HTMLElement = app._container;
+//   let app: App | null = createComponent<T>('createDrag', parentEl, comp, {
+//     ...prop,
+//     element: currentTarget?.cloneNode(true) as HTMLElement
+//   });
+//   const el: HTMLElement = app._container;
 
-  let drag: Drag | null = new Drag();
-  drag?.install(el, {
-    pos: pos,
-    cursorPos: event ? { x: event.x, y: event.y } : null,
-    onUp: function () {
-      app?.unmount();
-      app = null;
-      drag?.uninstall();
-      drag = null;
-    }
-  });
-};
+//   let drag: Drag | null = new Drag();
+//   drag?.install(el, {
+//     pos: pos,
+//     cursorPos: event ? { x: event.x, y: event.y } : null,
+//     onUp: function () {
+//       app?.unmount();
+//       app = null;
+//       drag?.uninstall();
+//       drag = null;
+//     }
+//   });
+// };
