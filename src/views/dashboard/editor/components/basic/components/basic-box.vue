@@ -4,7 +4,7 @@ div(class="basic-box transition" :class="boxStyle" @click="onClick" @mousedown="
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watchEffect, watch } from 'vue';
 
 interface Props {
   modelValue?: boolean;
@@ -25,8 +25,8 @@ watch(props, (newValue) => {
   }
 });
 
-watch(model, (newValue) => {
-  emit('update:modelValue', newValue);
+watchEffect(() => {
+  emit('update:modelValue', model.value);
 });
 
 const boxStyle = computed(() => ({

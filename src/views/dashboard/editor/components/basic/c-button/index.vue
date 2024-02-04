@@ -1,5 +1,5 @@
 <template lang="pug">
-BasicBox(v-bind="$attrs" :type="type || 'button'" @click="onClick")
+BasicBox(:type="type || 'button'" @click="onClick")
   BasicIcon(:icon="icon")
 </template>
 
@@ -12,10 +12,12 @@ import BasicIcon from '../components/basic-icon.vue';
 interface Props {
   type?: string; // status-button button
   icon?: string;
+  dataType?: BooleanConstructor;
 }
 const props = withDefaults(defineProps<Props>(), {
   type: 'button',
-  icon: ''
+  icon: '',
+  dataType: Boolean
 });
 
 const onClick = function () {
