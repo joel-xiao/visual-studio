@@ -279,8 +279,6 @@ export class Drag {
   updateSticks() {
     for (const stickDom of this.stickEls) {
       const scale = 1 / this.#scale;
-      const scale_translate = scale;
-      console.log(scale_translate);
       const stick = stickDom.getAttribute('stick');
       switch (stick) {
         case 'rm':
