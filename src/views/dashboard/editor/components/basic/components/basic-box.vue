@@ -15,7 +15,7 @@ const props = withDefaults(defineProps<Props>(), {
   type: ''
 });
 
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue', 'update']);
 
 const model = ref(props.modelValue);
 
@@ -27,6 +27,7 @@ watch(props, (newValue) => {
 
 watchEffect(() => {
   emit('update:modelValue', model.value);
+  emit('update', model.value);
 });
 
 const boxStyle = computed(() => ({
