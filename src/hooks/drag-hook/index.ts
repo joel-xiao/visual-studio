@@ -1,4 +1,4 @@
-import { Component, App } from 'vue';
+import { Component, App, HtmlHTMLAttributes } from 'vue';
 import { createComponent } from './../vue-hooks';
 import type { DragDataset, CursorPos, Binding } from './interface';
 
@@ -14,6 +14,7 @@ export class Drag {
   callbackUp?: ((dragDataset: DragDataset) => void) | null;
   stickEl?: HTMLElement;
   sticks: string[];
+  stickEls: HTMLElement[] = [];
   currentStick: string;
   defaultPos: DragDataset;
   startPos: { x: number; y: number };
@@ -81,6 +82,7 @@ export class Drag {
         stickDom.setAttribute('stick', stick);
         stickDom.classList.add('v-drag-stick');
         stickDom.classList.add('v-drag-stick-' + stick);
+        this.stickEls.push(stickDom);
         this?.stickEl?.appendChild(stickDom);
         stickDom = null;
       });
@@ -136,6 +138,7 @@ export class Drag {
 
   setScale(scale: number): void {
     this.#scale = scale;
+    this.updateSticks();
   }
 
   #setMoved(moved: boolean): void {
@@ -270,6 +273,51 @@ export class Drag {
       }px) ${rotate}`;
       this.el.style.width = Math.abs(pos.x2 - pos.x) + 'px';
       this.el.style.height = Math.abs(pos.y2 - pos.y) + 'px';
+    }
+  }
+
+  updateSticks() {
+    for (const stickDom of this.stickEls) {
+      const scale = 1 / this.#scale;
+      const scale_translate = scale;
+      console.log(scale_translate);
+      const stick = stickDom.getAttribute('stick');
+      switch (stick) {
+        case 'rm':
+          stickDom.style.transformOrigin = 'right';
+          stickDom.style.transform = `scaleX(${scale})`;
+          break;
+        case 'lm':
+          stickDom.style.transformOrigin = 'left';
+          stickDom.style.transform = `scaleX(${scale})`;
+          break;
+        case 'tm':
+          stickDom.style.transformOrigin = 'top';
+          stickDom.style.transform = `scaleY(${scale})`;
+          break;
+        case 'bm':
+          stickDom.style.transformOrigin = 'bottom';
+          stickDom.style.transform = `scaleY(${scale})`;
+          break;
+        case 'tl':
+          stickDom.style.transformOrigin = 'center';
+          stickDom.style.transform = `translate(-50%, -50%) scale(${scale})`;
+          break;
+        case 'tr':
+          stickDom.style.transformOrigin = 'center';
+          stickDom.style.transform = `translate(50%, -50%)  scale(${scale})`;
+          break;
+        case 'br':
+          stickDom.style.transformOrigin = 'center';
+          stickDom.style.transform = `translate(50%, 50%) scale(${scale})`;
+          break;
+        case 'bl':
+          stickDom.style.transformOrigin = 'center';
+          stickDom.style.transform = `translate(-50%, 50%) scale(${scale})`;
+          break;
+        default:
+          break;
+      }
     }
   }
 }

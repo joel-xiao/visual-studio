@@ -1,6 +1,7 @@
 import { readonly, Raw, markRaw } from 'vue';
 import { useOverlay } from '../overlay-context';
 import { useRuler } from '../ruler-context';
+import type { ICallbackUpdate } from './interface';
 
 type ContainerOption = {
   parentEl: HTMLElement;
@@ -14,6 +15,7 @@ class Container {
   #maxScale = 256;
   #minScale = 0.02;
   #option?: ContainerOption;
+  #containerUpdates: ICallbackUpdate[] = [];
 
   constructor() {
     this.uninstall = this.uninstall.bind(this);
@@ -21,6 +23,8 @@ class Container {
     this.addScaleEvent = this.addScaleEvent.bind(this);
     this.removeScaleEvent = this.removeScaleEvent.bind(this);
     this.onWheel = this.onWheel.bind(this);
+    this.addContainerUpdated = this.addContainerUpdated.bind(this);
+    this.removeContainerUpdated = this.removeContainerUpdated.bind(this);
 
     this.getScale = this.getScale.bind(this);
   }
@@ -86,7 +90,18 @@ class Container {
       setScaleOffset(offset);
       setRulerScaleOffset(offset);
       setRulerScale(this.#scale);
+
+      this.#containerUpdates.forEach((callback) => callback({ scale: this.#scale }));
     }
+  }
+
+  addContainerUpdated(fn: ICallbackUpdate) {
+    this.#containerUpdates.push(fn);
+  }
+
+  removeContainerUpdated(fn: ICallbackUpdate) {
+    const idx: number = this.#containerUpdates.findIndex((r) => r === fn);
+    idx && this.#containerUpdates.splice(idx, 1);
   }
 
   getScale() {
@@ -109,6 +124,8 @@ export const useContainer = function () {
     markRaw({
       addScaleEvent: container.addScaleEvent,
       removeScaleEvent: container.removeScaleEvent,
+      addContainerUpdated: container.addContainerUpdated,
+      removeContainerUpdated: container.removeContainerUpdated,
       getScale: container.getScale
     })
   );

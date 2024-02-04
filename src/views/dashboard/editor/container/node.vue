@@ -24,7 +24,7 @@ const { getNode, getNodeStyle, updateNode, onSelectNode, addNodeInstance } = use
 const node = getNode(props.id);
 const nodeStyle = getNodeStyle(props.id);
 
-const { getScale } = useContainer();
+const { getScale, addContainerUpdated } = useContainer();
 const dragDataset = readonly(
   reactive<DragDataset>(
     markRaw({
@@ -49,10 +49,13 @@ const updatePos = function () {
   });
 };
 
+addContainerUpdated(() => {
+  resize?.value?.setScale(getScale());
+});
+
 addNodeInstance(node.id, { setActive, updatePos });
 
 const onDown = function (): void {
-  resize?.value?.setScale(getScale());
   onSelectNode(node.id);
 };
 

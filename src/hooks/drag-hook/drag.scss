@@ -54,6 +54,7 @@
       &.v-drag-stick-br,
       &.v-drag-stick-tr,
       &.v-drag-stick-bl {
+        box-sizing: border-box;
         width: 9px;
         height: 9px;
         background: #fff;
@@ -82,23 +83,23 @@
       }
 
       &.v-drag-stick-tl {
-        top: -4px;
-        left: -4px;
+        top: 0;
+        left: 0;
       }
 
       &.v-drag-stick-tr {
-        top: -4px;
-        right: -4px;
+        top: 0;
+        right: 0;
       }
 
       &.v-drag-stick-br {
-        right: -4px;
-        bottom: -4px;
+        right: 0;
+        bottom: 0;
       }
 
       &.v-drag-stick-bl {
-        bottom: -4px;
-        left: -4px;
+        bottom: 0;
+        left: 0;
       }
 
       &.v-drag-stick-tm {
