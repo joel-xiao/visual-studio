@@ -7,7 +7,7 @@ const schema: ComponentSchemaExport = {
   schemas: [
     {
       type: 'schema',
-      schema: 'COMMON_OLD_LAYOUT',
+      schema: 'COMMON_LAYOUT',
       default: {
         x: 0,
         y: 0,
