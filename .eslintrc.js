@@ -110,6 +110,7 @@ module.exports = {
     'no-use-before-define': 0, // 禁止在变量定义之前使用它们
     'no-useless-concat': 1, // 禁止不必要的字符串字面量或模板字面量的连接
     '@typescript-eslint/no-explicit-any': 2,
+    '@typescript-eslint/ban-types': 1, // 禁令类型
     '@typescript-eslint/ban-ts-comment': 0, // @ts-ignore
     '@typescript-eslint/no-unused-vars': 0,
     'vue/multi-word-component-names': 0
