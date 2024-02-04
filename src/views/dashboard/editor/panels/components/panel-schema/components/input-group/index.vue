@@ -33,19 +33,20 @@ const emit = defineEmits(['update:modelValue', 'update']);
 
 const data = reactive({
   isMore: false,
+  modelValue: props.modelValue,
   oldValue: props.modelValue[0]
 });
 
 function onUpdate() {
   if (!data.isMore) {
-    props.modelValue.forEach((value, idx) => {
-      if (props.modelValue[idx] === data.oldValue) {
-        props.modelValue[idx] = props.modelValue[0];
+    data.modelValue.forEach((value, idx) => {
+      if (data.modelValue[idx] === data.oldValue) {
+        data.modelValue[idx] = data.modelValue[0];
       }
     });
   }
 
-  data.oldValue = props.modelValue[0];
+  data.oldValue = data.modelValue[0];
   emit('update', props.modelValue);
 }
 </script>
