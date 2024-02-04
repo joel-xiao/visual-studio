@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 3143945 */
-  src: url('iconfont.woff2?t=1706968693474') format('woff2'),
-       url('iconfont.woff?t=1706968693474') format('woff'),
-       url('iconfont.ttf?t=1706968693474') format('truetype');
+  src: url('iconfont.woff2?t=1707059075369') format('woff2'),
+       url('iconfont.woff?t=1707059075369') format('woff'),
+       url('iconfont.ttf?t=1707059075369') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,30 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-locking-ratio:before {
+  content: "\e6cf";
+}
+
+.icon-reverse-y:before {
+  content: "\e668";
+}
+
+.icon-reverse-x:before {
+  content: "\e669";
+}
+
+.icon-spread-out:before {
+  content: "\e781";
+}
+
+.icon-rotate:before {
+  content: "\e604";
+}
+
+.icon-top-left-radius:before {
+  content: "\e6eb";
 }
 
 .icon-yulan:before {
@@ -57,7 +81,7 @@
   content: "\e67e";
 }
 
-.icon-RectangleCopy:before {
+.icon-noticeboard:before {
   content: "\e6ab";
 }
 

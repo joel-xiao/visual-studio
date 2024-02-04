@@ -6,6 +6,48 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "26995929",
+      "name": "锁定比例",
+      "font_class": "locking-ratio",
+      "unicode": "e6cf",
+      "unicode_decimal": 59087
+    },
+    {
+      "icon_id": "1630789",
+      "name": "镜像反转-Y",
+      "font_class": "reverse-y",
+      "unicode": "e668",
+      "unicode_decimal": 58984
+    },
+    {
+      "icon_id": "1630806",
+      "name": "镜像反转-X",
+      "font_class": "reverse-x",
+      "unicode": "e669",
+      "unicode_decimal": 58985
+    },
+    {
+      "icon_id": "3092113",
+      "name": "铺开",
+      "font_class": "spread-out",
+      "unicode": "e781",
+      "unicode_decimal": 59265
+    },
+    {
+      "icon_id": "9502115",
+      "name": "measure-angle",
+      "font_class": "rotate",
+      "unicode": "e604",
+      "unicode_decimal": 58884
+    },
+    {
+      "icon_id": "33242099",
+      "name": "radius",
+      "font_class": "top-left-radius",
+      "unicode": "e6eb",
+      "unicode_decimal": 59115
+    },
+    {
       "icon_id": "10538252",
       "name": "预览",
       "font_class": "yulan",
@@ -85,7 +127,7 @@
     {
       "icon_id": "7549839",
       "name": "看板",
-      "font_class": "RectangleCopy",
+      "font_class": "noticeboard",
       "unicode": "e6ab",
       "unicode_decimal": 59051
     },

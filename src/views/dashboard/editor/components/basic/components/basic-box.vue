@@ -78,6 +78,7 @@ defineExpose({ focus, blur });
   align-items: center;
 
   &.button-box {
+    justify-content: center;
     background: var(--db-editor-color-input-background);
     &:hover {
       background: var(--db-editor-color-button-bg-hover);
@@ -91,15 +92,15 @@ defineExpose({ focus, blur });
   &.status-button-box {
     height: 30px;
     width: 30px;
-    box-shadow: 0 0 0 1px var(--theme-color-tran-6) inset;
-    color: var(--theme-color-gray-800);
+    box-shadow: 0 0 0 1px var(--db-editor-status-button-border) inset;
+    color: var(--db-editor-status-button-color);
 
     &:hover {
-      box-shadow: 0 0 0 1px var(--theme-color-tran-12) inset;
+      box-shadow: 0 0 0 1px var(--db-editor-status-button-hover-border) inset;
     }
     &.active {
-      background: var(--color-blue-700);
-      color: var(--theme-color-text-primary-white);
+      background: var(--db-editor-status-button-bg-active);
+      color: var(--db-editor-color-button-active);
     }
   }
 

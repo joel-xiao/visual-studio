@@ -1,6 +1,6 @@
 <template lang="pug">
 BasicBox(ref='box' type="input")
-  BasicIcon(:lock="lock")
+  BasicIcon(:lock="lock" :icon="icon")
   BasicInput(:disabled="lock" v-bind="$attrs" @focus="onFocus" @blur="onBlur" @update="onUpdate" type="text" placeholder="")
 </template>
 
@@ -15,11 +15,13 @@ import BasicBox from '../components/basic-box.vue';
 import BasicIcon from '../components/basic-icon.vue';
 import BasicInput from '../components/basic-input.vue';
 
-interface Props {
+interface IProps {
   lock?: boolean;
+  icon?: string;
 }
-const props = withDefaults(defineProps<Props>(), {
-  lock: false
+const props = withDefaults(defineProps<IProps>(), {
+  lock: false,
+  icon: ''
 });
 
 const emit = defineEmits(['update']);

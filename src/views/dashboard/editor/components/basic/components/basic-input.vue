@@ -62,7 +62,7 @@ const onBlur = function (event: Event) {
 #editor .basic-input {
   width: 100%;
   height: 100%;
-  color: var(--theme-color-text-primary);
+  color: var(--db-editor-color-input);
   background: transparent;
   display: flex;
   -webkit-box-align: center;
@@ -72,7 +72,7 @@ const onBlur = function (event: Event) {
   font-weight: 500;
 
   &:disabled {
-    color: var(--theme-color-tran-30);
+    color: var(--db-editor-color-input-disabled-background);
   }
 }
 </style>

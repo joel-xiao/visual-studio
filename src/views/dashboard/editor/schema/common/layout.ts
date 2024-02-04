@@ -13,14 +13,14 @@ const schema: SchemaExport = {
         key: 'x',
         type: Number,
         default: 0,
-        icon: 'x',
+        icon: 'X',
         ctrl: 'input'
       },
       {
         key: 'y',
         type: Number,
         default: 0,
-        icon: 'y',
+        icon: 'Y',
         ctrl: 'input'
       }
     ],
@@ -29,21 +29,21 @@ const schema: SchemaExport = {
         key: 'width',
         type: Number,
         default: 0,
-        icon: 'width',
+        icon: 'W',
         ctrl: 'input'
       },
       {
         key: 'height',
         type: Number,
         default: 0,
-        icon: 'height',
+        icon: 'H',
         ctrl: 'input'
       },
       {
         key: 'size_proportion_lock',
         type: Boolean,
         default: false,
-        icon: '',
+        icon: 'icon-locking-ratio',
         ctrl: 'button',
         ctrl_type: 'status-button',
         size: 'right'
@@ -54,14 +54,14 @@ const schema: SchemaExport = {
         key: 'rotate',
         type: Number,
         default: 0,
-        icon: 'rotate',
+        icon: 'icon-rotate',
         ctrl: 'input'
       },
       {
         key: '',
         type: Boolean,
         default: false,
-        icon: '',
+        icon: 'icon-reverse-y',
         ctrl: 'button',
         size: 'small',
         click: (props) => {
@@ -74,7 +74,7 @@ const schema: SchemaExport = {
         key: '',
         type: Boolean,
         default: false,
-        icon: '',
+        icon: 'icon-reverse-x',
         ctrl: 'button',
         size: 'small',
         click: (props) => {
@@ -89,7 +89,7 @@ const schema: SchemaExport = {
         key: 'radius',
         type: Array,
         default: [0, 0, 0, 0],
-        icon: 'radius',
+        icon: 'icon-top-left-radius',
         ctrl: 'input-group',
         size: 'largely'
       }

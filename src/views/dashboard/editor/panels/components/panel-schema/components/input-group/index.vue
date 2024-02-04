@@ -2,16 +2,16 @@
 div(class="schema-input-group")
   ul(class="schema-input-group__options")
     li
-      Input(v-model="data.radius" :placeholder="data.isMore ? '' : '多个值'" @update="onUpdate")
+      Input(v-model="data.radius" :icon="icon" :placeholder="data.isMore ? '' : '多个值'" @update="onUpdate")
     template(v-if="data.isMore")
       li
-        Input(v-model="modelValue[1]" @update="onUpdate")
+        Input(v-model="modelValue[1]" :icon="icon" @update="onUpdate")
       li
-        Input(v-model="modelValue[2]" @update="onUpdate")
+        Input(v-model="modelValue[2]" :icon="icon" @update="onUpdate")
       li
-        Input(v-model="modelValue[3]" @update="onUpdate")
+        Input(v-model="modelValue[3]" :icon="icon" @update="onUpdate")
   div(class="schema-input-group__button-switch")
-    Button(v-model="data.isMore" type="status-button")
+    Button(v-model="data.isMore" icon="icon-spread-out" type="status-button")
 </template>
 
 <script setup lang="ts">
@@ -22,9 +22,11 @@ import type { PanelSchemaRadius } from './interface';
 
 interface Props {
   modelValue: PanelSchemaRadius;
+  icon: string | string[];
 }
 const props = withDefaults(defineProps<Props>(), {
-  modelValue: () => [0, 0, 0, 0]
+  modelValue: () => [0, 0, 0, 0],
+  icon: ''
 });
 
 const emit = defineEmits(['update:modelValue', 'update']);
