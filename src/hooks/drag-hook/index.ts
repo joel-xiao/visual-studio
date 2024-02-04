@@ -93,6 +93,7 @@ export class Drag {
     this.setDisabled(this.disabled);
     this.setActive(this.active);
     this.setPos(this.defaultPos);
+    this.updateSticks();
   }
 
   uninstall(): void {

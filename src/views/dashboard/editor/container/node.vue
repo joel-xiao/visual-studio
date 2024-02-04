@@ -49,8 +49,12 @@ const updatePos = function () {
   });
 };
 
-addContainerUpdated(() => {
+addContainerUpdated(setScale);
+function setScale() {
   resize?.value?.setScale(getScale());
+}
+onMounted(() => {
+  setScale();
 });
 
 addNodeInstance(node.id, { setActive, updatePos });

@@ -278,15 +278,14 @@ class Ruler {
   #drawRect() {
     if (!this.#rulerRectEl) return;
     const config = {
-      width: this.#setting.size,
-      height: this.#setting.size,
+      width: this.#setting.size + 1,
+      height: this.#setting.size + 1,
       top: this.#setting.top,
       left: this.#setting.left
     };
 
     const el = this.#rulerRectEl;
     el.style.position = 'absolute';
-    el.style.boxSizing = 'border-box';
     el.style.borderRight = this.#config.border;
     el.style.borderBottom = this.#config.border;
     el.style.backgroundColor = this.#config.background;
@@ -303,7 +302,7 @@ class Ruler {
   ) {
     if (!el) return;
     if (type === 'Y') {
-      el.style.borderBottom = this.#config.background;
+      el.style.borderBottom = this.#config.border;
     } else if (type === 'X') {
       el.style.borderRight = this.#config.border;
     }
