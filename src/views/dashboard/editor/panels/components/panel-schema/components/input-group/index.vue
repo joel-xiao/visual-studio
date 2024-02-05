@@ -2,14 +2,14 @@
 div(class="schema-input-group")
   ul(class="schema-input-group__options")
     li
-      Input(v-model="modelValue[0]" :icon="icon" :placeholder="data.isMore ? '' : '多个值'" @update="onUpdate")
+      Input(v-model="modelValue[0]" :icon="data.icon[0]" :placeholder="data.isMore ? '' : '多个值'" @update="onUpdate")
     template(v-if="data.isMore")
       li
-        Input(v-model="modelValue[1]" :icon="icon" @update="onUpdate")
+        Input(v-model="modelValue[1]" :icon="data.icon[1]" @update="onUpdate")
       li
-        Input(v-model="modelValue[2]" :icon="icon" @update="onUpdate")
+        Input(v-model="modelValue[2]" :icon="data.icon[2]" @update="onUpdate")
       li
-        Input(v-model="modelValue[3]" :icon="icon" @update="onUpdate")
+        Input(v-model="modelValue[3]" :icon="data.icon[3]" @update="onUpdate")
   div(class="schema-input-group__button-switch")
     Button(v-model="data.isMore" icon="icon-spread-out" type="status-button")
 </template>
@@ -32,6 +32,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits(['update:modelValue', 'update']);
 
 const data = reactive({
+  icon: Array.isArray(props.icon) ? props.icon : [props.icon, props.icon, props.icon, props.icon],
   isMore: false,
   modelValue: props.modelValue,
   oldValue: props.modelValue[0]

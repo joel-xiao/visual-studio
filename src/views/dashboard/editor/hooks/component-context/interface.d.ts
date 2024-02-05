@@ -36,6 +36,7 @@ interface SchemaKeyBooleanData extends defaultSchemaKeyData {
 
 interface SchemaArrayData extends defaultSchemaKeyData {
   type: ArrayConstructor;
+  icon?: string | string[];
   default: number[];
 }
 

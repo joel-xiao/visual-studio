@@ -89,7 +89,12 @@ const schema: SchemaExport = {
         key: 'radius',
         type: Array,
         default: [0, 0, 0, 0],
-        icon: 'icon-top-left-radius',
+        icon: [
+          'icon-top-left-radius',
+          'icon-top-right-radius',
+          'icon-bottom-left-radius',
+          'icon-bottom-right-radius'
+        ],
         ctrl: 'input-group',
         size: 'largely'
       }
