@@ -1,4 +1,3 @@
-ya
 <template lang="pug">
 div.editor-nav-panel
   .nav-panel-left
@@ -11,13 +10,13 @@ div.editor-nav-panel
     span.nav-panel-content-span(:class="{ active: currentTab.id === item.id }" :key="item.id" v-for="(item, idx) in tabs" @click="onTabSelect(item, idx)")
       | {{ item.label }}
   .nav-panel-right
-    n-button(type="primary" size="small" class="share-btn" @click="onShare")
+    CButton(class="share-btn" @click="onShare")
       | 分享
-    n-button(tertiary circle size="small" class="preview-button-icon")
-      Icon(size="small" src="icon-yulan")
+    CButton(size="medium" circle icon="icon-yulan")
 </template>
 
 <script setup lang="ts">
+import CButton from './../../components/basic/c-button/index.vue';
 import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
@@ -86,6 +85,9 @@ const onShare = function (): void {
     .nav-panel-left {
       float: left;
       .mas-button-icon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
         margin-left: -2px;
         width: 34px;
         height: 34px;

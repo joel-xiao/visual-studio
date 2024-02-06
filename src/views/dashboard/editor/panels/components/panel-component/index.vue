@@ -2,9 +2,7 @@
 div(class='editor-panel-component')
   div.component-header
     div.search
-      NInput(placeholder="搜索关键词..." size="small")
-        template(#prefix)
-          Icon(src='icon-sousuo')
+      CInput(icon="icon-sousuo" :focus="false" placeholder="搜索组件...")
     Icon(button @click="onSwitchType" size="small" :src="currentType.icon" class="icon-btn")
 
   div.component-masters
@@ -22,6 +20,7 @@ div(class='editor-panel-component')
 import { ref, reactive, provide, withDefaults } from 'vue';
 import type { ComponentData } from './interface';
 import ComponentItem from './component-item.vue';
+import CInput from './../../../../components/basic/c-input/index.vue';
 
 interface Props {
   data?: ComponentData[];

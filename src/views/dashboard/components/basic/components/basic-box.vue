@@ -69,7 +69,7 @@ defineExpose({ focus, blur });
 </script>
 
 <style lang="scss">
-#editor .basic-box {
+#dashboard .basic-box {
   border-radius: 6px;
   height: 30px;
   position: relative;
@@ -80,36 +80,40 @@ defineExpose({ focus, blur });
 
   &.button-box {
     justify-content: center;
-    background: var(--db-editor-color-input-background);
+    background: var(--db-color-input-background);
     &:hover {
-      background: var(--db-editor-color-button-bg-hover);
+      background: var(--db-color-button-bg-hover);
     }
 
     &.active {
-      background: var(--db-editor-color-button-bg-active);
+      background: var(--db-color-button-bg-active);
     }
   }
 
   &.status-button-box {
     height: 30px;
     width: 30px;
-    box-shadow: 0 0 0 1px var(--db-editor-status-button-border) inset;
-    color: var(--db-editor-status-button-color);
+    box-shadow: 0 0 0 1px var(--db-color-button-status-border) inset;
+    color: var(--db-color-button-status-color);
 
     &:hover {
-      box-shadow: 0 0 0 1px var(--db-editor-status-button-hover-border) inset;
+      box-shadow: 0 0 0 1px var(--db-color-button-status-hover-border) inset;
     }
     &.active {
-      background: var(--db-editor-status-button-bg-active);
-      color: var(--db-editor-color-button-active);
+      background: var(--db-color-button-status-bg-active);
+      color: var(--db-color-button-active);
     }
   }
 
   &.input-box {
-    background: var(--db-editor-color-input-background);
+    background: var(--db-color-input-background);
     &.active {
-      box-shadow: 0 0 0 2px var(--db-editor-color-button-focus-border) inset;
+      box-shadow: 0 0 0 2px var(--db-color-button-focus-border) inset;
     }
+  }
+
+  &[circle] {
+    border-radius: 50%;
   }
 }
 </style>

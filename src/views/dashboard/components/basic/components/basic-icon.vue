@@ -31,7 +31,7 @@ div(class="basic-icon" :class="iconClass")
 </template>
 
 <style lang="scss">
-#editor .basic-icon {
+#dashboard .basic-icon {
   line-height: 1;
   width: 30px;
   height: 100%;

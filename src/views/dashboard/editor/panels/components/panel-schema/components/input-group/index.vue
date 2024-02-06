@@ -16,8 +16,8 @@ div(class="schema-input-group")
 
 <script setup lang="ts">
 import { reactive, nextTick } from 'vue';
-import Input from './../../../../../components/basic/c-input/index.vue';
-import Button from './../../../../../components/basic/c-button/index.vue';
+import Input from './../../../../../../components/basic/c-input/index.vue';
+import Button from './../../../../../../components/basic/c-button/index.vue';
 import type { PanelSchemaRadius } from './interface';
 
 interface Props {

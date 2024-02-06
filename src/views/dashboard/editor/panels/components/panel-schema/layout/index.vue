@@ -25,8 +25,8 @@ export default {
 import { reactive, watch } from 'vue';
 import PropsLayout from '../components/props-layout.vue';
 import PropsItem from './../components/props-item.vue';
-import Input from './../../../../components/basic/c-input/index.vue';
-import Button from './../../../../components/basic/c-button/index.vue';
+import Input from './../../../../../components/basic/c-input/index.vue';
+import Button from './../../../../../components/basic/c-button/index.vue';
 import Radius from './../components/input-group/index.vue';
 import type { PanelSchemaLayout } from './interface';
 

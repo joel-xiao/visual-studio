@@ -59,10 +59,10 @@ const onBlur = function (event: Event) {
 </script>
 
 <style lang="scss">
-#editor .basic-input {
+#dashboard .basic-input {
   width: 100%;
   height: 100%;
-  color: var(--db-editor-color-input);
+  color: var(--db-color-input);
   background: transparent;
   display: flex;
   -webkit-box-align: center;
@@ -71,8 +71,13 @@ const onBlur = function (event: Event) {
   font-size: inherit;
   font-weight: 500;
 
+  &::placeholder {
+    font-weight: normal;
+    opacity: 0.7;
+  }
+
   &:disabled {
-    color: var(--db-editor-color-input-disabled-background);
+    color: var(--db-color-input-disabled-background);
   }
 }
 </style>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import CInput from './../../components/basic/c-input/index.vue';
 import { ref, reactive, markRaw, defineEmits } from 'vue';
 import { getUuid } from '@a/utils/index';
 import type {
@@ -120,9 +121,7 @@ div#dashboard-my-project
 
     div.projects-search
       div.search
-        NInput(placeholder="搜索项目...")
-          template(#prefix)
-            Icon(src='icon-sousuo')
+        CInput(placeholder="搜索项目..." :focus="false"  icon="icon-sousuo")
 
     div.project-header
       div.project-title

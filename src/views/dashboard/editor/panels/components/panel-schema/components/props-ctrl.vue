@@ -23,10 +23,10 @@ const props = withDefaults(defineProps<Props>(), {
 
 const components = reactive<{ [key: string]: Component }>({
   ['input']: markRaw(
-    defineAsyncComponent(() => import('./../../../../components/basic/c-input/index.vue'))
+    defineAsyncComponent(() => import('./../../../../../components/basic/c-input/index.vue'))
   ),
   ['button']: markRaw(
-    defineAsyncComponent(() => import('./../../../../components/basic/c-button/index.vue'))
+    defineAsyncComponent(() => import('./../../../../../components/basic/c-button/index.vue'))
   ),
   ['input-group']: markRaw(defineAsyncComponent(() => import('./input-group/index.vue')))
 });

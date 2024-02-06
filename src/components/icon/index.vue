@@ -28,7 +28,7 @@ const isIcon = computed(() => {
 </script>
 
 <template lang="pug">
-span(class='c-icon-font' :style="Style" :class="[button ? 'button' : '', block ? 'block' : '', size, !isIcon ? 'img' : '']")
+span(class='c-icon-font' v-bind="$attrs" :style="Style" :class="[button ? 'button' : '', block ? 'block' : '', size, !isIcon ? 'img' : '']")
   i(class='icon-font' :class='src' v-if="isIcon")
   img(class='icon-img' v-else :src="src")
 </template>
@@ -79,11 +79,21 @@ span(class='c-icon-font' :style="Style" :class="[button ? 'button' : '', block ?
       color: var(--theme-color-tran-85);
       background: var(--theme-color-tran-12);
     }
+
+    &[circle] {
+      border-radius: 50%;
+    }
   }
 
   &.small {
     width: 24px;
     height: 24px;
+    font-size: 14px;
+  }
+
+  &.medium {
+    width: 28px;
+    height: 28px;
     font-size: 14px;
   }
 }

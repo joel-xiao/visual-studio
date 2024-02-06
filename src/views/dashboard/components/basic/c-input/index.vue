@@ -1,7 +1,7 @@
 <template lang="pug">
 BasicBox(ref='box' type="input")
   BasicIcon(:lock="lock" :icon="icon")
-  BasicInput(:disabled="lock" v-bind="$attrs" @focus="onFocus" @blur="onBlur" @update="onUpdate" type="text" placeholder="")
+  BasicInput(:disabled="lock" v-bind="$attrs" @focus="onFocus" @blur="onBlur" @update="onUpdate" type="text")
 </template>
 
 <script lang="ts">
@@ -18,10 +18,12 @@ import BasicInput from '../components/basic-input.vue';
 interface IProps {
   lock?: boolean;
   icon?: string;
+  focus?: boolean;
 }
 const props = withDefaults(defineProps<IProps>(), {
   lock: false,
-  icon: ''
+  icon: '',
+  focus: true
 });
 
 const emit = defineEmits(['update']);
@@ -29,7 +31,9 @@ const emit = defineEmits(['update']);
 const box = ref<null | InstanceType<typeof BasicBox>>(null);
 
 const onFocus = function () {
-  box.value?.focus();
+  if (props.focus) {
+    box.value?.focus();
+  }
 };
 
 const onBlur = function () {
