@@ -42,7 +42,9 @@ function initCurrentNav() {
       | {{ item.label }}
   .nav-right(v-if="$noTauri()")
     a(class="download" download="Visual Studio.dmg" href="/apps/visual-studio_0.1.0_x64.dmg")
-      | 下载桌面应用
+      | 下载 macOs 应用
+    a(class="download" download="Visual Studio.msi" href="/apps/visual-studio_0.1.0_x64_en-US.msi")
+      | 下载 Windows 应用
 .dashboard-content
   router-view
 </template>
@@ -90,6 +92,8 @@ function initCurrentNav() {
     }
 
     .nav-right {
+      display: flex;
+      column-gap: 16px;
       .download {
         cursor: pointer;
         color: #8181ee;
