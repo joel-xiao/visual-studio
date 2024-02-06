@@ -14,7 +14,7 @@ export default {
 };
 </script>
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 interface Props {
   keyValue: string;
   label?: string;
@@ -24,7 +24,7 @@ const props = withDefaults(defineProps<Props>(), {
   label: ''
 });
 
-const showLabel = ref(!!props.label);
+const showLabel = computed(() => !!props.label);
 
 const propsLayout = ref<HTMLElement>();
 

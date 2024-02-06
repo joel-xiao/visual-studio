@@ -10,8 +10,8 @@ div.editor-container(
     ref="containerEl"
     id="editor-container-root"
     :style="rootStyle"
-    @mousedown.self="onDown")
-    GridLine
+    @mousedown.stop.prevent="onDown")
+    GridLine(@mousedown.stop.prevent="onDown")
     ContainerNode(v-for="(node, idx) in nodes" :key="node.id" :id="node.id")
 </template>
 

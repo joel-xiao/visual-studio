@@ -18,6 +18,7 @@ export class CreateComponentContext {
   UILibraryComponentUses: Record<string, { [key: string]: UseUILibraryComponent }>;
 
   #schemas: { [key: string]: SchemaExport };
+  containerSchemas: Record<string, { [key: string]: ComponentSchemaExport }>;
   componentSchemas: Record<string, { [key: string]: ComponentSchemaExport }>;
   components: Record<string, { [key: string]: App }>;
   constructor() {
@@ -25,6 +26,8 @@ export class CreateComponentContext {
     this.UILibraryComponentUses = {};
 
     this.#schemas = {};
+
+    this.containerSchemas = {};
     this.componentSchemas = {};
     this.components = {};
 
@@ -54,6 +57,9 @@ export class CreateComponentContext {
       eager: true,
       import: 'default'
     });
+
+    this.containerSchemas = import.meta.glob('./../../container/schema/*.ts', { eager: true });
+
     this.componentSchemas = import.meta.glob('./../../ui-library/*/*/schema/*.ts', { eager: true });
   }
   install() {
@@ -164,7 +170,11 @@ export class CreateComponentContext {
   }
 
   #getComponentSchema(schema_path: string): ComponentSchemaExport {
-    return this.componentSchemas[schema_path]?.default || {};
+    return (
+      this.containerSchemas[schema_path]?.default ||
+      this.componentSchemas[schema_path]?.default ||
+      {}
+    );
   }
 
   #getComponentPropsTypes(schema_path: string) {

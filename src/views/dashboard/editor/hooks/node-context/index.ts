@@ -101,6 +101,12 @@ class CreateNodeContext {
     return readonly(this.#nodes);
   }
 
+  #initSelectedNode() {
+    const node = this.#data?.nodes.find((node) => node.select);
+    if (!node) return;
+    this.#currentNode.value = node;
+  }
+
   #createSelectedNodes() {
     this.#selectedNodes = computed<Node[]>(() =>
       this.#data ? this.#data.nodes.filter((node) => node.select) : []
@@ -357,6 +363,7 @@ class CreateNodeContext {
     this.#createSelectedNodes();
     this.#createNodeTree();
     this.onSelectNode('root');
+    this.#initSelectedNode();
   }
 
   uninstall(): void {

@@ -28,6 +28,10 @@
   /* Dashboard Main ------ End ------ */
 
   /* Dashboard Editor ------ Start ------ */
+  // Select color
+  --db-editor-color-select: rgba(54, 98, 236, 0.3);
+  --db-editor-color-select-light: rgba(54, 98, 236, 0.15);
+
   // Canvas color
   --db-editor-color-canvas: var(--theme-color-real-gray-900);
   --db-editor-color-canvas-bg: #262626;
@@ -39,10 +43,6 @@
   /* Dashboard Editor ------ End ------ */
 
   /* Dashboard Control ------ Start ------ */
-  // Select color
-  --db-color-select: rgba(54, 98, 236, 0.3);
-  --db-color-select-light: rgba(54, 98, 236, 0.15);
-
   // Button/Input color
   --db-color-input-background: var(--theme-color-tran-8);
   --db-color-input-disabled-background: var(--theme-color-tran-30);

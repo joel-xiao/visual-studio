@@ -33,7 +33,7 @@ let data = reactive<EditorData>({
       id: 'root',
       icon: '',
       component: 'root',
-      schema: 'root',
+      schema: '../../container/schema/default.ts',
       name: '根容器',
       width: 1000,
       height: 600,
@@ -44,7 +44,12 @@ let data = reactive<EditorData>({
       z: 0,
       select: true,
       lock: false,
-      props: {}
+      props: {
+        layout: {
+          width: 1000,
+          height: 600
+        }
+      }
     }
   ]
 });
