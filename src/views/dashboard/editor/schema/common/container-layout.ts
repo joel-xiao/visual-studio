@@ -1,6 +1,6 @@
 import type { SchemaExport } from '../interface';
 const SCHEMA_NAME = 'COMMON_CONTAINER_LAYOUT';
-const SCHEMA_LABEL = '容器';
+const SCHEMA_LABEL = '';
 const SCHEMA_KEY = 'layout';
 
 const schema: SchemaExport = {
