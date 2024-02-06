@@ -6,7 +6,7 @@ input(class="basic-input" type="input" v-model="inputValue" v-bind="$attrs" @foc
 import { ref, watchEffect, watch } from 'vue';
 
 interface Props {
-  modelValue: string | number;
+  modelValue?: string | number;
   dataType?: NumberConstructor | StringConstructor;
 }
 const props = withDefaults(defineProps<Props>(), {

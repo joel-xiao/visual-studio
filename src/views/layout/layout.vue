@@ -7,8 +7,8 @@ div#layout
 </template>
 
 <script setup lang="ts">
-import Header from './layout-header.vue';
-import Content from './layout-content.vue';
+import Header from './components/layout-header.vue';
+import Content from './components/layout-content.vue';
 </script>
 
 <style lang="scss">
