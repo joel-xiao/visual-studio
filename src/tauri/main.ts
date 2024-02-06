@@ -5,6 +5,7 @@ function noTauri() {
   return !window?.__TAURI__;
 }
 export function invoke(cmd: string, args?: InvokeArgs) {
+  console.log(2);
   if (noTauri()) return;
   as_invoke(cmd, args);
 }

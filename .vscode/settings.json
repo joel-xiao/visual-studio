@@ -3,6 +3,7 @@
     "ipcrenderer",
     "optimizelegibility",
     "pxtorem",
+    "splashscreen",
     "TAURI",
     "vite"
   ],
