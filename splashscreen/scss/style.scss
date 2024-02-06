@@ -1,0 +1,88 @@
+@import "compass/css3";
+
+$ANIMATION_DURATION: 1000ms; 
+$BALL_DIAMETER: 50px;
+$TRANSLATE_DISTANCE: 150px;
+
+#contain {
+  width: $BALL_DIAMETER + $TRANSLATE_DISTANCE; 
+  height: $BALL_DIAMETER;
+  position: absolute;
+  top: calc(50% + #{$BALL_DIAMETER});
+  left: calc(50% + #{$BALL_DIAMETER});
+  opacity: 0;
+  animation: fadeIn 1s 1;
+  animation-fill-mode: forwards;
+}
+
+.wrap {
+  animation: translateX $ANIMATION_DURATION infinite ease-in-out alternate;
+  position: absolute;
+}
+
+.ball { 
+  width: $BALL_DIAMETER;
+  height: $BALL_DIAMETER;
+  box-shadow: ($BALL_DIAMETER * -.125) ($BALL_DIAMETER * -.125) 0 rgba(0,0,0,.1) inset;
+  background-color: #397BF9;
+  border-radius: 50%;
+  animation: translateY $ANIMATION_DURATION/2 infinite ease-in-out alternate;
+}
+
+// The Shadow
+.wrap:after {
+  content: '';
+  width: $BALL_DIAMETER;
+  height: $BALL_DIAMETER * .15;
+  background: #eee;
+  position: absolute;
+  bottom: 0;
+  top: $BALL_DIAMETER * 1.4;
+  border-radius: 50%;
+  animation: scale $ANIMATION_DURATION/2 infinite ease-in-out alternate;
+}
+
+#wrap2,
+#ball2,
+#wrap2:after{
+  animation-delay: $ANIMATION_DURATION * -.4;
+}
+
+#wrap3,
+#ball3,
+#wrap3:after{
+  animation-delay: $ANIMATION_DURATION * -.8;
+}
+
+#wrap4,
+#ball4,
+#wrap4:after{
+  animation-delay: $ANIMATION_DURATION * -1.2;
+}
+
+#wrap5,
+#ball5,
+#wrap5:after{
+  animation-delay: $ANIMATION_DURATION * -1.6;
+}
+
+
+#ball2 { background-color: #F4B400; }
+#ball3 { background-color: #EEEEEE; }
+#ball4 { background-color: #00A656; }
+#ball5 { background-color: #E3746B; }
+
+
+@keyframes translateX {
+  100% { transform: translateX(-$TRANSLATE_DISTANCE); }
+}
+
+@keyframes translateY {
+  100% { transform: translateY(-$TRANSLATE_DISTANCE * 1.25); }
+}
+
+@keyframes scale {
+  100% { transform: scale(.85); }
+}
+
+@keyframes fadeIn { 100% { opacity: 1; } }

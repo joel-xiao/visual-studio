@@ -102,11 +102,11 @@
         "visible": false
       },
       {
-        "width": 400,
-        "height": 200,
+        "width": 600,
+        "height": 400,
         "center": true,
         "decorations": false,
-        "url": "splashscreen.html",
+        "url": "splashscreen/index.html",
         "label": "splashscreen"
       }
     ],
