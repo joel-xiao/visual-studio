@@ -10,3 +10,10 @@ declare module '*.vue' {
 declare interface ElementEventMap {
   mousewheel: WheelEvent;
 }
+
+declare module '@vue/runtime-core' {
+  interface ComponentCustomProperties {
+    $noTauri: function;
+    $isTauri: function;
+  }
+}

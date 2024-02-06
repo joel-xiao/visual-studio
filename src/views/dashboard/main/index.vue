@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, markRaw, onMounted } from 'vue';
+import { ref, reactive, markRaw, onMounted, getCurrentInstance } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 const router = useRouter();
 const route = useRoute();
@@ -40,6 +40,9 @@ function initCurrentNav() {
   .nav-content
     span.nav-content-span(@click="onNavSelect(item)" :class="{ active: currentNav.id === item.id }" :key="item.id" v-for="(item, idx) in navList")
       | {{ item.label }}
+  .nav-right(v-if="$noTauri()")
+    a(class="download" download="Visual Studio.dmg" href="/apps/visual-studio_0.1.0_x64.dmg")
+      | 下载桌面应用
 .dashboard-content
   router-view
 </template>
@@ -53,6 +56,7 @@ function initCurrentNav() {
   .dashboard-header {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     height: 47px;
     padding: 0 20px;
     border-bottom: 1px solid var(--db-main-border-black);
@@ -82,6 +86,14 @@ function initCurrentNav() {
           color: var(--theme-color-tran-85);
           background: var(--theme-color-tran-12);
         }
+      }
+    }
+
+    .nav-right {
+      .download {
+        cursor: pointer;
+        color: #8181ee;
+        font-size: 14px;
       }
     }
   }
