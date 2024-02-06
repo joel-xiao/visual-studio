@@ -4,7 +4,6 @@ import viteCompression from 'vite-plugin-compression';
 import vue from '@vitejs/plugin-vue';
 import vueJsx from '@vitejs/plugin-vue-jsx';
 import VueDevTools from 'vite-plugin-vue-devtools';
-import copyPlugin from 'rollup-plugin-copy';
 
 // https://vitejs.dev/config/
 export default defineConfig((config) => {
@@ -47,14 +46,6 @@ export default defineConfig((config) => {
       //     drop_debugger: true
       //   }
       // }
-      emptyOutDir: false,
-      rollupOptions: {
-        plugins: [
-          copyPlugin({
-            targets: [{ src: 'apps/*', dest: 'dist/apps' }]
-          })
-        ]
-      }
     },
     server: {
       proxy: {
