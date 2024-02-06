@@ -103,7 +103,7 @@ div#dashboard-my-project
       Icon(src="icon-jiahao" class="add-group" button size="small")
     NavTree(
       :data="folderTree"
-      itemIcon="image/dashboard/my-main/folder.svg"
+      itemIcon="/image/dashboard/my-main/folder.svg"
       size='small'
       :itemMenus="folderMenus"
       ref="navRef"
