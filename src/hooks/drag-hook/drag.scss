@@ -36,7 +36,14 @@
     }
 
     &.no-opacity {
-      opacity: 0;
+      & > .v-drag-stick {
+        &.v-drag-stick-tl,
+        &.v-drag-stick-br,
+        &.v-drag-stick-tr,
+        &.v-drag-stick-bl {
+          opacity: 0 !important;
+        }
+      }
     }
 
     &.active {
