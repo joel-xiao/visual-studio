@@ -100,6 +100,7 @@ defineExpose({ focus, blur });
       box-shadow: 0 0 0 1px var(--db-color-button-status-hover-border) inset;
     }
     &.active {
+      box-shadow: 0 0 0 1px var(--db-color-button-status-bg-active) inset;
       background: var(--db-color-button-status-bg-active);
       color: var(--db-color-button-active);
     }
