@@ -1,4 +1,5 @@
 dist
+dist-tauri
 src-tauri
 splashscreen
 .eslintignore
