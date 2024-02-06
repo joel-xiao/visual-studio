@@ -3,7 +3,7 @@
  * @Autor: Joel
  */
 import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router';
-import layout from '@v/layout/index.vue';
+import layout from '@v/layout/layout-screen.vue';
 import type { App } from 'vue';
 
 const routes: Array<RouteRecordRaw> = [
