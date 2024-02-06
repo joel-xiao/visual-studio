@@ -1,5 +1,6 @@
 dist
 public
 src-tauri
+splashscreen
 *.html
 src/env.d.ts

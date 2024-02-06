@@ -1,5 +1,6 @@
 dist
 src-tauri
+splashscreen
 .eslintignore
 .stylelintignore
 *.js
