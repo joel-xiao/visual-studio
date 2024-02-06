@@ -1,5 +1,11 @@
 {
-  "cSpell.words": ["ipcrenderer", "optimizelegibility", "pxtorem", "vite"],
+  "cSpell.words": [
+    "ipcrenderer",
+    "optimizelegibility",
+    "pxtorem",
+    "TAURI",
+    "vite"
+  ],
   // 基础设置
   "editor.detectIndentation": false, // 重置 editor.tabSize属性
   "editor.tabSize": 2, // 缩进2单元格

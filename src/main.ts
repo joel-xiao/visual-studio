@@ -1,5 +1,5 @@
 import { createApp } from 'vue';
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@/tauri/main';
 // import 'amfe-flexible';// 用于设置rem基准值
 import '@a/style/index.scss';
 import '@a/style/font/iconfont.css';
