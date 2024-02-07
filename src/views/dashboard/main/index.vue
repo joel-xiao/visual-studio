@@ -40,7 +40,7 @@ function initCurrentNav() {
   .nav-content
     span.nav-content-span(@click="onNavSelect(item)" :class="{ active: currentNav.id === item.id }" :key="item.id" v-for="(item, idx) in navList")
       | {{ item.label }}
-  .nav-right(v-if="$noTauri()")
+  .nav-right(v-if="$noNative()")
     a(class="download" download="Visual Studio.dmg" href="/apps/visual-studio_0.1.0_x64.dmg")
       | 下载 macOs 应用
     a(class="download" download="Visual Studio.msi" href="/apps/visual-studio_0.1.0_x64_en-US.msi")

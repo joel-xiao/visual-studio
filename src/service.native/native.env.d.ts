@@ -1,6 +1,6 @@
 declare module '*.vue' {
   interface ComponentCustomProperties {
-    $noTauri: function;
-    $isTauri: function;
+    $noNative: function;
+    $isNative: function;
   }
 }
