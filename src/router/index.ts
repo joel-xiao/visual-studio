@@ -2,7 +2,7 @@
  * @Description: router
  * @Autor: Joel
  */
-import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
+import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router';
 import layout from '@v/layout/layout-screen.vue';
 import type { App } from 'vue';
 
@@ -64,8 +64,8 @@ const routePathJoinHandler = function (routes: Array<RouteRecordRaw>, parentPath
 routePathJoinHandler(routes);
 
 const router = createRouter({
-  history: createWebHistory(),
-  // history: createWebHashHistory(),
+  // history: createWebHistory(),
+  history: createWebHashHistory(),
   routes
 });
 
