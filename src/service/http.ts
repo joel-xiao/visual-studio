@@ -1,5 +1,7 @@
 import axios, { AxiosRequestConfig } from 'axios';
-let loadingBar;
+// import NProgress from 'nprogress';
+import { useLoadingBar } from 'naive-ui';
+let loadingBar = useLoadingBar();
 if (!loadingBar) {
   loadingBar = {
     start: () => {

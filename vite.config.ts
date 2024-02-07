@@ -77,6 +77,9 @@ export default defineConfig(({ command }) => {
         // "layouts": path.resolve(__dirname, "src/layouts"),
       }
     },
+
+    base: './',
+    
     server: process.env.VSCODE_DEBUG && (() => {
       const url = new URL(pkg.debug.env.VITE_DEV_SERVER_URL)
       return {

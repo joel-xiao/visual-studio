@@ -1,5 +1,5 @@
 import { createApp } from 'vue';
-import { invoke, setupTauri } from '@/tauri/main';
+import { invokeNative, setupNative } from '@/service.native';
 // import 'amfe-flexible';// 用于设置rem基准值
 import '@a/style/index.scss';
 import '@a/style/font/iconfont.css';
@@ -16,12 +16,11 @@ const app = createApp(App).use(components).use(directives).use(native);
 setupRouter(app);
 // store
 setupStore(app);
-// tauri
-setupTauri(app);
+// service.native
+setupNative(app);
 
 router.isReady().then(() => {
   app.mount('#app').$nextTick((): void => {
-    postMessage({ payload: 'removeLoading' }, '*');
-    invoke('close_splashscreen');
+    invokeNative('close_splashscreen');
   });
 });
