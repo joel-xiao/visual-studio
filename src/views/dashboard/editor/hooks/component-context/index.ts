@@ -173,7 +173,7 @@ export class CreateComponentContext {
     return (
       this.containerSchemas[schema_path]?.default ||
       this.componentSchemas[schema_path]?.default ||
-      {}
+      {} as ComponentSchemaExport
     );
   }
 
