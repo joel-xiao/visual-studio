@@ -9,7 +9,7 @@
 
 [DEMO](https://visual-studio-one.vercel.app/)
 
-[Electron Visual Studio](https://github.com/joel-xiao/visual-studio.electron)
+[Tauri Visual Studio](https://github.com/joel-xiao/visual-studio)
 
 🥳 `Electron` + `Vue3` + `Vite2` + `Ts`
 
