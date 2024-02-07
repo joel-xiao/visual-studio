@@ -9,8 +9,7 @@
 
 [DEMO](https://visual-studio-one.vercel.app/)
 
-🥳 `Tauri` + `Vue3` + `Vite2` + `Ts` + `Pinia` + `TsLint` + `EsLint` + `StyleLint` + `Prettier` +
-`CommitLint` + `husky` + `lint-staged`
+🥳 `Tauri` + `Vue3` + `Vite2` + `Ts`
 
 ## 概述
 
