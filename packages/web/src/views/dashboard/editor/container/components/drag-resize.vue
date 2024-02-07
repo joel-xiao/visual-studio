@@ -8,7 +8,7 @@ div(
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, readonly, markRaw, withDefaults } from 'vue';
+import { ref, reactive, computed, readonly, markRaw } from 'vue';
 import type { DragDataset, Binding } from '@d/drag-resize/interface';
 
 interface Props {

@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
+    "tauri:build": "vue-tsc --noEmit && vite build --outDir dist-tauri",
     "preview": "vite preview"
   },
   "dependencies": {

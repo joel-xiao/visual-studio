@@ -3,6 +3,24 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "dev:web": "pnpm -F @visual-studio/web dev"
+    "dev:web": "pnpm -F @visual-studio/web dev",
+    "build:web": "pnpm -F @visual-studio/web build",
+    "build:web:dist-tauri": "pnpm -F @visual-studio/web tauri:build",
+    "build:tauri": "pnpm build:web:dist-tauri && pnpm -F @visual-studio/tauri build",
+    "log": "conventional-changelog -p custom-config -i CHANGELOG.md -s -r 0  -n ./changelog-option.js",
+    "prepare": "husky install"
+  },
+  "changelog": {
+    "bugsUrl": "https://github.com/huoyou/vue_cli3/issues/",
+    "emojis": true,
+    "authorName": true,
+    "authorEmail": true
+  },
+  "lint-staged": {},
+  "optionalDependencies": {
+    "@commitlint/cli": "^18.6.0",
+    "@commitlint/config-conventional": "^18.6.0",
+    "husky": "^9.0.10",
+    "lint-staged": "^15.2.2"
   }
 }

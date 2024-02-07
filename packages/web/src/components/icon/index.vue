@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { Size } from './../types.d';
-import { computed, reactive, withDefaults } from 'vue';
+import { computed, reactive } from 'vue';
 
 interface Props {
   src?: string;

@@ -1,0 +1,9 @@
+{
+  "name": "@visual-studio/tauri",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "tauri dev",
+    "build": "tauri build"
+  }
+}

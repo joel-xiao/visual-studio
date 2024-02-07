@@ -6,7 +6,7 @@ DragResize(ref="resize" :data="dragDataset" @resizing="onResizing" @mousedown.st
 
 <script setup lang="ts">
 import DragResize from './components/drag-resize.vue';
-import { ref, reactive, markRaw, readonly, withDefaults, watch, onMounted } from 'vue';
+import { ref, reactive, markRaw, readonly, watch, onMounted } from 'vue';
 import type { DragDataset } from '@d/drag-resize/interface';
 import { useNodeContext } from './../hooks/node-context';
 import { useComponentContext } from './../hooks/component-context';

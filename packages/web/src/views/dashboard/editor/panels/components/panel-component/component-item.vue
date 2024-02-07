@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { inject, withDefaults } from 'vue';
+import { inject } from 'vue';
 import type { ComponentData } from './interface';
 
 interface Props {

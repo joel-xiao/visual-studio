@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, reactive, withDefaults, onUnmounted } from 'vue';
+import { computed, reactive, onUnmounted } from 'vue';
 import type { ClickMenu } from './interface';
 
 interface Props {

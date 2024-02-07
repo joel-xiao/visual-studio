@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, reactive, withDefaults, computed } from 'vue';
+import { ref, reactive, computed } from 'vue';
 import type { TreeItemData, TreeItemMenu } from './interface';
 import type { Size } from './../types.d';
 

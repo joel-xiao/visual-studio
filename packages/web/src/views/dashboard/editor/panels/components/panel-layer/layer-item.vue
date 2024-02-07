@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, reactive, withDefaults } from 'vue';
+import { ref, reactive } from 'vue';
 import type { LayerItemData, LayerItemMenu } from './interface';
 
 interface Props {

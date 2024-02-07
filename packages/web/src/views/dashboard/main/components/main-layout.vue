@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import CInput from './../../components/basic/c-input/index.vue';
-import { ref, reactive, markRaw, defineEmits } from 'vue';
+import { ref, reactive, markRaw } from 'vue';
 import { getUuid } from '@a/utils/index';
 import type {
   ITreeItemMenu,
