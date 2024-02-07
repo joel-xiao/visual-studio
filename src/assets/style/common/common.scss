@@ -1,0 +1,76 @@
+/**
+* @description: CSS Common
+* @author: Joel
+*/
+
+.left {
+  float: left;
+}
+
+.right {
+  float: right;
+}
+
+.clearfix {
+  &::after {
+    display: block;
+    width: 0;
+    height: 0;
+    clear: both;
+    zoom: 1;
+    content: '';
+  }
+}
+
+.ellipsis {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+//禁止文本被选中
+.not-select {
+  user-select: none;
+}
+
+/* 滚动条优化 start */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f6f6f6;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cdcdcd;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #747474;
+}
+
+::-webkit-scrollbar-corner {
+  background: #f6f6f6;
+}
+
+/* 滚动条优化 end */
+
+.transition {
+  transition-timing-function: ease-out;
+  transition-duration: 0.1s;
+  transition-property: background-color, border-color, color, fill, stroke, opacity, left, right,
+    top, bottom, -webkit-box-shadow, -webkit-transform;
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow,
+    transform, left, right, top, bottom;
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow,
+    transform, left, right, top, bottom, -webkit-box-shadow, -webkit-transform;
+}

@@ -1,0 +1,140 @@
+/**
+* @description: Drag resize CSS
+* @author: Joel
+*/
+
+.v-drag-resize {
+  position: fixed;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
+
+  &.active {
+    z-index: 999999;
+  }
+
+  &:hover {
+    & > .v-drag-sticks {
+      display: block;
+
+      & > .v-drag-stick {
+        &.v-drag-stick-tl,
+        &.v-drag-stick-br,
+        &.v-drag-stick-tr,
+        &.v-drag-stick-bl {
+          opacity: 0;
+        }
+      }
+    }
+  }
+
+  & > .v-drag-sticks {
+    display: none;
+
+    &.disabled {
+      display: none !important;
+    }
+
+    &.no-opacity {
+      & > .v-drag-stick {
+        &.v-drag-stick-tl,
+        &.v-drag-stick-br,
+        &.v-drag-stick-tr,
+        &.v-drag-stick-bl {
+          opacity: 0 !important;
+        }
+      }
+    }
+
+    &.active {
+      display: block;
+
+      & > .v-drag-stick {
+        opacity: 1 !important;
+      }
+    }
+
+    & > .v-drag-stick {
+      position: absolute;
+
+      &.v-drag-stick-tl,
+      &.v-drag-stick-br,
+      &.v-drag-stick-tr,
+      &.v-drag-stick-bl {
+        width: 8px;
+        height: 8px;
+        background: #fff;
+        border: 1px solid var(--drag-resize-color);
+        border-radius: 2px;
+      }
+
+      &.v-drag-stick-tl,
+      &.v-drag-stick-br {
+        cursor: nwse-resize;
+      }
+
+      &.v-drag-stick-tr,
+      &.v-drag-stick-bl {
+        cursor: nesw-resize;
+      }
+
+      &.v-drag-stick-tm,
+      &.v-drag-stick-bm {
+        cursor: ns-resize;
+      }
+
+      &.v-drag-stick-lm,
+      &.v-drag-stick-rm {
+        cursor: ew-resize;
+      }
+
+      &.v-drag-stick-tl {
+        top: 0;
+        left: 0;
+      }
+
+      &.v-drag-stick-tr {
+        top: 0;
+        right: 0;
+      }
+
+      &.v-drag-stick-br {
+        right: 0;
+        bottom: 0;
+      }
+
+      &.v-drag-stick-bl {
+        bottom: 0;
+        left: 0;
+      }
+
+      &.v-drag-stick-tm {
+        top: 0;
+        right: 0;
+        left: 0;
+        border-top: 1px solid var(--drag-resize-color);
+      }
+
+      &.v-drag-stick-bm {
+        right: 0;
+        bottom: 0;
+        left: 0;
+        border-bottom: 1px solid var(--drag-resize-color);
+      }
+
+      &.v-drag-stick-rm {
+        top: 0;
+        right: 0;
+        bottom: 0;
+        border-right: 1px solid var(--drag-resize-color);
+      }
+
+      &.v-drag-stick-lm {
+        top: 0;
+        bottom: 0;
+        left: 0;
+        border-left: 1px solid var(--drag-resize-color);
+      }
+    }
+  }
+}

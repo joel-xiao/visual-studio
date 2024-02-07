@@ -1,0 +1,70 @@
+/**
+* @description: CSS Initialize
+* @author: Joel
+*/
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  appearance: none;
+}
+
+html {
+  text-size-adjust: 100%;
+}
+
+body {
+  // font-family: 'Microsoft YaHei', '微软雅黑', 'Helvetica Neue', Helvetica, 'PingFang SC',
+  //   'Hiragino Sans GB', Arial, sans-serif;
+  font-family: Inter, 'Apple System', 'SF Pro SC', 'SF Pro Display', 'Helvetica Neue', Arial,
+    'PingFang SC', 'Hiragino Sans GB', STHeiti, 'Microsoft YaHei', 'Microsoft JhengHei',
+    'Source Han Sans SC', 'Noto Sans CJK SC', 'Source Han Sans CN', sans-serif;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #333;
+  -webkit-tap-highlight-color: transparent;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizelegibility;
+}
+
+div:focus {
+  outline: none;
+}
+
+button,
+input {
+  overflow: visible;
+  line-height: normal;
+}
+
+button,
+input,
+li,
+ol,
+optgroup,
+select,
+textarea,
+ul {
+  padding: 0;
+  margin: 0;
+  font-family: inherit;
+  font-size: 100%;
+  list-style: none;
+  border: 0;
+  outline: none;
+}
+
+table {
+  border-spacing: 0;
+  border-collapse: collapse;
+
+  //table表格自动换行 特殊文字换行
+  tr {
+    td {
+      word-break: break-all;
+      word-wrap: break-word;
+    }
+  }
+}
