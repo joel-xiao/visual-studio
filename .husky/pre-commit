@@ -1,0 +1,9 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+. "$(dirname "$0")/common.sh"
+
+npx --no-install lint-staged
+
+# echo "---Check start---"
+# npm run tsc
+# echo "---Check end---"
