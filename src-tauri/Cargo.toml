@@ -1,8 +1,11 @@
 [package]
-name = "tauri-app"
+name = "visual"
 version = "0.0.0"
-description = "A Tauri App"
-authors = ["you"]
+description = "A Visual Studio"
+authors = ["The visual xiao"]
+license = ""
+repository = ""
+default-run = "visual"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

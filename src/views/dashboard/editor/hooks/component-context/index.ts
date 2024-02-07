@@ -76,7 +76,7 @@ export class CreateComponentContext {
   }
 
   #getIcon(icon: string): string {
-    return `/image/dashboard/editor/panel-component/${icon}`;
+    return `image/dashboard/editor/panel-component/${icon}`;
   }
 
   #getComponentSchemas(component_path: string): ComponentData[] {
