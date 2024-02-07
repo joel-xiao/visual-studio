@@ -9,9 +9,10 @@
 
 [DEMO](https://visual-studio-one.vercel.app/)
 
+🥳 `Electron` + `Vue3` + `Vite2` + `Ts`
+
 [Tauri Visual Studio](https://github.com/joel-xiao/visual-studio)
 
-🥳 `Electron` + `Vue3` + `Vite2` + `Ts`
 
 ## 概述
 
