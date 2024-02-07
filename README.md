@@ -85,7 +85,7 @@ npm run dev or yarn dev or pnpm dev
 ## 提交更改
 
 请点击这里查看
-[提交规则](https://github.com/xiaowenlong1022/visual-studio/blob/main/.commitlintrc.js)。
+[提交规则](https://github.com/joel-xiao/visual-studio.electron/blob/main/.commitlintrc.js)。
 
 ```bash
 # pull
