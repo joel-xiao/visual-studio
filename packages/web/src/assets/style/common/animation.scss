@@ -1,0 +1,21 @@
+/**
+* @description: CSS Animation
+* @author: Joel
+*/
+
+.animation-card-suspension {
+  &:hover {
+    animation-name: suspension;
+    animation-duration: 0.3s;
+    animation-fill-mode: forwards;
+  }
+}
+@keyframes suspension {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(-10px);
+  }
+}

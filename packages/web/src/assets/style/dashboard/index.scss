@@ -1,0 +1,68 @@
+/**
+* @description: Dashboard module CSS
+* @author: Joel
+*/
+
+#dashboard {
+  // Color
+  --db-color-main: var(--color-gray-800);
+  --db-color-bg-dark: #080808;
+
+  // Font color
+  color: var(--theme-color-text);
+
+  /* Dashboard Main ------ Start ------ */
+  // Border color
+  --db-main-border-black: rgb(8 8 8);
+
+  // Bar color
+  --db-main-color-left-bar-bg: #262626;
+
+  // Card color
+  --db-main-color-card-bg: #2c2c2c;
+
+  // Request Type color
+  --db-main-color-get: #4caf50;
+  --db-main-color-post: #fa8c16;
+
+  /* Dashboard Main ------ End ------ */
+
+  /* Dashboard Editor ------ Start ------ */
+  // Select color
+  --db-editor-color-select: rgba(54, 98, 236, 0.3);
+  --db-editor-color-select-light: rgba(54, 98, 236, 0.15);
+
+  // Canvas color
+  --db-editor-color-canvas: var(--theme-color-real-gray-900);
+  --db-editor-color-canvas-bg: #262626;
+  --db-editor-color-panel-bg: var(--db-color-main);
+
+  // Root color
+  --db-editor-color-root-bg: var(--color-gray-800);
+
+  /* Dashboard Editor ------ End ------ */
+
+  /* Dashboard Control ------ Start ------ */
+  // Button/Input color
+  --db-color-input-background: var(--theme-color-tran-8);
+  --db-color-input-disabled-background: var(--theme-color-tran-30);
+  --db-color-input: var(--theme-color-text-primary);
+
+  --db-color-button-focus-border: var(--theme-color-blue-700);
+  --db-color-button-bg-hover: var(--theme-color-gray-300);
+  --db-color-button-bg-active: var(--theme-color-gray-200);
+  --db-color-button-active: var(--theme-color-text-primary-white);
+
+  --db-color-button-status-border: var(--theme-color-tran-6);
+  --db-color-button-status-color: var(--theme-color-gray-800);
+  --db-color-button-status-hover-border: var(--theme-color-tran-12);
+  --db-color-button-status-bg-active: var(--theme-color-blue-700);
+
+  // Icon
+  --db-editor-icon-color: var(--theme-color-gray-700);
+
+  // Drag the color of the dashboard component
+  --drag-resize-color: hsl(260, 100%, 66%);
+
+  /* Dashboard Control ------ End ------ */
+}

@@ -1,0 +1,22 @@
+/**
+* @description: Editor Container Overlay CSS
+* @author: Joel
+*/
+
+#editor {
+  .editor-overlay {
+    position: absolute;
+    inset: 0;
+    display: none;
+    cursor: grab;
+
+    &.show {
+      display: block;
+      cursor: grab;
+    }
+
+    &.down {
+      cursor: grabbing;
+    }
+  }
+}

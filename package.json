@@ -1,0 +1,8 @@
+{
+  "name": "visual-studio.monorepo",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev:web": "pnpm -F @visual-studio/web dev"
+  }
+}
