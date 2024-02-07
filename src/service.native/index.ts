@@ -1,12 +1,13 @@
 import type { App } from 'vue';
 import { invokeTauri, isTauri, noTauri } from './tauri/main';
+import { isElectron, noElectron } from './electron/main';
 
 function isNative() {
-  return isTauri();
+  return isElectron() || isTauri();
 }
 
 function noNative() {
-  return noTauri();
+  return noElectron() && noTauri();
 }
 
 export function invokeNative(cmd: string, args?: any) {
