@@ -26,18 +26,20 @@ export default defineConfig(async () => {
   
     resolve: {
       alias: {
-        '@': path.resolve(path.dirname(new URL(import.meta.url).pathname), 'src'),
-        '@v': path.resolve(path.dirname(new URL(import.meta.url).pathname), 'src/views'),
-        '@c': path.resolve(path.dirname(new URL(import.meta.url).pathname), 'src/components'),
-        '@u': path.resolve(path.dirname(new URL(import.meta.url).pathname), 'src/utils'),
-        '@a': path.resolve(path.dirname(new URL(import.meta.url).pathname), 'src/assets'),
-        '@s': path.resolve(path.dirname(new URL(import.meta.url).pathname), 'src/service'),
-        '@p': path.resolve(path.dirname(new URL(import.meta.url).pathname), 'src/plugins'),
-        '@d': path.resolve(path.dirname(new URL(import.meta.url).pathname), 'src/directives'),
-        '@hooks': path.resolve(path.dirname(new URL(import.meta.url).pathname), 'src/hooks')
+        '@': path.resolve(__dirname, 'src'),
+        '@v': path.resolve(__dirname, 'src/views'),
+        '@c': path.resolve(__dirname, 'src/components'),
+        '@u': path.resolve(__dirname, 'src/utils'),
+        '@a': path.resolve(__dirname, 'src/assets'),
+        '@s': path.resolve(__dirname, 'src/service'),
+        '@p': path.resolve(__dirname, 'src/plugins'),
+        '@d': path.resolve(__dirname, 'src/directives'),
+        '@hooks': path.resolve(__dirname, 'src/hooks')
         // "layouts": path.resolve(path.dirname(new URL(import.meta.url).pathname), "src/layouts"),
       }
     },
+
+    base: '/',
 
     build: {
       // minify: 'terser',
