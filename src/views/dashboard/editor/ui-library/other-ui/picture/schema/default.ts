@@ -3,7 +3,7 @@ import type { ComponentSchemaExport } from '../../../interface';
 const schema: ComponentSchemaExport = {
   name: '图片',
   type: 'CONTROLS_PICTURE',
-  icon: 'qw.png',
+  icon: 'ui-library/qw.png',
   schemas: [
     {
       type: 'schema',

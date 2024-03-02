@@ -114,13 +114,13 @@ div.component-box__container(v-for="(item, idx) in data.children" v-show="data.c
     .component-box__swapper {
       .component-item__content {
         padding: 4px;
-        background-color: rgb(255, 255, 255);
+        background-color: hsla(0, 0%, 100%, 0.06);
         display: flex;
         align-items: center;
         justify-content: center;
         img {
-          width: 100%;
-          height: 100%;
+          max-width: 100%;
+          max-height: 100%;
         }
       }
       &.icon {
