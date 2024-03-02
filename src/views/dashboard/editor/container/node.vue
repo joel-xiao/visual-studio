@@ -9,6 +9,8 @@ import DragResize from './components/drag-resize.vue';
 import { ref, reactive, markRaw, readonly, withDefaults, watch, onMounted } from 'vue';
 import type { DragDataset } from '@d/drag-resize/interface';
 import { useNodeContext } from './../hooks/node-context';
+import type { Node } from './../hooks/node-context/interface';
+import { getNodeStyle } from './../hooks/node-context/example';
 import { useComponentContext } from './../hooks/component-context';
 import type { ComponentProps } from './../hooks/component-context/interface';
 import { useContainer } from '../hooks/container';
@@ -20,9 +22,9 @@ const props = withDefaults(defineProps<Props>(), {
   id: ''
 });
 
-const { getNode, getNodeStyle, updateNode, onSelectNode, addNodeInstance } = useNodeContext();
-const node = getNode(props.id);
-const nodeStyle = getNodeStyle(props.id);
+const { getNode, updateNode, onSelectNode, addNodeInstance } = useNodeContext();
+const node = getNode(props.id) as Node;
+const nodeStyle = getNodeStyle(node);
 
 const { getScale, addContainerUpdated } = useContainer();
 const dragDataset = readonly(

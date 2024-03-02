@@ -31,7 +31,6 @@ class CreateNodeContext {
     this.getRoot = this.getRoot.bind(this);
     this.getRootStyle = this.getRootStyle.bind(this);
     this.getNode = this.getNode.bind(this);
-    this.getNodeStyle = this.getNodeStyle.bind(this);
     this.updateNode = this.updateNode.bind(this);
     this.updateNodeProps = this.updateNodeProps.bind(this);
     this.onAddNode = this.onAddNode.bind(this);
@@ -145,32 +144,6 @@ class CreateNodeContext {
   getNode(id: string) {
     const node: Node | undefined = this.#data?.nodes.find((node) => node.id === id);
     return readonly(node ? node : ({} as Node));
-  }
-
-  getNodeStyle(id: string) {
-    const node: Node | undefined = this.#data?.nodes.find((node) => node.id === id);
-    return computed<{
-      'border-top-left-radius': string;
-      'border-top-right-radius': string;
-      'border-bottom-right-radius': string;
-      'border-bottom-left-radius': string;
-      width: string;
-      height: string;
-      overflow: string;
-    }>(() => {
-      const radius = node?.radius.map((r) => (r || 0) + 'px') || [];
-      const width = (node?.width || 0) + 'px';
-      const height = (node?.height || 0) + 'px';
-      return {
-        'border-top-left-radius': radius[0] || '0px',
-        'border-top-right-radius': radius[1] || '0px',
-        'border-bottom-right-radius': radius[2] || '0px',
-        'border-bottom-left-radius': radius[3] || '0px',
-        width: width,
-        height: height,
-        overflow: 'hidden'
-      };
-    });
   }
 
   /**

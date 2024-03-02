@@ -1,10 +1,16 @@
 {
   "cSpell.words": [
+    "autoresize",
+    "commitlint",
+    "echarts",
     "ipcrenderer",
+    "nuxtjs",
     "optimizelegibility",
+    "pinia",
     "pxtorem",
     "splashscreen",
     "TAURI",
+    "vfonts",
     "vite"
   ],
   // 格式化校验

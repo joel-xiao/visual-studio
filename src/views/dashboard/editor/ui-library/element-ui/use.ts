@@ -1,7 +1,7 @@
 import { UseComponent } from '../interface';
 
 const use: UseComponent = {
-  name: 'element-ui',
+  name: 'Element-UI',
   id: 'element-ui'
 };
 
