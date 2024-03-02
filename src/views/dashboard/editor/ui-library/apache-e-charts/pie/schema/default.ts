@@ -11,8 +11,8 @@ const schema: ComponentSchemaExport = {
       default: {
         x: 0,
         y: 0,
-        width: 300,
-        height: 300,
+        width: 600,
+        height: 400,
         rotate: 0,
         radius: [0, 0, 0, 0]
       }
