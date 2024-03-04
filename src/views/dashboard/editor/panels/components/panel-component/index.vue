@@ -63,10 +63,12 @@ provide('getType', getCurrentType);
 
 <style lang="scss">
 .editor-panel-component {
-  padding: 0 6px 6px;
   position: relative;
+  box-sizing: border-box;
+  height: 100%;
   .component-header {
-    padding: 6px 0 12px 6px;
+    padding: 6px 6px 6px 12px;
+    height: 48px;
     display: flex;
     align-items: center;
     .search {
@@ -85,6 +87,12 @@ provide('getType', getCurrentType);
   }
 
   .component-masters {
+    padding: 0px 6px;
+    padding-bottom: 6px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    height: calc(100% - 48px);
+
     .master-collapse {
       .master-collapse__title {
         padding: 0 6px;

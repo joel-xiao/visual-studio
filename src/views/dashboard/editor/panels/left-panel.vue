@@ -100,12 +100,17 @@ const componentData = reactive<ComponentData[]>(getUiLibrary());
       height: var(--db-editor-tab-bar-height);
     }
     .panel-component {
+      height: calc(100% - var(--db-editor-tab-bar-height));
       .panel-component-tab_bar {
         border-bottom: 1px solid var(--db-editor-color-canvas);
         padding: 0 12px 0 6px;
         height: var(--db-editor-tab-bar-height);
         .tab_bar-title {
         }
+      }
+
+      .editor-panel-component {
+        height: calc(100% - var(--db-editor-tab-bar-height));
       }
     }
   }

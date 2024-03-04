@@ -40,22 +40,22 @@
 
 /* 滚动条优化 start */
 ::-webkit-scrollbar {
-  width: 7px;
-  height: 7px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f6f6f6;
-  border-radius: 5px;
+  background: transparent;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cdcdcd;
-  border-radius: 5px;
+  background:  rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #747474;
+  background:  rgba(255, 255, 255, 0.16);
 }
 
 ::-webkit-scrollbar-corner {

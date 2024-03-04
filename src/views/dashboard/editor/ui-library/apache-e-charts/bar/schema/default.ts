@@ -1,9 +1,9 @@
 import type { ComponentSchemaExport } from '../../../interface';
 
 const schema: ComponentSchemaExport = {
-  name: '基础饼图',
-  type: 'APACHE_ECHARTS_PIE_SIMPLE',
-  icon: 'ui-library/apache-e-charts/pie-simple.png',
+  name: '基础柱状图',
+  type: 'APACHE_ECHARTS_BAR_SIMPLE',
+  icon: 'ui-library/apache-e-charts/bar-simple.png',
   schemas: [
     {
       type: 'schema',
