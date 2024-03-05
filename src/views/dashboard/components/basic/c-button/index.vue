@@ -11,6 +11,7 @@ export default {
   name: 'C_BUTTON',
 };
 </script>
+
 <script setup lang="ts">
 import BasicBox from '../components/basic-box.vue';
 import BasicIcon from '../components/basic-icon.vue';

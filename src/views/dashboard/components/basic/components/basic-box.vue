@@ -77,6 +77,7 @@ defineExpose({ focus, blur });
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
+  overflow: hidden;
 
   &.button-box {
     justify-content: center;

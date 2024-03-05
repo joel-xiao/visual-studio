@@ -32,6 +32,15 @@ const schema: SchemaExport = {
         ctrl_type: 'status-button',
         size: 'right'
       }
+    ],
+    [
+      {
+        key: 'color',
+        type: Number,
+        default: 0,
+        icon: 'C',
+        ctrl: 'C_COLOR_PICKER'
+      },
     ]
   ]
 };
