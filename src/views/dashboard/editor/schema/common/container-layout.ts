@@ -14,21 +14,21 @@ const schema: SchemaExport = {
         type: Number,
         default: 0,
         icon: 'W',
-        ctrl: 'input'
+        ctrl: 'C_INPUT'
       },
       {
         key: 'height',
         type: Number,
         default: 0,
         icon: 'H',
-        ctrl: 'input'
+        ctrl: 'C_INPUT'
       },
       {
         key: 'size_proportion_lock',
         type: Boolean,
         default: false,
         icon: 'icon-locking-ratio',
-        ctrl: 'button',
+        ctrl: 'C_BUTTON',
         ctrl_type: 'status-button',
         size: 'right'
       }

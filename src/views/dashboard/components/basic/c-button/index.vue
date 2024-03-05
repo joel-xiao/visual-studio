@@ -7,7 +7,8 @@ BasicBox(class="c-button" v-bind="$attrs" :type="type || 'button'" @update="onUp
 
 <script lang="ts">
 export default {
-  inheritAttrs: false
+  inheritAttrs: false,
+  name: 'C_BUTTON',
 };
 </script>
 <script setup lang="ts">

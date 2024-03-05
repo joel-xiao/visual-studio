@@ -14,14 +14,14 @@ const schema: SchemaExport = {
         type: Number,
         default: 0,
         icon: 'X',
-        ctrl: 'input'
+        ctrl: 'C_INPUT'
       },
       {
         key: 'y',
         type: Number,
         default: 0,
         icon: 'Y',
-        ctrl: 'input'
+        ctrl: 'C_INPUT'
       }
     ],
     [
@@ -30,21 +30,21 @@ const schema: SchemaExport = {
         type: Number,
         default: 0,
         icon: 'W',
-        ctrl: 'input'
+        ctrl: 'C_INPUT'
       },
       {
         key: 'height',
         type: Number,
         default: 0,
         icon: 'H',
-        ctrl: 'input'
+        ctrl: 'C_INPUT'
       },
       {
         key: 'size_proportion_lock',
         type: Boolean,
         default: false,
         icon: 'icon-locking-ratio',
-        ctrl: 'button',
+        ctrl: 'C_BUTTON',
         ctrl_type: 'status-button',
         size: 'right'
       }
@@ -55,14 +55,14 @@ const schema: SchemaExport = {
         type: Number,
         default: 0,
         icon: 'icon-rotate',
-        ctrl: 'input'
+        ctrl: 'C_INPUT'
       },
       {
         key: '',
         type: Boolean,
         default: false,
         icon: 'icon-reverse-y',
-        ctrl: 'button',
+        ctrl: 'C_BUTTON',
         size: 'small',
         click: (props) => {
           if (typeof props.rotate === 'number') {
@@ -75,7 +75,7 @@ const schema: SchemaExport = {
         type: Boolean,
         default: false,
         icon: 'icon-reverse-x',
-        ctrl: 'button',
+        ctrl: 'C_BUTTON',
         size: 'small',
         click: (props) => {
           if (typeof props.rotate === 'number') {
@@ -95,7 +95,7 @@ const schema: SchemaExport = {
           'icon-bottom-left-radius',
           'icon-bottom-right-radius'
         ],
-        ctrl: 'input-group',
+        ctrl: 'INPUT_GROUP',
         size: 'largely'
       }
     ]

@@ -14,6 +14,13 @@ div(class="schema-input-group")
     Button(v-model="data.isMore" icon="icon-spread-out" type="status-button")
 </template>
 
+<script lang="ts">
+export default {
+  inheritAttrs: false,
+  name: 'INPUT_GROUP',
+};
+</script>
+
 <script setup lang="ts">
 import { reactive, nextTick } from 'vue';
 import Input from './../../../../../../components/basic/c-input/index.vue';
