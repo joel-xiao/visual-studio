@@ -48,7 +48,9 @@ let data = reactive<EditorData>({
         layout: {
           width: 1000,
           height: 600,
-          background: 'hsla(0, 0%, 13% , 1)'
+        },
+        fill: {
+          color: 'hsla(0, 0%, 13% , 1)'
         }
       }
     }

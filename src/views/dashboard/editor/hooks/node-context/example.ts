@@ -37,8 +37,8 @@ export function getRootStyle(node: Node) {
       height: node.height + 'px',
     };
 
-    if (node.props.layout.background) {
-      style['background-color'] = node.props.layout.background;
+    if (node.props.fill.color) {
+      style['background-color'] = node.props.fill.color;
     }
 
     return style;

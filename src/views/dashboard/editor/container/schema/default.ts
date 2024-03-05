@@ -11,7 +11,14 @@ const schema: ComponentSchemaExport = {
       default: {
         width: 1000,
         height: 600,
-        background: ''
+      }
+    },
+
+    {
+      type: 'schema',
+      schema: 'COMMON_CONTAINER_FILL',
+      default: {
+        color: ''
       }
     }
   ]

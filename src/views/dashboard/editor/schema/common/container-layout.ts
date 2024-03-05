@@ -33,16 +33,6 @@ const schema: SchemaExport = {
         size: 'right'
       }
     ],
-    [
-      {
-        key: 'background',
-        type: String,
-        default: '',
-        icon: 'C',
-        ctrl: 'C_COLOR_PICKER',
-        size: 'large'
-      },
-    ]
   ]
 };
 export default schema;
