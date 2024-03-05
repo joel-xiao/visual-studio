@@ -7,7 +7,6 @@ const uses = import.meta.glob<{ install: (app: App) => void }>('./**/use.ts', {
 });
 export default {
   install(app: App<Element>): void {
-    console.log('install', uses);
     for (const path of Object.keys(uses)) {
       const install = uses[path]?.install;
       install && install(app);

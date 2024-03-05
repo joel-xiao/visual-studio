@@ -9,8 +9,9 @@ const schema: ComponentSchemaExport = {
       type: 'schema',
       schema: 'COMMON_CONTAINER_LAYOUT',
       default: {
-        width: 300,
-        height: 300
+        width: 1000,
+        height: 600,
+        background: ''
       }
     }
   ]

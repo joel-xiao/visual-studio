@@ -33,7 +33,7 @@ const style = computed(() => {
 
   if (props.gridTemplateColumns.length) {
     let columns = props.gridTemplateColumns;
-    if (columns.length > 1 && !columns.some((column) => column === 'largely'))
+    if (columns.length >= 1 && !columns.some((column) => column === 'largely'))
       columns = [
         ...columns.filter((column) => column !== 'right').map((column) => column || 'default'),
         'right'

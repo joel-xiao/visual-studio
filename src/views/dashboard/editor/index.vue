@@ -47,7 +47,8 @@ let data = reactive<EditorData>({
       props: {
         layout: {
           width: 1000,
-          height: 600
+          height: 600,
+          background: 'hsla(0, 0%, 13% , 1)'
         }
       }
     }

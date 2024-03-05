@@ -21,6 +21,8 @@ import ContainerNode from './node.vue';
 import { ref, nextTick, onMounted, onBeforeUnmount } from 'vue';
 import { useDrag } from './../hooks/drag-context';
 import { useNodeContext } from './../hooks/node-context';
+import type { Node } from './../hooks/node-context/interface';
+import { getRootStyle } from './../hooks/node-context/example';
 import { useComponentContext } from './../hooks/component-context';
 import { useBindKeysContext } from './../hooks/bind-keys-context';
 import { useRuler } from './../hooks/ruler-context';
@@ -30,10 +32,10 @@ import { removeContainer, useContainer } from '../hooks/container';
 // interface Props {}
 // const props = withDefaults(defineProps<Props>(), {});
 
-const { getRoot, getNodes, getRootStyle, onSelectNode, onAddNode } = useNodeContext();
+const { getRoot, getNodes, onSelectNode, onAddNode } = useNodeContext();
 const nodes = getNodes();
 const root = getRoot();
-const rootStyle = getRootStyle();
+const rootStyle = getRootStyle(root as Node);
 
 const onDown = function (): void {
   onSelectNode(root.id);

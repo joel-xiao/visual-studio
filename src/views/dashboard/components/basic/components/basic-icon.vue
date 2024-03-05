@@ -43,6 +43,8 @@ div(class="basic-icon" :class="iconClass")
   align-items: center;
   color: var(--db-editor-icon-color);
   user-select: none;
+  position: relative;
+  // left: -8px;
 
   &.lock {
     opacity: 0.5;

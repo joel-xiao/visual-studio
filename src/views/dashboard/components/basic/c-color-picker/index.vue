@@ -1,6 +1,7 @@
 <template lang="pug">
-BasicBox(class="c-color-picker" type="input")
-  ColorPicker
+BasicBox(ref='box' class="c-color-picker" type="input")
+  BasicColorPicker(v-bind="$attrs"  v-model="modelValue")
+  BasicInput(v-bind="$attrs" v-model="modelValue" @focus="onFocus" @blur="onBlur" @update="onUpdate" type="text")
 </template>
 
 <script lang="ts">
@@ -11,28 +12,47 @@ export default {
 </script>
 
 <script setup lang="ts">
+import { ref, computed, withDefaults } from 'vue';
 import BasicBox from '../components/basic-box.vue';
+import BasicColorPicker from '../components/basic-color-picker.vue';
+import BasicInput from '../components/basic-input.vue';
 
+interface IProps {
+  modelValue?: string;
+  focus?: boolean;
+}
+
+const props = withDefaults(defineProps<IProps>(), {
+  modelValue: '',
+  focus: true
+});
+
+const emit = defineEmits<{
+  (event: 'update:modelValue', value: string | undefined): void;
+  (event: 'update', value: string | undefined): void;
+}>();
+
+const modelValue = computed({
+  get() { return props.modelValue },
+  set(value) {emit('update:modelValue', value)},
+});
+
+const box = ref<null | InstanceType<typeof BasicBox>>(null);
+
+const onFocus = function () {
+  if (props.focus) {
+    box.value?.focus();
+  }
+};
+
+const onBlur = function () {
+  box.value?.blur();
+};
+
+const onUpdate = function (value: string | number) {
+  emit('update', value);
+};
 </script>
 
 <style lang="scss">
-.c-color-picker {
-  .n-color-picker {
-    height: 100%;
-
-    .n-color-picker-trigger {
-      border: none;
-      border-radius: 0;
-
-      .n-color-picker-trigger__fill {
-        left: 0;
-        top: 0;
-        bottom: 0;
-        right: 0;
-
-
-      }
-    }
-  }
-}
 </style>

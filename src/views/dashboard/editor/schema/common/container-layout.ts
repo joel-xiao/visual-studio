@@ -35,11 +35,12 @@ const schema: SchemaExport = {
     ],
     [
       {
-        key: 'color',
-        type: Number,
-        default: 0,
+        key: 'background',
+        type: String,
+        default: '',
         icon: 'C',
-        ctrl: 'C_COLOR_PICKER'
+        ctrl: 'C_COLOR_PICKER',
+        size: 'large'
       },
     ]
   ]

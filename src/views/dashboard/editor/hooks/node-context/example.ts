@@ -29,3 +29,18 @@ export function getNodeStyle(node: Node) {
     };
   });
 }
+
+export function getRootStyle(node: Node) {
+  return computed<{ width: string; height: string }>(() => {
+    const style = {
+      width: node.width + 'px',
+      height: node.height + 'px',
+    };
+
+    if (node.props.layout.background) {
+      style['background-color'] = node.props.layout.background;
+    }
+
+    return style;
+  });
+}
