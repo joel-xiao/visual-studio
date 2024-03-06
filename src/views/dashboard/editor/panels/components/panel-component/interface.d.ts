@@ -1,5 +1,5 @@
 import { BasicNode } from '../../../hooks/node-context/interface';
-export interface Component {
+export interface IComponent {
   name: string;
   id: string;
   component?: boolean;
@@ -7,8 +7,9 @@ export interface Component {
   data?: BasicNode;
 }
 
-export interface ComponentData extends Component {
-  children?: ComponentData[];
+export interface IComponentData extends IComponent {
+  children?: IComponentData[];
   AFold?: boolean;
   dot?: boolean;
+  show?: boolean;
 }

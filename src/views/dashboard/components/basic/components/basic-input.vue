@@ -1,46 +1,52 @@
 <template lang="pug">
-input(class="basic-input" type="input" v-model="inputValue" v-bind="$attrs" @focus="onFocus" @blur="onBlur")
+input(class="basic-input" type="input" v-model="modelValue" v-bind="$attrs" @focus="onFocus" @blur="onBlur")
 </template>
 
 <script setup lang="ts">
-import { ref, watchEffect, watch } from 'vue';
+import { ref, computed } from 'vue';
 
 interface Props {
   modelValue?: string | number;
   dataType?: NumberConstructor | StringConstructor;
+  input?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
   lock: false,
   modelValue: '',
-  dataType: String
+  dataType: String,
+  input: false,
 });
 
 const emit = defineEmits(['focus', 'blur', 'update:modelValue', 'update']);
 
-const inputValue = ref(props.modelValue);
-
 const focus = ref(false);
 
-watch(props, (newValue) => {
-  if (newValue.modelValue !== inputValue.value) {
-    inputValue.value = newValue.modelValue;
-  }
+const modelValue = computed({
+  get() {
+    return props.modelValue;
+  },
+  set(newValue) {
+    let value = newValue;
+    if (props.input) {
+      value = newValue;
+      emit('update:modelValue', value);
+      emit('update', value);
+
+    } else if (focus.value) {
+      if ((value ? String(value).trim() : value) || value === 0) {
+        if (props.dataType === Number) {
+          value = Number(value);
+          isNaN(value) && (value = newValue);
+        } else if (props.dataType === String) {
+          value = value + '';
+        }
+        emit('update:modelValue', value);
+        emit('update', value);
+      }
+    }
+  },
 });
 
-watchEffect(() => {
-  if (!focus.value) return;
-  let value = inputValue.value;
-  if ((value ? String(value).trim() : value) || value === 0) {
-    if (props.dataType === Number) {
-      value = Number(value);
-      isNaN(value) && (value = inputValue.value);
-    } else if (props.dataType === String) {
-      value = value + '';
-    }
-    emit('update:modelValue', value);
-    emit('update', value);
-  }
-});
 
 const onFocus = function (event: Event) {
   focus.value = true;
@@ -49,11 +55,9 @@ const onFocus = function (event: Event) {
 
 const onBlur = function (event: Event) {
   focus.value = false;
-  if (
-    !(inputValue.value ? String(inputValue.value).trim() : inputValue.value) &&
-    inputValue.value !== 0
-  )
-    inputValue.value = props.modelValue;
+  if (!(modelValue.value ? String(modelValue.value).trim() : modelValue.value) && modelValue.value !== 0) {
+    modelValue.value = props.modelValue;
+  }
   emit('blur', event);
 };
 </script>

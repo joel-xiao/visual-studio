@@ -2,11 +2,11 @@
 div(class='editor-panel-component')
   div.component-header
     div.search
-      CInput(icon="icon-sousuo" :focus="false" placeholder="搜索组件...")
+      CInput(icon="icon-sousuo" v-model="keyword" input @update="onUpdateKeyword" :focus="false" placeholder="搜索组件...")
     Icon(button @click="onSwitchType" size="small" :src="currentType.icon" class="icon-btn")
 
   div.component-masters
-    div.master-collapse( v-for="(item, idx) in data" :key="(item.id || '') + idx")
+    div.master-collapse( v-for="(item, idx) in Data" :key="(item.id || '') + idx")
       div(class="master-collapse__title" @click="onArrow(item)")
         div.master-collapse__title__text {{ item.name }}
         Icon(src="icon-shouqi2" class="arrow" :class="{ 'active': item.AFold }")
@@ -17,13 +17,13 @@ div(class='editor-panel-component')
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, provide, withDefaults } from 'vue';
-import type { ComponentData } from './interface';
+import { ref, reactive, provide, withDefaults, computed } from 'vue';
+import type { IComponentData } from './interface';
 import ComponentItem from './component-item.vue';
 import CInput from './../../../../components/basic/c-input/index.vue';
 
 interface Props {
-  data?: ComponentData[];
+  data?: IComponentData[];
   drag?: boolean | undefined | null;
 }
 
@@ -32,13 +32,45 @@ const props = withDefaults(defineProps<Props>(), {
   drag: true
 });
 
+const keyword = ref<string>('');
+const onUpdateKeyword = function (value: string): void {
+  keyword.value = value;
+};
+
+const Data = computed(() => {
+  return showKeyword(props.data, keyword.value);
+});
+
+function showKeyword(data: IComponentData[], keyword: string): IComponentData[] {
+  if (!keyword) {
+    data.forEach((item) => {
+      item.show = undefined;
+      if (Array.isArray(item.children)) {
+        showKeyword(item.children, keyword);
+      }
+    });
+
+  } else {
+    data.forEach((item) => {
+      item.show = item.name.includes(keyword);
+      if (Array.isArray(item.children)) {
+        showKeyword(item.children, keyword);
+        item.show = item.children.some((child) => child.show) || item.show;
+      }
+    });
+  }
+
+  console.log(data);
+  return data;
+}
+
 const emit = defineEmits(['drag-start', 'drag-stop']);
 
-const onArrow = function (item: ComponentData): void {
+const onArrow = function (item: IComponentData): void {
   item.AFold = !item.AFold;
 };
 
-const onDragStart = function (event: DragEvent, item: ComponentData): void {
+const onDragStart = function (event: DragEvent, item: IComponentData): void {
   emit('drag-start', item, event);
 };
 const onDragStop = function (event: DragEvent): void {

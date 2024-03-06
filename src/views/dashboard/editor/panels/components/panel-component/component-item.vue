@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import { inject, withDefaults } from 'vue';
-import type { ComponentData } from './interface';
+import { computed, inject, withDefaults } from 'vue';
+import type { IComponentData } from './interface';
 
 interface Props {
-  data?: ComponentData | { name?: string };
+  data?: IComponentData | { name?: string, children?: IComponentData[]};
   drag: boolean | undefined | null;
 }
 
@@ -14,11 +14,16 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits(['arrow', 'drag-start', 'drag-stop']);
 
-const onArrow = function (item: ComponentData) {
+const Items = computed(() => {
+  const children = props.data.children || [] ;
+  return children.filter((item: IComponentData) => item.show !== false);
+});
+
+const onArrow = function (item: IComponentData) {
   emit('arrow', item);
 };
 
-const onDragStart = function (event: DragEvent, item: ComponentData): void {
+const onDragStart = function (event: DragEvent, item: IComponentData): void {
   emit('drag-start', event, item);
 };
 const onDragStop = function (event: DragEvent): void {
@@ -31,7 +36,7 @@ const onDrag = function (event: DragEvent): void {
 const getType = inject('getType');
 </script>
 <template lang="pug">
-div.component-box__container(v-for="(item, idx) in data.children" v-show="data.component || data.AFold" v-if="Array.isArray(data.children) && data.children.length > 0" :key="(item.id || '') + idx")
+div.component-box__container(v-for="(item, idx) in Items" v-show="data.component || data.AFold" v-if="Array.isArray(data.children) && data.children.length > 0" :key="(item.id || '') + idx")
   template(v-if="data.component")
     div.component-box__swapper(:class="typeof getType === 'function' ? getType() : ''")
       div.component-item__content(

@@ -28,7 +28,7 @@ import type { Tab } from './components/panel-tab-bar/interface';
 import PanelLayer from './components/panel-layer/index.vue';
 import type { LayerItemMenu, LayerItemData } from './components/panel-layer/interface';
 import PanelComponent from './components/panel-component/index.vue';
-import type { ComponentData } from './components/panel-component/interface';
+import type { IComponentData } from './components/panel-component/interface';
 import { ref, reactive } from 'vue';
 import { useDrag } from './../hooks/drag-context';
 import { useComponentContext } from './../hooks/component-context';
@@ -81,7 +81,7 @@ const componentTab = ref<Tab>(componentTabBars[0]);
 const { onDragStart, onDragStop } = useDrag();
 
 const { getUiLibrary } = useComponentContext();
-const componentData = reactive<ComponentData[]>(getUiLibrary());
+const componentData = reactive<IComponentData[]>(getUiLibrary());
 </script>
 
 <style lang="scss">

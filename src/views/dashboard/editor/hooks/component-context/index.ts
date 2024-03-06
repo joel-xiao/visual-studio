@@ -1,7 +1,7 @@
 import { App, readonly, createVNode } from 'vue';
 import { cloneDeep } from 'lodash';
 import { createComponent } from '@hooks/vue-hooks';
-import type { ComponentData } from './../../panels/components/panel-component/interface';
+import type { IComponentData } from './../../panels/components/panel-component/interface';
 import type {
   SchemaExport,
   SchemaKeyTypes,
@@ -79,8 +79,8 @@ export class CreateComponentContext {
     return `/image/dashboard/editor/${icon}`;
   }
 
-  #getComponentSchemas(component_path: string): ComponentData[] {
-    const schemas: ComponentData[] = [];
+  #getComponentSchemas(component_path: string): IComponentData[] {
+    const schemas: IComponentData[] = [];
 
     for (const path of Object.keys(this.componentSchemas).filter(
       (key) => key && key.startsWith(component_path)
@@ -103,8 +103,8 @@ export class CreateComponentContext {
     return schemas;
   }
 
-  #getLibraryComponents(library_path: string): ComponentData[] {
-    const components: ComponentData[] = [];
+  #getLibraryComponents(library_path: string): IComponentData[] {
+    const components: IComponentData[] = [];
 
     for (const path of Object.keys(this.UILibraryComponentUses).filter(
       (key) => key && key.startsWith(library_path)
@@ -123,7 +123,7 @@ export class CreateComponentContext {
     return components;
   }
 
-  getUiLibrary(): ComponentData[] {
+  getUiLibrary(): IComponentData[] {
     this.UILibraryComponentUses = import.meta.glob('./../../ui-library/*/*/use.ts', {
       eager: true
     });
@@ -131,7 +131,7 @@ export class CreateComponentContext {
       eager: true
     });
 
-    const children: ComponentData[] = [];
+    const children: IComponentData[] = [];
     for (const path of Object.keys(this.UILibraryUses)) {
       const library_path = path.substring(0, path.lastIndexOf('/use.ts') + 1);
       const library: UseUILibraryComponent = this.UILibraryUses[path].default;
