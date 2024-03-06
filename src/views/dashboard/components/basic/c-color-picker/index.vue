@@ -27,10 +27,7 @@ const props = withDefaults(defineProps<IProps>(), {
   focus: true
 });
 
-const emit = defineEmits<{
-  (event: 'update:modelValue', value: string | undefined): void;
-  (event: 'update', value: string | undefined): void;
-}>();
+const emit = defineEmits(['update:modelValue', 'update']);
 
 const modelValue = computed({
   get() { return props.modelValue },

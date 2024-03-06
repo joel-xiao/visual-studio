@@ -12,15 +12,13 @@ export default {
 import { ref, computed } from 'vue';
 
 interface IProps {
-  modelValue?: string;
+  modelValue: string;
 }
 const props = withDefaults(defineProps<IProps>(), {
   modelValue: undefined,
 });
 
-const emit = defineEmits<{
-  (event: 'update:modelValue', value: string | undefined): void;
-}>();
+const emit = defineEmits(['update:modelValue']);
 
 const modelValue = computed({
   get() { return props.modelValue },

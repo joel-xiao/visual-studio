@@ -1,8 +1,6 @@
-import type { PanelSchemaLayout } from '../../panels/components/panel-schema/layout/interface';
-
-export type ComponentProp =
-  | PanelSchemaLayout
-  | { [key: string]: number | string | number[] | boolean | undefined };
+// import type { PanelSchemaLayout } from '../../panels/components/panel-schema/layout/interface';
+// | PanelSchemaLayout
+export type ComponentProp = { [key: string]: number | string | number[] | boolean | undefined };
 
 export interface ComponentProps {
   [key: string]: ComponentProp;

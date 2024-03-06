@@ -31,14 +31,15 @@ export function getNodeStyle(node: Node) {
 }
 
 export function getRootStyle(node: Node) {
-  return computed<{ width: string; height: string }>(() => {
+  return computed(() => {
     const style = {
       width: node.width + 'px',
       height: node.height + 'px',
+      'background-color': '',
     };
 
     if (node.props.fill.color) {
-      style['background-color'] = node.props.fill.color;
+      style['background-color'] = node.props.fill.color as string;
     }
 
     return style;
