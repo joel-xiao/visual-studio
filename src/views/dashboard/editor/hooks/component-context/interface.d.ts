@@ -78,7 +78,7 @@ export interface ComponentSchemaExport {
     default: ComponentProp;
   }[];
 
-  category?: {
+  categorySchemas?: {
     name: string;
     icon: string;
     category: string;
