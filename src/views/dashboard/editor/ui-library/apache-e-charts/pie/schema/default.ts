@@ -16,7 +16,7 @@ const schema: ComponentSchemaExport = {
         rotate: 0,
         radius: [0, 0, 0, 0]
       }
-    }
-  ]
+    },
+  ],
 };
 export default schema;

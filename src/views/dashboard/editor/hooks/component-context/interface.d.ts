@@ -71,10 +71,34 @@ export interface ComponentSchemaExport {
   name: string;
   type: string;
   icon: string;
+
   schemas: {
     type: string;
     schema: string;
     default: ComponentProp;
+  }[];
+
+  category?: {
+    name: string;
+    icon: string;
+    category: string;
+
+    schemasTabs?: {
+      name: string;
+      tab: string;
+
+      schemas: {
+        type: string;
+        schema: string;
+        default: ComponentProp;
+      }[];
+    }[];
+
+    schemas?: {
+      type: string;
+      schema: string;
+      default: ComponentProp;
+    }[];
   }[];
 }
 
