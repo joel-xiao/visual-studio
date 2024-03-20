@@ -1,9 +1,9 @@
-import type { SchemaExport } from '../interface';
+import type { ISchemaExport } from '../interface';
 const SCHEMA_NAME = 'COMMON_CONTAINER_FILL';
 const SCHEMA_LABEL = '填充';
 const SCHEMA_KEY = 'fill';
 
-const schema: SchemaExport = {
+const schema: ISchemaExport = {
   name: SCHEMA_NAME,
   label: SCHEMA_LABEL,
   key: SCHEMA_KEY,

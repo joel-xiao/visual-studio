@@ -1,9 +1,9 @@
-import type { SchemaExport } from '../interface';
+import type { ISchemaExport } from '../interface';
 const SCHEMA_NAME = 'COMMON_LAYOUT';
 const SCHEMA_LABEL = '布局';
 const SCHEMA_KEY = 'layout';
 
-const schema: SchemaExport = {
+const schema: ISchemaExport = {
   name: SCHEMA_NAME,
   label: '', // SCHEMA_LABEL,
   key: SCHEMA_KEY,

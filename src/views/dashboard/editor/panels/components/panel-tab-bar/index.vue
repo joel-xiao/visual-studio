@@ -29,10 +29,12 @@ const onSelect = function (tab: Tab): void {
 <style lang="scss">
 .editor-panel-tab_bar {
   height: 100%;
+
   .tab_container {
     display: flex;
     align-items: center;
     height: 100%;
+
     .tab_item {
       height: 100%;
       display: inline-flex;
@@ -48,7 +50,6 @@ const onSelect = function (tab: Tab): void {
       &:hover,
       &.active {
         color: var(--theme-color-text-bold);
-        color: #fff;
         font-weight: 600;
       }
     }

@@ -3,23 +3,24 @@ import { cloneDeep } from 'lodash';
 import { createComponent } from '@hooks/vue-hooks';
 import type { IComponentData } from './../../panels/components/panel-component/interface';
 import type {
-  SchemaExport,
+  ISchemaExport,
   SchemaKeyTypes,
   SchemaPropsTypes,
-  SchemaPropTypes,
-  ComponentSchemaExport,
+  CategorySchemaTypes,
+  IComponentSchemaExportSchemas,
+  IComponentSchemaExport,
   ComponentProp,
-  ComponentProps,
-  UseUILibraryComponent
+  IComponentProps,
+  IUseUILibraryComponent
 } from './interface';
 
 export class CreateComponentContext {
-  UILibraryUses: Record<string, { [key: string]: UseUILibraryComponent }>;
-  UILibraryComponentUses: Record<string, { [key: string]: UseUILibraryComponent }>;
+  UILibraryUses: Record<string, { [key: string]: IUseUILibraryComponent }>;
+  UILibraryComponentUses: Record<string, { [key: string]: IUseUILibraryComponent }>;
 
-  #schemas: { [key: string]: SchemaExport };
-  containerSchemas: Record<string, { [key: string]: ComponentSchemaExport }>;
-  componentSchemas: Record<string, { [key: string]: ComponentSchemaExport }>;
+  #schemas: { [key: string]: ISchemaExport };
+  containerSchemas: Record<string, { [key: string]: IComponentSchemaExport }>;
+  componentSchemas: Record<string, { [key: string]: IComponentSchemaExport }>;
   components: Record<string, { [key: string]: App }>;
   constructor() {
     this.UILibraryUses = {};
@@ -45,7 +46,7 @@ export class CreateComponentContext {
 
   #install() {
     Object.values(
-      import.meta.glob<SchemaExport>(['./../../schema/**/*.ts', '!./../../schema/**/*.d.ts'], {
+      import.meta.glob<ISchemaExport>(['./../../schema/**/*.ts', '!./../../schema/**/*.d.ts'], {
         eager: true,
         import: 'default'
       })
@@ -86,7 +87,7 @@ export class CreateComponentContext {
       (key) => key && key.startsWith(component_path)
     )) {
       const component_path = path.substring(0, path.lastIndexOf('/schema/') + 1);
-      const schema: ComponentSchemaExport = this.componentSchemas[path].default;
+      const schema: IComponentSchemaExport = this.componentSchemas[path].default;
       schemas.push({
         name: schema.name,
         id: schema.type,
@@ -110,7 +111,7 @@ export class CreateComponentContext {
       (key) => key && key.startsWith(library_path)
     )) {
       const component_path = path.substring(0, path.lastIndexOf('/use.ts') + 1);
-      const component: UseUILibraryComponent = this.UILibraryComponentUses[path].default;
+      const component: IUseUILibraryComponent = this.UILibraryComponentUses[path].default;
       components.push({
         dot: true,
         component: true,
@@ -134,7 +135,7 @@ export class CreateComponentContext {
     const children: IComponentData[] = [];
     for (const path of Object.keys(this.UILibraryUses)) {
       const library_path = path.substring(0, path.lastIndexOf('/use.ts') + 1);
-      const library: UseUILibraryComponent = this.UILibraryUses[path].default;
+      const library: IUseUILibraryComponent = this.UILibraryUses[path].default;
       children.push({
         name: library.name,
         id: library.id,
@@ -153,8 +154,8 @@ export class CreateComponentContext {
     ];
   }
 
-  #getSchemas(schema_names?: string | string[]): { [key: string]: SchemaExport } {
-    const schemas: { [key: string]: SchemaExport } = {};
+  #getSchemas(schema_names?: string | string[]): { [key: string]: ISchemaExport } {
+    const schemas: { [key: string]: ISchemaExport } = {};
 
     if (typeof schema_names === 'string') {
       schemas[schema_names] = this.#schemas[schema_names];
@@ -169,25 +170,19 @@ export class CreateComponentContext {
     return schemas;
   }
 
-  #getComponentSchema(schema_path: string): ComponentSchemaExport {
+  #getComponentSchema(schema_path: string): IComponentSchemaExport {
     return (
       this.containerSchemas[schema_path]?.default ||
       this.componentSchemas[schema_path]?.default ||
-      {} as ComponentSchemaExport
+      {} as IComponentSchemaExport
     );
   }
 
-  #getComponentPropsTypes(schema_path: string) {
+  #parseSchema(exportSchemas: IComponentSchemaExportSchemas ) {
     const schemas = this.#getSchemas();
-    const componentSchemas = this.#getComponentSchema(schema_path);
     const propsTypes: SchemaPropsTypes = [];
-
-    if (
-      componentSchemas &&
-      typeof componentSchemas === 'object' &&
-      Array.isArray(componentSchemas.schemas)
-    ) {
-      componentSchemas.schemas
+    if (Array.isArray(exportSchemas)) {
+      exportSchemas
         .filter((schema) => schema && typeof schema === 'object' && !Array.isArray(schema))
         .forEach((component_schema) => {
           const schema = schemas[component_schema.schema];
@@ -195,21 +190,51 @@ export class CreateComponentContext {
             name: schema.name,
             label: schema.label,
             key: schema.key,
-            //@ts-ignore
+            // @ts-ignore
             schema: schema[component_schema.type]
           });
         });
     }
-    return readonly(propsTypes);
+
+    return propsTypes;
+  }
+
+  #getComponentPropsTypes(schema_path: string) {
+    const componentSchemas = this.#getComponentSchema(schema_path);
+    const isSchemaObject =  componentSchemas && typeof componentSchemas === 'object';
+    
+    let propsTypes: SchemaPropsTypes = [];
+    if (isSchemaObject){
+      propsTypes = this.#parseSchema(componentSchemas.schemas);
+    }
+
+    let categorySchemas: CategorySchemaTypes = []
+    if (isSchemaObject){
+      if (Array.isArray(componentSchemas.categorySchemas)) {
+        for (let category of componentSchemas.categorySchemas) {
+          categorySchemas.push({
+            name: category.name,
+            icon: category.icon,
+            category: category.category,
+            propsTypes: this.#parseSchema(category.schemas)
+          });
+        }
+      }
+    }
+    
+    return readonly({
+      propsTypes,
+      categorySchemas,
+    });
   }
   getComponentPropsTypes(schema_path: string) {
     return this.#getComponentPropsTypes(schema_path);
   }
 
-  #getComponentProps(schema_path: string): ComponentProps {
+  #getComponentProps(schema_path: string): IComponentProps {
     const schemas = this.#getSchemas();
     const componentSchemas = this.#getComponentSchema(schema_path);
-    const props: ComponentProps = {};
+    const props: IComponentProps = {};
     if (
       componentSchemas &&
       typeof componentSchemas === 'object' &&
@@ -254,9 +279,11 @@ export class CreateComponentContext {
               Object.keys(schema_data).forEach((key) => {
                 if (!key) {
                   console.warn(
+                    'Schema 1',
                     'Schema Key of Editor is null',
-                    'schema name=' + schema.name,
-                    'component_schema type=' + component_schema.type
+                    'schema name = ' + schema.name,
+                    'component_schema type = ' + component_schema.type,
+                    schema_data
                   );
                   return;
                 }
@@ -276,9 +303,11 @@ export class CreateComponentContext {
                   r_arr.forEach((item) => {
                     if (!item.key) {
                       console.warn(
+                        'Schema 2',
                         'Schema Key of Editor is null',
-                        'schema name=' + schema.name,
-                        'component_schema type=' + component_schema.type
+                        'schema name = ' + schema.name,
+                        'component_schema type = ' + component_schema.type,
+                        item
                       );
                       return;
                     }
@@ -308,8 +337,8 @@ export class CreateComponentContext {
   // formatter component prop is schema prop type
   formatterComponentProp(
     schema: SchemaKeyTypes,
-    opts: { key: string; value: string | number | boolean | undefined | null; unit?: string }
-  ): string | number | boolean | undefined | null {
+    opts: { key: string; value: number | string | boolean | undefined | number[]; unit?: string }
+  ): number | string | boolean | undefined | number[] {
     let value = opts.value;
 
     const is_array_schema = schema && Array.isArray(schema);
@@ -339,18 +368,18 @@ export class CreateComponentContext {
     return this.components[component_path];
   }
 
-  createNodeComponent(props: ComponentProps | ComponentProps, component: string) {
+  createNodeComponent(props: IComponentProps, component: string) {
     return createVNode(this.#getComponent(component), {
       data: props
     });
   }
 
   createNodeComponentApp(
-    props: ComponentProps | ComponentProps,
+    props: IComponentProps | IComponentProps,
     parentEl: HTMLElement | undefined,
     component: string
   ): App {
-    return createComponent<{ data: ComponentProps }>(
+    return createComponent<{ data: IComponentProps }>(
       'component',
       parentEl,
       this.#getComponent(component),

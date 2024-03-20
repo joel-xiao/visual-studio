@@ -1,6 +1,6 @@
-import type { ComponentSchemaExport } from '../../../interface';
+import type { IComponentSchemaExport } from '../../../interface';
 
-const schema: ComponentSchemaExport = {
+const schema: IComponentSchemaExport = {
   name: '基础 K 线图',
   type: 'APACHE_ECHARTS_CANDLESTICK_SIMPLE',
   icon: 'ui-library/apache-e-charts/candlestick-simple.png',

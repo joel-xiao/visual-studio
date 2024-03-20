@@ -12,7 +12,7 @@ import { useNodeContext } from './../hooks/node-context';
 import type { Node } from './../hooks/node-context/interface';
 import { getNodeStyle } from './../hooks/node-context/example';
 import { useComponentContext } from './../hooks/component-context';
-import type { ComponentProps } from './../hooks/component-context/interface';
+import type { IComponentProps } from './../hooks/component-context/interface';
 import { useContainer } from '../hooks/container';
 
 interface Props {
@@ -77,7 +77,7 @@ const onResizing = function (dragDataset: DragDataset): void {
 const { createNodeComponentApp } = useComponentContext();
 const vm = ref<HTMLElement>();
 onMounted(() => {
-  createNodeComponentApp(node.props as ComponentProps, vm?.value, node.component);
+  createNodeComponentApp(node.props as IComponentProps, vm?.value, node.component);
 });
 </script>
 

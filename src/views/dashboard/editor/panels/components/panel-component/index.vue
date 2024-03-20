@@ -60,7 +60,6 @@ function showKeyword(data: IComponentData[], keyword: string): IComponentData[] 
     });
   }
 
-  console.log(data);
   return data;
 }
 
@@ -98,11 +97,13 @@ provide('getType', getCurrentType);
   position: relative;
   box-sizing: border-box;
   height: 100%;
+
   .component-header {
     padding: 6px 6px 6px 12px;
     height: 48px;
     display: flex;
     align-items: center;
+
     .search {
       width: 100%;
       padding-right: 6px;
@@ -113,6 +114,7 @@ provide('getType', getCurrentType);
         border-radius: var(--border-radius-6);
       }
     }
+
     .icon-btn {
       flex: none;
     }
@@ -152,6 +154,7 @@ provide('getType', getCurrentType);
           opacity: 0.6;
           transform: scale(0.9);
           transition: transform 0.1s;
+
           &.active {
             transform: scale(0.9) rotate(90deg);
           }

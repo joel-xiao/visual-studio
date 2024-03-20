@@ -1,6 +1,6 @@
-import type { ComponentSchemaExport } from '../../../interface';
+import type { IComponentSchemaExport } from '../../../interface';
 
-const schema: ComponentSchemaExport = {
+const schema: IComponentSchemaExport = {
   name: '基础雷达图',
   type: 'APACHE_ECHARTS_RADAR_SIMPLE',
   icon: 'ui-library/apache-e-charts/radar-simple.png',

@@ -1,6 +1,6 @@
-import type { ComponentSchemaExport } from '../../../interface';
+import type { IComponentSchemaExport } from '../../../interface';
 
-const schema: ComponentSchemaExport = {
+const schema: IComponentSchemaExport = {
   name: '基础折线图',
   type: 'APACHE_ECHARTS_LINE_SIMPLE',
   icon: 'ui-library/apache-e-charts/line-simple.png',

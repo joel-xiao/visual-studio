@@ -1,5 +1,5 @@
 import type { LayerItemData } from './../../panels/components/panel-layer/interface';
-import type { ComponentProps } from './../component-context/interface';
+import type { IComponentProps } from './../component-context/interface';
 
 export interface PointerPos {
   x: number;
@@ -18,7 +18,7 @@ export interface AddNode extends BasicNode {
   icon: string;
   component: string;
   schema: string;
-  props: ComponentProps;
+  props: IComponentProps;
 }
 
 export interface Node extends AddNode {

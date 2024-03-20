@@ -1,9 +1,9 @@
 import {
-  UseUILibraryComponent,
-  ComponentSchemaExport as _ComponentSchemaExport,
-  ComponentProps as _ComponentProps
+  IUseUILibraryComponent,
+  IComponentSchemaExport as _ComponentSchemaExport,
+  IComponentProps as _ComponentProps
 } from './../hooks/component-context/interface';
 
-export type UseComponent = UseUILibraryComponent;
-export type ComponentSchemaExport = _ComponentSchemaExport;
-export type ComponentProps = _ComponentProps;
+export type UseComponent = IUseUILibraryComponent;
+export type IComponentSchemaExport = _ComponentSchemaExport;
+export type IComponentProps = _ComponentProps;

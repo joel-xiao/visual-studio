@@ -2,11 +2,11 @@
 // | PanelSchemaLayout
 export type ComponentProp = { [key: string]: number | string | number[] | boolean | undefined };
 
-export interface ComponentProps {
+export interface IComponentProps {
   [key: string]: ComponentProp;
 }
 
-interface defaultSchemaKeyData {
+interface IDefaultSchemaKeyData {
   key?: string;
   label?: string;
   icon?: string;
@@ -17,66 +17,85 @@ interface defaultSchemaKeyData {
   change?: (props: ComponentProp) => void;
 }
 
-interface SchemaKeyNumberData extends defaultSchemaKeyData {
+interface ISchemaKeyNumberData extends IDefaultSchemaKeyData {
   type: NumberConstructor;
   default: number;
 }
 
-interface SchemaKeyStringData extends defaultSchemaKeyData {
+interface ISchemaKeyStringData extends IDefaultSchemaKeyData {
   type: StringConstructor;
   default: string;
 }
 
-interface SchemaKeyBooleanData extends defaultSchemaKeyData {
+interface ISchemaKeyBooleanData extends IDefaultSchemaKeyData {
   type: BooleanConstructor;
   default: boolean;
 }
 
-interface SchemaArrayData extends defaultSchemaKeyData {
+interface ISchemaArrayData extends IDefaultSchemaKeyData {
   type: ArrayConstructor;
   icon?: string | string[];
   default: number[];
 }
 
-interface SchemaFunctionData extends defaultSchemaKeyData {
+interface ISchemaFunctionData extends IDefaultSchemaKeyData {
   type: FunctionConstructor;
   default: () => void;
 }
 
 export type SchemaKeyType =
-  | SchemaKeyNumberData
-  | SchemaKeyStringData
-  | SchemaKeyBooleanData
-  | SchemaArrayData;
+  | ISchemaKeyNumberData
+  | ISchemaKeyStringData
+  | ISchemaKeyBooleanData
+  | ISchemaArrayData;
 
 export type SchemaKeyTypes = { [key: string]: SchemaKeyType } | SchemaKeyType[][];
 
-export interface SchemaExportDefault {
+export interface ISchemaExportDefault {
   name: string;
   label: string;
   key: string;
 }
-export interface SchemaExport extends SchemaExportDefault {
+export interface ISchemaExport extends ISchemaExportDefault {
   schema: SchemaKeyTypes;
 }
 
-export type SchemaKeysTypes = SchemaExport[];
+export type SchemaKeysTypes = ISchemaExport[];
 
-export interface SchemaPropTypes extends SchemaExportDefault {
+export interface ISchemaPropTypes extends ISchemaExportDefault {
   schema: SchemaKeyTypes;
 }
-export type SchemaPropsTypes = SchemaPropTypes[];
+export type SchemaPropsTypes = ISchemaPropTypes[];
 
-export interface ComponentSchemaExport {
+export type CategorySchemaTypes = {
+  name: string;
+  icon: string;
+  category: string;
+  propsTypes: SchemaPropsTypes,
+}[];
+
+export type ComponentPropsTypes = {
+  propsTypes: SchemaTypes,
+  CategorySchemasTypes: CategorySchemaTypes,
+}
+
+export interface IComponentSchemaExportSchemas  {
+  type: string;
+  schema: string;
+  default: ComponentProp;
+}[];
+
+export interface ICategorySchemas {
+  name: string;
+  icon: string;
+  category: string;
+};
+
+export interface IComponentSchemaExport {
   name: string;
   type: string;
   icon: string;
-
-  schemas: {
-    type: string;
-    schema: string;
-    default: ComponentProp;
-  }[];
+  schemas: IComponentSchemaExportSchemas;
 
   categorySchemas?: {
     name: string;
@@ -87,22 +106,14 @@ export interface ComponentSchemaExport {
       name: string;
       tab: string;
 
-      schemas: {
-        type: string;
-        schema: string;
-        default: ComponentProp;
-      }[];
+      schemas: IComponentSchemaExportSchemas;
     }[];
 
-    schemas?: {
-      type: string;
-      schema: string;
-      default: ComponentProp;
-    }[];
+    schemas: IComponentSchemaExportSchemas;
   }[];
 }
 
-export interface UseUILibraryComponent {
+export interface IUseUILibraryComponent {
   name: string;
   id: string;
 }
