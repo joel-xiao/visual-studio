@@ -7,7 +7,7 @@ import type {
   SchemaKeyTypes,
   SchemaPropsTypes,
   CategorySchemaTypes,
-  IComponentSchemaExportSchemas,
+  ComponentSchemaExportSchemas,
   IComponentSchemaExport,
   ComponentProp,
   IComponentProps,
@@ -178,7 +178,7 @@ export class CreateComponentContext {
     );
   }
 
-  #parseSchema(exportSchemas: IComponentSchemaExportSchemas ) {
+  #parseSchema(exportSchemas: ComponentSchemaExportSchemas ) {
     const schemas = this.#getSchemas();
     const propsTypes: SchemaPropsTypes = [];
     if (Array.isArray(exportSchemas)) {

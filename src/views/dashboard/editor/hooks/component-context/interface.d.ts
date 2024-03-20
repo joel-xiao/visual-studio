@@ -79,23 +79,17 @@ export type ComponentPropsTypes = {
   CategorySchemasTypes: CategorySchemaTypes,
 }
 
-export interface IComponentSchemaExportSchemas  {
+export type  ComponentSchemaExportSchemas =   {
   type: string;
   schema: string;
   default: ComponentProp;
 }[];
 
-export interface ICategorySchemas {
-  name: string;
-  icon: string;
-  category: string;
-};
-
 export interface IComponentSchemaExport {
   name: string;
   type: string;
   icon: string;
-  schemas: IComponentSchemaExportSchemas;
+  schemas: ComponentSchemaExportSchemas;
 
   categorySchemas?: {
     name: string;
@@ -106,10 +100,10 @@ export interface IComponentSchemaExport {
       name: string;
       tab: string;
 
-      schemas: IComponentSchemaExportSchemas;
+      schemas: ComponentSchemaExportSchemas;
     }[];
 
-    schemas: IComponentSchemaExportSchemas;
+    schemas: ComponentSchemaExportSchemas;
   }[];
 }
 
