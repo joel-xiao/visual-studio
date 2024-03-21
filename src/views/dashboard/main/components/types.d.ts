@@ -1,6 +1,6 @@
 import type {
-  TreeItemMenu as _ITreeItemMenu,
-  TreeItemData as _TreeItemData
+  ITreeItemMenu as _ITreeItemMenu,
+  ITreeItemData as _TreeItemData
 } from '@/components/nav-tree/interface';
 
 export type ITreeItemMenu = _ITreeItemMenu;
@@ -19,8 +19,8 @@ export interface ILayoutNewProjectData {
 }
 
 export interface ILayoutOption {
-  folderTree?: TreeItemData[];
-  folderMenus?: TreeItemMenu[];
+  folderTree?: ITreeItemData[];
+  folderMenus?: ITreeItemMenu[];
   buttons?: newProjectData[];
 }
 

@@ -91,7 +91,7 @@ div(class='editor-panel-layer')
     :data="tree"
     :itemIcon="itemIcon"
     :itemMenus="itemMenus")
-  ClickMenu(
+  ICClickMenu(
     v-model='clickMenu.show'
     :data="commandData?.cmd?.children || []"
     :x="clickMenu.x"

@@ -76,6 +76,7 @@ const onShare = function (): void {
 
       .share-btn {
         margin: 0 6px;
+
         .share-btn-icon {
           margin-right: 4px;
         }
@@ -84,6 +85,7 @@ const onShare = function (): void {
 
     .nav-panel-left {
       float: left;
+
       .mas-button-icon {
         display: flex;
         justify-content: center;
@@ -97,6 +99,7 @@ const onShare = function (): void {
 
     .nav-panel-right {
       justify-content: flex-end;
+
       .preview-button-icon {
         height: 30px;
         width: 30px;
