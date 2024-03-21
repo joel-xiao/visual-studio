@@ -3,7 +3,6 @@ import MainLayout from './components/main-layout.vue';
 import ItemCard from './components/item-card.vue';
 import { ref, reactive, markRaw, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import type { LayoutCreateProject, ILayoutProject } from './components/types';
 import { useDashboardStore } from '@/store/dashboard';
 import visual from '@s/visual/visual';
 import type { IVisualProjectsResponse } from '@s/visual/types';
@@ -54,12 +53,12 @@ function initLayout() {
 }
 
 let { saveCrumbs } = useDashboardStore();
-function onButtonClick(opt: LayoutCreateProject) {
+function onButtonClick(opt: DbLayoutCreateProject) {
   saveCrumbs(opt.folder?.cascades);
   router.push('/dashboard/editor');
 }
 
-const projects = ref<ILayoutProject[]>([]);
+const projects = ref<IDbLayoutProject[]>([]);
 </script>
 
 <template lang="pug">

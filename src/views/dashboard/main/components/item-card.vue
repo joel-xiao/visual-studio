@@ -10,10 +10,9 @@ div(class="item-card")
 </template>
 <script lang="ts" setup>
 import { ref, reactive, withDefaults } from 'vue';
-import type { IItemCard } from './types.d';
 
 interface Props {
-  data: IItemCard;
+  data: IDbItemCard;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -32,8 +31,10 @@ const props = withDefaults(defineProps<Props>(), {
       overflow: hidden;
       padding: 6px;
       transition: 0.2s;
+
       &:hover {
         background: var(--db-main-color-card-bg);
+
         .item-card-cover_mask {
           border: 1px solid var(--theme-color-border);
         }
@@ -46,6 +47,7 @@ const props = withDefaults(defineProps<Props>(), {
         margin: 0 auto;
         width: 100%;
         height: 180px;
+
         .item-card-cover_mask {
           border-radius: var(--border-radius-4);
           overflow: hidden;
@@ -55,6 +57,7 @@ const props = withDefaults(defineProps<Props>(), {
           display: flex;
           justify-content: center;
           align-items: center;
+
           img {
             user-select: none;
           }
