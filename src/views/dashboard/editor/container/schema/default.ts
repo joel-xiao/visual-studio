@@ -1,5 +1,3 @@
-import type { IComponentSchemaExport } from './../../hooks/component-context/interface';
-
 const schema: IComponentSchemaExport = {
   name: '根容器',
   type: 'CANVAS_CONTAINER',

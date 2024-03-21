@@ -1,5 +1,3 @@
-import type { IComponentSchemaExport } from '../../../interface';
-
 const schema: IComponentSchemaExport = {
   name: '图片',
   type: 'CONTROLS_PICTURE',

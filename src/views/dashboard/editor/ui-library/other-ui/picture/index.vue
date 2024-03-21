@@ -3,7 +3,6 @@ img( class="controls_picture" src="https://picsum.photos/seed/picsum/300" alt="p
 </template>
 
 <script setup lang="ts">
-import type { IComponentProps } from './../../interface';
 interface Props {
   data: IComponentProps;
 }

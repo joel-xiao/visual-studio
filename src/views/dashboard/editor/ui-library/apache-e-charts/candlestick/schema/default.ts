@@ -1,5 +1,3 @@
-import type { IComponentSchemaExport } from '../../../interface';
-
 const schema: IComponentSchemaExport = {
   name: '基础 K 线图',
   type: 'APACHE_ECHARTS_CANDLESTICK_SIMPLE',

@@ -13,7 +13,6 @@ export default {
 import PropsLayout from './components/props-layout.vue';
 import PropsItem from './components/props-item.vue';
 import PropsCtrl from './components/props-ctrl.vue';
-import type { ComponentProp, ISchemaPropTypes, SchemaKeyType } from './interface';
 import { computed } from 'vue';
 
 interface Props {

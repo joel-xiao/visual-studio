@@ -1,6 +1,4 @@
-import { UseComponent } from '../../interface';
-
-const use: UseComponent = {
+const use: IUseUILibraryComponent = {
   name: '散点图',
   id: 'apache-e-charts-scatter'
 };

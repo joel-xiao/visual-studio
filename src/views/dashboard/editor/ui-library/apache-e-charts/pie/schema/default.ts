@@ -1,5 +1,3 @@
-import type { IComponentSchemaExport } from '../../../interface';
-
 const schema: IComponentSchemaExport = {
   name: '基础饼图',
   type: 'APACHE_ECHARTS_PIE_SIMPLE',

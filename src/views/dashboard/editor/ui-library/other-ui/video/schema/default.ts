@@ -1,5 +1,3 @@
-import type { IComponentSchemaExport } from '../../../interface';
-
 const schema: IComponentSchemaExport = {
   name: '视频',
   type: 'CONTROLS_VIDEO',

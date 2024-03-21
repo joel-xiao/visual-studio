@@ -1,6 +1,4 @@
-import { UseComponent } from '../../interface';
-
-const use: UseComponent = {
+const use: IUseUILibraryComponent = {
   name: '柱状图',
   id: 'apache-e-charts-bar'
 };

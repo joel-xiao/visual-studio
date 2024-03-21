@@ -20,8 +20,6 @@ import { cloneDeep } from 'lodash';
 import PropsWarp from './props-warp.vue';
 import Layout from './layout/index.vue';
 import Tabs from './tabs/index.vue';
-
-import type { SchemaKeyTypes } from './interface';
 import { useComponentContext } from '../../../hooks/component-context';
 import { useNodeContext } from './../../../hooks/node-context';
 

@@ -1,6 +1,4 @@
-import { UseComponent } from '../../interface';
-
-const use: UseComponent = {
+const use: IUseUILibraryComponent = {
   name: 'K 线图',
   id: 'apache-e-charts-candlestick'
 };

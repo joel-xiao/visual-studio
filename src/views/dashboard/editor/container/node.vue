@@ -11,7 +11,6 @@ import { useNodeContext } from './../hooks/node-context';
 import type { Node } from './../hooks/node-context/interface';
 import { getNodeStyle } from './../hooks/node-context/example';
 import { useComponentContext } from './../hooks/component-context';
-import type { IComponentProps } from './../hooks/component-context/interface';
 import { useContainer } from '../hooks/container';
 
 interface Props {

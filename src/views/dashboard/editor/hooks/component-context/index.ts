@@ -2,17 +2,6 @@ import { App, readonly, createVNode } from 'vue';
 import { cloneDeep } from 'lodash';
 import { createComponent } from '@hooks/vue-hooks';
 import type { IComponentData } from './../../panels/components/panel-component/interface';
-import type {
-  ISchemaExport,
-  SchemaKeyTypes,
-  SchemaPropsTypes,
-  CategorySchemaTypes,
-  ComponentSchemaExportSchemas,
-  IComponentSchemaExport,
-  ComponentProp,
-  IComponentProps,
-  IUseUILibraryComponent
-} from './interface';
 
 export class CreateComponentContext {
   UILibraryUses: Record<string, { [key: string]: IUseUILibraryComponent }>;

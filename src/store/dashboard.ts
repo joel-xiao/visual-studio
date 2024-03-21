@@ -1,10 +1,5 @@
 import { defineStore } from 'pinia';
 
-declare interface IDashboardCrumb {
-  id?: string;
-  name?: string;
-}
-
 type DashboardState = {
   crumbs: IDashboardCrumb[];
 };

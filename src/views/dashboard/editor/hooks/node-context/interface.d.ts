@@ -1,5 +1,4 @@
 import type { LayerItemData } from './../../panels/components/panel-layer/interface';
-import type { IComponentProps } from './../component-context/interface';
 
 export interface PointerPos {
   x: number;

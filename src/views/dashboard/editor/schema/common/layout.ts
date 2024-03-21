@@ -1,4 +1,3 @@
-import type { ISchemaExport } from '../interface';
 const SCHEMA_NAME = 'COMMON_LAYOUT';
 const SCHEMA_LABEL = '布局';
 const SCHEMA_KEY = 'layout';
