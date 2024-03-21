@@ -1,18 +1,18 @@
-import type { LayerItemData } from './../../panels/components/panel-layer/interface';
+// import type { LayerItemData } from './../panels/components/panel-layer/interface';
 
-export interface PointerPos {
+declare interface INodePointerPos {
   x: number;
   y: number;
 }
 
-export interface BasicNode {
+declare interface IBasicNode {
   name: string;
   icon: string;
   component: string;
   schema: string;
 }
 
-export interface AddNode extends BasicNode {
+declare interface IAddNode extends IBasicNode {
   name: string;
   icon: string;
   component: string;
@@ -20,7 +20,7 @@ export interface AddNode extends BasicNode {
   props: IComponentProps;
 }
 
-export interface Node extends AddNode {
+declare interface INode extends IAddNode {
   container: string;
   id: string;
   type: string;
@@ -34,7 +34,7 @@ export interface Node extends AddNode {
   z: number;
 }
 
-export interface NodeDelta {
+declare interface INodeDelta {
   name?: string;
   id?: string;
   width?: number;
@@ -43,15 +43,15 @@ export interface NodeDelta {
   y?: number;
 }
 
-export interface EditorData {
+declare interface IEditorData {
   folder?: string;
   name: string;
   id: string;
   type: string;
-  nodes: Node[];
+  nodes: INode[];
 }
 
-interface TreeNodeData {
+interface ITreeNodeData {
   container?: string | undefined | null;
   id: string;
   name: string;
@@ -60,9 +60,9 @@ interface TreeNodeData {
   type: string;
 }
 
-export type TreeNode = LayerItemData;
+declare type TreeNode = LayerItemData;
 
-export interface NodeInstance {
+declare interface INodeInstance {
   setActive: (val: boolean) => void;
   updatePos: () => void;
 }

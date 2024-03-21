@@ -1,7 +1,6 @@
 import { computed } from 'vue';
-import { Node } from './interface';
 
-export function getNodeStyle(node: Node) {
+export function getNodeStyle(node: INode) {
   return computed<{
     'border-top-left-radius': string;
     'border-top-right-radius': string;
@@ -30,7 +29,7 @@ export function getNodeStyle(node: Node) {
   });
 }
 
-export function getRootStyle(node: Node) {
+export function getRootStyle(node: INode) {
   return computed(() => {
     const style = {
       width: node.width + 'px',

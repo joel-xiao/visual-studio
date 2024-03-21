@@ -21,7 +21,6 @@ import ContainerNode from './node.vue';
 import { ref, nextTick, onMounted, onBeforeUnmount } from 'vue';
 import { useDrag } from './../hooks/drag-context';
 import { useNodeContext } from './../hooks/node-context';
-import type { Node } from './../hooks/node-context/interface';
 import { getRootStyle } from './../hooks/node-context/example';
 import { useComponentContext } from './../hooks/component-context';
 import { useBindKeysContext } from './../hooks/bind-keys-context';
@@ -35,7 +34,7 @@ import { removeContainer, useContainer } from '../hooks/container';
 const { getRoot, getNodes, onSelectNode, onAddNode } = useNodeContext();
 const nodes = getNodes();
 const root = getRoot();
-const rootStyle = getRootStyle(root as Node);
+const rootStyle = getRootStyle(root as INode);
 
 const onDown = function (): void {
   onSelectNode(root.id);
@@ -112,10 +111,12 @@ const onDrop = function (event: DragEvent): void {
     right: var(--db-editor-right-menu-width);
     bottom: 0px;
     background-color: var(--db-editor-color-canvas-bg);
+
     .editor-container-root {
       position: absolute;
       background-color: var(--db-editor-color-root-bg);
     }
+
     .editor-container-root-mask {
       position: absolute;
       left: 0;
@@ -123,6 +124,7 @@ const onDrop = function (event: DragEvent): void {
       bottom: 0;
       top: 0;
       cursor: grab;
+
       &.down {
         cursor: grabbing;
       }

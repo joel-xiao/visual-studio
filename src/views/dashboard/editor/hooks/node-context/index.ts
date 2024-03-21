@@ -1,24 +1,15 @@
 import { watch, computed, readonly, reactive, Ref, ref, ComputedRef, App } from 'vue';
 import { getUuid } from '@a/utils/index';
-import type {
-  EditorData,
-  PointerPos,
-  Node,
-  AddNode,
-  NodeDelta,
-  TreeNode,
-  NodeInstance
-} from './interface';
 
 class CreateNodeContext {
-  #data?: EditorData;
-  #nodes: ComputedRef<Node[]> | [] = [];
-  #selectedNodes: ComputedRef<Node[]> | [] = [];
-  #currentNode: Ref<Node> = ref({} as Node);
+  #data?: IEditorData;
+  #nodes: ComputedRef<INode[]> | [] = [];
+  #selectedNodes: ComputedRef<INode[]> | [] = [];
+  #currentNode: Ref<INode> = ref({} as INode);
   #nodesTreeSource: TreeNode[] = [];
   #nodesTree: ComputedRef<TreeNode[]> | [] = [];
   #nodeInstances?: {
-    [nodeId: string]: NodeInstance;
+    [nodeId: string]: INodeInstance;
   } = {};
   #nodeComponentInstances?: {
     [nodeId: string]: App | undefined;
@@ -71,7 +62,7 @@ class CreateNodeContext {
     });
   }
 
-  #addTreeNode(node: Node) {
+  #addTreeNode(node: INode) {
     this.#nodesTreeSource.push({
       parentId: node.container,
       icon: node.icon,
@@ -90,7 +81,7 @@ class CreateNodeContext {
 
   #createNodes() {
     this.#nodes = this.#data
-      ? computed<Node[]>(() =>
+      ? computed<INode[]>(() =>
           this.#data ? this.#data.nodes.filter((node) => node.id !== 'root') : []
         )
       : [];
@@ -107,13 +98,13 @@ class CreateNodeContext {
   }
 
   #createSelectedNodes() {
-    this.#selectedNodes = computed<Node[]>(() =>
+    this.#selectedNodes = computed<INode[]>(() =>
       this.#data ? this.#data.nodes.filter((node) => node.select) : []
     );
 
     watch(this.#selectedNodes, (newVal) => {
       if (newVal.length <= 1) {
-        this.#currentNode.value = newVal[0] || ({} as Node);
+        this.#currentNode.value = newVal[0] || ({} as INode);
       }
     });
   }
@@ -127,8 +118,8 @@ class CreateNodeContext {
   }
 
   getRoot() {
-    const node: Node | undefined = this.#data?.nodes.find((node) => node.id === 'root');
-    return readonly(node ? node : ({} as Node));
+    const node: INode | undefined = this.#data?.nodes.find((node) => node.id === 'root');
+    return readonly(node ? node : ({} as INode));
   }
 
   getRootStyle() {
@@ -142,8 +133,8 @@ class CreateNodeContext {
   }
 
   getNode(id: string) {
-    const node: Node | undefined = this.#data?.nodes.find((node) => node.id === id);
-    return readonly(node ? node : ({} as Node));
+    const node: INode | undefined = this.#data?.nodes.find((node) => node.id === id);
+    return readonly(node ? node : ({} as INode));
   }
 
   /**
@@ -151,7 +142,7 @@ class CreateNodeContext {
    *  change_type: update_node_props | ''
    * }
    * **/
-  updateNode(id: string, delta: NodeDelta, change_type = ''): void {
+  updateNode(id: string, delta: INodeDelta, change_type = ''): void {
     const node = this.#data?.nodes.find((node) => node.id === id);
     if (node && delta) {
       Object.keys(delta).forEach((key: string): void => {
@@ -161,7 +152,7 @@ class CreateNodeContext {
 
       this.#nodeInstances?.[node.id]?.updatePos?.();
 
-      // Node binds to  Pros Layout
+      // INode binds to  Pros Layout
       if (change_type !== 'update_node_props') {
         this.updateNodeProps(node.id, undefined, 'update_node');
       }
@@ -184,7 +175,7 @@ class CreateNodeContext {
     const node = this.#data?.nodes.find((node) => node.id === id);
     if (!node) return;
 
-    // Pros Layout binds to  Node
+    // Pros Layout binds to  INode
     if (!opts) {
       switch (change_type) {
         case 'update_node':
@@ -227,7 +218,7 @@ class CreateNodeContext {
             //@ts-ignore
             data[k] = value;
 
-            //  Pros Layout binds to  Node
+            //  Pros Layout binds to  INode
             if (change_type !== 'update_node') {
               const keys = [
                 'layout.x',
@@ -249,9 +240,9 @@ class CreateNodeContext {
     }
   }
 
-  #onAddNode(addNode: AddNode, container: string, pos: PointerPos) {
+  #onAddNode(addNode: IAddNode, container: string, pos: INodePointerPos) {
     if (addNode instanceof Object) {
-      const node: Node = {
+      const node: INode = {
         container: container,
         id: getUuid(),
         name: addNode.name,
@@ -282,9 +273,9 @@ class CreateNodeContext {
     }
   }
 
-  onAddNode(nodes: AddNode[] | AddNode, container: string, pos: PointerPos) {
+  onAddNode(nodes: IAddNode[] | IAddNode, container: string, pos: INodePointerPos) {
     if (Array.isArray(nodes)) {
-      nodes.forEach((node: AddNode) => {
+      nodes.forEach((node: IAddNode) => {
         this.#onAddNode(node, container, pos);
       });
     } else if (nodes instanceof Object) {
@@ -302,16 +293,16 @@ class CreateNodeContext {
       this.#nodeInstances?.[node.id]?.setActive?.(node.select);
     });
 
-    this.#nodesTreeSource.forEach((TreeNode) => {
-      if (id === TreeNode?.data?.id) {
-        TreeNode.select = true;
+    this.#nodesTreeSource.forEach((treeNode) => {
+      if (id === treeNode?.data?.id) {
+        treeNode.select = true;
       } else {
-        TreeNode.select = false;
+        treeNode.select = false;
       }
     });
   }
 
-  addNodeInstance(nodeId: string, addNodeInstance: NodeInstance): void {
+  addNodeInstance(nodeId: string, addNodeInstance: INodeInstance): void {
     this.#nodeInstances && (this.#nodeInstances[nodeId] = addNodeInstance);
   }
 
@@ -319,18 +310,18 @@ class CreateNodeContext {
     this.#nodeInstances && delete this.#nodeInstances[nodeId];
   }
 
-  addNodeNodeComponent(node: Node, component: App): void {
+  addNodeNodeComponent(node: INode, component: App): void {
     this.#nodeComponentInstances && (this.#nodeComponentInstances[node.id] = component);
   }
 
-  deleteNodeComponent(node: Node): void {
+  deleteNodeComponent(node: INode): void {
     if (this.#nodeComponentInstances) {
       this.#nodeComponentInstances[node.id]?.unmount();
       delete this.#nodeComponentInstances[node.id];
     }
   }
 
-  install(data: EditorData): void {
+  install(data: IEditorData): void {
     this.#data = data;
     this.#createNodes();
     this.#createSelectedNodes();

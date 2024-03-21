@@ -1,10 +1,9 @@
-import { BasicNode } from '../../../hooks/node-context/interface';
 export interface IComponent {
   name: string;
   id: string;
   component?: boolean;
   icon?: string;
-  data?: BasicNode;
+  data?: IBasicNode;
 }
 
 export interface IComponentData extends IComponent {
