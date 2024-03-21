@@ -28,7 +28,15 @@ import PropsItem from './../components/props-item.vue';
 import Input from './../../../../../components/basic/c-input/index.vue';
 import Button from './../../../../../components/basic/c-button/index.vue';
 import Radius from './../components/input-group/index.vue';
-import type { PanelSchemaLayout } from './interface';
+
+type PanelSchemaLayout = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  rotate: number;
+  radius: number[];
+};
 
 interface Props {
   modelValue?: PanelSchemaLayout;

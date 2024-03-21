@@ -25,10 +25,9 @@ export default {
 import { reactive, nextTick } from 'vue';
 import Input from './../../../../../../components/basic/c-input/index.vue';
 import Button from './../../../../../../components/basic/c-button/index.vue';
-import type { PanelSchemaRadius } from './interface';
 
 interface Props {
-  modelValue: PanelSchemaRadius;
+  modelValue: number[];
   icon: string | string[];
 }
 const props = withDefaults(defineProps<Props>(), {
@@ -66,7 +65,7 @@ function onUpdate() {
   grid-template-columns: 1fr 30px;
   grid-gap: 6px;
 
-  & > .schema-input-group__options {
+  &>.schema-input-group__options {
     display: grid;
     width: 100%;
     grid-template-columns: 1fr 1fr;
@@ -74,7 +73,7 @@ function onUpdate() {
     grid-gap: 6px;
   }
 
-  & > .schema-input-group__button-switch {
+  &>.schema-input-group__button-switch {
     display: grid;
     grid-template-rows: auto;
     grid-template-columns: auto;
