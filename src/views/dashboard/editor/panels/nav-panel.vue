@@ -21,12 +21,11 @@ import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useDashboardStore } from '@/store/dashboard';
-import type { Crumb } from '@/store/dashboard';
 let router = useRouter();
 
 let { crumbs } = storeToRefs(useDashboardStore());
 
-const onCrumbClick = function (crumb: Crumb, idx: number): void {
+const onCrumbClick = function (crumb: IDashboardCrumb, idx: number): void {
   if (idx === 0) {
     router.push('/');
   }
