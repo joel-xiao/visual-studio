@@ -7,7 +7,6 @@ DragResize(ref="resize" :data="dragDataset" @resizing="onResizing" @mousedown.st
 <script setup lang="ts">
 import DragResize from './components/drag-resize.vue';
 import { ref, reactive, markRaw, readonly, withDefaults, watch, onMounted } from 'vue';
-import type { DragDataset } from '@d/drag-resize/interface';
 import { useNodeContext } from './../hooks/node-context';
 import type { Node } from './../hooks/node-context/interface';
 import { getNodeStyle } from './../hooks/node-context/example';
@@ -28,7 +27,7 @@ const nodeStyle = getNodeStyle(node);
 
 const { getScale, addContainerUpdated } = useContainer();
 const dragDataset = readonly(
-  reactive<DragDataset>(
+  reactive<IDragDataset>(
     markRaw({
       x: node.x || 0,
       y: node.y || 0,
@@ -65,7 +64,7 @@ const onDown = function (): void {
   onSelectNode(node.id);
 };
 
-const onResizing = function (dragDataset: DragDataset): void {
+const onResizing = function (dragDataset: IDragDataset): void {
   updateNode(node.id, {
     x: dragDataset.x,
     y: dragDataset.y,

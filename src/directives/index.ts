@@ -1,7 +1,7 @@
 import { App } from 'vue';
 
 const directives = import.meta.glob<{ install: (app: App) => void }>(
-  ['./**/*.ts', '!./**/*.d.ts'],
+  ['./**/*.ts', '!./types/*'],
   {
     eager: true,
     import: 'default'

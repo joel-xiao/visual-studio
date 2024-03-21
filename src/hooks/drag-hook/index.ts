@@ -1,7 +1,5 @@
 import { Component, App, HtmlHTMLAttributes } from 'vue';
 import { createComponent } from './../vue-hooks';
-import type { DragDataset, CursorPos, Binding } from './interface';
-
 import './drag.scss';
 
 export class Drag {
@@ -11,16 +9,16 @@ export class Drag {
   active: boolean;
   #moved: boolean;
   #scale = 1;
-  callbackUp?: ((dragDataset: DragDataset) => void) | null;
+  callbackUp?: ((dragDataset: IDragDataset) => void) | null;
   stickEl?: HTMLElement;
   sticks: string[];
   stickEls: HTMLElement[] = [];
   currentStick: string;
-  defaultPos: DragDataset;
+  defaultPos: IDragDataset;
   startPos: { x: number; y: number };
-  pos: DragDataset;
-  cursorPos?: CursorPos | null;
-  binding: Binding;
+  pos: IDragDataset;
+  cursorPos?: IDragCursorPos | null;
+  binding: IDragBinding;
   constructor() {
     this.sticks = ['tm', 'rm', 'bm', 'lm', 'tl', 'tr', 'br', 'bl'];
     this.currentStick = '';
@@ -49,7 +47,7 @@ export class Drag {
     this.onMove = this.onMove.bind(this);
   }
 
-  install(el: HTMLElement, binding: Binding | null = this.binding): void {
+  install(el: HTMLElement, binding: IDragBinding | null = this.binding): void {
     binding &&
       Object.keys(binding).forEach((key) => {
         //@ts-ignore
@@ -130,7 +128,7 @@ export class Drag {
     this.active = active;
   }
 
-  setPos(pos: DragDataset): void {
+  setPos(pos: IDragDataset): void {
     if (!this.resize) return;
     this.pos = { ...pos };
     this.defaultPos = { ...this.pos };
@@ -158,7 +156,7 @@ export class Drag {
     this.onDown();
   }
 
-  buttonDown(pos: CursorPos): void {
+  buttonDown(pos: IDragCursorPos): void {
     if (this.disabled) return;
     this.setActive(true);
     this.currentStick = 'body';
@@ -214,7 +212,7 @@ export class Drag {
     this.prevent(event);
 
     const stick: string = this.currentStick;
-    const defaultPos: DragDataset = this.defaultPos;
+    const defaultPos: IDragDataset = this.defaultPos;
 
     const diff_x: number = (event.x - this.startPos.x) / this.#scale;
     const diff_y: number = (event.y - this.startPos.y) / this.#scale;
@@ -252,7 +250,7 @@ export class Drag {
     event.preventDefault();
   }
 
-  updateStyle(pos: DragDataset): void {
+  updateStyle(pos: IDragDataset): void {
     let diff_rotate_x = 0;
     let diff_rotate_y = 0;
     let rotate = '';
@@ -341,7 +339,7 @@ createDrag<T>(
 //     return;
 //   }
 
-//   let pos: DragDataset | undefined = undefined;
+//   let pos: IDragDataset | undefined = undefined;
 //   let currentTarget: HTMLElement | void;
 //   if (event) {
 //     currentTarget = event.currentTarget as HTMLElement;
