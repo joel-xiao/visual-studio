@@ -1,9 +1,8 @@
 <script lang="ts" setup>
 import { computed, inject, withDefaults } from 'vue';
-import type { IComponentData } from './interface';
 
 interface Props {
-  data?: IComponentData | { name?: string, children?: IComponentData[]};
+  data?: PanelComponentData | { name?: string, children?: PanelComponentData[] };
   drag: boolean | undefined | null;
 }
 
@@ -15,15 +14,15 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits(['arrow', 'drag-start', 'drag-stop']);
 
 const Items = computed(() => {
-  const children = props.data.children || [] ;
-  return children.filter((item: IComponentData) => item.show !== false);
+  const children = props.data.children || [];
+  return children.filter((item: PanelComponentData) => item.show !== false);
 });
 
-const onArrow = function (item: IComponentData) {
+const onArrow = function (item: PanelComponentData) {
   emit('arrow', item);
 };
 
-const onDragStart = function (event: DragEvent, item: IComponentData): void {
+const onDragStart = function (event: DragEvent, item: PanelComponentData): void {
   emit('drag-start', event, item);
 };
 const onDragStop = function (event: DragEvent): void {
@@ -68,6 +67,7 @@ div.component-box__container(v-for="(item, idx) in Items" v-show="data.component
 .editor-panel-component {
   .component-box__container {
     flex: none;
+
     .component-box__title {
       padding: 0 6px;
       font-size: 12px;
@@ -75,6 +75,7 @@ div.component-box__container(v-for="(item, idx) in Items" v-show="data.component
       display: flex;
       align-items: center;
       height: 30px;
+
       &:hover {
         background: var(--theme-color-tran-6);
       }
@@ -99,6 +100,7 @@ div.component-box__container(v-for="(item, idx) in Items" v-show="data.component
 
       &.dot {
         background: none;
+
         &::before {
           display: inline-block;
           content: ' ';
@@ -123,13 +125,16 @@ div.component-box__container(v-for="(item, idx) in Items" v-show="data.component
         display: flex;
         align-items: center;
         justify-content: center;
+
         img {
           max-width: 100%;
           max-height: 100%;
         }
       }
+
       &.icon {
         margin-bottom: 10px;
+
         .component-item__content {
           border-radius: 4px;
           max-width: 100%;
@@ -137,6 +142,7 @@ div.component-box__container(v-for="(item, idx) in Items" v-show="data.component
           min-width: 100%;
           min-height: 100%;
         }
+
         .component-item__label {
           display: none;
         }
@@ -150,12 +156,14 @@ div.component-box__container(v-for="(item, idx) in Items" v-show="data.component
         width: 100%;
         border-radius: 3px;
         align-items: center;
+
         .component-item__content {
           border-radius: 3px;
           width: 45px;
           height: 45px;
           flex: none;
         }
+
         .component-item__label {
           width: 100%;
           margin: 0 9px;

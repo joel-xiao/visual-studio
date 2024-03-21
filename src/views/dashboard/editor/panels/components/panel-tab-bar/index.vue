@@ -6,11 +6,10 @@ div.editor-panel-tab_bar
 
 <script setup lang="ts">
 import { ref, reactive, withDefaults } from 'vue';
-import type { Tab } from './interface';
 
 interface Props {
-  data?: Tab[];
-  modelValue?: Tab;
+  data?: PanelTab[];
+  modelValue?: PanelTab;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -20,7 +19,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits(['select', 'update:modelValue']);
 
-const onSelect = function (tab: Tab): void {
+const onSelect = function (tab: PanelTab): void {
   emit('update:modelValue', tab);
   emit('select', tab);
 };

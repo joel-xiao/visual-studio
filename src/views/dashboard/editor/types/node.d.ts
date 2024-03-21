@@ -1,5 +1,3 @@
-// import type { LayerItemData } from './../panels/components/panel-layer/interface';
-
 declare interface INodePointerPos {
   x: number;
   y: number;
@@ -60,7 +58,7 @@ interface ITreeNodeData {
   type: string;
 }
 
-declare type TreeNode = LayerItemData;
+declare type TreeNode = PanelLayerItemData;
 
 declare interface INodeInstance {
   setActive: (val: boolean) => void;

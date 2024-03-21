@@ -18,12 +18,11 @@ div(class='editor-panel-component')
 
 <script setup lang="ts">
 import { ref, reactive, provide, withDefaults, computed } from 'vue';
-import type { IComponentData } from './interface';
 import ComponentItem from './component-item.vue';
 import CInput from './../../../../components/basic/c-input/index.vue';
 
 interface Props {
-  data?: IComponentData[];
+  data?: PanelComponentData[];
   drag?: boolean | undefined | null;
 }
 
@@ -41,7 +40,7 @@ const Data = computed(() => {
   return showKeyword(props.data, keyword.value);
 });
 
-function showKeyword(data: IComponentData[], keyword: string): IComponentData[] {
+function showKeyword(data: PanelComponentData[], keyword: string): PanelComponentData[] {
   if (!keyword) {
     data.forEach((item) => {
       item.show = undefined;
@@ -65,11 +64,11 @@ function showKeyword(data: IComponentData[], keyword: string): IComponentData[] 
 
 const emit = defineEmits(['drag-start', 'drag-stop']);
 
-const onArrow = function (item: IComponentData): void {
+const onArrow = function (item: PanelComponentData): void {
   item.AFold = !item.AFold;
 };
 
-const onDragStart = function (event: DragEvent, item: IComponentData): void {
+const onDragStart = function (event: DragEvent, item: PanelComponentData): void {
   emit('drag-start', item, event);
 };
 const onDragStop = function (event: DragEvent): void {

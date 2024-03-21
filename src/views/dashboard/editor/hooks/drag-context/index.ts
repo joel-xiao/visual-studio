@@ -1,6 +1,4 @@
-import type { IComponent } from './../../panels/components/panel-component/interface';
-
-const onDragStart = function (item: IComponent, event: DragEvent): void {
+const onDragStart = function (item: PanelComponent, event: DragEvent): void {
   event.dataTransfer?.setData('component', JSON.stringify(item));
 };
 const onDragStop = function (event: DragEvent): void {
@@ -12,7 +10,7 @@ const dropHandler = function (
   callback: (data: IBasicNode, pos: { x: number; y: number }) => void
 ): void {
   const data: string | undefined = event.dataTransfer?.getData('component');
-  const node: IComponent = data ? JSON.parse(data) : undefined;
+  const node: PanelComponent = data ? JSON.parse(data) : undefined;
   if (node) {
     callback?.(node.data as IBasicNode, { x: event.x, y: event.y });
   }
