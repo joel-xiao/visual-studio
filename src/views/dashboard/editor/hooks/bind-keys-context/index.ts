@@ -1,6 +1,15 @@
 import { markRaw } from 'vue';
 import { getPlatform } from '@a/utils/index';
-import type { ComBindKeys, CallbackUpdate } from './interface';
+interface ComBindKeys {
+  isSpace: boolean;
+  isShift: boolean;
+  isCtrl: boolean;
+  isAlt: boolean;
+}
+
+interface CallbackUpdate {
+  (bindKeys: ComBindKeys): void;
+}
 
 class BindKeys {
   #comBindKeys: ComBindKeys;
