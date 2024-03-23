@@ -1,12 +1,12 @@
 <template lang="pug">
 div(class="editor-panel-schema")
-  div(class="editor-panel-schema-wrapper")
+  div(class="editor-panel-schema-wrapper" ref="panelSchemaWrapperRef")
     template(v-for="(item, idx) in PanelSchemaTypes.propsTypes")
       template(v-if="isComponent(item.name)")
         component(:is="getComponent(item.name)" v-model="PropsData[item.key]" @update="onUpdate(item.key, item.schema, $event)")
       template(v-else)
         component(:is="getComponent('PANEL_PROPS_WRAP')" :keyValue="item.key" :propsType="item" v-model="PropsData[item.key]" @update="onUpdate(item.key, item.schema, $event)")
-  Tabs
+  Tabs( :style="TabsStyle" )
     template(v-for="(item, idx) in PanelSchemaTypes.propsTypes")
       template(v-if="isComponent(item.name)")
         component(:is="getComponent(item.name)" v-model="PropsData[item.key]" @update="onUpdate(item.key, item.schema, $event)")
@@ -62,6 +62,15 @@ const onUpdate = function (
     })
   });
 };
+
+
+const panelSchemaWrapperRef = ref<HTMLElement>();
+const TabsStyle = computed(() => {
+  const rect = panelSchemaWrapperRef.value?.getBoundingClientRect() || { height: 0 };
+  return {
+    '--panel-schema-tabs-wrapper-height': `calc(100% - ${rect.height}px)`,
+  };
+});
 
 </script>
 

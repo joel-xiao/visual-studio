@@ -29,7 +29,7 @@
   --color-divider: var(--theme-color-gray-100);
 
   width: 100%;
-  height: 100%;
+  height: var(--panel-schema-tabs-wrapper-height);
   border-top: 1px solid var(--color-divider);
 
   .schemas-tabs-nav-wrapper {
@@ -38,6 +38,7 @@
     padding: 3px;
     float: left;
     background-color: var(--theme-color-gray-25);
+    box-sizing: border-box;
 
     .schemas-tab-nav {
       font-size: 12px;
