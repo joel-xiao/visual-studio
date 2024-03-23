@@ -10,12 +10,14 @@ declare interface ISchemaPropTypes extends ISchemaExportDefault {
 
 declare type SchemaPropsTypes = ISchemaPropTypes[];
 
-declare type CategorySchemaTypes = {
+declare type CategorySchemaType = {
   name: string;
   icon: string;
   category: string;
   propsTypes: SchemaPropsTypes,
 }[];
+
+declare type CategorySchemaTypes = CategorySchemaType[];
 
 declare type ComponentPropsTypes = {
   propsTypes: SchemaTypes,

@@ -6,8 +6,8 @@ div(class="editor-panel-schema")
         component(:is="getComponent(item.name)" v-model="PropsData[item.key]" @update="onUpdate(item.key, item.schema, $event)")
       template(v-else)
         component(:is="getComponent('PANEL_PROPS_WRAP')" :keyValue="item.key" :propsType="item" v-model="PropsData[item.key]" @update="onUpdate(item.key, item.schema, $event)")
-  Tabs( :style="TabsStyle" )
-    template(v-for="(item, idx) in PanelSchemaTypes.propsTypes")
+  Tabs(:style="TabsStyle" :tabs="PanelSchemaTypes.categorySchemas" @select-tab="onSelectTab")
+    template( v-if="currentTab" v-for="(item, idx) in currentTab.propsTypes")
       template(v-if="isComponent(item.name)")
         component(:is="getComponent(item.name)" v-model="PropsData[item.key]" @update="onUpdate(item.key, item.schema, $event)")
       template(v-else)
@@ -40,7 +40,6 @@ const getComponent = (schema_name: string) => {
 const { getCurrentNode, updateNodeProps } = useNodeContext();
 const currentNode = getCurrentNode();
 const PropsData = computed(() => currentNode.value.props);
-console.log(PropsData)
 
 const { getComponentPropsTypes, formatterComponentProp } = useComponentContext();
 
@@ -71,6 +70,12 @@ const TabsStyle = computed(() => {
     '--panel-schema-tabs-wrapper-height': `calc(100% - ${rect.height}px)`,
   };
 });
+
+const currentTab = ref<CategorySchemaType>();
+function onSelectTab(data: CategorySchemaType) {
+  currentTab.value = data;
+  console.log(currentTab.value)
+}
 
 </script>
 

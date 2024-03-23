@@ -1,18 +1,37 @@
 <script setup lang="ts">
+import { ref, onMounted, watch } from 'vue';
+
+type Props = {
+  tabs: CategorySchemaType[];
+};
+const props = withDefaults(defineProps<Props>(), {
+  tabs: [],
+});
+
+const emits = defineEmits<{
+  (e: 'select-tab', data: CategorySchemaType): void;
+}>();
+
+const currentTab = ref<CategorySchemaType>();
+function onTab(nav: CategorySchemaType) {
+  if (currentTab.value === nav) return;
+  currentTab.value = nav;
+  emits('select-tab', currentTab.value);
+}
+
+watch(() => props.tabs, () => {
+  onTab(props.tabs[0]);
+})
+
 
 </script>
 
 <template>
-  <div class="schemas-tabs">
+  <div class="schemas-tabs" v-show="tabs.length">
     <div class="schemas-tabs-nav-wrapper">
-      <div class="schemas-tab-nav ">
-        图表
-      </div>
-      <div class="schemas-tab-nav active">
-        标题
-      </div>
-      <div class="schemas-tab-nav">
-        图列
+      <div class="schemas-tab-nav" :class="{ 'active': currentTab?.category === nav.category }" @click="onTab(nav)"
+        v-for="nav in tabs">
+        {{ nav.name }}
       </div>
     </div>
     <div class="schemas-tabs-pane-wrapper">
