@@ -1,5 +1,6 @@
 <template lang="pug">
 component(v-if="isComponent(ctrl)" :is="getComponent(ctrl)" :type="ctrlType" v-bind="$attrs")
+div(v-else) IS NO {{ ctrl }}
 </template>
 
 <script lang="ts">
@@ -21,7 +22,7 @@ const props = withDefaults(defineProps<Props>(), {
   ctrlType: ''
 });
 
-const component_models = import.meta.glob(['./../../../../../components/basic/*/index.vue','./input-group/index.vue'], {
+const component_models = import.meta.glob(['./../../../../../components/basic/*/index.vue', './input-group/index.vue'], {
   eager: true,
   import: 'default'
 });
@@ -42,6 +43,5 @@ const getComponent = (schema_name: string) => {
 };
 </script>
 <style lang="scss">
-.editor-panel-schema .schema-ctrl {
-}
+.editor-panel-schema .schema-ctrl {}
 </style>

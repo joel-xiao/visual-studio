@@ -28,6 +28,8 @@ declare type ComponentPropsTypes = {
 
 declare type  ComponentSchemaExportSchemas =   {
   type: string;
+  label?: string;
+  key?: string;
   schema: string;
   default: ComponentProp;
 }[];

@@ -14,7 +14,8 @@ const schema: ISchemaExport = {
         default: '',
         icon: 'C',
         ctrl: 'C_COLOR_PICKER',
-        size: 'large'
+        ctrl_type: 'color-input',
+        size: 'large',
       },
     ]
   ]

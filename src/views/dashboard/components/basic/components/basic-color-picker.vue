@@ -8,7 +8,7 @@ ColorPicker(v-bind="$attrs")
 <style lang="scss">
 #dashboard .n-color-picker {
   width: 16px;
-  height: 14px;
+  height: 16px;
   margin: 0px 6px;
   border-radius: 3px;
   overflow: hidden;

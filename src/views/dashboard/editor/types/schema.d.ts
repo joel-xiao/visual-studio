@@ -5,7 +5,7 @@ interface IDefaultSchemaKeyData {
   icon?: string;
   ctrl: string;
   ctrl_type?: string;
-  size?: 'default' | 'small' | 'large' | 'largely' | 'right';
+  size?: 'default' | 'small' | 'middle' |  'large' |'mini';
   click?: (props: ComponentProp) => void;
   change?: (props: ComponentProp) => void;
 }

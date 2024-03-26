@@ -170,18 +170,18 @@ export class CreateComponentContext {
     const schemas = this.#getSchemas();
     const propsTypes: SchemaPropsTypes = [];
     if (Array.isArray(exportSchemas)) {
-      exportSchemas
-        .filter((schema) => schema && typeof schema === 'object' && !Array.isArray(schema))
-        .forEach((component_schema) => {
+      for (const component_schema of exportSchemas) {
+        if (component_schema && typeof component_schema === 'object' && !Array.isArray(component_schema)) {
           const schema = schemas[component_schema.schema];
           propsTypes.push({
             name: schema.name,
-            label: schema.label,
-            key: schema.key,
+            label: component_schema.label || schema.label,
+            key: component_schema.key || schema.key,
             // @ts-ignore
             schema: schema[component_schema.type]
           });
-        });
+        }
+      }
     }
 
     return propsTypes;
@@ -219,76 +219,33 @@ export class CreateComponentContext {
     return this.#getComponentPropsTypes(schema_path);
   }
 
-  #getComponentProps(schema_path: string): IComponentProps {
+  #parseSchemaProp(exportSchemas: ComponentSchemaExportSchemas ) {
     const schemas = this.#getSchemas();
-    const componentSchemas = this.#getComponentSchema(schema_path);
-    const props: IComponentProps = {};
-    if (
-      componentSchemas &&
-      typeof componentSchemas === 'object' &&
-      Array.isArray(componentSchemas.schemas)
-    ) {
-      componentSchemas.schemas
-        .filter((schema) => schema && typeof schema === 'object' && !Array.isArray(schema))
-        .forEach((component_schema) => {
+
+    if (Array.isArray(exportSchemas)) {
+      for (const component_schema of exportSchemas) {
+
+        if (component_schema && typeof component_schema === 'object' && !Array.isArray(component_schema)) {
           const schema = schemas[component_schema.schema];
-          const schema_data: SchemaKeyTypes | null =
-            !Array.isArray(schema) && typeof schema === 'object'
-              ? //@ts-ignore
-                schema[component_schema.type]
-              : null;
+           //@ts-ignore
+          const schema_data: SchemaKeyTypes | null = !Array.isArray(schema) && typeof schema === 'object' ? schema[component_schema.type] : null;
 
+          const is_component_schema = !!component_schema.schema;
           const is_array_schema = schema_data && Array.isArray(schema_data);
-          const is_object_schema =
-            schema_data && !is_array_schema && typeof schema_data === 'object';
-
-          const is_component_schema_default =
-            component_schema &&
-            !Array.isArray(component_schema) &&
-            typeof component_schema === 'object' &&
-            component_schema.default;
-
-          const is_component_schema_default_object =
-            is_component_schema_default &&
-            !Array.isArray(component_schema.default) &&
-            typeof component_schema.default === 'object';
-
-          const component_schema_name =
-            component_schema &&
-            !Array.isArray(component_schema) &&
-            typeof component_schema === 'object' &&
-            component_schema.schema;
+          const is_component_schema_default = !!component_schema.default;
+          const is_component_schema_default_object = is_component_schema_default && !Array.isArray(component_schema.default) && typeof component_schema.default === 'object';
 
           const prop: ComponentProp = {};
 
-          if (component_schema_name) {
+          if (is_component_schema) {
             const component_schema_default: ComponentProp = component_schema.default;
-            if (is_object_schema) {
-              Object.keys(schema_data).forEach((key) => {
-                if (!key) {
-                  console.warn(
-                    'Schema 1',
-                    'Schema Key of Editor is null',
-                    'schema name = ' + schema.name,
-                    'component_schema type = ' + component_schema.type,
-                    schema_data
-                  );
-                  return;
-                }
-                if (is_component_schema_default_object) {
-                  //@ts-ignore
-                  prop[key] = component_schema_default[key] || schema_data[key].default;
-                } else if (is_component_schema_default) {
-                  //@ts-ignore
-                  prop[key] = component_schema_default || schema_data[key].default;
-                } else {
-                  prop[key] = schema_data[key].default;
-                }
-              });
-            } else if (is_array_schema) {
-              schema_data.forEach((r_arr) => {
-                Array.isArray(r_arr) &&
-                  r_arr.forEach((item) => {
+
+            if (is_array_schema) {
+              for (const row_array of schema_data) {
+
+                if (Array.isArray(row_array)) {
+                  for (const item of row_array) {
+
                     if (!item.key) {
                       console.warn(
                         'Schema 2',
@@ -297,8 +254,9 @@ export class CreateComponentContext {
                         'component_schema type = ' + component_schema.type,
                         item
                       );
-                      return;
+                      continue;
                     }
+
                     if (is_component_schema_default_object) {
                       //@ts-ignore
                       prop[item.key] = component_schema_default[item.key] || item.default;
@@ -308,14 +266,44 @@ export class CreateComponentContext {
                     } else {
                       prop[item.key] = item.default;
                     }
-                  });
-              });
+                  }
+                }
+              }
             }
           }
 
-          schema && schema.key && (props[schema.key] = prop);
-        });
+          return {
+            key: component_schema.key || schema.key,
+            prop: prop,
+          }
+        }
+      }
     }
+  }
+
+  #getComponentProps(schema_path: string): IComponentProps {
+    const schemas = this.#getSchemas();
+    const componentSchemas = this.#getComponentSchema(schema_path);
+    const isSchemaObject = componentSchemas && typeof componentSchemas === 'object';
+
+    const props: IComponentProps = {};
+
+    if (isSchemaObject){
+      const result = this.#parseSchemaProp(componentSchemas.schemas);
+      if (result) props[result.key] = result.prop;
+    }
+
+    if (isSchemaObject){
+      if (Array.isArray(componentSchemas.categorySchemas)) {
+        for (let category of componentSchemas.categorySchemas) {
+          const result = this.#parseSchemaProp(category.schemas);
+          if (result) props[result.key] = result.prop;
+        }
+      }
+    }
+
+    console.log(props)
+
     return cloneDeep(props);
   }
   getComponentProps(schema_path: string) {

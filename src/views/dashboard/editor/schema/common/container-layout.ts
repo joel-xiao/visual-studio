@@ -13,14 +13,16 @@ const schema: ISchemaExport = {
         type: Number,
         default: 0,
         icon: 'W',
-        ctrl: 'C_INPUT'
+        ctrl: 'C_INPUT',
+        size: 'middle',
       },
       {
         key: 'height',
         type: Number,
         default: 0,
         icon: 'H',
-        ctrl: 'C_INPUT'
+        ctrl: 'C_INPUT',
+        size: 'middle',
       },
       {
         key: 'size_proportion_lock',
@@ -29,7 +31,7 @@ const schema: ISchemaExport = {
         icon: 'icon-locking-ratio',
         ctrl: 'C_BUTTON',
         ctrl_type: 'status-button',
-        size: 'right'
+        size: 'mini'
       }
     ],
   ]

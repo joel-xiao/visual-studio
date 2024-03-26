@@ -1,7 +1,7 @@
 <template lang="pug">
 BasicBox(ref='box' class="c-color-picker" type="input")
   BasicColorPicker(v-bind="$attrs"  v-model="modelValue")
-  BasicInput(v-bind="$attrs" v-model="modelValue" @focus="onFocus" @blur="onBlur" @update="onUpdate" type="text")
+  BasicInput( v-if="type === 'color-input'" v-bind="$attrs" v-model="modelValue" @focus="onFocus" @blur="onBlur" @update="onUpdate" type="text")
 </template>
 
 <script lang="ts">
@@ -18,11 +18,13 @@ import BasicColorPicker from '../components/basic-color-picker.vue';
 import BasicInput from '../components/basic-input.vue';
 
 interface IProps {
+  type?: string; // color-input color
   modelValue?: string;
   focus?: boolean;
 }
 
 const props = withDefaults(defineProps<IProps>(), {
+  type: 'color',
   modelValue: '',
   focus: true
 });
@@ -31,7 +33,7 @@ const emit = defineEmits(['update:modelValue', 'update']);
 
 const modelValue = computed({
   get() { return props.modelValue },
-  set(value) {emit('update:modelValue', value)},
+  set(value) { emit('update:modelValue', value) },
 });
 
 const box = ref<null | InstanceType<typeof BasicBox>>(null);
@@ -52,4 +54,8 @@ const onUpdate = function (value: string | number) {
 </script>
 
 <style lang="scss">
+#dashboard .c-color-picker {
+  display: flex;
+  justify-content: center;
+}
 </style>

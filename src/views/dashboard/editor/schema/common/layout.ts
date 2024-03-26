@@ -13,14 +13,16 @@ const schema: ISchemaExport = {
         type: Number,
         default: 0,
         icon: 'X',
-        ctrl: 'C_INPUT'
+        ctrl: 'C_INPUT',
+        size: 'middle',
       },
       {
         key: 'y',
         type: Number,
         default: 0,
         icon: 'Y',
-        ctrl: 'C_INPUT'
+        ctrl: 'C_INPUT',
+        size: 'middle',
       }
     ],
     [
@@ -29,14 +31,16 @@ const schema: ISchemaExport = {
         type: Number,
         default: 0,
         icon: 'W',
-        ctrl: 'C_INPUT'
+        ctrl: 'C_INPUT',
+        size: 'middle',
       },
       {
         key: 'height',
         type: Number,
         default: 0,
         icon: 'H',
-        ctrl: 'C_INPUT'
+        ctrl: 'C_INPUT',
+        size: 'middle',
       },
       {
         key: 'size_proportion_lock',
@@ -45,7 +49,7 @@ const schema: ISchemaExport = {
         icon: 'icon-locking-ratio',
         ctrl: 'C_BUTTON',
         ctrl_type: 'status-button',
-        size: 'right'
+        size: 'mini'
       }
     ],
     [
@@ -54,7 +58,8 @@ const schema: ISchemaExport = {
         type: Number,
         default: 0,
         icon: 'icon-rotate',
-        ctrl: 'C_INPUT'
+        ctrl: 'C_INPUT',
+        size: 'middle',
       },
       {
         key: '',
@@ -95,7 +100,6 @@ const schema: ISchemaExport = {
           'icon-bottom-right-radius'
         ],
         ctrl: 'INPUT_GROUP',
-        size: 'largely'
       }
     ]
   ]
