@@ -15,7 +15,7 @@ declare type CategorySchemaType = {
   icon: string;
   category: string;
   propsTypes: SchemaPropsTypes,
-}[];
+};
 
 declare type CategorySchemaTypes = CategorySchemaType[];
 

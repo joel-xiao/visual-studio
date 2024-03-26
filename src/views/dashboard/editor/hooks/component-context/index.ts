@@ -302,8 +302,6 @@ export class CreateComponentContext {
       }
     }
 
-    console.log(props)
-
     return cloneDeep(props);
   }
   getComponentProps(schema_path: string) {

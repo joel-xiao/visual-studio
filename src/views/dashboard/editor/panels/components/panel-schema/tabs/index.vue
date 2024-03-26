@@ -2,10 +2,10 @@
 import { ref, onMounted, watch } from 'vue';
 
 type Props = {
-  tabs: CategorySchemaType[];
+  tabs?: CategorySchemaType[];
 };
 const props = withDefaults(defineProps<Props>(), {
-  tabs: [],
+  tabs: undefined,
 });
 
 const emits = defineEmits<{
@@ -20,14 +20,14 @@ function onTab(nav: CategorySchemaType) {
 }
 
 watch(() => props.tabs, () => {
-  onTab(props.tabs[0]);
+  props.tabs && onTab(props.tabs[0]);
 })
 
 
 </script>
 
 <template>
-  <div class="schemas-tabs" v-show="tabs.length">
+  <div class="schemas-tabs" v-show="tabs?.length">
     <div class="schemas-tabs-nav-wrapper">
       <div class="schemas-tab-nav" :class="{ 'active': currentTab?.category === nav.category }" @click="onTab(nav)"
         v-for="nav in tabs">

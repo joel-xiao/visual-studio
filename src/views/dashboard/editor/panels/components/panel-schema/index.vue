@@ -74,7 +74,6 @@ const TabsStyle = computed(() => {
 const currentTab = ref<CategorySchemaType>();
 function onSelectTab(data: CategorySchemaType) {
   currentTab.value = data;
-  console.log(currentTab.value)
 }
 
 </script>
