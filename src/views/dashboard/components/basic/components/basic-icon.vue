@@ -25,8 +25,8 @@ const isIconText = computed(() => {
 
 <template lang="pug">
 div(class="basic-icon" :class="iconClass")
-  span(class='icon-text' v-if="isIconText")
-   | {{ icon }}
+  span(class='basic-icon-text' v-if="isIconText")
+    | {{ icon }}
   i(class='icon-font' :class='icon' v-else-if="isIcon")
 </template>
 
@@ -44,13 +44,13 @@ div(class="basic-icon" :class="iconClass")
   color: var(--db-editor-icon-color);
   user-select: none;
   position: relative;
-  // left: -8px;
+  font-weight: normal;
 
   &.lock {
     opacity: 0.5;
   }
 
-  .icon-text {
+  .basic-icon-text {
     font-size: 12px;
     font-weight: normal;
     transform: scale(0.9);

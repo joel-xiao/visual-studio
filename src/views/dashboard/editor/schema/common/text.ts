@@ -12,7 +12,7 @@ const schema: ISchemaExport = {
         key: 'value',
         type: String,
         default: '这是文本',
-        icon: '',
+        icon: 'icon-text',
         ctrl: 'C_INPUT'
       },
     ],
@@ -30,8 +30,8 @@ const schema: ISchemaExport = {
         key: 'fontSize',
         type: Number,
         default: 12,
-        icon: '',
-        ctrl: 'C_INPUT',
+        icon: 'icon-text-size',
+        ctrl: 'C_SELECT',
         size: 'large',
       },
       {
@@ -41,6 +41,24 @@ const schema: ISchemaExport = {
         icon: '',
         ctrl: 'C_COLOR_PICKER',
         size: 'mini'
+      },
+    ],
+    [
+      {
+        key: 'lineHeight',
+        type: String,
+        default: '',
+        icon: 'icon-line-height',
+        ctrl: 'C_INPUT',
+        size: 'middle',
+      },
+      {
+        key: 'letterSpacing',
+        type: String,
+        default: '',
+        icon: 'icon-letter-spacing',
+        ctrl: 'C_INPUT',
+        size: 'middle',
       },
     ],
   ]

@@ -1,5 +1,5 @@
 <template lang="pug">
-div(class="basic-box transition" :class="boxStyle" @click="onClick" @mousedown="onMouseDown" @mouseup="onMouseUp")
+div(class="basic-box transition" ref="boxRef" :class="boxStyle" @click="onClick" @mousedown="onMouseDown" @mouseup="onMouseUp")
   slot
 </template>
 
@@ -65,7 +65,12 @@ const blur = function () {
   }
 };
 
-defineExpose({ focus, blur });
+const boxRef = ref<null | HTMLElement>(null);
+const getRect = function () {
+  return boxRef.value?.getBoundingClientRect() || { width: 0, height: 0, left: 0, top: 0 };
+};
+
+defineExpose({ focus, blur, getRect });
 </script>
 
 <style lang="scss">
@@ -82,6 +87,7 @@ defineExpose({ focus, blur });
   &.button-box {
     justify-content: center;
     background: var(--db-color-input-background);
+
     &:hover {
       background: var(--db-color-button-bg-hover);
     }
@@ -100,6 +106,7 @@ defineExpose({ focus, blur });
     &:hover {
       box-shadow: 0 0 0 1px var(--db-color-button-status-hover-border) inset;
     }
+
     &.active {
       box-shadow: 0 0 0 1px var(--db-color-button-status-bg-active) inset;
       background: var(--db-color-button-status-bg-active);
@@ -107,8 +114,10 @@ defineExpose({ focus, blur });
     }
   }
 
-  &.input-box {
+  &.input-box,
+  &.select-box {
     background: var(--db-color-input-background);
+
     &.active {
       box-shadow: 0 0 0 2px var(--db-color-button-focus-border) inset;
     }
