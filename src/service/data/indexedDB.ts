@@ -48,6 +48,29 @@ class IndexedDBService {
       };
   }
 
+  public find<T>(key: number | string, callback: (item: T | null) => void, errorCallback?: (error: any) => void): void {
+    if (!this.db) {
+        console.error("Database not initialized");
+        return;
+    }
+    const transaction: IDBTransaction = this.db.transaction([this.config.storeName], 'readonly');
+    const store: IDBObjectStore = transaction.objectStore(this.config.storeName);
+    const request: IDBRequest<T | undefined> = store.get(key);
+
+    request.onerror = (event: Event) => {
+        console.error("Error finding item: " + (event.target as IDBRequest<T | undefined>).error);
+        if (errorCallback) errorCallback((event.target as IDBRequest<T | undefined>).error);
+    };
+    request.onsuccess = (event: Event) => {
+        const item: T | undefined = (event.target as IDBRequest<T | undefined>).result;
+        if (item !== undefined) {
+            callback(item);
+        } else {
+            callback(null);
+        }
+    };
+  }
+
   public getAll<T>(callback: (items: T[]) => void, errorCallback?: (error: any) => void): void {
       if (!this.db) {
           console.error("Database not initialized");
@@ -91,35 +114,3 @@ class IndexedDBService {
       };
   }
 }
-
-// Example usage
-interface User {
-  id?: number;
-  name: string;
-  email: string;
-}
-
-const dbConfig: DBConfig = {
-  dbName: 'myDatabase',
-  storeName: 'users'
-};
-
-const dbService = new IndexedDBService(dbConfig);
-
-const user: User = { name: "John Doe", email: "john@example.com" };
-
-// Add user
-dbService.add<User>(user, () => {
-  console.log("User added successfully");
-});
-
-// Get all users
-dbService.getAll<User>((users) => {
-  console.log("Users:", users);
-});
-
-// Delete user by key
-const userIdToDelete: number = 1;
-dbService.delete(userIdToDelete, () => {
-  console.log("User deleted successfully");
-});
