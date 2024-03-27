@@ -1,6 +1,6 @@
 declare module '*.vue' {
   interface ComponentCustomProperties {
-    $noNative: function;
-    $isNative: function;
+    $noClient: function;
+    $isClient: function;
   }
 }

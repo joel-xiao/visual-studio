@@ -1,4 +1,4 @@
-import http from '@/service/http';
+import http from '../http';
 import * as T from './types';
 
 const loginApi: T.ILoginApi = {

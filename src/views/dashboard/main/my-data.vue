@@ -3,8 +3,8 @@ import MainLayout from './components/main-layout.vue';
 import { ref, reactive, markRaw, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useDashboardStore } from '@/store/dashboard';
-import visual from '@s/visual/visual';
-import type { IVisualProjectsResponse } from '@s/visual/types';
+import visual from '@api/visual/visual';
+import type { IVisualProjectsResponse } from '@api/visual/types';
 const router = useRouter();
 
 const layoutRef = ref();

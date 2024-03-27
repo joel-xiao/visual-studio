@@ -20,6 +20,7 @@
       "@u/*": ["./src/utils/*"],
       "@a/*": ["./src/assets/*"],
       "@s/*": ["./src/service/*"],
+      "@api/*": ["./src/service/api/*"],
       "@p/*": ["./src/plugins/*"],
       "@d/*": ["./src/directives/*"],
       "@hooks/*": ["./src/hooks/*"]

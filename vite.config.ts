@@ -32,6 +32,7 @@ export default defineConfig(async () => {
         '@u': path.resolve(__dirname, 'src/utils'),
         '@a': path.resolve(__dirname, 'src/assets'),
         '@s': path.resolve(__dirname, 'src/service'),
+        '@api': path.resolve(__dirname, 'src/service/api'),
         '@p': path.resolve(__dirname, 'src/plugins'),
         '@d': path.resolve(__dirname, 'src/directives'),
         '@hooks': path.resolve(__dirname, 'src/hooks')
