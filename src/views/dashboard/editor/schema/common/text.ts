@@ -21,7 +21,7 @@ const schema: ISchemaExport = {
         key: 'fontFamily',
         type: String,
         default: '',
-        icon: '',
+        icon: 'icon-font-family',
         ctrl: 'C_SELECT'
       },
     ],

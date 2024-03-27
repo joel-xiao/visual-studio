@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "11020939",
+      "name": "字体选择",
+      "font_class": "font-family",
+      "unicode": "e6b5",
+      "unicode_decimal": 59061
+    },
+    {
       "icon_id": "35462922",
       "name": "自动行高",
       "font_class": "line-height",
