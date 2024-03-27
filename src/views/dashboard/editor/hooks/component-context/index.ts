@@ -221,6 +221,7 @@ export class CreateComponentContext {
 
   #parseSchemaProp(exportSchemas: ComponentSchemaExportSchemas ) {
     const schemas = this.#getSchemas();
+    const props: IComponentProps = {};
 
     if (Array.isArray(exportSchemas)) {
       for (const component_schema of exportSchemas) {
@@ -272,13 +273,12 @@ export class CreateComponentContext {
             }
           }
 
-          return {
-            key: component_schema.key || schema.key,
-            prop: prop,
-          }
+          props[component_schema.key || schema.key] = prop;
         }
       }
     }
+
+    return props;
   }
 
   #getComponentProps(schema_path: string): IComponentProps {
@@ -290,14 +290,18 @@ export class CreateComponentContext {
 
     if (isSchemaObject){
       const result = this.#parseSchemaProp(componentSchemas.schemas);
-      if (result) props[result.key] = result.prop;
+      for ( const key of Object.keys(result)) {
+        props[key] = result[key];
+      }
     }
 
     if (isSchemaObject){
       if (Array.isArray(componentSchemas.categorySchemas)) {
         for (let category of componentSchemas.categorySchemas) {
           const result = this.#parseSchemaProp(category.schemas);
-          if (result) props[result.key] = result.prop;
+          for ( const key of Object.keys(result)) {
+            props[key] = result[key];
+          }
         }
       }
     }

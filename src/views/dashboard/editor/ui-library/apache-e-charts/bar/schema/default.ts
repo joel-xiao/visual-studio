@@ -52,6 +52,15 @@ const schema: IComponentSchemaExport = {
           default: {
             value: '这是标题'
           }
+        },
+        {
+          type: 'schema',
+          schema: 'COMMON_TEXT',
+          label: '副标题',
+          key: 'subtitle',
+          default: {
+            value: '这是副标题'
+          }
         }
       ],
     },
