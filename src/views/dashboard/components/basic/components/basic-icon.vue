@@ -33,13 +33,11 @@ div(class="basic-icon" :class="iconClass")
 <style lang="scss">
 #dashboard .basic-icon {
   line-height: 1;
-  width: 30px;
+  width: 24px;
   height: 100%;
   display: flex;
-  box-pack: center;
+  flex: none;
   justify-content: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
   align-items: center;
   color: var(--db-editor-icon-color);
   user-select: none;

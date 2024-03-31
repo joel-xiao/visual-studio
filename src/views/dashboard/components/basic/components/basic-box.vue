@@ -8,7 +8,7 @@ import { ref, computed, watchEffect, watch } from 'vue';
 
 interface Props {
   modelValue?: boolean;
-  type: string; // status-button button input
+  type: string; // status-button button input input-select
 }
 const props = withDefaults(defineProps<Props>(), {
   modelValue: false,
@@ -84,7 +84,8 @@ defineExpose({ focus, blur, getRect });
   align-items: center;
   overflow: hidden;
 
-  &.button-box {
+  &.button-box,
+  &.select-box {
     justify-content: center;
     background: var(--db-color-input-background);
 
@@ -115,7 +116,7 @@ defineExpose({ focus, blur, getRect });
   }
 
   &.input-box,
-  &.select-box {
+  &.input-select-box {
     background: var(--db-color-input-background);
 
     &.active {

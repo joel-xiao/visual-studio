@@ -1,21 +1,28 @@
 <template>
   <div class="c-select">
-    <BasicBox ref="boxRef" type="select">
+    <BasicBox ref="boxRef" :type="Type" @click="onOpenWrapper('wrapper')">
       <BasicIcon :lock="lock" :icon="icon" />
-      <BasicInput :disabled="lock" v-bind="$attrs" @update="onUpdate" type="text" />
-      <div class="c-select-icon" @click="onOpenWrapper">
-        <i class='icon-font icon-shouqi2'></i>
+      <div class="c-select-label-wrapper">
+        <BasicInput v-if="Type === 'input-select'" :disabled="lock" v-model="modelValue" v-bind="$attrs"
+          @update="onUpdate" type="text" />
+        <div v-else class="c-select-current-label"> {{ CurrLabel }} </div>
+      </div>
+      <div class="c-select-icon" @click="onOpenWrapper('arrow')">
+        <i class="icon-font icon-shouqi2"></i>
       </div>
     </BasicBox>
     <div ref="selectMaskRef" class="c-select-mask" @click="onClose"></div>
     <div ref="selectWrapperRef" class="c-select-wrapper">
-      <div class="c-select-item" :class="enterItem === item ? 'active' : ''" v-for="item of items"
-        @mouseenter="onItemEnter(item)" @click="onItemClick(item)">
-        <div class="c-select-item-icon">
-          <i v-if="currItem === item" class='icon-font icon-shouqi2'></i>
+      <template v-for="item of Items">
+        <div class="c-select-item" :class="enterValue === item.value ? 'active' : ''" @mouseenter="onItemEnter(item)"
+          @click="onItemClick(item)">
+          <div class="c-select-item-icon">
+            <i v-if="currValue === item.value" class="icon-font icon-shouqi2"></i>
+          </div>
+          <span>{{ item.label }}</span>
         </div>
-        <span>{{ item }}</span>
-      </div>
+        <div v-if="item.splitLine" class="c-select-item-split-line"></div>
+      </template>
     </div>
   </div>
 </template>
@@ -23,64 +30,107 @@
 <script lang="ts">
 export default {
   inheritAttrs: false,
-  name: 'C_SELECT',
+  name: "C_SELECT",
 };
 </script>
 
 <script setup lang="ts">
-import { ref, reactive, provide, withDefaults } from 'vue';
-import BasicBox from '../components/basic-box.vue';
-import BasicIcon from '../components/basic-icon.vue';
-import BasicInput from '../components/basic-input.vue';
+import { ref, reactive, computed, provide, withDefaults } from "vue";
+import BasicBox from "../components/basic-box.vue";
+import BasicIcon from "../components/basic-icon.vue";
+import BasicInput from "../components/basic-input.vue";
 
 interface IProps {
+  type?: string;
+  modelValue: string | number;
   lock?: boolean;
   icon?: string;
 }
+type Item = {
+  label: string;
+  value: string | number;
+  splitLine?: boolean;
+};
+
 const props = withDefaults(defineProps<IProps>(), {
+  type: "select", // select input-select
+  modelValue: "",
   lock: false,
-  icon: '',
+  icon: "",
 });
 
-const emit = defineEmits(['update']);
+const emit = defineEmits(["update", "update:modelValue"]);
 
-const items = ref<string[]>(['1w23', '123', '12wa3', '12we3']);
-const currItem = ref('1w23');
-const enterItem = ref(currItem.value);
+const Type = computed(() => {
+  return props.type === "input-select" ? "input-select" : "select";
+});
+
+const items = ref<Item[]>([{ label: "item1", value: "item1" }, { label: "item2", value: "item2" }]);
+
+const Items = computed(() => {
+  const result = [...items.value];
+
+  if (!result.some((item) => modelValue.value === item.value)) {
+    result.unshift({
+      label: modelValue.value,
+      value: modelValue.value,
+      splitLine: true,
+    });
+  }
+
+  return result;
+});
+
+const modelValue = ref(props.modelValue);
+const currValue = ref(modelValue.value);
+const enterValue = ref(currValue.value);
+
+const CurrLabel = computed(() => {
+  const item = Items.value.find((item) => item.value === currValue.value);
+  return item ? item.label : "";
+});
 
 const onUpdate = function (value: string | number) {
-  emit('update', value);
+  modelValue.value = value;
+  currValue.value = value;
+  enterValue.value = value;
+  emit("update:modelValue", value);
+  emit("update", value);
 };
 
 const boxRef = ref<null | InstanceType<typeof BasicBox>>(null);
 const selectMaskRef = ref<null | HTMLElement>(null);
 const selectWrapperRef = ref<null | HTMLElement>(null);
 
-function onOpenWrapper() {
+function onOpenWrapper(event_type: string) {
+  // input-select type should not open wrapper
+  if (Type.value === 'input-select' && event_type === 'wrapper') {
+    return;
+  }
+
   if (selectMaskRef.value && selectWrapperRef.value && boxRef.value) {
     const boxRect = boxRef.value.getRect();
-    selectMaskRef.value.style.display = 'block';
-    selectWrapperRef.value.style.display = 'block';
-    selectWrapperRef.value.style.width = boxRect.width + 'px';
-    selectWrapperRef.value.style.top = boxRect.top + 'px';
-    selectWrapperRef.value.style.left = boxRect.left + 'px';
+    selectMaskRef.value.style.display = "block";
+    selectWrapperRef.value.style.display = "block";
+    selectWrapperRef.value.style.width = boxRect.width + "px";
+    selectWrapperRef.value.style.top = boxRect.top + "px";
+    selectWrapperRef.value.style.left = boxRect.left + "px";
   }
 }
 
 function onClose() {
   if (selectMaskRef.value && selectWrapperRef.value) {
-    selectMaskRef.value.style.display = 'none';
-    selectWrapperRef.value.style.display = 'none';
+    selectMaskRef.value.style.display = "none";
+    selectWrapperRef.value.style.display = "none";
   }
 }
 
-function onItemEnter(item: string) {
-  enterItem.value = item;
+function onItemEnter(item: Item) {
+  enterValue.value = item.value;
 }
 
-function onItemClick(item: string) {
-  currItem.value = item;
-  enterItem.value = item;
+function onItemClick(item: Item) {
+  onUpdate(item.value);
   onClose();
 }
 </script>
@@ -110,6 +160,22 @@ function onItemClick(item: string) {
   &:hover {
     .c-select-icon {
       background-color: var(--db-color-select-arrow-bg-hover);
+    }
+
+    .select-box {
+      .c-select-icon {
+        background: none;
+      }
+    }
+  }
+
+  .c-select-label-wrapper {
+    width: 100%;
+    color: #fff;
+
+    .c-select-current-label {
+      width: 100%;
+      box-sizing: border-box;
     }
   }
 
@@ -160,6 +226,12 @@ function onItemClick(item: string) {
         color: var(--db-color-select-item-text);
         font-size: 12px;
       }
+    }
+
+    .c-select-item-split-line {
+      height: 1px;
+      background-color: var(--theme-color-gray-100);
+      margin: 6px 6px;
     }
   }
 }

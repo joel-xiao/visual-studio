@@ -32,6 +32,7 @@ const schema: ISchemaExport = {
         default: 12,
         icon: 'icon-text-size',
         ctrl: 'C_SELECT',
+        ctrl_type: 'input-select',
         size: 'large',
       },
       {
