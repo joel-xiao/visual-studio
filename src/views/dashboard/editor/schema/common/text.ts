@@ -1,3 +1,5 @@
+import argOptions from "../compossible/arg-options";
+
 const SCHEMA_NAME = 'COMMON_TEXT';
 const SCHEMA_LABEL = '文字';
 const SCHEMA_KEY = 'text';
@@ -22,7 +24,8 @@ const schema: ISchemaExport = {
         type: String,
         default: '',
         icon: 'icon-font-family',
-        ctrl: 'C_SELECT'
+        ctrl: 'C_SELECT',
+        options: argOptions.FontFamilyOptions,
       },
     ],
     [
@@ -34,6 +37,7 @@ const schema: ISchemaExport = {
         ctrl: 'C_SELECT',
         ctrl_type: 'input-select',
         size: 'large',
+        options: argOptions.FontSizeOptions,
       },
       {
         key: 'color',

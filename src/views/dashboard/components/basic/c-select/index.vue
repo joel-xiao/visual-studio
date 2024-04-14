@@ -45,6 +45,7 @@ interface IProps {
   modelValue: string | number;
   lock?: boolean;
   icon?: string;
+  options?: { label: string | number, value: string | number }[];
 }
 type Item = {
   label: string;
@@ -57,6 +58,7 @@ const props = withDefaults(defineProps<IProps>(), {
   modelValue: "",
   lock: false,
   icon: "",
+  options: () => [],
 });
 
 const emit = defineEmits(["update", "update:modelValue"]);
@@ -65,10 +67,10 @@ const Type = computed(() => {
   return props.type === "input-select" ? "input-select" : "select";
 });
 
-const items = ref<Item[]>([{ label: "item1", value: "item1" }, { label: "item2", value: "item2" }]);
+const items = ref<Item[]>([{ label: "item1", value: "item1" }, { label: "item2", value: "item2" }])
 
 const Items = computed(() => {
-  const result = [...items.value];
+  const result = [...(props.options || [])];
 
   if (!result.some((item) => modelValue.value === item.value)) {
     result.unshift({
