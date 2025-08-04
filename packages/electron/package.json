@@ -1,0 +1,20 @@
+{
+  "name": "@visual-studio/electron",
+  "private": true,
+  "main": "dist/main/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build && electron-builder"
+  },
+  "dependencies": {
+    "electron": "^28.1.0"
+  },
+  "devDependencies": {
+    "electron-vite": "^2.3.0",
+    "vite": "^5.0.0",
+    "electron-builder": "^24.9.1",
+    "concurrently": "^9.2.0"
+  }
+}
+    

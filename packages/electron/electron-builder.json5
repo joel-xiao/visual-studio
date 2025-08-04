@@ -1,0 +1,49 @@
+{
+  "appId": "com.visual-studio.electron",
+  "productName": "Visual Studio",
+  "copyright": "Copyright © 2024 Joel Xiao",
+  "directories": {
+    "output": "release/${version}"
+  },
+  "files": [
+    "dist/main/**/*",
+    "dist/preload/**/*",
+    "!dist/renderer/**/*",
+    {
+      "from": "../web/dist",
+      "to": "web/dist",
+      "filter": ["**/*"]
+    }
+  ],
+  "asar": true,
+  "asarUnpack": [
+    "web/dist/**/*" // Web 静态资源不压缩，避免加载问题
+  ],
+  "win": {
+    "target": [
+      {
+        "target": "nsis",
+        "arch": ["x64"]
+      }
+    ],
+    "icon": "icons/icon.ico"
+  },
+  "mac": {
+    "target": "dmg",
+    "icon": "icons/icon.icns",
+    "hardenedRuntime": true,
+    "entitlements": "build/entitlements.mac.plist"
+  },
+  "linux": {
+    "target": "deb",
+    "icon": "icons/icon.png",
+    "category": "Development"
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "installerIcon": "icons/installer.ico",
+    "uninstallerIcon": "icons/uninstaller.ico"
+  }
+}
+    

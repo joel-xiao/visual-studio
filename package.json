@@ -8,7 +8,8 @@
     "build:web:dist-tauri": "pnpm -F @visual-studio/web tauri:build",
     "dev:tauri": "pnpm dev:web && pnpm -F @visual-studio/tauri dev",
     "build:tauri": "pnpm build:web:dist-tauri && pnpm -F @visual-studio/tauri build",
-    "dev:electron": "pnpm -F @visual-studio/electron dev",
+    "dev:electron": "concurrently \"pnpm dev:web\" \"pnpm -F @visual-studio/electron dev\"",
+    "build:electron": "pnpm build:web  && pnpm -F @visual-studio/electron build",
     "log": "conventional-changelog -p custom-config -i CHANGELOG.md -s -r 0  -n ./changelog-option.js",
     "prepare": "husky install"
   },
@@ -24,5 +25,8 @@
     "@commitlint/config-conventional": "^18.6.0",
     "husky": "^9.0.10",
     "lint-staged": "^15.2.2"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.0"
   }
 }
