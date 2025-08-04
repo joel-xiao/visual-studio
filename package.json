@@ -6,7 +6,9 @@
     "dev:web": "pnpm -F @visual-studio/web dev",
     "build:web": "pnpm -F @visual-studio/web build",
     "build:web:dist-tauri": "pnpm -F @visual-studio/web tauri:build",
+    "dev:tauri": "pnpm dev:web && pnpm -F @visual-studio/tauri dev",
     "build:tauri": "pnpm build:web:dist-tauri && pnpm -F @visual-studio/tauri build",
+    "dev:electron": "pnpm -F @visual-studio/electron dev",
     "log": "conventional-changelog -p custom-config -i CHANGELOG.md -s -r 0  -n ./changelog-option.js",
     "prepare": "husky install"
   },
