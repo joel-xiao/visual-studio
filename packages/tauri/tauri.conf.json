@@ -3,7 +3,7 @@
     "beforeDevCommand": "",
     "beforeBuildCommand": "",
     "devPath": "http://localhost:1420",
-    "distDir": "../web/dist-tauri"
+    "distDir": "../web/dist"
   },
   "package": {
     "productName": "visual-studio",
