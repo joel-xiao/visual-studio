@@ -6,7 +6,7 @@
     "dev:web": "pnpm -F @visual-studio/web dev",
     "wait:web": "wait-on --interval 1000 --timeout 60000 tcp:1420",
     "build:web": "pnpm -F @visual-studio/web build",
-    "dev:tauri": "pnpm dev:web && pnpm -F @visual-studio/tauri dev",
+    "dev:tauri": "concurrently \"pnpm dev:web\" \"pnpm wait:web && pnpm -F @visual-studio/tauri dev\"",
     "build:tauri": "pnpm build:web && pnpm -F @visual-studio/tauri build",
     "dev:electron": "concurrently \"pnpm dev:web\" \"pnpm wait:web && pnpm -F @visual-studio/electron dev\"",
     "build:electron": "pnpm build:web  && pnpm -F @visual-studio/electron build",
