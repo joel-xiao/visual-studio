@@ -5,8 +5,7 @@ export type CommonState = {
   name: string;
 };
 
-export const useCommonStore = defineStore({
-  id: 'common',
+export const useCommonStore = defineStore('common', {
   state: (): CommonState => ({
     name: '张三'
   }),

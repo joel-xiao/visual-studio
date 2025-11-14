@@ -1,9 +1,4 @@
-/**
-* @description: Common Master CSS
-* @author: Joel
-*/
-
-@import './initialize';
-@import './animation';
-@import './common';
-@import './theme-color-table';
+@use './initialize' as *;
+@use './animation' as *;
+@use './common' as *;
+@use './theme-color-table' as *;

@@ -1,24 +1,27 @@
 {
-  "appId": "com.visual-studio.electron",
-  "productName": "Visual Studio",
+  "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
+  "appId": "com.visualization-editor.electron",
+  "productName": "Visualization Editor",
   "copyright": "Copyright © 2024 Joel Xiao",
+  "asar": true,
   "directories": {
-    "output": "release/${version}"
+    "output": "release/${version}",
+    "buildResources": "build"
   },
   "files": [
     "dist/main/**/*",
     "dist/preload/**/*",
     "!dist/renderer/**/*",
-    {
-      "from": "../web/dist",
-      "to": "web/dist",
-      "filter": ["**/*"]
-    }
+    "dist/web/**/*",
+    "package.json"
   ],
-  "asar": true,
-  "asarUnpack": [
-    "web/dist/**/*" // Web 静态资源不压缩，避免加载问题
-  ],
+  "extraMetadata": {
+    "main": "dist/main/index.js"
+  },
+  "mac": {
+    "target": "dmg",
+    "artifactName": "${productName}-Mac-${version}-Installer.${ext}"
+  },
   "win": {
     "target": [
       {
@@ -26,24 +29,18 @@
         "arch": ["x64"]
       }
     ],
-    "icon": "icons/icon.ico"
-  },
-  "mac": {
-    "target": "dmg",
-    "icon": "icons/icon.icns",
-    "hardenedRuntime": true,
-    "entitlements": "build/entitlements.mac.plist"
+    "artifactName": "${productName}-Windows-${version}-Setup.${ext}"
   },
   "linux": {
     "target": "deb",
-    "icon": "icons/icon.png",
-    "category": "Development"
+    "category": "Development",
+    "artifactName": "${productName}-Linux-${version}.${ext}"
   },
   "nsis": {
     "oneClick": false,
+    "perMachine": false,
     "allowToChangeInstallationDirectory": true,
-    "installerIcon": "icons/installer.ico",
-    "uninstallerIcon": "icons/uninstaller.ico"
+    "deleteAppDataOnUninstall": false
   }
 }
     

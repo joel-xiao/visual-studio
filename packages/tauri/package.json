@@ -1,9 +1,15 @@
 {
-  "name": "@visual-studio/tauri",
+  "name": "@visualization-editor/tauri",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "scripts": {
     "dev": "tauri dev",
-    "build": "tauri build"
+    "build": "tauri build",
+    "build:app": "tauri build --bundles app",
+    "build:dmg": "tauri build --bundles dmg",
+    "create-dmg": "bash scripts/create-dmg.sh"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.9.4"
   }
 }

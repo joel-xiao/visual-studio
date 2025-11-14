@@ -1,0 +1,25 @@
+{
+  "name": {
+    "kebab": "visualization-editor",
+    "pascal": "VisualizationEditor",
+    "display": "Visualization Editor",
+    "monorepo": "visualization-editor.monorepo"
+  },
+  "version": "0.0.1",
+  "description": "Visualization Editor - A powerful visualization and editing tool",
+  "author": {
+    "name": "Joel Xiao",
+    "email": ""
+  },
+  "copyright": "Copyright © 2024 Joel Xiao",
+  "appId": {
+    "electron": "com.visualization-editor.electron",
+    "tauri": "com.visualization-editor.tauri"
+  },
+  "repository": {
+    "url": "",
+    "type": "git"
+  },
+  "license": ""
+}
+

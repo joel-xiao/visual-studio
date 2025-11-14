@@ -1,6 +1,6 @@
-import axios, { AxiosRequestConfig } from 'axios';
-// import NProgress from 'nprogress';
+import axios from 'axios';
 import { useLoadingBar } from 'naive-ui';
+import { apiBaseURL } from '@/utils/env';
 let loadingBar = useLoadingBar();
 if (!loadingBar) {
   loadingBar = {
@@ -27,8 +27,7 @@ const NProgress = {
   done: () => void;
 };
 
-// 设置请求头和请求路径
-axios.defaults.baseURL = '/api';
+axios.defaults.baseURL = apiBaseURL;
 axios.defaults.timeout = 10000;
 axios.defaults.headers.post['Content-Type'] = 'application/json;charset=UTF-8';
 axios.interceptors.request.use(

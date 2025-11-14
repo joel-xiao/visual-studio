@@ -1,24 +1,15 @@
 [package]
 name = "visual"
-version = "0.0.0"
-description = "A Visual Studio"
-authors = ["The visual xiao"]
+version = "0.0.1"
+description = "Visualization Editor - A powerful visualization and editing tool"
+authors = ["Joel Xiao"]
 license = ""
 repository = ""
 default-run = "visual"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [build-dependencies]
-tauri-build = { version = "1.5", features = [] }
+tauri-build = { version = "2.5.2", features = [] }
 
 [dependencies]
-tauri = { version = "1.5", features = ["shell-open"] }
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-
-[features]
-# this feature is used for production builds or when `devPath` points to the filesystem
-# DO NOT REMOVE!!
-custom-protocol = ["tauri/custom-protocol"]
+tauri = { version = "2.9.3", features = [] }

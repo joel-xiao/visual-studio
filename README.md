@@ -1,112 +1,187 @@
 # Visualization Editor
 
-<!-- ![awesome-vite](https://camo.githubusercontent.com/abb97269de2982c379cbc128bba93ba724d8822bfbe082737772bd4feb59cb54/68747470733a2f2f63646e2e7261776769742e636f6d2f73696e647265736f726875732f617765736f6d652f643733303566333864323966656437386661383536353265336136336531353464643865383832392f6d656469612f62616467652e737667)
-![GitHub license](https://img.shields.io/github/license/caoxiemeihao/electron-vue-vite?style=flat)
-![GitHub stars](https://img.shields.io/github/stars/caoxiemeihao/electron-vue-vite?color=fa6470&style=flat)
-![GitHub forks](https://img.shields.io/github/forks/caoxiemeihao/electron-vue-vite?style=flat) -->
+一个基于 Monorepo 架构的低代码可视化开发平台，支持 Web、Electron 和 Tauri 多平台部署。
 
-<!-- **[English](README.md) | 简体中文** -->
+## ✨ 特性
 
-[DEMO](https://visual-studio-one.vercel.app/)
+- 🎨 **可视化编辑器** - 通过拖放组件快速构建应用
+- 🚀 **多平台支持** - Web、Electron、Tauri 三端统一
+- 📦 **Monorepo 架构** - 使用 pnpm workspace 管理多包
+- 🔧 **统一配置管理** - 通过 `project.config.json` 集中管理项目配置
+- 💻 **现代化技术栈** - Vue 3 + TypeScript + Vite
+- 🎯 **代码共享** - Web 核心代码被 Electron 和 Tauri 复用
 
-🥳 `Tauri` + `Vue3` + `Vite2` + `Ts`
+## 🏗️ 项目结构
 
-[Electron Visualization Editor](https://github.com/joel-xiao/visual-studio.electron)
+这是一个 Monorepo 项目，使用 pnpm workspace 管理多个包：
+
+```
+visualization-editor.monorepo/
+├── packages/
+│   ├── web/              # Web 核心包（Vue3 + Vite + TypeScript）
+│   ├── electron/         # Electron 桌面应用
+│   └── tauri/            # Tauri 桌面应用（Rust + Vue3）
+├── scripts/              # 项目级脚本
+│   └── sync-project-config.js
+├── config/               # 配置文件目录
+│   └── changelog-option.js
+├── project.config.json   # 项目统一配置
+└── package.json          # 根 package.json
+```
 
 
-## 概述
+## 🚀 快速开始
 
-&emsp;&emsp;这是一个低代码开发平台简化软件，通过可视化界面和拖放组件快速构建应用。开发者无需写大量代
-码，可配置预定义模块，如表单、数据管理和工作流程。它加快开发速度、降低成本，适用于企业应用、移动应用
-和 Web 应用开发。提供实时预览和可视化界面，便于测试和定制，提高效率和灵活性。
+### 环境要求
 
-它还在开发阶段，所以说如果你对该工程感兴趣，欢迎你的加入。或者刚入世的小白想弄明白`Tauri`整合类模板
-最基础的工作原理，亦或者你是大神只是想偷懒少干点活；那么这个程序最合适你不过了。
+- Node.js >= 18
+- pnpm >= 8
+- Rust (仅 Tauri 需要)
 
-目前正在进行`可视化`编辑器开发，后续会陆续集成`3D` `网页` `拓扑`等快速开发模块。还有
-`生成可二次编辑的代码` 比如说生成 `Vue` `React` 脚手架项目程序和单元文件，及
-`一键打包上传指定至服务器`等功能。
-
-按照计划会依次对某个已完成的模块进行单独发布作为公共库，即上传至 npm，yarn，pnpm 库供使用者安装。还
-可将使用者开发的自定义组件加载至该库可进行拖放自定义组件快速构建应用。
-
-尽管如此，我还是希望你对`Tauri` `Vue3` `Vite` `Ts` `Scss`有一定的基础；
-
-具体实现细节我相信你看两遍源码就能把它吃透了 😋
-
-## 运行项目
+### 安装依赖
 
 ```bash
-# clone the project
-git clone git@github.com:joel-xiao/visual-studio.git
+# 克隆项目
+git clone git@github.com:joel-xiao/visual-studio.monorepo.git
 
-# enter the project directory
-cd visual-studio
+# 进入项目目录
+cd visualization-editor.monorepo
 
-# switch the main
-git switch main
-
-# install dependency
-npm install or yarn or pnpm
-
-# develop
-npm run dev or yarn dev or pnpm dev
-
-# Tauri develop
-npm run tauri dev or yarn tauri dev or pnpm tauri dev
+# 安装依赖
+pnpm install
 ```
 
-## 目录结构
-
-&emsp;&emsp;一旦启动或打包脚本执行过，会在根目录产生 **`dist` 文件夹，里面的文件夹同 `src` 一模一
-样**；在使用一些路径计算时，尤其是相对路径计算；`dist` 与 `src` 里面保持相同的目录结构能避开好多问题
-
-```tree
-├
-├── dist                        构建后，根据 src 目录生成
-├   ├── assets
-├   ├── images
-├
-├── .vscode
-├   ├── settings.json           vscode 规范 配置
-├
-├── src-tauri                   Tauri and Rust code
-├   ├── icons
-├   ├── src
-├   ├── ...
-├
-├── src                         Vue3 and JS code
-├   ├── assets
-├   ├── ...
-├
-├── tests                         Vue3 and JS 单元测试
-├
-├── .commitlintrc.js            git commit message 规范 配置
-├── .editorconfig               跨不同的编辑器和IDE为多个开发人员维护一致的编码风格的配置文件
-├── .eslintignore               指定 eslint 忽略文件和目录
-├── .eslintrc.js                eslint 配置项
-├── .gitignore                  指定 git 忽略文件和目录
-├── .prettierrc.js              prettier格式化 配置项
-├── .stylelintignore            指定 stylelint 忽略文件和目录
-├── .stylelintrc.js             stylelint 配置项
-├── changelog-option.js         git commit message 扩展阅读 配置
-├── tsconfig.json               tslint 配置
-
-├
-```
-
-## 提交更改
-
-请点击这里查看
-[提交规则](https://github.com/xiaowenlong1022/visual-studio/blob/main/.commitlintrc.js)。
+### 开发模式
 
 ```bash
-# pull
-git pull --rebase
+# Web 开发
+pnpm dev:web
 
-# commit the message
-git commit -m "commit: message"
+# Electron 开发
+pnpm dev:electron
 
-# push
-git push
+# Tauri 开发
+pnpm dev:tauri
 ```
+
+### 构建
+
+```bash
+# 构建 Web 版本
+pnpm build:web
+
+# 构建 Electron 应用
+pnpm build:electron
+
+# 构建 Tauri 应用
+pnpm build:tauri
+
+# Tauri 创建 DMG（构建完成后）
+cd packages/tauri && pnpm create-dmg
+```
+
+## 📦 包说明
+
+### `@visualization-editor/web`
+
+Web 核心包，包含所有业务逻辑和 UI 组件。
+
+- **技术栈**: Vue 3 + TypeScript + Vite
+- **状态管理**: Pinia
+- **路由**: Vue Router
+- **UI 框架**: Naive UI
+
+### `@visualization-editor/electron`
+
+Electron 桌面应用包。
+
+- **技术栈**: Electron 39 + electron-vite
+- **构建工具**: electron-builder
+- **特点**: 复用 web 包的核心代码
+
+### `@visualization-editor/tauri`
+
+Tauri 桌面应用包。
+
+- **技术栈**: Tauri 2.9 + Rust
+- **特点**: 更小的应用体积，更好的性能
+- **构建脚本**: `scripts/create-dmg.sh` - 手动创建 DMG
+- **构建命令**: 
+  - `pnpm build:app` - 只构建 app
+  - `pnpm build:dmg` - 构建 DMG（需要权限）
+  - `pnpm create-dmg` - 手动创建 DMG
+
+## 🔧 配置管理
+
+项目使用 `project.config.json` 作为单一数据源（SSOT）管理所有配置：
+
+- 项目名称和版本
+- 应用 ID (appId)
+- 作者信息
+- 版权信息
+
+修改配置后，运行以下命令同步到所有相关文件：
+
+```bash
+pnpm sync:config
+```
+
+## 📝 开发规范
+
+### 代码规范
+
+项目使用以下工具保证代码质量：
+
+- **EditorConfig** - 统一编辑器配置
+- **Prettier** - 代码格式化
+- **TypeScript** - 类型检查
+- **Commitlint** - Commit 信息规范
+
+### Git Commit 规范
+
+项目遵循 [Conventional Commits](https://www.conventionalcommits.org/) 规范：
+
+```bash
+feat: 新功能
+fix: 修复 Bug
+docs: 文档更新
+style: 代码格式调整
+refactor: 代码重构
+perf: 性能优化
+test: 测试相关
+chore: 构建/工具链相关
+```
+
+## 🛠️ 技术栈
+
+- **前端框架**: Vue 3.5
+- **构建工具**: Vite 7
+- **类型系统**: TypeScript 5.9
+- **桌面框架**: Electron 39 / Tauri 2.9
+- **包管理**: pnpm
+- **Monorepo**: pnpm workspace
+- **状态管理**: Pinia 3
+- **路由**: Vue Router 4
+- **UI 组件**: Naive UI
+
+## 📚 相关文档
+
+- [项目配置](./project.config.json) - 项目统一配置
+- [Tauri 构建问题](./packages/tauri/BUILD_FIX.md) - Tauri DMG 构建解决方案
+
+## 🤝 贡献
+
+欢迎贡献代码！请确保：
+
+1. 遵循项目的代码规范
+2. 提交前运行 `pnpm sync:config` 同步配置
+3. 遵循 Git Commit 规范
+
+## 📄 许可证
+
+[待定]
+
+## 🔗 相关链接
+
+- [Web Demo](https://visual-studio-one.vercel.app/)
+- [Electron 版本](https://github.com/joel-xiao/visual-studio.electron)

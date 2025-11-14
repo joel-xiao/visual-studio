@@ -1,6 +1,15 @@
 import type { App } from 'vue';
-import { InvokeArgs } from '@tauri-apps/api/tauri';
-import { invoke as as_invoke } from '@tauri-apps/api/tauri';
+import { invoke as as_invoke } from '@tauri-apps/api/core';
+
+type InvokeArgs = Parameters<typeof as_invoke>[1];
+
+declare global {
+  interface Window {
+    __TAURI__?: {
+      invoke: typeof as_invoke;
+    };
+  }
+}
 
 export function noTauri() {
   return !window?.__TAURI__;

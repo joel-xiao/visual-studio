@@ -1,20 +1,22 @@
 {
-  "name": "@visual-studio/electron",
+  "name": "@visualization-editor/electron",
   "private": true,
   "main": "dist/main/index.js",
   "type": "commonjs",
+  "version": "0.0.1",
+  "description": "Visualization Editor - A powerful visualization and editing tool (Electron)",
+  "author": "Joel Xiao",
   "scripts": {
     "dev": "electron-vite dev",
-    "build": "electron-vite build && electron-builder"
+    "build": "electron-vite build && npm run copy-web && electron-builder",
+    "copy-web": "node scripts/copy-web.js"
   },
-  "dependencies": {
-    "electron": "^28.1.0"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "electron-vite": "^2.3.0",
-    "vite": "^5.0.0",
-    "electron-builder": "^24.9.1",
-    "concurrently": "^9.2.0"
+    "electron": "^39.2.0",
+    "electron-vite": "^4.0.1",
+    "vite": "^7.2.2",
+    "electron-builder": "^26.0.12",
+    "concurrently": "^9.2.1"
   }
 }
-    

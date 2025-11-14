@@ -9,8 +9,7 @@ type DashboardState = {
   crumbs: Crumb[];
 };
 
-export const useDashboardStore = defineStore({
-  id: 'dashboard',
+export const useDashboardStore = defineStore('dashboard', {
   state: (): DashboardState => ({
     crumbs: []
   }),

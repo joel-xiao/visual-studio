@@ -1,10 +1,9 @@
 export function noElectron() {
-  const userAgent = window?.navigator?.userAgent?.toLowerCase();
-  return !userAgent?.includes('electron/');
+  return !window?.electron;
 }
 
 export function isElectron() {
-  return !noElectron();
+  return !!window?.electron;
 }
 
 export function invokeElectron(cmd: string, args?: any) {

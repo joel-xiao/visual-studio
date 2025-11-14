@@ -41,9 +41,9 @@ function initCurrentNav() {
     span.nav-content-span(@click="onNavSelect(item)" :class="{ active: currentNav.id === item.id }" :key="item.id" v-for="(item, idx) in navList")
       | {{ item.label }}
   .nav-right(v-if="$noNative()")
-    a(class="download" download="Visual Studio.dmg" href="/apps/visual-studio_0.1.0_x64.dmg")
+    a(class="download" download="Visualization Editor.dmg" href="/apps/visualization-editor_0.1.0_x64.dmg")
       | 下载 macOs 应用
-    a(class="download" download="Visual Studio.msi" href="/apps/visual-studio_0.1.0_x64_en-US.msi")
+    a(class="download" download="Visualization Editor.msi" href="/apps/visualization-editor_0.1.0_x64_en-US.msi")
       | 下载 Windows 应用
 .dashboard-content
   router-view

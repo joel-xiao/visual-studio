@@ -11,8 +11,6 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noUnusedLocals": false,
-
-
     "paths": {
       "@/*": ["./src/*"],
       "@v/*": ["./src/views/*"],
@@ -27,7 +25,7 @@
     "allowSyntheticDefaultImports": true,
     "lib": ["ESNext", "DOM"],
     "skipLibCheck": true,
-    "types": ["vite/client", "@types/node"]
+    "types": ["vite/client", "@types/node", "@tauri-apps/api"],
   },
   "include": ["./src/**/*.ts", "./src/**/*.d.ts", "./src/**/*.tsx", "./src/**/*.vue"],
   "references": [{ "path": "./tsconfig.node.json" }]

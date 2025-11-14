@@ -1,18 +1,100 @@
+# Dependencies
 node_modules/
+.pnp
+.pnp.js
 
+# Package manager locks
 pnpm-lock.yaml
-pnpm-debug.log
-*.pnpm-error.log
+yarn.lock
+package-lock.json
+Cargo.lock
 
+# Build outputs
 dist/
+dist-*/
 release/
 build/
+target/
+*.tsbuildinfo
 
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+*.pnpm-error.log
+
+# Environment variables
 .env
 .env.local
 .env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
 
+# IDE and editors
 .idea/
 .vscode/
+!.vscode/extensions.json
+*.swp
+*.swo
+*~
 *.sublime-*
 .DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Electron
+packages/electron/dist/
+packages/electron/release/
+packages/electron/*.dmg
+packages/electron/*.msi
+packages/electron/*.deb
+packages/electron/*.AppImage
+packages/electron/*.exe
+packages/electron/*.blockmap
+
+# Tauri
+packages/tauri/target/
+packages/tauri/gen/
+
+# Web
+packages/web/dist/
+packages/web/dist-tauri/
+packages/web/dist-ssr/
+packages/web/*.local
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+.temp/
+tmp/
+temp/
+
+# Coverage
+coverage/
+*.lcov
+.nyc_output/
+
+# Misc
+*.bak
+*.backup
+*.old
+.cursor/

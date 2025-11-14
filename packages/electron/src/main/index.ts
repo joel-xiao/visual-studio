@@ -1,12 +1,10 @@
-import { app, BrowserWindow } from 'electron';
-import { join } from 'path';
+import { app, shell, BrowserWindow } from 'electron';
+import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import path from 'path';
+import { isDev, devServerURL } from '../utils/env';
 
-// 处理 __dirname 定义（避免重复）
-var __dirname = typeof __dirname !== 'undefined' 
-  ? __dirname 
-  : path.dirname(fileURLToPath(import.meta.url));
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -18,21 +16,24 @@ function createWindow() {
       preload: join(__dirname, '../preload/index.js'),
       nodeIntegration: false,
       contextIsolation: true,
-      webSecurity: false // 开发环境允许跨域访问 Web 服务
+      webSecurity: false
     }
   });
 
-  // 强制使用 Web 服务的端口（1420）
-  const webServerUrl = process.env.NODE_ENV === 'development' 
-    ? 'http://localhost:1420'  // 开发环境：直接连接 Web 服务
-    : `file://${join(__dirname, '../../web/dist/index.html')}`; // 生产环境：加载打包文件
+  if (isDev) {
+    mainWindow.loadURL(devServerURL);
+  } else {
+    const htmlPath = join(__dirname, '../web/index.html');
+    mainWindow.loadFile(htmlPath);
+  }
 
-  mainWindow.loadURL(webServerUrl);
-
-  // 开发环境打开调试工具
-  if (process.env.NODE_ENV === 'development') {
+  if (isDev) {
     mainWindow.webContents.openDevTools();
   }
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    shell.openExternal(url);
+    return { action: 'deny' };
+  });
 
   mainWindow.on('closed', () => {
     mainWindow = null;
