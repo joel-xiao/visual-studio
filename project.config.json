@@ -1,20 +1,20 @@
 {
   "name": {
-    "kebab": "visualization-editor",
-    "pascal": "VisualizationEditor",
-    "display": "Visualization Editor",
-    "monorepo": "visualization-editor.monorepo"
+    "kebab": "visual-craft",
+    "pascal": "VisualCraft",
+    "display": "VisualCraft",
+    "monorepo": "visual-craft.monorepo"
   },
   "version": "0.0.1",
-  "description": "Visualization Editor - A powerful visualization and editing tool",
+  "description": "VisualCraft - 可视化工匠 - A powerful visualization and editing tool",
   "author": {
     "name": "Joel Xiao",
     "email": ""
   },
   "copyright": "Copyright © 2024 Joel Xiao",
   "appId": {
-    "electron": "com.visualization-editor.electron",
-    "tauri": "com.visualization-editor.tauri"
+    "electron": "com.visual-craft.electron",
+    "tauri": "com.visual-craft.tauri"
   },
   "repository": {
     "url": "",

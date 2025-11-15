@@ -1,5 +1,5 @@
 {
-  "name": "@visualization-editor/tauri",
+  "name": "@visual-craft/tauri",
   "private": true,
   "version": "0.0.1",
   "scripts": {

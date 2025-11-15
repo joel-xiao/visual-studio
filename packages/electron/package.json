@@ -1,10 +1,10 @@
 {
-  "name": "@visualization-editor/electron",
+  "name": "@visual-craft/electron",
   "private": true,
   "main": "dist/main/index.js",
   "type": "commonjs",
   "version": "0.0.1",
-  "description": "Visualization Editor - A powerful visualization and editing tool (Electron)",
+  "description": "VisualCraft - 可视化工匠 - A powerful visualization and editing tool (Electron)",
   "author": "Joel Xiao",
   "scripts": {
     "dev": "pnpm exec electron-vite dev",
