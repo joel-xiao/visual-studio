@@ -7,8 +7,7 @@ import copyPlugin from 'rollup-plugin-copy';
 
 export default defineConfig(async ({ mode }) => {
   const isClientTarget = mode === 'client';
-  const OUTPUT_DIR = isClientTarget ? 'dist' : 'dist/web';
-  const copyPluginTargets = [{ src: 'apps/*', dest: `${OUTPUT_DIR}/apps` }];
+  const copyPluginTargets = [{ src: 'apps/*', dest: `dist/apps` }];
   const base = isClientTarget ? './' : '/';
 
   return {
@@ -42,7 +41,6 @@ export default defineConfig(async ({ mode }) => {
     base: base,
 
     build: {
-      outDir: OUTPUT_DIR,
       emptyOutDir: false,
       rollupOptions: {
         plugins: [
