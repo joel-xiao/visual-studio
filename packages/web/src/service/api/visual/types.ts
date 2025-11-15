@@ -1,4 +1,4 @@
-export interface IVisualProjectsResponse extends Object {
+export interface IVisualProjectsResponse extends Record<string, unknown> {
   data?: {
     icon: string;
     label: string;

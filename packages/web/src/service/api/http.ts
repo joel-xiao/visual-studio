@@ -1,6 +1,6 @@
 import axios from 'axios';
+// import NProgress from 'nprogress';
 import { useLoadingBar } from 'naive-ui';
-import { apiBaseURL } from '@/utils/env';
 let loadingBar = useLoadingBar();
 if (!loadingBar) {
   loadingBar = {
@@ -27,28 +27,25 @@ const NProgress = {
   done: () => void;
 };
 
-axios.defaults.baseURL = apiBaseURL;
+axios.defaults.baseURL = '/api';
 axios.defaults.timeout = 10000;
 axios.defaults.headers.post['Content-Type'] = 'application/json;charset=UTF-8';
 axios.interceptors.request.use(
-  // (config): AxiosRequestConfig<object> => {
-  (config) => {
+  config => {
     const token = window.sessionStorage.getItem('token');
     if (token) {
-      // @ts-ignore
+      // @ts-expect-error - Dynamic header assignment
       config.headers.token = token;
     }
     return config;
   },
-  (error) => {
+  error => {
     return error;
   }
 );
-// 响应拦截
-axios.interceptors.response.use((res) => {
+axios.interceptors.response.use(res => {
   if (res.data.code === 111) {
     sessionStorage.setItem('token', '');
-    // token过期操作
   }
   return res;
 });
@@ -73,11 +70,11 @@ const http: Http = {
       NProgress.start();
       axios
         .get(url, { params })
-        .then((res) => {
+        .then(res => {
           NProgress.done();
           resolve(res.data);
         })
-        .catch((err) => {
+        .catch(err => {
           NProgress.done();
           reject(err.data);
         });
@@ -88,11 +85,11 @@ const http: Http = {
       NProgress.start();
       axios
         .post(url, JSON.stringify(params))
-        .then((res) => {
+        .then(res => {
           NProgress.done();
           resolve(res.data);
         })
-        .catch((err) => {
+        .catch(err => {
           NProgress.done();
           reject(err.data);
         });
@@ -105,11 +102,11 @@ const http: Http = {
         .post(url, file, {
           headers: { 'Content-Type': 'multipart/form-data' }
         })
-        .then((res) => {
+        .then(res => {
           NProgress.done();
           resolve(res.data);
         })
-        .catch((err) => {
+        .catch(err => {
           NProgress.done();
           reject(err.data);
         });
