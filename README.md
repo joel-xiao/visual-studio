@@ -22,9 +22,9 @@ visualization-editor.monorepo/
 │   ├── electron/         # Electron 桌面应用
 │   └── tauri/            # Tauri 桌面应用（Rust + Vue3）
 ├── scripts/              # 项目级脚本
-│   └── sync-project-config.js
+│   └── sync-project-config.ts
 ├── config/               # 配置文件目录
-│   └── changelog-option.js
+│   └── changelog-option.ts
 ├── project.config.json   # 项目统一配置
 └── package.json          # 根 package.json
 ```
@@ -67,18 +67,24 @@ pnpm dev:tauri
 ### 构建
 
 ```bash
-# 构建 Web 版本
+# 构建 Web 版本（输出到 packages/web/dist/web）
 pnpm build:web
 
-# 构建 Electron 应用
+# 构建 Electron 应用（Web 输出到 packages/web/dist，Electron 构建到 packages/electron/dist）
 pnpm build:electron
 
-# 构建 Tauri 应用
+# 构建 Tauri 应用（Web 输出到 packages/web/dist，Tauri 构建到 packages/tauri/target）
 pnpm build:tauri
 
 # Tauri 创建 DMG（构建完成后）
 cd packages/tauri && pnpm create-dmg
 ```
+
+**构建输出目录：**
+- **Web 模式** (`--mode web`): 输出到 `packages/web/dist/web/`
+- **客户端模式** (`--mode client`): 输出到 `packages/web/dist/`（用于 Electron 和 Tauri）
+- **Electron**: `packages/electron/dist/` 和 `packages/electron/release/`
+- **Tauri**: `packages/tauri/target/` 和 `packages/tauri/gen/`
 
 ## 📦 包说明
 
@@ -90,6 +96,9 @@ Web 核心包，包含所有业务逻辑和 UI 组件。
 - **状态管理**: Pinia
 - **路由**: Vue Router
 - **UI 框架**: Naive UI
+- **构建模式**:
+  - `build:web` - Web 模式，输出到 `dist/web/`
+  - `build:client` - 客户端模式（Electron/Tauri），输出到 `dist/`
 
 ### `@visualization-editor/electron`
 
@@ -132,14 +141,16 @@ pnpm sync:config
 
 项目使用以下工具保证代码质量：
 
-- **EditorConfig** - 统一编辑器配置
+- **ESLint** - 代码检查和格式化（Flat Config）
 - **Prettier** - 代码格式化
 - **TypeScript** - 类型检查
-- **Commitlint** - Commit 信息规范
+- **Husky** - Git hooks 管理
+- **lint-staged** - 暂存文件检查（pre-commit）
+- **Commitlint** - Commit 信息规范（commit-msg）
 
 ### Git Commit 规范
 
-项目遵循 [Conventional Commits](https://www.conventionalcommits.org/) 规范：
+项目遵循 [Conventional Commits](https://www.conventionalcommits.org/) 规范，使用 Husky 和 Commitlint 自动验证：
 
 ```bash
 feat: 新功能
@@ -149,7 +160,19 @@ style: 代码格式调整
 refactor: 代码重构
 perf: 性能优化
 test: 测试相关
+build: 构建系统或外部依赖的变动
 chore: 构建/工具链相关
+config: 构建过程或辅助工具的变动
+revert: 回滚
+merge: 代码合并
+sync: 同步主线或分支的 Bug
+```
+
+**示例：**
+```bash
+feat: add user authentication
+fix: resolve memory leak in editor
+refactor: simplify build configuration
 ```
 
 ## 🛠️ 技术栈
