@@ -3,11 +3,10 @@ import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import VueDevTools from 'vite-plugin-vue-devtools';
 import viteCompression from 'vite-plugin-compression';
-import copyPlugin from 'rollup-plugin-copy';
+import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 export default defineConfig(async ({ mode }) => {
   const isClientTarget = mode === 'client';
-  const copyPluginTargets = [{ src: 'apps/*', dest: `dist/apps` }];
   const base = isClientTarget ? './' : '/';
 
   return {
@@ -20,6 +19,14 @@ export default defineConfig(async ({ mode }) => {
         threshold: 10240,
         algorithm: 'gzip',
         ext: '.gz'
+      }),
+      viteStaticCopy({
+        targets: [
+          {
+            src: 'apps/*',
+            dest: 'apps'
+          }
+        ]
       })
     ],
 
@@ -41,14 +48,7 @@ export default defineConfig(async ({ mode }) => {
     base: base,
 
     build: {
-      emptyOutDir: false,
-      rollupOptions: {
-        plugins: [
-          copyPlugin({
-            targets: copyPluginTargets
-          })
-        ]
-      }
+      emptyOutDir: false
     },
 
     clearScreen: false,
