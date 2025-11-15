@@ -27,14 +27,14 @@ export const getUuid = function (): string {
         );
       };
 
-      //@ts-ignore
+      //@ts-expect-error - UUID generation workaround
       return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, callback);
     }
   }
   let timestamp = new Date().getTime();
   let performNow =
     (typeof performance !== 'undefined' && performance.now && performance.now() * 1000) || 0;
-  return 'xxxxxxxx-xxxx-6xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+  return 'xxxxxxxx-xxxx-6xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
     let random = Math.random() * 16;
     if (timestamp > 0) {
       random = (timestamp + random) % 16 | 0;

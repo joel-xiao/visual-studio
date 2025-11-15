@@ -1,12 +1,11 @@
 <script lang="ts" setup>
-import { ref, reactive } from 'vue';
-import type { LayerItemData, LayerItemMenu } from './interface';
+import { ref, reactive, withDefaults } from 'vue';
 
 interface Props {
   recursion?: number;
-  data?: LayerItemData[];
+  data?: PanelLayerItemData[];
   itemIcon?: string;
-  itemMenus: LayerItemMenu[];
+  itemMenus: PanelLayerItemMenu[];
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -19,18 +18,22 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits(['select', 'command']);
 
-const onSelect = function (item: LayerItemData): void {
+const onSelect = function (item: PanelLayerItemData): void {
   emit('select', item);
 };
 
 const layerItemStyle: { paddingLeft?: string } = reactive({});
 layerItemStyle.paddingLeft = 24 + props.recursion * 16 + 'px';
 
-const onArrow = function (item: LayerItemData): void {
+const onArrow = function (item: PanelLayerItemData): void {
   item.AFold = !item.AFold;
 };
 
-const onCommand = function (event: PointerEvent, cmd: LayerItemMenu, item: LayerItemData): void {
+const onCommand = function (
+  event: PointerEvent,
+  cmd: PanelLayerItemMenu,
+  item: PanelLayerItemData
+): void {
   emit('command', event, cmd, item);
 };
 </script>
@@ -57,6 +60,7 @@ const onCommand = function (event: PointerEvent, cmd: LayerItemMenu, item: Layer
       border-radius: 6px;
       overflow: hidden;
     }
+
     .layer-item-nav {
       position: relative;
       display: flex;

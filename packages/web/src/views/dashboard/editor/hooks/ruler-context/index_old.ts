@@ -1,6 +1,5 @@
 // import { Ref, nextTick } from 'vue';
 // import { cloneDeep } from 'lodash';
-// import { RulerConfig, RulerSetting, RulerDOMRect, RulerPos } from './interface';
 
 // class Ruler {
 //   #config: Readonly<RulerConfig> = {

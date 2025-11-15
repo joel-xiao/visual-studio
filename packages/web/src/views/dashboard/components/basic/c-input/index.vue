@@ -6,9 +6,11 @@ BasicBox(ref='box' type="input")
 
 <script lang="ts">
 export default {
+  name: 'C_INPUT',
   inheritAttrs: false
 };
 </script>
+
 <script setup lang="ts">
 import { ref, reactive, provide, withDefaults } from 'vue';
 import BasicBox from '../components/basic-box.vue';

@@ -2,10 +2,9 @@
 import MainLayout from './components/main-layout.vue';
 import { ref, reactive, markRaw, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import type { LayoutCreateProject } from './components/types';
 import { useDashboardStore } from '@/store/dashboard';
-import visual from '@s/visual/visual';
-import type { IVisualProjectsResponse } from '@s/visual/types';
+import visual from '@api/visual/visual';
+import type { IVisualProjectsResponse } from '@api/visual/types';
 const router = useRouter();
 
 const layoutRef = ref();
@@ -75,8 +74,8 @@ function initLayout() {
   ]);
 }
 
-let { saveCrumbs } = useDashboardStore();
-function onNewProject(opt: LayoutCreateProject) {
+const { saveCrumbs } = useDashboardStore();
+function onNewProject(opt: DbLayoutCreateProject) {
   // saveCrumbs(opt.folder?.cascades);
   // router.push('/dashboard/editor');
 }
@@ -91,9 +90,11 @@ MainLayout(ref="layoutRef" @create-project="onNewProject")
   font-weight: 600;
   display: block;
   width: 34px;
+
   &.get {
     color: var(--db-main-color-get);
   }
+
   &.post {
     color: var(--db-main-color-post);
   }

@@ -6,11 +6,10 @@ DragResize(ref="resize" :data="dragDataset" @resizing="onResizing" @mousedown.st
 
 <script setup lang="ts">
 import DragResize from './components/drag-resize.vue';
-import { ref, reactive, markRaw, readonly, watch, onMounted } from 'vue';
-import type { DragDataset } from '@d/drag-resize/interface';
+import { ref, reactive, markRaw, readonly, withDefaults, watch, onMounted } from 'vue';
 import { useNodeContext } from './../hooks/node-context';
+import { getNodeStyle } from './../hooks/node-context/example';
 import { useComponentContext } from './../hooks/component-context';
-import type { ComponentProps } from './../hooks/component-context/interface';
 import { useContainer } from '../hooks/container';
 
 interface Props {
@@ -20,13 +19,13 @@ const props = withDefaults(defineProps<Props>(), {
   id: ''
 });
 
-const { getNode, getNodeStyle, updateNode, onSelectNode, addNodeInstance } = useNodeContext();
-const node = getNode(props.id);
-const nodeStyle = getNodeStyle(props.id);
+const { getNode, updateNode, onSelectNode, addNodeInstance } = useNodeContext();
+const node = getNode(props.id) as INode;
+const nodeStyle = getNodeStyle(node);
 
 const { getScale, addContainerUpdated } = useContainer();
 const dragDataset = readonly(
-  reactive<DragDataset>(
+  reactive<IDragDataset>(
     markRaw({
       x: node.x || 0,
       y: node.y || 0,
@@ -63,7 +62,7 @@ const onDown = function (): void {
   onSelectNode(node.id);
 };
 
-const onResizing = function (dragDataset: DragDataset): void {
+const onResizing = function (dragDataset: IDragDataset): void {
   updateNode(node.id, {
     x: dragDataset.x,
     y: dragDataset.y,
@@ -75,7 +74,7 @@ const onResizing = function (dragDataset: DragDataset): void {
 const { createNodeComponentApp } = useComponentContext();
 const vm = ref<HTMLElement>();
 onMounted(() => {
-  createNodeComponentApp(node.props as ComponentProps, vm?.value, node.component);
+  createNodeComponentApp(node.props as IComponentProps, vm?.value, node.component);
 });
 </script>
 

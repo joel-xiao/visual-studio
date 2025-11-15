@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory, createWebHashHistory, RouteRecordRaw } from 'vue-router';
 import layout from '@v/layout/layout-screen.vue';
 import type { App } from 'vue';
-import { isElectron } from '@/service.native/electron/main';
-import { isTauri } from '@/service.native/tauri/main';
+import { isElectron } from '@/client/electron/main';
+import { isTauri } from '@/client/tauri/main';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -49,7 +49,7 @@ const routes: Array<RouteRecordRaw> = [
 ];
 
 const routePathJoinHandler = function (routes: Array<RouteRecordRaw>, parentPath?: string): void {
-  routes.forEach((route) => {
+  routes.forEach(route => {
     if (parentPath) {
       route.path = parentPath + route.path;
     }

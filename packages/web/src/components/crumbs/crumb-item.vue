@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import type { Size } from './../types.d';
-import type { Crumbs } from './types.d';
 interface Props {
-  crumbs: Crumbs;
-  size?: Size;
+  crumbs: CCrumbs;
+  size?: CSize;
 }
 const props = withDefaults(defineProps<Props>(), {
   crumbs: () => [],

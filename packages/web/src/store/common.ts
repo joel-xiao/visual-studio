@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia';
 
-
 export type CommonState = {
   name: string;
 };

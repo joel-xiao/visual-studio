@@ -1,10 +1,45 @@
 {
   "id": "3143945",
-  "name": "dashboard",
+  "name": "Visual Studio",
   "font_family": "iconfont",
   "css_prefix_text": "icon-",
   "description": "",
   "glyphs": [
+    {
+      "icon_id": "11020939",
+      "name": "字体选择",
+      "font_class": "font-family",
+      "unicode": "e6b5",
+      "unicode_decimal": 59061
+    },
+    {
+      "icon_id": "35462922",
+      "name": "自动行高",
+      "font_class": "line-height",
+      "unicode": "e9d7",
+      "unicode_decimal": 59863
+    },
+    {
+      "icon_id": "39691801",
+      "name": "字间距",
+      "font_class": "letter-spacing",
+      "unicode": "e849",
+      "unicode_decimal": 59465
+    },
+    {
+      "icon_id": "4890393",
+      "name": "文字",
+      "font_class": "text",
+      "unicode": "e6ec",
+      "unicode_decimal": 59116
+    },
+    {
+      "icon_id": "34198298",
+      "name": "文字大小2",
+      "font_class": "text-size",
+      "unicode": "e853",
+      "unicode_decimal": 59475
+    },
     {
       "icon_id": "39221758",
       "name": "bottom-left-radius",

@@ -8,11 +8,10 @@ div(
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, readonly, markRaw } from 'vue';
-import type { DragDataset, Binding } from '@d/drag-resize/interface';
+import { ref, reactive, computed, readonly, markRaw, withDefaults } from 'vue';
 
 interface Props {
-  data: DragDataset;
+  data: IDragDataset;
 }
 const props = withDefaults(defineProps<Props>(), {
   data: () => ({ y2: 0, x2: 0, x: 0, y: 0 })
@@ -20,23 +19,23 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits(['resizing']);
 
-const dragData = reactive<Binding>({
+const dragData = reactive<IDragResizeBinding>({
   pos: props.data,
   disabled: false,
   active: false,
   scale: 1,
-  onUp: (dragDataset: DragDataset) => {
+  onUp: (dragDataset: IDragDataset) => {
     emit('resizing', dragDataset);
   }
 });
 
-const dragDataComputed = computed<Binding>(() => ({ ...dragData }));
+const dragDataComputed = computed<IDragResizeBinding>(() => ({ ...dragData }));
 
 const setActive = function (val: boolean | undefined): void {
   dragData.active = !!val;
 };
 
-const setPos = function (pos: DragDataset): void {
+const setPos = function (pos: IDragDataset): void {
   dragData.pos = pos;
 };
 

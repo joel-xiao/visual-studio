@@ -1,6 +1,4 @@
-import { UseComponent } from '../../interface';
-
-const use: UseComponent = {
+const use: IUseUILibraryComponent = {
   name: '视频',
   id: 'controls_video'
 };

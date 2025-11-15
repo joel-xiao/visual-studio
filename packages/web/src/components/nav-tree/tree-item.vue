@@ -1,15 +1,13 @@
 <script lang="ts" setup>
-import { ref, reactive, computed } from 'vue';
-import type { TreeItemData, TreeItemMenu } from './interface';
-import type { Size } from './../types.d';
+import { ref, reactive, withDefaults, computed } from 'vue';
 
 interface Props {
   recursion?: number;
-  data?: TreeItemData[];
+  data?: ITreeItemData[];
   itemIcon?: string;
-  itemMenus: TreeItemMenu[];
-  size?: Size;
-  currentNav?: TreeItemData | null;
+  itemMenus: ITreeItemMenu[];
+  size?: CSize;
+  currentNav?: ITreeItemData | null;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -23,20 +21,20 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits(['select', 'command']);
 
-const onSelect = function (item: TreeItemData, isTop: boolean): void {
+const onSelect = function (item: ITreeItemData, isTop: boolean): void {
   if (!isTop) onArrow(item);
   emit('select', item);
 };
 
 const IsDot = computed(() => {
-  return props.data.some((item) => item.children?.length);
+  return props.data.some(item => item.children?.length);
 });
 
 const IsPrefix = computed(() => {
-  return props.data.some((item) => !!item.prefix);
+  return props.data.some(item => !!item.prefix);
 });
 
-const IsArrow = function (item: TreeItemData) {
+const IsArrow = function (item: ITreeItemData) {
   return item?.children?.length;
 };
 
@@ -44,12 +42,12 @@ const treeItemStyle: { paddingLeft?: string } = reactive({});
 treeItemStyle.paddingLeft = (IsPrefix.value ? 10 : 24) + props.recursion * 16 + 'px';
 
 // const AFold = ref<boolean>(false);
-function onArrow(item: TreeItemData): void {
+function onArrow(item: ITreeItemData): void {
   item.AFold = !item.AFold;
   // AFold.value = item.AFold;
 }
 
-const onCommand = function (event: PointerEvent, cmd: TreeItemMenu, item: TreeItemData): void {
+const onCommand = function (event: PointerEvent, cmd: ITreeItemMenu, item: ITreeItemData): void {
   emit('command', event, cmd, item);
 };
 </script>
@@ -165,6 +163,7 @@ const onCommand = function (event: PointerEvent, cmd: TreeItemMenu, item: TreeIt
       opacity: 0.2;
       overflow: hidden;
       transition: 0.1s;
+
       &.expand {
         opacity: 1;
         height: 100%;

@@ -1,12 +1,11 @@
 <script lang="ts" setup>
-import type { Size } from './../types.d';
-import { computed, reactive } from 'vue';
+import { computed, reactive, withDefaults } from 'vue';
 
 interface Props {
   src?: string;
   button?: boolean;
   block?: boolean;
-  size?: Size;
+  size?: CSize;
   fontSize?: string | number;
 }
 
@@ -72,9 +71,11 @@ span(class='c-icon-font' v-bind="$attrs" :style="Style" :class="[button ? 'butto
     margin: 2px;
     color: var(--theme-color-tran-85);
     transition: all 0.15s;
+
     &:hover {
       background-color: var(--theme-color-tran-6);
     }
+
     &.active {
       color: var(--theme-color-tran-85);
       background: var(--theme-color-tran-12);

@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
 contextBridge.exposeInMainWorld('electron', {
-  invoke: (channel: string, ...args: any[]) => {
+  invoke: (channel: string, ...args: unknown[]) => {
     const validChannels = ['get-app-info'];
     if (validChannels.includes(channel)) {
       return ipcRenderer.invoke(channel, ...args);
@@ -9,7 +9,7 @@ contextBridge.exposeInMainWorld('electron', {
     return Promise.reject(new Error(`禁止调用未授权的 IPC 通道: ${channel}`));
   },
 
-  send: (channel: string, ...args: any[]) => {
+  send: (channel: string, ...args: unknown[]) => {
     const validChannels = ['ui-event', 'log-event'];
     if (validChannels.includes(channel)) {
       ipcRenderer.send(channel, ...args);
@@ -19,10 +19,10 @@ contextBridge.exposeInMainWorld('electron', {
     return false;
   },
 
-  on: (channel: string, listener: (...args: any[]) => void) => {
+  on: (channel: string, listener: (...args: unknown[]) => void) => {
     const validChannels = ['app-event', 'update-event'];
     if (validChannels.includes(channel)) {
-      const subscription = (event: any, ...args: any[]) => listener(...args);
+      const subscription = (_event: unknown, ...args: unknown[]) => listener(...args);
       ipcRenderer.on(channel, subscription);
       return () => {
         ipcRenderer.removeListener(channel, subscription);
@@ -35,4 +35,3 @@ contextBridge.exposeInMainWorld('electron', {
   isElectron: true,
   platform: process.platform
 });
-

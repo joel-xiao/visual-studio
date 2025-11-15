@@ -8,8 +8,6 @@ type ContainerOption = {
   containerEl: HTMLElement;
 };
 
-type Rect = DOMRect | { width: number; height: number };
-
 class Container {
   #scale = 1;
   #maxScale = 256;
@@ -91,7 +89,7 @@ class Container {
       setRulerScaleOffset(offset);
       setRulerScale(this.#scale);
 
-      this.#containerUpdates.forEach((callback) => callback({ scale: this.#scale }));
+      this.#containerUpdates.forEach(callback => callback({ scale: this.#scale }));
     }
   }
 
@@ -100,8 +98,10 @@ class Container {
   }
 
   removeContainerUpdated(fn: ICallbackUpdate) {
-    const idx: number = this.#containerUpdates.findIndex((r) => r === fn);
-    idx && this.#containerUpdates.splice(idx, 1);
+    const idx: number = this.#containerUpdates.findIndex(r => r === fn);
+    if (idx !== -1) {
+      this.#containerUpdates.splice(idx, 1);
+    }
   }
 
   getScale() {

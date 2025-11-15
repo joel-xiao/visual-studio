@@ -3,6 +3,6 @@ import Index from './index.vue';
 
 export default {
   install(app: App<Element>): void {
-    app.component('ClickMenu', Index);
+    app.component('ICClickMenu', Index);
   }
 };

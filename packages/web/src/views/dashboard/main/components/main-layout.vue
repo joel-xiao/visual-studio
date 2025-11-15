@@ -1,26 +1,25 @@
 <script setup lang="ts">
 import CInput from './../../components/basic/c-input/index.vue';
-import { ref, reactive, markRaw } from 'vue';
+import { ref, reactive, markRaw, defineEmits } from 'vue';
 import { getUuid } from '@a/utils/index';
-import type {
-  ITreeItemMenu,
-  ITreeItemData,
-  ILayoutOption,
-  ILayoutNewProjectData,
-  LayoutCreateProject
-} from './types.d';
 
 const emits = defineEmits<{
-  (e: 'button-click', data: LayoutCreateProject): void;
+  (e: 'button-click', data: DbLayoutCreateProject): void;
 }>();
 
-let option = reactive<ILayoutOption>({});
+let option = reactive<IDbLayoutOption>({});
 
-function setOption(opt: ILayoutOption) {
+function setOption(opt: IDbLayoutOption) {
   option = opt;
-  opt.folderTree && setFolderTree(opt.folderTree);
-  opt.folderMenus && setFolderTree(opt.folderMenus);
-  opt.buttons && setButtons(opt.buttons);
+  if (opt.folderTree) {
+    setFolderTree(opt.folderTree);
+  }
+  if (opt.folderMenus) {
+    setFolderTree(opt.folderMenus);
+  }
+  if (opt.buttons) {
+    setButtons(opt.buttons);
+  }
 }
 
 function clearOption() {
@@ -55,9 +54,9 @@ function clearFolderMenus() {
   folderMenus.value = [];
 }
 
-const buttons = ref<ILayoutNewProjectData[]>([]);
+const buttons = ref<IDbLayoutNewProjectData[]>([]);
 
-function setButtons(data: ILayoutNewProjectData[]) {
+function setButtons(data: IDbLayoutNewProjectData[]) {
   buttons.value = markRaw(Array.isArray(data) ? data : []);
 }
 
@@ -65,12 +64,15 @@ function clearButtons() {
   buttons.value = [];
 }
 
-function onButton(item: ILayoutNewProjectData): void {
-  let project: ITreeItemData = { name: '未命名', id: getUuid(), sum: 0 };
+function onButton(item: IDbLayoutNewProjectData): void {
+  const project: ITreeItemData = { name: '未命名', id: getUuid(), sum: 0 };
   if (currentFolder.value?.children) {
     currentFolder.value.AFold = true;
     currentFolder.value.children.push(project);
-    currentFolder.value.cascades.push(project);
+
+    if (currentFolder.value.cascades) {
+      currentFolder.value.cascades.push(project);
+    }
   }
   emits('button-click', {
     folder: currentFolder.value,
@@ -112,12 +114,12 @@ div#dashboard-my-project
   div(class="project-screen-list left")
     div.new-projects
       div.new-project(
-          v-for="(item, idx) in buttons"
-          @click="onButton(item)"
-          :key="item.id")
-          img(v-if="item.icon" :src="'@a/img/dashboard/main/' + item.icon")
-          span.ellipsis.project-type {{item.name}}
-          Icon(src='icon-jiahao' font-size="16px")
+        v-for="(item, idx) in buttons"
+        @click="onButton(item)"
+        :key="item.id")
+        img(v-if="item.icon" :src="'@a/img/dashboard/main/' + item.icon")
+        span.ellipsis.project-type {{item.name}}
+        Icon(src='icon-jiahao' font-size="16px")
 
     div.projects-search
       div.search
@@ -149,6 +151,7 @@ div#dashboard-my-project
       padding: 8px;
       background: var(--db-main-color-left-bar-bg);
       z-index: 1;
+
       .manage-title {
         height: 40px;
         display: flex;
@@ -260,9 +263,11 @@ div#dashboard-my-project
         position: absolute;
         top: -40px;
         left: 36px;
+
         .search {
           width: 340px;
           height: 100%;
+
           .n-input {
             height: 100%;
             border-radius: var(--border-radius-8);
@@ -295,6 +300,7 @@ div#dashboard-my-project
             padding-left: 6px;
             font-size: 14px;
             letter-spacing: 1px;
+
             .projects-number {
               padding: 0 2px;
             }

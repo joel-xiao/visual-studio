@@ -6,10 +6,12 @@
 #app {
   /* Color table ------ Start ------ */
   --theme-color-gray-0: hsla(0, 0%, 100%, 0);
+  --theme-color-gray-25: hsla(0, 0%, 100%, 0.015);
+  --theme-color-gray-50: hsla(0, 0%, 100%, 0.03);
   --theme-color-gray-100: hsla(0, 0%, 100%, 0.06);
   --theme-color-gray-200: hsla(0, 0%, 100%, 0.08);
   --theme-color-gray-300: hsla(0, 0%, 100%, 0.12);
-  --theme-color-gray-400: hsla(0, 0%, 100%, 0.18);
+  --theme-color-gray-400: hsla(0, 0%, 100%, 0.15);
   --theme-color-gray-500: hsla(0, 0%, 100%, 0.18);
   --theme-color-gray-600: hsla(0, 0%, 100%, 0.3);
   --theme-color-gray-700: hsla(0, 0%, 100%, 0.5);
@@ -34,6 +36,7 @@
   --theme-color-blue-900: #324894;
 
   --theme-color: 0, 0%, 100%;
+  --theme-color-tran-4: hsla(var(--theme-color), 0.04);
   --theme-color-tran-6: hsla(var(--theme-color), 0.06);
   --theme-color-tran-8: hsla(var(--theme-color), 0.08);
   --theme-color-tran-10: hsla(var(--theme-color), 0.1);
@@ -47,14 +50,9 @@
   --theme-color-tran-85: hsla(var(--theme-color), 0.9);
   --theme-color-tran-100: rgb(255 255 255 / 100%);
 
-  --theme-light-600: 24%;
-  --theme-light-700: 19%;
-  --theme-light-800: 13%;
-  --theme-light-900: 3%;
-
-  --color-gray-700: hsla(0, 0%, var(--theme-light-700), 1);
-  --color-gray-800: hsla(0, 0%, var(--theme-light-800), 1);
-  --color-gray-900: hsla(0, 0%, var(--theme-light-900), 1);
+  --color-gray-700: hsla(0, 0%, 19%, 1);
+  --color-gray-800: hsla(0, 0%, 13%, 1);
+  --color-gray-900: hsla(0, 0%, 3%, 1);
 
   /* Color table ------ End ------ */
 

@@ -1,14 +1,11 @@
 <script lang="ts" setup>
 import TreeItem from './tree-item.vue';
-import { ref, reactive, computed, onUnmounted } from 'vue';
-import type { TreeItemData, TreeItemMenu } from './interface';
-import type { Size } from './../types.d';
-
+import { ref, reactive, computed, withDefaults, onUnmounted } from 'vue';
 interface Props {
-  data?: TreeItemData[];
-  itemMenus?: TreeItemMenu[];
+  data?: ITreeItemData[];
+  itemMenus?: ITreeItemMenu[];
   itemIcon?: string;
-  size?: Size;
+  size?: CSize;
 }
 const props = withDefaults(defineProps<Props>(), {
   data: () => [],
@@ -20,10 +17,10 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits(['select', 'command']);
 
 const findTreeFolder = function (
-  folders: TreeItemData[],
-  cascades?: TreeItemData[]
-): TreeItemData[] {
-  folders.forEach((folder) => {
+  folders: ITreeItemData[],
+  cascades?: ITreeItemData[]
+): ITreeItemData[] {
+  folders.forEach(folder => {
     folder.cascades = [{ name: folder.name, id: folder.id }];
     if (cascades) folder.cascades.unshift(...cascades);
     if (folder.children) {
@@ -34,12 +31,12 @@ const findTreeFolder = function (
   });
   return folders;
 };
-const tree = computed<TreeItemData[]>(() => {
+const tree = computed<ITreeItemData[]>(() => {
   return findTreeFolder(props.data);
 });
 
-const currentNav = ref<TreeItemData>();
-const onNavSelect = function (item: TreeItemData): void {
+const currentNav = ref<ITreeItemData>();
+const onNavSelect = function (item: ITreeItemData): void {
   currentNav.value = item;
   emit('select', item);
 };
@@ -60,23 +57,23 @@ const onContentMenuShow = function (val?: boolean, el?: HTMLElement): void {
   }
 };
 
-let commandData = reactive<{
-  item: TreeItemData | null;
-  cmd: TreeItemMenu | null;
+const commandData = reactive<{
+  item: ITreeItemData | null;
+  cmd: ITreeItemMenu | null;
 }>({
   item: null,
   cmd: null
 });
 
-const onMenuCommand = function (cmd: TreeItemMenu): void {
+const onMenuCommand = function (cmd: ITreeItemMenu): void {
   console.log(cmd);
   emit('command', cmd);
 };
 
 const onCommand = function (
   event: { composedPath: () => HTMLElement[] },
-  cmd: TreeItemMenu,
-  item: TreeItemData
+  cmd: ITreeItemMenu,
+  item: ITreeItemData
 ): void {
   commandData.cmd = cmd;
   commandData.item = item;
@@ -104,7 +101,7 @@ div(class='c-nav-tree' :class="size")
     :itemIcon="itemIcon"
     :itemMenus="itemMenus"
     :currentNav="currentNav")
-  ClickMenu(
+  ICClickMenu(
     v-model='clickMenu.show'
     :data="commandData?.cmd?.children || []"
     :x="clickMenu.x"

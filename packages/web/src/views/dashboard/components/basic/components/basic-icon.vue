@@ -25,30 +25,30 @@ const isIconText = computed(() => {
 
 <template lang="pug">
 div(class="basic-icon" :class="iconClass")
-  span(class='icon-text' v-if="isIconText")
-   | {{ icon }}
+  span(class='basic-icon-text' v-if="isIconText")
+    | {{ icon }}
   i(class='icon-font' :class='icon' v-else-if="isIcon")
 </template>
 
 <style lang="scss">
 #dashboard .basic-icon {
   line-height: 1;
-  width: 30px;
+  width: 24px;
   height: 100%;
   display: flex;
-  box-pack: center;
+  flex: none;
   justify-content: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
   align-items: center;
   color: var(--db-editor-icon-color);
   user-select: none;
+  position: relative;
+  font-weight: normal;
 
   &.lock {
     opacity: 0.5;
   }
 
-  .icon-text {
+  .basic-icon-text {
     font-size: 12px;
     font-weight: normal;
     transform: scale(0.9);

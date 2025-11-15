@@ -1,12 +1,7 @@
 import { defineStore } from 'pinia';
 
-export interface Crumb {
-  id?: string;
-  name?: string;
-}
-
 type DashboardState = {
-  crumbs: Crumb[];
+  crumbs: IDashboardCrumb[];
 };
 
 export const useDashboardStore = defineStore('dashboard', {
@@ -14,7 +9,7 @@ export const useDashboardStore = defineStore('dashboard', {
     crumbs: []
   }),
   actions: {
-    saveCrumbs(value?: Crumb[] | undefined): void {
+    saveCrumbs(value?: IDashboardCrumb[] | undefined): void {
       this.crumbs = value || [];
     }
   },

@@ -18,7 +18,8 @@ import {
   NPopover,
   NInput,
   NBreadcrumb,
-  NBreadcrumbItem
+  NBreadcrumbItem,
+  NColorPicker
 } from 'naive-ui';
 
 const components = [
@@ -35,7 +36,8 @@ const components = [
   NPopover,
   NInput,
   NBreadcrumb,
-  NBreadcrumbItem
+  NBreadcrumbItem,
+  NColorPicker
 ];
 const naive = create({
   components

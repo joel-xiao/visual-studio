@@ -1,6 +1,4 @@
-import type { ComponentSchemaExport } from './../../hooks/component-context/interface';
-
-const schema: ComponentSchemaExport = {
+const schema: IComponentSchemaExport = {
   name: '根容器',
   type: 'CANVAS_CONTAINER',
   icon: 'qw.png',
@@ -9,8 +7,16 @@ const schema: ComponentSchemaExport = {
       type: 'schema',
       schema: 'COMMON_CONTAINER_LAYOUT',
       default: {
-        width: 300,
-        height: 300
+        width: 1000,
+        height: 600
+      }
+    },
+
+    {
+      type: 'schema',
+      schema: 'COMMON_CONTAINER_FILL',
+      default: {
+        color: ''
       }
     }
   ]

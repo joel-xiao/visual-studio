@@ -1,11 +1,10 @@
 <script lang="ts" setup>
 import LayerItem from './layer-item.vue';
-import { ref, reactive, computed, onUnmounted } from 'vue';
-import type { LayerItemData, LayerItemMenu } from './interface';
+import { ref, reactive, computed, withDefaults, onUnmounted } from 'vue';
 
 interface Props {
-  data?: LayerItemData[];
-  itemMenus?: LayerItemMenu[];
+  data?: PanelLayerItemData[];
+  itemMenus?: PanelLayerItemMenu[];
   itemIcon?: string;
 }
 const props = withDefaults(defineProps<Props>(), {
@@ -16,8 +15,11 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits(['select', 'command']);
 
-const findLayer = function (folders: LayerItemData[], cascades?: LayerItemData[]): LayerItemData[] {
-  folders.forEach((folder) => {
+const findLayer = function (
+  folders: PanelLayerItemData[],
+  cascades?: PanelLayerItemData[]
+): PanelLayerItemData[] {
+  folders.forEach(folder => {
     folder.cascades = [folder];
     if (cascades) folder.cascades.unshift(...cascades);
     if (folder.children) {
@@ -28,13 +30,15 @@ const findLayer = function (folders: LayerItemData[], cascades?: LayerItemData[]
   });
   return folders;
 };
-const tree = computed<LayerItemData[]>(() => {
+const tree = computed<PanelLayerItemData[]>(() => {
   return findLayer(props.data);
 });
 
-const oldSelect = ref<LayerItemData>();
-const onNavSelect = function (item: LayerItemData): void {
-  oldSelect.value && (oldSelect.value.select = false);
+const oldSelect = ref<PanelLayerItemData>();
+const onNavSelect = function (item: PanelLayerItemData): void {
+  if (oldSelect.value) {
+    oldSelect.value.select = false;
+  }
   oldSelect.value = item;
   item.select = true;
   emit('select', item);
@@ -54,22 +58,22 @@ const onContentMenuShow = function (val?: boolean, el?: HTMLElement): void {
   }
 };
 
-let commandData = reactive<{
-  item: LayerItemData | null;
-  cmd: LayerItemMenu | null;
+const commandData = reactive<{
+  item: PanelLayerItemData | null;
+  cmd: PanelLayerItemMenu | null;
 }>({
   item: null,
   cmd: null
 });
 
-const onMenuCommand = function (cmd: LayerItemMenu): void {
+const onMenuCommand = function (cmd: PanelLayerItemMenu): void {
   emit('command', cmd, commandData.item);
 };
 
 const onCommand = function (
   event: { composedPath: () => HTMLElement[] },
-  cmd: LayerItemMenu,
-  item: LayerItemData
+  cmd: PanelLayerItemMenu,
+  item: PanelLayerItemData
 ): void {
   commandData.cmd = cmd;
   commandData.item = item;
@@ -91,7 +95,7 @@ div(class='editor-panel-layer')
     :data="tree"
     :itemIcon="itemIcon"
     :itemMenus="itemMenus")
-  ClickMenu(
+  ICClickMenu(
     v-model='clickMenu.show'
     :data="commandData?.cmd?.children || []"
     :x="clickMenu.x"

@@ -5,12 +5,11 @@ div.editor-panel-tab_bar
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue';
-import type { Tab } from './interface';
+import { ref, reactive, withDefaults } from 'vue';
 
 interface Props {
-  data?: Tab[];
-  modelValue?: Tab;
+  data?: PanelTab[];
+  modelValue?: PanelTab;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -20,7 +19,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits(['select', 'update:modelValue']);
 
-const onSelect = function (tab: Tab): void {
+const onSelect = function (tab: PanelTab): void {
   emit('update:modelValue', tab);
   emit('select', tab);
 };
@@ -29,10 +28,12 @@ const onSelect = function (tab: Tab): void {
 <style lang="scss">
 .editor-panel-tab_bar {
   height: 100%;
+
   .tab_container {
     display: flex;
     align-items: center;
     height: 100%;
+
     .tab_item {
       height: 100%;
       display: inline-flex;
@@ -48,7 +49,6 @@ const onSelect = function (tab: Tab): void {
       &:hover,
       &.active {
         color: var(--theme-color-text-bold);
-        color: #fff;
         font-weight: 600;
       }
     }

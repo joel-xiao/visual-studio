@@ -1,9 +1,7 @@
-import type { SchemaExport } from '../interface';
 const SCHEMA_NAME = 'COMMON_LAYOUT';
-const SCHEMA_LABEL = '布局';
 const SCHEMA_KEY = 'layout';
 
-const schema: SchemaExport = {
+const schema: ISchemaExport = {
   name: SCHEMA_NAME,
   label: '', // SCHEMA_LABEL,
   key: SCHEMA_KEY,
@@ -14,14 +12,16 @@ const schema: SchemaExport = {
         type: Number,
         default: 0,
         icon: 'X',
-        ctrl: 'input'
+        ctrl: 'C_INPUT',
+        size: 'middle'
       },
       {
         key: 'y',
         type: Number,
         default: 0,
         icon: 'Y',
-        ctrl: 'input'
+        ctrl: 'C_INPUT',
+        size: 'middle'
       }
     ],
     [
@@ -30,23 +30,25 @@ const schema: SchemaExport = {
         type: Number,
         default: 0,
         icon: 'W',
-        ctrl: 'input'
+        ctrl: 'C_INPUT',
+        size: 'middle'
       },
       {
         key: 'height',
         type: Number,
         default: 0,
         icon: 'H',
-        ctrl: 'input'
+        ctrl: 'C_INPUT',
+        size: 'middle'
       },
       {
         key: 'size_proportion_lock',
         type: Boolean,
         default: false,
         icon: 'icon-locking-ratio',
-        ctrl: 'button',
+        ctrl: 'C_BUTTON',
         ctrl_type: 'status-button',
-        size: 'right'
+        size: 'mini'
       }
     ],
     [
@@ -55,16 +57,17 @@ const schema: SchemaExport = {
         type: Number,
         default: 0,
         icon: 'icon-rotate',
-        ctrl: 'input'
+        ctrl: 'C_INPUT',
+        size: 'middle'
       },
       {
         key: '',
         type: Boolean,
         default: false,
         icon: 'icon-reverse-y',
-        ctrl: 'button',
+        ctrl: 'C_BUTTON',
         size: 'small',
-        click: (props) => {
+        click: props => {
           if (typeof props.rotate === 'number') {
             props.rotate = 180 - props.rotate;
           }
@@ -75,9 +78,9 @@ const schema: SchemaExport = {
         type: Boolean,
         default: false,
         icon: 'icon-reverse-x',
-        ctrl: 'button',
+        ctrl: 'C_BUTTON',
         size: 'small',
-        click: (props) => {
+        click: props => {
           if (typeof props.rotate === 'number') {
             props.rotate = 180 - props.rotate;
           }
@@ -95,8 +98,7 @@ const schema: SchemaExport = {
           'icon-bottom-left-radius',
           'icon-bottom-right-radius'
         ],
-        ctrl: 'input-group',
-        size: 'largely'
+        ctrl: 'INPUT_GROUP'
       }
     ]
   ]

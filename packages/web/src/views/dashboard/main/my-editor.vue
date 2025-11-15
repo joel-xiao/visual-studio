@@ -4,10 +4,9 @@ Editor
 
 <script setup lang="ts">
 import Editor from '../editor/index.vue';
-import type { EditorData } from '../editor/hooks/node-context/interface';
 import { ref, reactive } from 'vue';
 
-// const data = reactive<EditorData>({
+// const data = reactive<IEditorData>({
 //   folder: '',
 //   id: '',
 //   type: '',

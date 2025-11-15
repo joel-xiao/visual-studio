@@ -9,7 +9,9 @@ export default {
   install(app: App<Element>): void {
     for (const path of Object.keys(uses)) {
       const install = uses[path]?.install;
-      install && install(app);
+      if (install) {
+        install(app);
+      }
     }
   }
 };

@@ -14,14 +14,20 @@ div(class="schema-input-group")
     Button(v-model="data.isMore" icon="icon-spread-out" type="status-button")
 </template>
 
+<script lang="ts">
+export default {
+  name: 'INPUT_GROUP',
+  inheritAttrs: false
+};
+</script>
+
 <script setup lang="ts">
 import { reactive, nextTick } from 'vue';
 import Input from './../../../../../../components/basic/c-input/index.vue';
 import Button from './../../../../../../components/basic/c-button/index.vue';
-import type { PanelSchemaRadius } from './interface';
 
 interface Props {
-  modelValue: PanelSchemaRadius;
+  modelValue: number[];
   icon: string | string[];
 }
 const props = withDefaults(defineProps<Props>(), {

@@ -3,20 +3,19 @@ import MainLayout from './components/main-layout.vue';
 import ItemCard from './components/item-card.vue';
 import { ref, reactive, markRaw, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import type { LayoutCreateProject, ILayoutProject } from './components/types';
 import { useDashboardStore } from '@/store/dashboard';
-import visual from '@s/visual/visual';
-import type { IVisualProjectsResponse } from '@s/visual/types';
+import visual from '@api/visual/visual';
+import type { IVisualProjectsResponse } from '@api/visual/types';
 const router = useRouter();
 
-const layoutRef = ref();
+const layoutRef = ref<InstanceType<typeof MainLayout>>();
 
 onMounted(() => {
   initLayout();
 });
 
 function initLayout() {
-  layoutRef.value.setFolderTree([
+  layoutRef.value?.setFolderTree([
     { name: '全部应用', id: 'all', sum: 0, handle: false },
     { name: '未分组', id: 'no-group', sum: 0, handle: false },
     {
@@ -31,7 +30,7 @@ function initLayout() {
     }
   ]);
 
-  layoutRef.value.setFolderMenus([
+  layoutRef.value?.setFolderMenus([
     {
       name: '更多',
       id: 'more',
@@ -45,7 +44,7 @@ function initLayout() {
     { name: '添加组', id: 'add', icon: 'icon-jiahao', disabled: true }
   ]);
 
-  layoutRef.value.setButtons([
+  layoutRef.value?.setButtons([
     { name: '可视化', id: 'new', icon: '' },
     { name: '导入', id: 'import', icon: '' }
     // { name: 'PC端', id: 'web', icon: 'new-project-web.png' },
@@ -53,18 +52,18 @@ function initLayout() {
   ]);
 }
 
-let { saveCrumbs } = useDashboardStore();
-function onButtonClick(opt: LayoutCreateProject) {
+const { saveCrumbs } = useDashboardStore();
+function onButtonClick(opt: DbLayoutCreateProject) {
   saveCrumbs(opt.folder?.cascades);
   router.push('/dashboard/editor');
 }
 
-const projects = ref<ILayoutProject[]>([]);
+const projects = ref<IDbLayoutProject[]>([]);
 </script>
 
 <template lang="pug">
 MainLayout(ref="layoutRef" @button-click="onButtonClick")
-  content
+  div.content
     ItemCard(v-for="(item, idx) in projects" :data="item" :key="item.id + '_' + idx")
 </template>
 

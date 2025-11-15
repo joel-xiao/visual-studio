@@ -43,10 +43,16 @@
   /* Dashboard Editor ------ End ------ */
 
   /* Dashboard Control ------ Start ------ */
-  // Button/Input color
+  // Button / Select / Input color
   --db-color-input-background: var(--theme-color-tran-8);
   --db-color-input-disabled-background: var(--theme-color-tran-30);
   --db-color-input: var(--theme-color-text-primary);
+
+  --db-color-select-arrow: var(--theme-color-text-primary);
+  --db-color-select-wrapper-background: #212121;
+  --db-color-select-item-text: var(--theme-color-text-primary);
+  --db-color-select-arrow-bg-hover: var(--theme-color-gray-400);
+  --db-color-select-item-bg-hover: var(--theme-color-blue-700);
 
   --db-color-button-focus-border: var(--theme-color-blue-700);
   --db-color-button-bg-hover: var(--theme-color-gray-300);
@@ -57,6 +63,9 @@
   --db-color-button-status-color: var(--theme-color-gray-800);
   --db-color-button-status-hover-border: var(--theme-color-tran-12);
   --db-color-button-status-bg-active: var(--theme-color-blue-700);
+  
+  // Color Picker color
+  --db-color-picker-panel-bg: var(--db-color-bg-dark);
 
   // Icon
   --db-editor-icon-color: var(--theme-color-gray-700);

@@ -21,12 +21,11 @@ import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useDashboardStore } from '@/store/dashboard';
-import type { Crumb } from '@/store/dashboard';
-let router = useRouter();
+const router = useRouter();
 
-let { crumbs } = storeToRefs(useDashboardStore());
+const { crumbs } = storeToRefs(useDashboardStore());
 
-const onCrumbClick = function (crumb: Crumb, idx: number): void {
+const onCrumbClick = function (crumb: IDashboardCrumb, idx: number): void {
   if (idx === 0) {
     router.push('/');
   }
@@ -76,6 +75,7 @@ const onShare = function (): void {
 
       .share-btn {
         margin: 0 6px;
+
         .share-btn-icon {
           margin-right: 4px;
         }
@@ -84,6 +84,7 @@ const onShare = function (): void {
 
     .nav-panel-left {
       float: left;
+
       .mas-button-icon {
         display: flex;
         justify-content: center;
@@ -97,6 +98,7 @@ const onShare = function (): void {
 
     .nav-panel-right {
       justify-content: flex-end;
+
       .preview-button-icon {
         height: 30px;
         width: 30px;

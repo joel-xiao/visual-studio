@@ -1,25 +1,14 @@
-import { App, readonly, createVNode } from 'vue';
+import { readonly, createVNode } from 'vue';
 import { cloneDeep } from 'lodash';
 import { createComponent } from '@hooks/vue-hooks';
-import type { ComponentData } from './../../panels/components/panel-component/interface';
-import type {
-  SchemaExport,
-  SchemaKeyTypes,
-  SchemaPropsTypes,
-  SchemaPropTypes,
-  ComponentSchemaExport,
-  ComponentProp,
-  ComponentProps,
-  UseUILibraryComponent
-} from './interface';
 
 export class CreateComponentContext {
-  UILibraryUses: Record<string, { [key: string]: UseUILibraryComponent }>;
-  UILibraryComponentUses: Record<string, { [key: string]: UseUILibraryComponent }>;
+  UILibraryUses: Record<string, { [key: string]: IUseUILibraryComponent }>;
+  UILibraryComponentUses: Record<string, { [key: string]: IUseUILibraryComponent }>;
 
-  #schemas: { [key: string]: SchemaExport };
-  containerSchemas: Record<string, { [key: string]: ComponentSchemaExport }>;
-  componentSchemas: Record<string, { [key: string]: ComponentSchemaExport }>;
+  #schemas: { [key: string]: ISchemaExport };
+  containerSchemas: Record<string, { [key: string]: IComponentSchemaExport }>;
+  componentSchemas: Record<string, { [key: string]: IComponentSchemaExport }>;
   components: Record<string, { [key: string]: App }>;
   constructor() {
     this.UILibraryUses = {};
@@ -45,12 +34,14 @@ export class CreateComponentContext {
 
   #install() {
     Object.values(
-      import.meta.glob<SchemaExport>(['./../../schema/**/*.ts', '!./../../schema/**/*.d.ts'], {
+      import.meta.glob<ISchemaExport>(['./../../schema/**/*.ts', '!./../../schema/**/*.d.ts'], {
         eager: true,
         import: 'default'
       })
-    ).forEach((schema) => {
-      schema && (this.#schemas[schema.name] = schema);
+    ).forEach(schema => {
+      if (schema) {
+        this.#schemas[schema.name] = schema;
+      }
     });
 
     this.components = import.meta.glob(['./../../ui-library/*/*/index.vue'], {
@@ -76,17 +67,17 @@ export class CreateComponentContext {
   }
 
   #getIcon(icon: string): string {
-    return `/image/dashboard/editor/panel-component/${icon}`;
+    return `/image/dashboard/editor/${icon}`;
   }
 
-  #getComponentSchemas(component_path: string): ComponentData[] {
-    const schemas: ComponentData[] = [];
+  #getComponentSchemas(component_path: string): PanelComponentData[] {
+    const schemas: PanelComponentData[] = [];
 
     for (const path of Object.keys(this.componentSchemas).filter(
-      (key) => key && key.startsWith(component_path)
+      key => key && key.startsWith(component_path)
     )) {
       const component_path = path.substring(0, path.lastIndexOf('/schema/') + 1);
-      const schema: ComponentSchemaExport = this.componentSchemas[path].default;
+      const schema: IComponentSchemaExport = this.componentSchemas[path].default;
       schemas.push({
         name: schema.name,
         id: schema.type,
@@ -103,14 +94,14 @@ export class CreateComponentContext {
     return schemas;
   }
 
-  #getLibraryComponents(library_path: string): ComponentData[] {
-    const components: ComponentData[] = [];
+  #getLibraryComponents(library_path: string): PanelComponentData[] {
+    const components: PanelComponentData[] = [];
 
     for (const path of Object.keys(this.UILibraryComponentUses).filter(
-      (key) => key && key.startsWith(library_path)
+      key => key && key.startsWith(library_path)
     )) {
       const component_path = path.substring(0, path.lastIndexOf('/use.ts') + 1);
-      const component: UseUILibraryComponent = this.UILibraryComponentUses[path].default;
+      const component: IUseUILibraryComponent = this.UILibraryComponentUses[path].default;
       components.push({
         dot: true,
         component: true,
@@ -123,7 +114,7 @@ export class CreateComponentContext {
     return components;
   }
 
-  getUiLibrary(): ComponentData[] {
+  getUiLibrary(): PanelComponentData[] {
     this.UILibraryComponentUses = import.meta.glob('./../../ui-library/*/*/use.ts', {
       eager: true
     });
@@ -131,10 +122,10 @@ export class CreateComponentContext {
       eager: true
     });
 
-    const children: ComponentData[] = [];
+    const children: PanelComponentData[] = [];
     for (const path of Object.keys(this.UILibraryUses)) {
       const library_path = path.substring(0, path.lastIndexOf('/use.ts') + 1);
-      const library: UseUILibraryComponent = this.UILibraryUses[path].default;
+      const library: IUseUILibraryComponent = this.UILibraryUses[path].default;
       children.push({
         name: library.name,
         id: library.id,
@@ -153,13 +144,13 @@ export class CreateComponentContext {
     ];
   }
 
-  #getSchemas(schema_names?: string | string[]): { [key: string]: SchemaExport } {
-    const schemas: { [key: string]: SchemaExport } = {};
+  #getSchemas(schema_names?: string | string[]): { [key: string]: ISchemaExport } {
+    const schemas: { [key: string]: ISchemaExport } = {};
 
     if (typeof schema_names === 'string') {
       schemas[schema_names] = this.#schemas[schema_names];
     } else if (Array.isArray(schema_names)) {
-      schema_names.forEach((schema_name) => {
+      schema_names.forEach(schema_name => {
         schemas[schema_name] = this.#schemas[schema_name];
       });
     } else {
@@ -169,136 +160,165 @@ export class CreateComponentContext {
     return schemas;
   }
 
-  #getComponentSchema(schema_path: string): ComponentSchemaExport {
+  #getComponentSchema(schema_path: string): IComponentSchemaExport {
     return (
       this.containerSchemas[schema_path]?.default ||
       this.componentSchemas[schema_path]?.default ||
-      {} as ComponentSchemaExport
+      ({} as IComponentSchemaExport)
     );
   }
 
-  #getComponentPropsTypes(schema_path: string) {
+  #parseSchema(exportSchemas: ComponentSchemaExportSchemas) {
     const schemas = this.#getSchemas();
-    const componentSchemas = this.#getComponentSchema(schema_path);
     const propsTypes: SchemaPropsTypes = [];
-
-    if (
-      componentSchemas &&
-      typeof componentSchemas === 'object' &&
-      Array.isArray(componentSchemas.schemas)
-    ) {
-      componentSchemas.schemas
-        .filter((schema) => schema && typeof schema === 'object' && !Array.isArray(schema))
-        .forEach((component_schema) => {
+    if (Array.isArray(exportSchemas)) {
+      for (const component_schema of exportSchemas) {
+        if (
+          component_schema &&
+          typeof component_schema === 'object' &&
+          !Array.isArray(component_schema)
+        ) {
           const schema = schemas[component_schema.schema];
           propsTypes.push({
             name: schema.name,
-            label: schema.label,
-            key: schema.key,
-            //@ts-ignore
+            label: component_schema.label || schema.label,
+            key: component_schema.key || schema.key,
+            // @ts-expect-error - Dynamic schema access
             schema: schema[component_schema.type]
           });
-        });
+        }
+      }
     }
-    return readonly(propsTypes);
+
+    return propsTypes;
+  }
+
+  #getComponentPropsTypes(schema_path: string) {
+    const componentSchemas = this.#getComponentSchema(schema_path);
+    const isSchemaObject = componentSchemas && typeof componentSchemas === 'object';
+
+    let propsTypes: SchemaPropsTypes = [];
+    if (isSchemaObject) {
+      propsTypes = this.#parseSchema(componentSchemas.schemas);
+    }
+
+    const categorySchemas: CategorySchemaTypes = [];
+    if (isSchemaObject) {
+      if (Array.isArray(componentSchemas.categorySchemas)) {
+        for (const category of componentSchemas.categorySchemas) {
+          categorySchemas.push({
+            name: category.name,
+            icon: category.icon,
+            category: category.category,
+            propsTypes: this.#parseSchema(category.schemas)
+          });
+        }
+      }
+    }
+
+    return readonly({
+      propsTypes,
+      categorySchemas
+    });
   }
   getComponentPropsTypes(schema_path: string) {
     return this.#getComponentPropsTypes(schema_path);
   }
 
-  #getComponentProps(schema_path: string): ComponentProps {
+  #parseSchemaProp(exportSchemas: ComponentSchemaExportSchemas) {
     const schemas = this.#getSchemas();
-    const componentSchemas = this.#getComponentSchema(schema_path);
-    const props: ComponentProps = {};
-    if (
-      componentSchemas &&
-      typeof componentSchemas === 'object' &&
-      Array.isArray(componentSchemas.schemas)
-    ) {
-      componentSchemas.schemas
-        .filter((schema) => schema && typeof schema === 'object' && !Array.isArray(schema))
-        .forEach((component_schema) => {
+    const props: IComponentProps = {};
+
+    if (Array.isArray(exportSchemas)) {
+      for (const component_schema of exportSchemas) {
+        if (
+          component_schema &&
+          typeof component_schema === 'object' &&
+          !Array.isArray(component_schema)
+        ) {
           const schema = schemas[component_schema.schema];
+          // @ts-expect-error - Dynamic schema access
           const schema_data: SchemaKeyTypes | null =
             !Array.isArray(schema) && typeof schema === 'object'
-              ? //@ts-ignore
-                schema[component_schema.type]
+              ? schema[component_schema.type]
               : null;
 
+          const is_component_schema = !!component_schema.schema;
           const is_array_schema = schema_data && Array.isArray(schema_data);
-          const is_object_schema =
-            schema_data && !is_array_schema && typeof schema_data === 'object';
-
-          const is_component_schema_default =
-            component_schema &&
-            !Array.isArray(component_schema) &&
-            typeof component_schema === 'object' &&
-            component_schema.default;
-
+          const is_component_schema_default = !!component_schema.default;
           const is_component_schema_default_object =
             is_component_schema_default &&
             !Array.isArray(component_schema.default) &&
             typeof component_schema.default === 'object';
 
-          const component_schema_name =
-            component_schema &&
-            !Array.isArray(component_schema) &&
-            typeof component_schema === 'object' &&
-            component_schema.schema;
-
           const prop: ComponentProp = {};
 
-          if (component_schema_name) {
+          if (is_component_schema) {
             const component_schema_default: ComponentProp = component_schema.default;
-            if (is_object_schema) {
-              Object.keys(schema_data).forEach((key) => {
-                if (!key) {
-                  console.warn(
-                    'Schema Key of Editor is null',
-                    'schema name=' + schema.name,
-                    'component_schema type=' + component_schema.type
-                  );
-                  return;
-                }
-                if (is_component_schema_default_object) {
-                  //@ts-ignore
-                  prop[key] = component_schema_default[key] || schema_data[key].default;
-                } else if (is_component_schema_default) {
-                  //@ts-ignore
-                  prop[key] = component_schema_default || schema_data[key].default;
-                } else {
-                  prop[key] = schema_data[key].default;
-                }
-              });
-            } else if (is_array_schema) {
-              schema_data.forEach((r_arr) => {
-                Array.isArray(r_arr) &&
-                  r_arr.forEach((item) => {
+
+            if (is_array_schema) {
+              for (const row_array of schema_data) {
+                if (Array.isArray(row_array)) {
+                  for (const item of row_array) {
                     if (!item.key) {
                       console.warn(
+                        'Schema 2',
                         'Schema Key of Editor is null',
-                        'schema name=' + schema.name,
-                        'component_schema type=' + component_schema.type
+                        'schema name = ' + schema.name,
+                        'component_schema type = ' + component_schema.type,
+                        item
                       );
-                      return;
+                      continue;
                     }
+
                     if (is_component_schema_default_object) {
-                      //@ts-ignore
+                      // @ts-expect-error - Dynamic property assignment
                       prop[item.key] = component_schema_default[item.key] || item.default;
                     } else if (is_component_schema_default) {
-                      //@ts-ignore
+                      // @ts-expect-error - Dynamic property assignment
                       prop[item.key] = component_schema_default || item.default;
                     } else {
                       prop[item.key] = item.default;
                     }
-                  });
-              });
+                  }
+                }
+              }
             }
           }
 
-          schema && schema.key && (props[schema.key] = prop);
-        });
+          props[component_schema.key || schema.key] = prop;
+        }
+      }
     }
+
+    return props;
+  }
+
+  #getComponentProps(schema_path: string): IComponentProps {
+    this.#getSchemas(); // 确保 schemas 已加载
+    const componentSchemas = this.#getComponentSchema(schema_path);
+    const isSchemaObject = componentSchemas && typeof componentSchemas === 'object';
+
+    const props: IComponentProps = {};
+
+    if (isSchemaObject) {
+      const result = this.#parseSchemaProp(componentSchemas.schemas);
+      for (const key of Object.keys(result)) {
+        props[key] = result[key];
+      }
+    }
+
+    if (isSchemaObject) {
+      if (Array.isArray(componentSchemas.categorySchemas)) {
+        for (const category of componentSchemas.categorySchemas) {
+          const result = this.#parseSchemaProp(category.schemas);
+          for (const key of Object.keys(result)) {
+            props[key] = result[key];
+          }
+        }
+      }
+    }
+
     return cloneDeep(props);
   }
   getComponentProps(schema_path: string) {
@@ -308,8 +328,8 @@ export class CreateComponentContext {
   // formatter component prop is schema prop type
   formatterComponentProp(
     schema: SchemaKeyTypes,
-    opts: { key: string; value: string | number | boolean | undefined | null; unit?: string }
-  ): string | number | boolean | undefined | null {
+    opts: { key: string; value: number | string | boolean | undefined | number[]; unit?: string }
+  ): number | string | boolean | undefined | number[] {
     let value = opts.value;
 
     const is_array_schema = schema && Array.isArray(schema);
@@ -319,13 +339,15 @@ export class CreateComponentContext {
     if (is_object_schema) {
       schema_prop = schema[opts.key];
     } else if (is_array_schema) {
-      schema_prop = schema.flatMap((arr) => arr).find((item) => item.key === opts.key);
+      schema_prop = schema.flatMap(arr => arr).find(item => item.key === opts.key);
     }
 
     if (schema_prop) {
       if (schema_prop.type === Number) {
         value = Number(value);
-        isNaN(value) && (value = opts.value);
+        if (isNaN(value)) {
+          value = opts.value;
+        }
       } else if (schema_prop.type === String) {
         value = value + '';
       } else if (schema_prop.type === Boolean) {
@@ -339,18 +361,18 @@ export class CreateComponentContext {
     return this.components[component_path];
   }
 
-  createNodeComponent(props: ComponentProps | ComponentProps, component: string) {
+  createNodeComponent(props: IComponentProps, component: string) {
     return createVNode(this.#getComponent(component), {
       data: props
     });
   }
 
   createNodeComponentApp(
-    props: ComponentProps | ComponentProps,
+    props: IComponentProps | IComponentProps,
     parentEl: HTMLElement | undefined,
     component: string
-  ): App {
-    return createComponent<{ data: ComponentProps }>(
+  ) {
+    return createComponent<{ data: IComponentProps }>(
       'component',
       parentEl,
       this.#getComponent(component),

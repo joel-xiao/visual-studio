@@ -1,9 +1,7 @@
-import type { ComponentSchemaExport } from '../../../interface';
-
-const schema: ComponentSchemaExport = {
+const schema: IComponentSchemaExport = {
   name: '视频',
   type: 'CONTROLS_VIDEO',
-  icon: 'qw.png',
+  icon: 'ui-library/qw.png',
   schemas: [
     {
       type: 'schema',

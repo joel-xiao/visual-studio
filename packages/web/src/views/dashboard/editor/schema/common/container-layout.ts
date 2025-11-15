@@ -1,9 +1,8 @@
-import type { SchemaExport } from '../interface';
 const SCHEMA_NAME = 'COMMON_CONTAINER_LAYOUT';
 const SCHEMA_LABEL = '';
 const SCHEMA_KEY = 'layout';
 
-const schema: SchemaExport = {
+const schema: ISchemaExport = {
   name: SCHEMA_NAME,
   label: SCHEMA_LABEL,
   key: SCHEMA_KEY,
@@ -14,23 +13,25 @@ const schema: SchemaExport = {
         type: Number,
         default: 0,
         icon: 'W',
-        ctrl: 'input'
+        ctrl: 'C_INPUT',
+        size: 'middle'
       },
       {
         key: 'height',
         type: Number,
         default: 0,
         icon: 'H',
-        ctrl: 'input'
+        ctrl: 'C_INPUT',
+        size: 'middle'
       },
       {
         key: 'size_proportion_lock',
         type: Boolean,
         default: false,
         icon: 'icon-locking-ratio',
-        ctrl: 'button',
+        ctrl: 'C_BUTTON',
         ctrl_type: 'status-button',
-        size: 'right'
+        size: 'mini'
       }
     ]
   ]

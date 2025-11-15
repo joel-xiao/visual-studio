@@ -17,12 +17,11 @@ import Container from './container/index.vue';
 import { ref, reactive, onMounted, onUnmounted } from 'vue';
 import { useConfig } from './config';
 import { useNodeContext, removeNodeContext } from './hooks/node-context';
-import type { EditorData } from './hooks/node-context/interface';
 import { createBindKeysContext, removeBindKeysContext } from './hooks/bind-keys-context';
 import { createComponentContext, removeComponentContext } from './hooks/component-context';
 import { useRuler, removeRuler } from './hooks/ruler-context';
 
-let data = reactive<EditorData>({
+let data = reactive<IEditorData>({
   folder: '',
   id: '',
   type: '',
@@ -48,25 +47,28 @@ let data = reactive<EditorData>({
         layout: {
           width: 1000,
           height: 600
+        },
+        fill: {
+          color: 'hsla(0, 0%, 13% , 1)'
         }
       }
     }
   ]
 });
 
-const init = function (editorData: EditorData): void {
+const init = function (editorData: IEditorData): void {
   data = editorData;
 };
 
 defineExpose({ init });
 
 //  Get Layout Config
-let { getConfig } = useConfig();
+const { getConfig } = useConfig();
 const layout = getConfig('layout');
 
 // Create  Node
-const { install: initEditorData } = useNodeContext();
-initEditorData(data);
+const { install: initIEditorData } = useNodeContext();
+initIEditorData(data);
 onUnmounted(() => {
   removeNodeContext();
 });

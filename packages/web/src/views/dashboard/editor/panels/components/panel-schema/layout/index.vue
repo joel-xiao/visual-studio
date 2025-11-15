@@ -28,7 +28,15 @@ import PropsItem from './../components/props-item.vue';
 import Input from './../../../../../components/basic/c-input/index.vue';
 import Button from './../../../../../components/basic/c-button/index.vue';
 import Radius from './../components/input-group/index.vue';
-import type { PanelSchemaLayout } from './interface';
+
+type PanelSchemaLayout = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  rotate: number;
+  radius: number[];
+};
 
 interface Props {
   modelValue?: PanelSchemaLayout;
@@ -55,7 +63,7 @@ const onUpdate = function (key: string, value: string | number | boolean | undef
 };
 
 const onRotate = function (type: string) {
-  let modelValue = reactive(props.modelValue);
+  const modelValue = reactive(props.modelValue);
   if (type === 'x') modelValue.rotate = 180 - modelValue.rotate;
   if (type === 'y') modelValue.rotate = -modelValue.rotate;
 };

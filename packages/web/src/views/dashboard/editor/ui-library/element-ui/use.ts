@@ -1,7 +1,5 @@
-import { UseComponent } from '../interface';
-
-const use: UseComponent = {
-  name: 'element-ui',
+const use: IUseUILibraryComponent = {
+  name: 'Element-UI',
   id: 'element-ui'
 };
 

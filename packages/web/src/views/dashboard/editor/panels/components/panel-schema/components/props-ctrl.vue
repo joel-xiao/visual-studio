@@ -1,5 +1,6 @@
 <template lang="pug">
 component(v-if="isComponent(ctrl)" :is="getComponent(ctrl)" :type="ctrlType" v-bind="$attrs")
+div(v-else) IS NO {{ ctrl }}
 </template>
 
 <script lang="ts">
@@ -21,15 +22,23 @@ const props = withDefaults(defineProps<Props>(), {
   ctrlType: ''
 });
 
-const components = reactive<{ [key: string]: Component }>({
-  ['input']: markRaw(
-    defineAsyncComponent(() => import('./../../../../../components/basic/c-input/index.vue'))
-  ),
-  ['button']: markRaw(
-    defineAsyncComponent(() => import('./../../../../../components/basic/c-button/index.vue'))
-  ),
-  ['input-group']: markRaw(defineAsyncComponent(() => import('./input-group/index.vue')))
-});
+const component_models = import.meta.glob(
+  ['./../../../../../components/basic/*/index.vue', './input-group/index.vue'],
+  {
+    eager: true,
+    import: 'default'
+  }
+);
+
+const components: { [key: string]: Component } = Object.keys(component_models).reduce(
+  (acc, key: string) => {
+    const component = component_models[key];
+    // @ts-expect-error - Dynamic component registration
+    acc[component.name] = component;
+    return acc;
+  },
+  {}
+);
 
 const isComponent = (schema_name: string) => {
   return !!components[schema_name];

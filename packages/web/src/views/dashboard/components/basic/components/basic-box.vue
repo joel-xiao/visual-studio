@@ -1,5 +1,5 @@
 <template lang="pug">
-div(class="basic-box transition" :class="boxStyle" @click="onClick" @mousedown="onMouseDown" @mouseup="onMouseUp")
+div(class="basic-box transition" ref="boxRef" :class="boxStyle" @click="onClick" @mousedown="onMouseDown" @mouseup="onMouseUp")
   slot
 </template>
 
@@ -8,7 +8,7 @@ import { ref, computed, watchEffect, watch } from 'vue';
 
 interface Props {
   modelValue?: boolean;
-  type: string; // status-button button input
+  type: string; // status-button button input input-select
 }
 const props = withDefaults(defineProps<Props>(), {
   modelValue: false,
@@ -19,7 +19,7 @@ const emit = defineEmits(['update:modelValue', 'update']);
 
 const model = ref(props.modelValue);
 
-watch(props, (newValue) => {
+watch(props, newValue => {
   if (newValue.modelValue !== model.value) {
     model.value = newValue.modelValue;
   }
@@ -65,7 +65,12 @@ const blur = function () {
   }
 };
 
-defineExpose({ focus, blur });
+const boxRef = ref<null | HTMLElement>(null);
+const getRect = function () {
+  return boxRef.value?.getBoundingClientRect() || { width: 0, height: 0, left: 0, top: 0 };
+};
+
+defineExpose({ focus, blur, getRect });
 </script>
 
 <style lang="scss">
@@ -77,10 +82,13 @@ defineExpose({ focus, blur });
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
+  overflow: hidden;
 
-  &.button-box {
+  &.button-box,
+  &.select-box {
     justify-content: center;
     background: var(--db-color-input-background);
+
     &:hover {
       background: var(--db-color-button-bg-hover);
     }
@@ -99,6 +107,7 @@ defineExpose({ focus, blur });
     &:hover {
       box-shadow: 0 0 0 1px var(--db-color-button-status-hover-border) inset;
     }
+
     &.active {
       box-shadow: 0 0 0 1px var(--db-color-button-status-bg-active) inset;
       background: var(--db-color-button-status-bg-active);
@@ -106,8 +115,10 @@ defineExpose({ focus, blur });
     }
   }
 
-  &.input-box {
+  &.input-box,
+  &.input-select-box {
     background: var(--db-color-input-background);
+
     &.active {
       box-shadow: 0 0 0 2px var(--db-color-button-focus-border) inset;
     }

@@ -1,7 +1,5 @@
-import { Ref, nextTick } from 'vue';
+import { nextTick } from 'vue';
 import { cloneDeep } from 'lodash';
-import { RulerConfig, RulerSetting, RulerDOMRect, RulerPos } from './interface';
-
 class Ruler {
   #config: Readonly<RulerConfig> = {
     textTranslateLeft: 0,
@@ -316,7 +314,7 @@ class Ruler {
     el.height = config.height || 0;
   }
 
-  #onResize(event: Event): void {
+  #onResize(_event: Event): void {
     this.#draw();
   }
 

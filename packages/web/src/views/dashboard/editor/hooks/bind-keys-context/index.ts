@@ -1,6 +1,14 @@
 import { markRaw } from 'vue';
-import { getPlatform } from '@a/utils/index';
-import type { ComBindKeys, CallbackUpdate } from './interface';
+interface ComBindKeys {
+  isSpace: boolean;
+  isShift: boolean;
+  isCtrl: boolean;
+  isAlt: boolean;
+}
+
+interface CallbackUpdate {
+  (bindKeys: ComBindKeys): void;
+}
 
 class BindKeys {
   #comBindKeys: ComBindKeys;
@@ -35,15 +43,15 @@ class BindKeys {
   }
 
   removeBindKeysUpdate(fn: CallbackUpdate): void {
-    const idx: number = this.#callbackUpdates.findIndex((r) => r === fn);
-    idx && this.#callbackUpdates.splice(idx, 1);
+    const idx: number = this.#callbackUpdates.findIndex(r => r === fn);
+    if (idx !== -1) {
+      this.#callbackUpdates.splice(idx, 1);
+    }
   }
 
   #comBindKeysUpdate(event: KeyboardEvent, isBoolean: boolean): void {
     event = event || window.event;
-    const code = event.keyCode || event.which || event.charCode;
     const key = (event.key && event.key.trim()) || event.code;
-    const platform = getPlatform();
     if (key === 'Shift') {
       event.preventDefault();
       if (this.#comBindKeys.isShift === isBoolean) return;
@@ -62,7 +70,7 @@ class BindKeys {
       this.#comBindKeys.isSpace = isBoolean;
     }
 
-    this.#callbackUpdates.forEach((callback) => callback({ ...this.#comBindKeys }));
+    this.#callbackUpdates.forEach(callback => callback({ ...this.#comBindKeys }));
   }
 
   onKeyDown(event: KeyboardEvent): void {

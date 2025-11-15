@@ -21,6 +21,7 @@ import ContainerNode from './node.vue';
 import { ref, nextTick, onMounted, onBeforeUnmount } from 'vue';
 import { useDrag } from './../hooks/drag-context';
 import { useNodeContext } from './../hooks/node-context';
+import { getRootStyle } from './../hooks/node-context/example';
 import { useComponentContext } from './../hooks/component-context';
 import { useBindKeysContext } from './../hooks/bind-keys-context';
 import { useRuler } from './../hooks/ruler-context';
@@ -30,10 +31,10 @@ import { removeContainer, useContainer } from '../hooks/container';
 // interface Props {}
 // const props = withDefaults(defineProps<Props>(), {});
 
-const { getRoot, getNodes, getRootStyle, onSelectNode, onAddNode } = useNodeContext();
+const { getRoot, getNodes, onSelectNode, onAddNode } = useNodeContext();
 const nodes = getNodes();
 const root = getRoot();
-const rootStyle = getRootStyle();
+const rootStyle = getRootStyle(root as INode);
 
 const onDown = function (): void {
   onSelectNode(root.id);
@@ -46,7 +47,7 @@ const containerEl = ref<HTMLElement>();
 const { addOverlayMoveUpdated, overlayUpdatePos, addOverlay, setOverlayDisabled } = useOverlay();
 
 // Use Container Mixin
-let { addScaleEvent, getScale } = useContainer();
+const { addScaleEvent, getScale } = useContainer();
 
 onMounted(() => {
   addScaleEvent({
@@ -68,12 +69,12 @@ onBeforeUnmount(() => {
 });
 
 const { setRulerPos } = useRuler();
-addOverlayMoveUpdated((pos) => {
+addOverlayMoveUpdated(pos => {
   setRulerPos(pos);
 });
 
 const { addBindKeysUpdated } = useBindKeysContext();
-addBindKeysUpdated((bindKeys) => {
+addBindKeysUpdated(bindKeys => {
   setOverlayDisabled(!bindKeys.isSpace);
 });
 
@@ -83,8 +84,8 @@ const { getComponentProps } = useComponentContext();
 const onDrop = function (event: DragEvent): void {
   dropHandler(event, (newNode, pos) => {
     const rect = containerEl.value?.getBoundingClientRect() || { x: 0, y: 0 };
-    let scale = getScale();
-    let node = onAddNode(
+    const scale = getScale();
+    const node = onAddNode(
       {
         ...newNode,
         props: getComponentProps(newNode.schema)
@@ -94,7 +95,9 @@ const onDrop = function (event: DragEvent): void {
     );
 
     nextTick(() => {
-      node && onSelectNode(node.id);
+      if (node) {
+        onSelectNode(node.id);
+      }
     });
   });
 };
@@ -110,10 +113,12 @@ const onDrop = function (event: DragEvent): void {
     right: var(--db-editor-right-menu-width);
     bottom: 0px;
     background-color: var(--db-editor-color-canvas-bg);
+
     .editor-container-root {
       position: absolute;
       background-color: var(--db-editor-color-root-bg);
     }
+
     .editor-container-root-mask {
       position: absolute;
       left: 0;
@@ -121,6 +126,7 @@ const onDrop = function (event: DragEvent): void {
       bottom: 0;
       top: 0;
       cursor: grab;
+
       &.down {
         cursor: grabbing;
       }

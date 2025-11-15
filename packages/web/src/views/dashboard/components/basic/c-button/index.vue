@@ -7,9 +7,11 @@ BasicBox(class="c-button" v-bind="$attrs" :type="type || 'button'" @update="onUp
 
 <script lang="ts">
 export default {
+  name: 'C_BUTTON',
   inheritAttrs: false
 };
 </script>
+
 <script setup lang="ts">
 import BasicBox from '../components/basic-box.vue';
 import BasicIcon from '../components/basic-icon.vue';

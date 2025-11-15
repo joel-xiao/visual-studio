@@ -5,7 +5,7 @@ n-config-provider(:theme="darkTheme" :theme-overrides="themeOverrides" :locale="
 </template>
 
 <script setup lang="ts">
-import { NConfigProvider, darkTheme } from 'naive-ui';
+import { darkTheme } from 'naive-ui';
 import native from '@/plugins/native-i18n';
 import themeOverrides from '@a/style/native/native-ui-theme-overrides.json';
 </script>

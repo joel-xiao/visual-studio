@@ -43,16 +43,22 @@ onMounted(() => {
   padding: 12px 0;
   border-bottom: 1px solid var(--color-divider);
 
+  &:last-of-type {
+    border-bottom: none;
+  }
+
   .schema-props-layout_title {
     height: 30px;
     display: flex;
     align-items: center;
     justify-content: space-between;
+
     .schema-props-layout_title-text {
       font-weight: 600;
       font-size: 12px;
       color: var(--theme-color-text-primary);
     }
+
     .schema-props-layout_title-right_content {
     }
   }

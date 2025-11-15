@@ -1,4 +1,4 @@
-export type RulerConfig = {
+declare type RulerConfig = {
   textTranslateLeft: number;
   textMargin: number[];
   border: string;
@@ -10,7 +10,7 @@ export type RulerConfig = {
   fontSize: string;
 };
 
-export type RulerSetting = {
+declare type RulerSetting = {
   left?: number;
   right?: number;
   bottom?: number;
@@ -18,11 +18,9 @@ export type RulerSetting = {
   size?: number;
 };
 
-export type RulerPos = {
+declare type RulerPos = {
   x: number;
   y: number;
 };
 
-RulerPos;
-
-export type RulerDOMRect = DOMRect | { width: number; height: number };
+declare type RulerDOMRect = DOMRect | { width: number; height: number };

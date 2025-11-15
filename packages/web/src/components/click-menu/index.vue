@@ -1,9 +1,8 @@
 <script lang="ts" setup>
-import { computed, reactive, onUnmounted } from 'vue';
-import type { ClickMenu } from './interface';
+import { computed, reactive, withDefaults, onUnmounted } from 'vue';
 
 interface Props {
-  data?: ClickMenu[];
+  data?: ICClickMenu[];
   modelValue: boolean;
   size?: 'small' | '';
   x: number;
@@ -46,7 +45,7 @@ onUnmounted(() => {
   document.removeEventListener('click', close);
 });
 
-const onMenuCommand = function (cmd: ClickMenu): void {
+const onMenuCommand = function (cmd: ICClickMenu): void {
   close();
   emit('command', cmd);
 };
@@ -97,6 +96,7 @@ transition(name='c-click-menu-fade')
 
     &:hover {
       background: var(--theme-color-blue-700);
+
       .menu-item-label,
       .menu-item-icon {
         color: var(--theme-color-text-primary-white);

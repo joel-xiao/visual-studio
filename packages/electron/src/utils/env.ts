@@ -5,4 +5,3 @@ export const isProd = !isDev;
 export const isPackaged = app.isPackaged;
 
 export const devServerURL = 'http://localhost:1420';
-

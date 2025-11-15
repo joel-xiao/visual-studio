@@ -21,27 +21,25 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const gridTemplateOption: { [key: string]: string } = {
-  right: '30px',
+  default: '1fr',
   small: '0.25fr',
-  default: '0.5fr',
+  middle: '0.5fr',
   large: '1fr',
-  largely: '1fr'
+  mini: '30px'
 };
 
 const style = computed(() => {
-  let style = { '--grid-template-columns': ' 0.5fr 0.5fr 30px' };
+  const style = { '--grid-template-columns': ' 0.5fr 0.5fr 30px' };
 
   if (props.gridTemplateColumns.length) {
     let columns = props.gridTemplateColumns;
-    if (columns.length > 1 && !columns.some((column) => column === 'largely'))
+    if (columns.length >= 1 && !columns.some(column => column === 'default' || !column))
       columns = [
-        ...columns.filter((column) => column !== 'right').map((column) => column || 'default'),
-        'right'
+        ...columns.filter(column => column !== 'mini').map(column => column || 'default'),
+        'mini'
       ];
 
-    style['--grid-template-columns'] = columns
-      .map((column) => gridTemplateOption[column])
-      .join(' ');
+    style['--grid-template-columns'] = columns.map(column => gridTemplateOption[column]).join(' ');
   }
 
   return style;

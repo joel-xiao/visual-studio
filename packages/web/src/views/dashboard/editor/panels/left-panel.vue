@@ -24,11 +24,8 @@ div.editor-left-panel
 
 <script setup lang="ts">
 import PanelTabBar from './components/panel-tab-bar/index.vue';
-import type { Tab } from './components/panel-tab-bar/interface';
 import PanelLayer from './components/panel-layer/index.vue';
-import type { LayerItemMenu, LayerItemData } from './components/panel-layer/interface';
 import PanelComponent from './components/panel-component/index.vue';
-import type { ComponentData } from './components/panel-component/interface';
 import { ref, reactive } from 'vue';
 import { useDrag } from './../hooks/drag-context';
 import { useComponentContext } from './../hooks/component-context';
@@ -41,23 +38,23 @@ import { useNodeContext } from './../hooks/node-context';
 //   layerData: () => []
 // });
 
-const tabBars = reactive<Tab[]>([
+const tabBars = reactive<PanelTab[]>([
   { name: '图层', id: 'layer', show: false },
   { name: '组件', id: 'component', show: false },
   { name: '资源库', id: 'repository', show: false }
 ]);
 
-const selectTab = ref<Tab>(tabBars[0]);
+const selectTab = ref<PanelTab>(tabBars[0]);
 selectTab.value.show = true;
 
-const onSelect = function (tab: Tab) {
+const onSelect = function (tab: PanelTab) {
   tab.show = true;
 };
 
 const { getNodeTree, onSelectNode } = useNodeContext();
 const layerData = getNodeTree();
 
-const layerMenus = reactive<LayerItemMenu[]>([
+const layerMenus = reactive<PanelLayerItemMenu[]>([
   {
     name: '更多',
     id: 'more',
@@ -67,21 +64,21 @@ const layerMenus = reactive<LayerItemMenu[]>([
   { name: '添加组', id: 'add', icon: 'icon-jiahao', disabled: true }
 ]);
 
-const onLayerSelect = function (item: LayerItemData) {
+const onLayerSelect = function (item: PanelLayerItemData) {
   onSelectNode(item?.data?.id as string);
 };
 
-const onLayerCommand = function (cmd: LayerItemMenu, item: LayerItemData) {
+const onLayerCommand = function (cmd: PanelLayerItemMenu, item: PanelLayerItemData) {
   console.log(cmd, item);
 };
 
-const componentTabBars = reactive<Tab[]>([{ name: '组件库', id: 'component' }]);
-const componentTab = ref<Tab>(componentTabBars[0]);
+const componentTabBars = reactive<PanelTab[]>([{ name: '组件库', id: 'component' }]);
+const componentTab = ref<PanelTab>(componentTabBars[0]);
 
 const { onDragStart, onDragStop } = useDrag();
 
 const { getUiLibrary } = useComponentContext();
-const componentData = reactive<ComponentData[]>(getUiLibrary());
+const componentData = reactive<PanelComponentData[]>(getUiLibrary());
 </script>
 
 <style lang="scss">
@@ -94,18 +91,27 @@ const componentData = reactive<ComponentData[]>(getUiLibrary());
     width: var(--db-editor-left-menu-width);
     border-right: 1px solid var(--db-editor-color-canvas);
     background-color: var(--db-editor-color-panel-bg);
+
     .panel-tab_bar {
       border-bottom: 1px solid var(--db-editor-color-canvas);
       padding: 0 12px 0 6px;
       height: var(--db-editor-tab-bar-height);
     }
+
     .panel-component {
+      height: calc(100% - var(--db-editor-tab-bar-height));
+
       .panel-component-tab_bar {
         border-bottom: 1px solid var(--db-editor-color-canvas);
         padding: 0 12px 0 6px;
         height: var(--db-editor-tab-bar-height);
+
         .tab_bar-title {
         }
+      }
+
+      .editor-panel-component {
+        height: calc(100% - var(--db-editor-tab-bar-height));
       }
     }
   }
