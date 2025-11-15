@@ -16,7 +16,9 @@ type OverlayOption = {
 };
 
 class Overlay {
+  // eslint-disable-next-line no-unused-private-class-members
   #disabled = true;
+  // eslint-disable-next-line no-unused-private-class-members
   #active = false;
   #callbackUpdates: CallbackUpdate[] = [];
   #overlayEl?: HTMLElement;
@@ -83,8 +85,8 @@ class Overlay {
       x: (parentRect.width - containerRect.width) / 2,
       y: (parentRect.height - containerRect.height) / 2
     };
-    defaultPos.x < 0 && (defaultPos.x = 0);
-    defaultPos.y < 0 && (defaultPos.y = 0);
+    if (defaultPos.x < 0) defaultPos.x = 0;
+    if (defaultPos.y < 0) defaultPos.y = 0;
 
     this.#defaultPos = defaultPos;
 
@@ -102,7 +104,7 @@ class Overlay {
   }
 
   onMaskDown(event: MouseEvent): void {
-    event?.button && this.#prevent(event);
+    if (event?.button) this.#prevent(event);
     this.#setActive(true);
     this.#startPos.x = event.x;
     this.#startPos.y = event.y;
@@ -125,7 +127,7 @@ class Overlay {
     this.#defaultPos = { ...this.#pos };
 
     document.documentElement.removeEventListener('mousemove', this.onMove, false);
-    document.documentElement.removeEventListener('mouseup', this.onUp), false;
+    document.documentElement.removeEventListener('mouseup', this.onUp, false);
     document.documentElement.removeEventListener('mouseleave', this.onUp, false);
 
     // document.documentElement.removeEventListener('mousedown', this.onUp, false);
@@ -169,7 +171,7 @@ class Overlay {
     this.#updatePos();
   }
   #updatePos(): void {
-    this.#callbackUpdates.forEach((callback) =>
+    this.#callbackUpdates.forEach(callback =>
       callback({
         x: this.#pos.x,
         y: this.#pos.y,
@@ -198,8 +200,10 @@ class Overlay {
   }
 
   removeMoveUpdate(fn: CallbackUpdate): void {
-    const idx: number = this.#callbackUpdates.findIndex((r) => r === fn);
-    idx && this.#callbackUpdates.splice(idx, 1);
+    const idx: number = this.#callbackUpdates.findIndex(r => r === fn);
+    if (idx !== -1) {
+      this.#callbackUpdates.splice(idx, 1);
+    }
   }
 }
 
