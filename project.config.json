@@ -17,7 +17,7 @@
     "tauri": "com.visual-craft.tauri"
   },
   "repository": {
-    "url": "",
+    "url": "https://github.com/joel-xiao/visual-studio.git",
     "type": "git"
   },
   "license": ""

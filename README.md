@@ -39,8 +39,8 @@ visual-craft.monorepo/
 ### 安装依赖
 
 ```bash
-git clone git@github.com:joel-xiao/visual-studio.monorepo.git
-cd visualization-editor.monorepo
+git clone git@github.com:joel-xiao/visual-studio.git
+cd visual-studio
 pnpm install
 ```
 
@@ -135,4 +135,3 @@ Vue 3.5 + Vite 7 + TypeScript 5.9 + Electron 39 / Tauri 2.9 + pnpm workspace + P
 ## 🔗 相关链接
 
 - [Web Demo](https://visual-studio-one.vercel.app/)
-- [Electron 版本](https://github.com/joel-xiao/visual-studio.electron)
