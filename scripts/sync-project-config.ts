@@ -30,6 +30,7 @@ interface ProjectConfig {
     outputDirectory: string;
     installCommand: string;
     framework: string | null;
+    nodeVersion?: string;
   };
 }
 
@@ -151,6 +152,7 @@ if (config.vercel) {
     outputDirectory?: string;
     installCommand?: string;
     framework?: string | null;
+    engines?: { node?: string };
     rewrites?: Array<{ source: string; destination: string }>;
   } = {
     buildCommand: config.vercel.buildCommand,
@@ -161,6 +163,13 @@ if (config.vercel) {
   // 只有在有框架时才添加 framework 字段
   if (config.vercel.framework) {
     vercelConfig.framework = config.vercel.framework as string;
+  }
+
+  // 添加 Node.js 版本配置
+  if (config.vercel.nodeVersion) {
+    vercelConfig.engines = {
+      node: config.vercel.nodeVersion
+    };
   }
 
   // 添加 SPA 路由重写规则（Vue Router history 模式需要）

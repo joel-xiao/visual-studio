@@ -24,7 +24,8 @@
     "buildCommand": "pnpm build:web",
     "outputDirectory": "packages/web/dist",
     "installCommand": "pnpm install",
-    "framework": null
+    "framework": null,
+    "nodeVersion": "22.x"
   },
   "license": ""
 }
