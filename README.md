@@ -1,43 +1,44 @@
 # VisualCraft
 
-可视化工匠 - 基于 Monorepo 架构的低代码可视化开发平台，支持 Web、Electron 和 Tauri 多平台部署。
+Visual Craft - A low-code visualization development platform based on Monorepo architecture, supporting Web, Electron, and Tauri multi-platform deployment.
 
-## ✨ 特性
+English | [中文](./README.zh-CN.md)
 
-- 🎨 **可视化编辑器** - 拖放组件快速构建应用
-- 🚀 **多平台支持** - Web、Electron、Tauri 三端统一
-- 📦 **Monorepo 架构** - pnpm workspace 管理多包
-- 🔧 **统一配置管理** - `project.config.json` 集中管理项目配置
-- 💻 **现代化技术栈** - Vue 3 + TypeScript + Vite
-- 🎯 **代码共享** - Web 核心代码被 Electron 和 Tauri 复用
+## ✨ Features
 
-## 🏗️ 项目结构
+- 🎨 **Visual Editor** - Build applications quickly by dragging and dropping components
+- 🚀 **Multi-platform Support** - Unified Web, Electron, and Tauri deployment
+- 📦 **Monorepo Architecture** - pnpm workspace for managing multiple packages
+- 🔧 **Unified Configuration Management** - `project.config.json` for centralized project configuration
+- 💻 **Modern Tech Stack** - Vue 3 + TypeScript + Vite
+- 🎯 **Code Sharing** - Web core code is reused by Electron and Tauri
+
+## 🏗️ Project Structure
 
 ```
 visual-studio/
 ├── packages/
-│   ├── web/          # Web 应用（Vue 3 + Vite）
-│   ├── electron/     # Electron 桌面应用
-│   └── tauri/        # Tauri 桌面应用（Rust）
-├── scripts/          # 项目脚本
+│   ├── web/          # Web application (Vue 3 + Vite)
+│   ├── electron/     # Electron desktop application
+│   └── tauri/        # Tauri desktop application (Rust)
+├── scripts/          # Project scripts
 │   └── sync-project-config.ts
-├── config/           # 配置文件
+├── config/           # Configuration files
 │   └── changelog-option.ts
-├── project.config.json  # 项目统一配置
-├── vercel.json       # Vercel 部署配置（自动生成）
+├── project.config.json  # Unified project configuration
+├── vercel.json       # Vercel deployment configuration (auto-generated)
 └── package.json
 ```
 
+## 🚀 Quick Start
 
-## 🚀 快速开始
-
-### 环境要求
+### Requirements
 
 - Node.js >= 22
 - pnpm >= 8
-- Rust (仅 Tauri 需要)
+- Rust (required for Tauri only)
 
-### 安装依赖
+### Installation
 
 ```bash
 git clone git@github.com:joel-xiao/visual-studio.git
@@ -45,20 +46,20 @@ cd visual-studio
 pnpm install
 ```
 
-### 开发模式
+### Development
 
 ```bash
-# Web 开发
+# Web development
 pnpm dev:web
 
-# Electron 开发
+# Electron development
 pnpm dev:electron
 
-# Tauri 开发
+# Tauri development
 pnpm dev:tauri
 ```
 
-### 构建
+### Build
 
 ```bash
 pnpm build:web
@@ -66,19 +67,19 @@ pnpm build:electron
 pnpm build:tauri
 ```
 
-**构建输出目录：**
-- **Web 模式** (`--mode web`): `packages/web/dist/` (base: `/`)
-- **客户端模式** (`--mode client`): `packages/web/dist/` (base: `./`)
+**Build Output Directories:**
+- **Web mode** (`--mode web`): `packages/web/dist/` (base: `/`)
+- **Client mode** (`--mode client`): `packages/web/dist/` (base: `./`)
 - **Electron**: 
-  - 主进程/预加载：`packages/electron/dist/main/`, `packages/electron/dist/preload/`
-  - Web 文件：`packages/electron/dist/web/`
-  - 打包输出：`packages/electron/release/`
+  - Main/Preload: `packages/electron/dist/main/`, `packages/electron/dist/preload/`
+  - Web files: `packages/electron/dist/web/`
+  - Release: `packages/electron/release/`
 - **Tauri**: 
-  - Rust 构建：`packages/tauri/target/`
-  - 生成文件：`packages/tauri/gen/`
-  - 前端：`packages/web/dist`
+  - Rust build: `packages/tauri/target/`
+  - Generated files: `packages/tauri/gen/`
+  - Frontend: `packages/web/dist`
 
-## 📦 包说明
+## 📦 Package Description
 
 ### `@visual-craft/web`
 
@@ -91,70 +92,70 @@ pnpm build:tauri
 
 - Electron 39 + electron-vite
 - electron-builder
-- 复用 web 包核心代码
+- Reuses web package core code
 
 ### `@visual-craft/tauri`
 
 - Tauri 2.9 + Rust
 - `pnpm build:app` / `pnpm build:dmg` / `pnpm create-dmg`
 
-## 🔧 配置管理
+## 🔧 Configuration Management
 
-使用 `project.config.json` 作为单一数据源管理配置。运行同步脚本会自动更新所有相关配置文件：
+Use `project.config.json` as the single source of truth for project configuration. Running the sync script will automatically update all related configuration files:
 
 ```bash
 pnpm sync:config
 ```
 
-**自动同步的配置包括：**
-- `package.json` - 根目录和所有子包的名称和版本
-- `packages/web/index.html` - 页面标题
-- `packages/electron/electron-builder.json5` - Electron 配置
-- `packages/tauri/tauri.conf.json` - Tauri 配置
-- `packages/tauri/Cargo.toml` - Rust 配置
-- `vercel.json` - Vercel 部署配置（包含构建命令、输出目录、Node.js 版本等）
+**Auto-synced configurations include:**
+- `package.json` - Root and all sub-packages' names and versions
+- `packages/web/index.html` - Page title
+- `packages/electron/electron-builder.json5` - Electron configuration
+- `packages/tauri/tauri.conf.json` - Tauri configuration
+- `packages/tauri/Cargo.toml` - Rust configuration
+- `vercel.json` - Vercel deployment configuration (includes build command, output directory, Node.js version, etc.)
 
-### Vercel 部署
+### Vercel Deployment
 
-项目已配置自动生成 `vercel.json`，支持一键部署到 Vercel：
+The project is configured to automatically generate `vercel.json` for one-click Vercel deployment:
 
-1. 确保 `project.config.json` 中的 `vercel` 配置正确
-2. 运行 `pnpm sync:config` 生成 `vercel.json`
-3. 在 Vercel 中导入项目即可自动部署
+1. Ensure the `vercel` configuration in `project.config.json` is correct
+2. Run `pnpm sync:config` to generate `vercel.json`
+3. Import the project in Vercel to automatically deploy
 
-**当前 Vercel 配置：**
-- Node.js 版本：22.x
-- 构建命令：`pnpm build:web`
-- 输出目录：`packages/web/dist`
-- 安装命令：`pnpm install`
+**Current Vercel Configuration:**
+- Node.js version: 22.x
+- Build command: `pnpm build:web`
+- Output directory: `packages/web/dist`
+- Install command: `pnpm install`
 
-## 📝 开发规范
+## 📝 Development Standards
 
 - ESLint (Flat Config) + Prettier + TypeScript
 - Husky + lint-staged (pre-commit)
 - Commitlint (commit-msg)
 
-**Commit 类型：**
+**Commit Types:**
 ```
 feat, fix, docs, style, refactor, perf, test
 build, chore, config, revert, merge, sync
 ```
 
-## 🛠️ 技术栈
+## 🛠️ Tech Stack
 
 Vue 3.5 + Vite 7 + TypeScript 5.9 + Node.js 22 + Electron 39 / Tauri 2.9 + pnpm workspace + Pinia 3 + Vue Router 4 + Naive UI
 
-## 📚 相关文档
+## 📚 Related Documentation
 
-- [项目配置](./project.config.json)
-- [Tauri 构建问题](./packages/tauri/BUILD_FIX.md)
+- [Project Configuration](./project.config.json)
+- [Tauri Build Issues](./packages/tauri/BUILD_FIX.md)
 
-## 🤝 贡献
+## 🤝 Contributing
 
-1. 遵循代码规范
-2. 提交前运行 `pnpm sync:config`
-3. 遵循 Git Commit 规范
+1. Follow code standards
+2. Run `pnpm sync:config` before committing
+3. Follow Git Commit conventions
 
-## 🔗 相关链接
+## 🔗 Links
 
 - [Web Demo](https://visual-studio-one.vercel.app/)
