@@ -20,6 +20,12 @@
     "url": "https://github.com/joel-xiao/visual-studio.git",
     "type": "git"
   },
+  "vercel": {
+    "buildCommand": "pnpm build:web",
+    "outputDirectory": "packages/web/dist",
+    "installCommand": "pnpm install",
+    "framework": null
+  },
   "license": ""
 }
 

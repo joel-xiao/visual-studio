@@ -25,6 +25,12 @@ interface ProjectConfig {
     tauri: string;
   };
   copyright: string;
+  vercel?: {
+    buildCommand: string;
+    outputDirectory: string;
+    installCommand: string;
+    framework: string | null;
+  };
 }
 
 interface PackageJson {
@@ -137,6 +143,40 @@ indexHtml = indexHtml.replace(
   `<title>${config.name.display}</title>`
 );
 fs.writeFileSync(indexHtmlPath, indexHtml);
+
+// 生成 Vercel 配置
+if (config.vercel) {
+  const vercelConfig: {
+    buildCommand?: string;
+    outputDirectory?: string;
+    installCommand?: string;
+    framework?: string | null;
+    rewrites?: Array<{ source: string; destination: string }>;
+  } = {
+    buildCommand: config.vercel.buildCommand,
+    outputDirectory: config.vercel.outputDirectory,
+    installCommand: config.vercel.installCommand
+  };
+
+  // 只有在有框架时才添加 framework 字段
+  if (config.vercel.framework) {
+    vercelConfig.framework = config.vercel.framework as string;
+  }
+
+  // 添加 SPA 路由重写规则（Vue Router history 模式需要）
+  vercelConfig.rewrites = [
+    {
+      source: '/(.*)',
+      destination: '/index.html'
+    }
+  ];
+
+  const vercelConfigPath = path.join(__dirname, '../vercel.json');
+  fs.writeFileSync(
+    vercelConfigPath,
+    JSON.stringify(vercelConfig, null, 2) + '\n'
+  );
+}
 
 console.log('✅ 项目配置已同步到所有文件');
 
