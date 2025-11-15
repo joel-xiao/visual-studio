@@ -24,6 +24,7 @@ visual-studio/
 ├── config/           # 配置文件
 │   └── changelog-option.ts
 ├── project.config.json  # 项目统一配置
+├── vercel.json       # Vercel 部署配置（自动生成）
 └── package.json
 ```
 
@@ -32,7 +33,7 @@ visual-studio/
 
 ### 环境要求
 
-- Node.js >= 18
+- Node.js >= 22
 - pnpm >= 8
 - Rust (仅 Tauri 需要)
 
@@ -99,11 +100,33 @@ pnpm build:tauri
 
 ## 🔧 配置管理
 
-使用 `project.config.json` 作为单一数据源管理配置：
+使用 `project.config.json` 作为单一数据源管理配置。运行同步脚本会自动更新所有相关配置文件：
 
 ```bash
 pnpm sync:config
 ```
+
+**自动同步的配置包括：**
+- `package.json` - 根目录和所有子包的名称和版本
+- `packages/web/index.html` - 页面标题
+- `packages/electron/electron-builder.json5` - Electron 配置
+- `packages/tauri/tauri.conf.json` - Tauri 配置
+- `packages/tauri/Cargo.toml` - Rust 配置
+- `vercel.json` - Vercel 部署配置（包含构建命令、输出目录、Node.js 版本等）
+
+### Vercel 部署
+
+项目已配置自动生成 `vercel.json`，支持一键部署到 Vercel：
+
+1. 确保 `project.config.json` 中的 `vercel` 配置正确
+2. 运行 `pnpm sync:config` 生成 `vercel.json`
+3. 在 Vercel 中导入项目即可自动部署
+
+**当前 Vercel 配置：**
+- Node.js 版本：22.x
+- 构建命令：`pnpm build:web`
+- 输出目录：`packages/web/dist`
+- 安装命令：`pnpm install`
 
 ## 📝 开发规范
 
@@ -119,7 +142,7 @@ build, chore, config, revert, merge, sync
 
 ## 🛠️ 技术栈
 
-Vue 3.5 + Vite 7 + TypeScript 5.9 + Electron 39 / Tauri 2.9 + pnpm workspace + Pinia 3 + Vue Router 4 + Naive UI
+Vue 3.5 + Vite 7 + TypeScript 5.9 + Node.js 22 + Electron 39 / Tauri 2.9 + pnpm workspace + Pinia 3 + Vue Router 4 + Naive UI
 
 ## 📚 相关文档
 
