@@ -6,8 +6,7 @@
     "dev": "vite",
     "build": "npx vue-tsc --noEmit && vite build --mode web",
     "build:web": "npx vue-tsc --noEmit && vite build --mode web",
-    "build:electron": "npx vue-tsc --noEmit && vite build --mode electron",
-    "build:tauri": "npx vue-tsc --noEmit && vite build --mode tauri",
+    "build:client": "npx vue-tsc --noEmit && vite build --mode client",
     "preview": "vite preview"
   },
   "dependencies": {

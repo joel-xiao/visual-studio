@@ -6,25 +6,10 @@ import viteCompression from 'vite-plugin-compression';
 import copyPlugin from 'rollup-plugin-copy';
 
 export default defineConfig(async ({ mode }) => {
-  let copyPluginTargets = [];
-  const isTauriBuild = process.argv.includes('build') && process.argv.includes('dist-tauri');
-  if (!isTauriBuild) copyPluginTargets = [{ src: 'apps/*', dest: 'dist/apps' }];
-
-  let buildTarget = mode && ['electron', 'tauri', 'web'].includes(mode) ? mode : 'web';
-
-  const targetIndex = process.argv.indexOf('--target');
-  if (targetIndex !== -1 && process.argv[targetIndex + 1]) {
-    const target = process.argv[targetIndex + 1];
-    if (['electron', 'tauri', 'web'].includes(target)) {
-      buildTarget = target;
-    }
-  }
-
-  if (isTauriBuild) {
-    buildTarget = 'tauri';
-  }
-
-  const base = buildTarget === 'electron' || buildTarget === 'tauri' ? './' : '/';
+  const isClientTarget = mode === 'client';
+  const OUTPUT_DIR = isClientTarget ? 'dist' : 'dist/web';
+  const copyPluginTargets = [{ src: 'apps/*', dest: `${OUTPUT_DIR}/apps` }];
+  const base = isClientTarget ? './' : '/';
 
   return {
     plugins: [
@@ -57,6 +42,7 @@ export default defineConfig(async ({ mode }) => {
     base: base,
 
     build: {
+      outDir: OUTPUT_DIR,
       emptyOutDir: false,
       rollupOptions: {
         plugins: [
@@ -70,10 +56,7 @@ export default defineConfig(async ({ mode }) => {
     clearScreen: false,
     server: {
       port: 1420,
-      strictPort: true,
-      watch: {
-        ignored: ['**/src-tauri/**']
-      }
+      strictPort: true
     }
   };
 });
