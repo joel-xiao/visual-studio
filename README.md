@@ -67,13 +67,13 @@ pnpm dev:tauri
 ### 构建
 
 ```bash
-# 构建 Web 版本（输出到 packages/web/dist/web）
+# 构建 Web 版本（输出到 packages/web/dist）
 pnpm build:web
 
-# 构建 Electron 应用（Web 输出到 packages/web/dist，Electron 构建到 packages/electron/dist）
+# 构建 Electron 应用（Web 输出到 packages/web/dist，然后复制到 packages/electron/dist/web）
 pnpm build:electron
 
-# 构建 Tauri 应用（Web 输出到 packages/web/dist，Tauri 构建到 packages/tauri/target）
+# 构建 Tauri 应用（Web 输出到 packages/web/dist，Tauri 使用该目录构建）
 pnpm build:tauri
 
 # Tauri 创建 DMG（构建完成后）
@@ -81,10 +81,21 @@ cd packages/tauri && pnpm create-dmg
 ```
 
 **构建输出目录：**
-- **Web 模式** (`--mode web`): 输出到 `packages/web/dist/web/`
-- **客户端模式** (`--mode client`): 输出到 `packages/web/dist/`（用于 Electron 和 Tauri）
-- **Electron**: `packages/electron/dist/` 和 `packages/electron/release/`
-- **Tauri**: `packages/tauri/target/` 和 `packages/tauri/gen/`
+- **Web 模式** (`--mode web`): 
+  - 输出目录：`packages/web/dist/`
+  - Base URL：`/`（用于部署到服务器）
+- **客户端模式** (`--mode client`): 
+  - 输出目录：`packages/web/dist/`（与 Web 模式相同）
+  - Base URL：`./`（用于 Electron 和 Tauri 本地文件加载）
+- **Electron**: 
+  - 主进程：`packages/electron/dist/main/`
+  - 预加载脚本：`packages/electron/dist/preload/`
+  - Web 文件：`packages/electron/dist/web/`（从 `packages/web/dist` 复制）
+  - 打包输出：`packages/electron/release/`
+- **Tauri**: 
+  - Rust 构建：`packages/tauri/target/`
+  - 生成文件：`packages/tauri/gen/`
+  - 前端：直接使用 `packages/web/dist`（通过 `frontendDist` 配置指向 `../web/dist`）
 
 ## 📦 包说明
 
@@ -97,8 +108,8 @@ Web 核心包，包含所有业务逻辑和 UI 组件。
 - **路由**: Vue Router
 - **UI 框架**: Naive UI
 - **构建模式**:
-  - `build:web` - Web 模式，输出到 `dist/web/`
-  - `build:client` - 客户端模式（Electron/Tauri），输出到 `dist/`
+  - `build:web` - Web 模式（`--mode web`），输出到 `dist/`，base 为 `/`
+  - `build:client` - 客户端模式（`--mode client`），输出到 `dist/`，base 为 `./`（用于 Electron 和 Tauri）
 
 ### `@visualization-editor/electron`
 
