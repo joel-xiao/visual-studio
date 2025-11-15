@@ -33,9 +33,8 @@ axios.defaults.headers.post['Content-Type'] = 'application/json;charset=UTF-8';
 axios.interceptors.request.use(
   config => {
     const token = window.sessionStorage.getItem('token');
-    if (token) {
-      // @ts-expect-error - Dynamic header assignment
-      config.headers.token = token;
+    if (token && config.headers) {
+      (config.headers as Record<string, string>).token = token;
     }
     return config;
   },

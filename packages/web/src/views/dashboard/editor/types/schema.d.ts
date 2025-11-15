@@ -52,6 +52,7 @@ declare interface ISchemaExportDefault {
 
 declare interface ISchemaExport extends ISchemaExportDefault {
   schema: SchemaKeyTypes;
+  [key: string]: unknown;
 }
 
 declare type SchemaKeysTypes = ISchemaExport[];

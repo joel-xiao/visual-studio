@@ -1,4 +1,4 @@
-import { watch, computed, readonly, reactive, ref, ComputedRef } from 'vue';
+import { watch, computed, readonly, reactive, ref, ComputedRef, type App, type Ref } from 'vue';
 import { getUuid } from '@a/utils/index';
 
 class CreateNodeContext {
@@ -146,8 +146,7 @@ class CreateNodeContext {
     const node = this.#data?.nodes.find(node => node.id === id);
     if (node && delta) {
       Object.keys(delta).forEach((key: string): void => {
-        // @ts-expect-error - Dynamic property assignment
-        node[key] = delta[key];
+        (node as unknown as Record<string, unknown>)[key] = (delta as Record<string, unknown>)[key];
       });
 
       this.#nodeInstances?.[node.id]?.updatePos?.();
@@ -210,13 +209,10 @@ class CreateNodeContext {
       const value = opt.value;
       if (key && (value || value === 0)) {
         const keyArr = key.split('.');
-        // @ts-expect-error - Dynamic property access
-        let data = node?.props;
+        let data: unknown = node?.props;
         keyArr.forEach((k, i) => {
-          // @ts-expect-error - Dynamic property assignment
-          if (typeof data === 'object' && i === keyArr.length - 1) {
-            // @ts-expect-error - Dynamic property assignment
-            data[k] = value;
+          if (typeof data === 'object' && data !== null && i === keyArr.length - 1) {
+            (data as Record<string, unknown>)[k] = value;
 
             //  Pros Layout binds to  INode
             if (change_type !== 'update_node') {
@@ -232,8 +228,7 @@ class CreateNodeContext {
               }
             }
           } else {
-            // @ts-expect-error - Dynamic property access
-            data = data[k];
+            data = typeof data === 'object' && data !== null ? (data as Record<string, unknown>)[k] : undefined;
           }
         });
       }

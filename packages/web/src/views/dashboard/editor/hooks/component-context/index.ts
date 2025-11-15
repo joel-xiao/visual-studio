@@ -1,4 +1,4 @@
-import { readonly, createVNode } from 'vue';
+import { readonly, createVNode, type App } from 'vue';
 import { cloneDeep } from 'lodash';
 import { createComponent } from '@hooks/vue-hooks';
 
@@ -183,8 +183,7 @@ export class CreateComponentContext {
             name: schema.name,
             label: component_schema.label || schema.label,
             key: component_schema.key || schema.key,
-            // @ts-expect-error - Dynamic schema access
-            schema: schema[component_schema.type]
+            schema: (schema as Record<string, unknown>)[component_schema.type] as SchemaKeyTypes
           });
         }
       }
@@ -237,10 +236,9 @@ export class CreateComponentContext {
           !Array.isArray(component_schema)
         ) {
           const schema = schemas[component_schema.schema];
-          // @ts-expect-error - Dynamic schema access
           const schema_data: SchemaKeyTypes | null =
             !Array.isArray(schema) && typeof schema === 'object'
-              ? schema[component_schema.type]
+              ? (schema as Record<string, unknown>)[component_schema.type] as SchemaKeyTypes | undefined ?? null
               : null;
 
           const is_component_schema = !!component_schema.schema;
@@ -272,13 +270,12 @@ export class CreateComponentContext {
                     }
 
                     if (is_component_schema_default_object) {
-                      // @ts-expect-error - Dynamic property assignment
-                      prop[item.key] = component_schema_default[item.key] || item.default;
+                      const value = (component_schema_default as Record<string, unknown>)[item.key] ?? item.default;
+                      (prop as Record<string, unknown>)[item.key] = value;
                     } else if (is_component_schema_default) {
-                      // @ts-expect-error - Dynamic property assignment
-                      prop[item.key] = component_schema_default || item.default;
+                      (prop as Record<string, unknown>)[item.key] = component_schema_default || item.default;
                     } else {
-                      prop[item.key] = item.default;
+                      (prop as Record<string, unknown>)[item.key] = item.default;
                     }
                   }
                 }
