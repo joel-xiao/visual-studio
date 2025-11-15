@@ -3,7 +3,7 @@
     "kebab": "visual-craft",
     "pascal": "VisualCraft",
     "display": "VisualCraft",
-    "monorepo": "visual-craft.monorepo"
+    "monorepo": "visual-craft"
   },
   "version": "0.0.1",
   "description": "VisualCraft - 可视化工匠 - A powerful visualization and editing tool",
