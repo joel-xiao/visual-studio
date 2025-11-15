@@ -8,27 +8,12 @@ export default tseslint.config(
   {
     ignores: [
       '**/node_modules/**',
-      '**/dist/**',
-      '**/dist-tauri/**',
-      '**/release/**',
-      '**/target/**',
-      '**/build/**',
-      '**/*.lock',
-      '**/*.log',
-      '**/pnpm-lock.yaml',
-      '**/Cargo.lock',
-      '**/.idea/**',
-      '**/.vscode/**',
-      '**/*.dmg',
-      '**/*.msi',
-      '**/*.deb',
-      '**/*.AppImage',
-      '**/*.exe',
-      '**/*.blockmap',
-      '**/packages/tauri/src/**',
-      '**/packages/tauri/target/**',
-      '**/packages/tauri/gen/**',
-      '**/packages/web/src/assets/style/font/**'
+      '**/packages/web/src/assets/style/font/**',
+      'packages/web/dist/**',
+      'packages/electron/dist/**',
+      'packages/electron/release/**',
+      'packages/tauri/target/**',
+      'packages/tauri/gen/**'
     ]
   },
   js.configs.recommended,

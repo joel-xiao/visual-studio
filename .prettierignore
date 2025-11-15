@@ -1,19 +1,6 @@
-node_modules
-dist
-dist-tauri
-release
-target
-build
-*.lock
-*.log
-pnpm-lock.yaml
-Cargo.lock
-.idea
-.vscode
-*.dmg
-*.msi
-*.deb
-*.AppImage
-*.exe
-*.blockmap
-
+# Build outputs
+packages/web/dist/
+packages/electron/dist/
+packages/electron/release/
+packages/tauri/target/
+packages/tauri/gen/
