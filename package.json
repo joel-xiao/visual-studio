@@ -10,8 +10,10 @@
     "build:tauri": "pnpm -F @visualization-editor/web build:tauri && pnpm -F @visualization-editor/tauri build",
     "dev:electron": "concurrently \"pnpm dev:web\" \"pnpm wait:web && pnpm -F @visualization-editor/electron dev\"",
     "build:electron": "pnpm -F @visualization-editor/web build:electron && pnpm -F @visualization-editor/electron build",
-    "log": "conventional-changelog -p custom-config -i CHANGELOG.md -s -r 0  -n ./config/changelog-option.js",
-    "sync:config": "node scripts/sync-project-config.js",
+    "log": "NODE_OPTIONS='--loader tsx/esm' conventional-changelog -p custom-config -i CHANGELOG.md -s -r 0 -n ./config/changelog-option.ts",
+    "lint": "eslint . --fix",
+    "lint:check": "eslint .",
+    "sync:config": "tsx scripts/sync-project-config.ts",
     "prepare": "husky install"
   },
   "changelog": {
@@ -20,7 +22,15 @@
     "authorName": true,
     "authorEmail": true
   },
-  "lint-staged": {},
+  "lint-staged": {
+    "*.{js,ts,vue}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,scss,css}": [
+      "prettier --write"
+    ]
+  },
   "optionalDependencies": {
     "@commitlint/cli": "^20.1.0",
     "@commitlint/config-conventional": "^20.0.0",
@@ -28,7 +38,22 @@
     "lint-staged": "^16.2.6"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/node": "^20.19.25",
+    "@typescript-eslint/eslint-plugin": "^8.46.4",
+    "@typescript-eslint/parser": "^8.46.4",
+    "compare-func": "^2.0.0",
     "concurrently": "^9.2.1",
+    "conventional-changelog": "^7.1.1",
+    "conventional-changelog-cli": "^5.0.0",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-vue": "^10.5.1",
+    "prettier": "^3.6.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.4",
+    "vue-eslint-parser": "^10.2.0",
     "wait-on": "^9.0.3"
   }
 }
