@@ -14,16 +14,16 @@
 ## 🏗️ 项目结构
 
 ```
-visual-craft.monorepo/
+visual-studio/
 ├── packages/
-│   ├── web/
-│   ├── electron/
-│   └── tauri/
-├── scripts/
+│   ├── web/          # Web 应用（Vue 3 + Vite）
+│   ├── electron/     # Electron 桌面应用
+│   └── tauri/        # Tauri 桌面应用（Rust）
+├── scripts/          # 项目脚本
 │   └── sync-project-config.ts
-├── config/
+├── config/           # 配置文件
 │   └── changelog-option.ts
-├── project.config.json
+├── project.config.json  # 项目统一配置
 └── package.json
 ```
 
