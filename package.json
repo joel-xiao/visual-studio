@@ -2,11 +2,6 @@
   "name": "visual-craft",
   "private": true,
   "version": "0.0.1",
-  "pnpm": {
-    "git-host-overrides": {
-      "github.com": "https://github.com"
-    }
-  },
   "scripts": {
     "dev:web": "pnpm -F @visual-craft/web dev",
     "wait:web": "wait-on --interval 1000 --timeout 60000 tcp:1420",
