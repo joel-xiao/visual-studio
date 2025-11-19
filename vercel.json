@@ -2,9 +2,6 @@
   "buildCommand": "pnpm build:web",
   "outputDirectory": "packages/web/dist",
   "installCommand": "pnpm install",
-  "engines": {
-    "node": "22.x"
-  },
   "rewrites": [
     {
       "source": "/(.*)",
