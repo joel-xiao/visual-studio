@@ -3,7 +3,7 @@ node_modules/
 
 # Package manager locks
 *.lock
-pnpm-lock.yaml
+# pnpm-lock.yaml
 
 # Build outputs
 packages/web/dist/
