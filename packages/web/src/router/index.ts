@@ -1,8 +1,7 @@
 import { createRouter, createWebHistory, createWebHashHistory, RouteRecordRaw } from 'vue-router';
 import layout from '@v/layout/layout-screen.vue';
 import type { App } from 'vue';
-import { isElectron } from '@/client/electron/main';
-import { isTauri } from '@/client/tauri/main';
+import { isElectron } from '@/client';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -61,7 +60,7 @@ const routePathJoinHandler = function (routes: Array<RouteRecordRaw>, parentPath
 };
 routePathJoinHandler(routes);
 
-const useHashMode = isElectron() || isTauri();
+const useHashMode = isElectron();
 
 const router = createRouter({
   history: useHashMode ? createWebHashHistory() : createWebHistory(),

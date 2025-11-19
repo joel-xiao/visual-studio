@@ -3,11 +3,13 @@ import type { InvokeArgs } from '@tauri-apps/api/core';
 import { invokeTauri, isTauri, noTauri } from './tauri/main';
 import { isElectron, noElectron } from './electron/main';
 
-function isClient() {
+export { isElectron } from './electron/main';
+
+export function isClient() {
   return isElectron() || isTauri();
 }
 
-function noClient() {
+export function noClient() {
   return noElectron() && noTauri();
 }
 
