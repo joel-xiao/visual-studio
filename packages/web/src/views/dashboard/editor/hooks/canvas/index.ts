@@ -34,6 +34,39 @@ class Canvas {
   addScaleEvent(opt: CanvasOption) {
     this.#option = opt;
     this.#option?.parentEl.addEventListener('mousewheel', this.onWheel);
+    this.#autoFit();
+  }
+
+  #autoFit() {
+    if (!this.#option?.canvasEl || !this.#option?.parentEl) return;
+    const { overlaySetPos, setScaleOffset } = useOverlay();
+    const { setRulerScaleOffset, setRulerScale } = useRuler();
+
+    const parentRect = this.#option.parentEl.getBoundingClientRect();
+    const width = this.#option.canvasEl.offsetWidth;
+    const height = this.#option.canvasEl.offsetHeight;
+
+    // Calculate center position
+    const x = (parentRect.width - width) / 2;
+    const y = (parentRect.height - height) / 2;
+
+    // Update overlay position
+    overlaySetPos({ x, y });
+
+    // Reset scale offset
+    const scaleOffset = { x: 0, y: 0 };
+    setScaleOffset(scaleOffset);
+
+    // Reset ruler
+    setRulerScaleOffset(scaleOffset);
+    setRulerScale(this.#scale);
+
+    // Reset scale
+    this.#scale = 1;
+    this.#option.canvasEl.style.transformOrigin = `0px 0px`;
+    this.#option.canvasEl.style.scale = `${this.#scale}`;
+
+    this.#canvasUpdates.forEach(callback => callback({ scale: this.#scale }));
   }
 
   removeScaleEvent() {

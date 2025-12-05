@@ -50,18 +50,20 @@ const { addOverlayMoveUpdated, overlayUpdatePos, addOverlay, setOverlayDisabled 
 const { addScaleEvent, getScale } = useCanvas();
 
 onMounted(() => {
-  addScaleEvent({
-    parentEl: middleEl.value as HTMLElement,
-    canvasEl: canvasRootEl.value as HTMLElement
-  });
+  nextTick(() => {
+    addOverlay({
+      parentEl: middleEl.value as HTMLElement,
+      canvasEl: canvasRootEl.value as HTMLElement,
+      key: 'editor-canvas-overlay'
+    });
 
-  addOverlay({
-    parentEl: middleEl.value as HTMLElement,
-    canvasEl: canvasRootEl.value as HTMLElement,
-    key: 'editor-canvas-overlay'
-  });
+    addScaleEvent({
+      parentEl: middleEl.value as HTMLElement,
+      canvasEl: canvasRootEl.value as HTMLElement
+    });
 
-  overlayUpdatePos();
+    overlayUpdatePos();
+  });
 });
 
 onBeforeUnmount(() => {

@@ -43,6 +43,8 @@ class Overlay {
 
     this.setScaleOffset = this.setScaleOffset.bind(this);
     this.getScaleOffset = this.getScaleOffset.bind(this);
+
+    this.setPos = this.setPos.bind(this);
   }
 
   install(opt: OverlayOption): void {
@@ -167,6 +169,12 @@ class Overlay {
     event.preventDefault();
   }
 
+  setPos(pos: Pos) {
+    this.#pos = pos;
+    this.#defaultPos = { ...pos };
+    this.#updatePos();
+  }
+
   updatePos() {
     this.#updatePos();
   }
@@ -226,7 +234,8 @@ export const useOverlay = function () {
       setOverlayDisabled: overlay.setDisabled,
       getPos: overlay.getPos,
       getScaleOffset: overlay.getScaleOffset,
-      setScaleOffset: overlay.setScaleOffset
+      setScaleOffset: overlay.setScaleOffset,
+      overlaySetPos: overlay.setPos
     })
   );
 };
