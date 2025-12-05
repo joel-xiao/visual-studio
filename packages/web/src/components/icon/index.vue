@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed, reactive, withDefaults } from 'vue';
+import { Icon } from '@iconify/vue';
 
 interface Props {
   src?: string;
@@ -21,6 +22,10 @@ const Style = reactive({
   fontSize: props.fontSize
 });
 
+const isIconify = computed(() => {
+  return props.src?.includes(':');
+});
+
 const isIcon = computed(() => {
   return !props.src?.includes('.');
 });
@@ -28,7 +33,8 @@ const isIcon = computed(() => {
 
 <template lang="pug">
 span(class='c-icon-font' v-bind="$attrs" :style="Style" :class="[button ? 'button' : '', block ? 'block' : '', size, !isIcon ? 'img' : '']")
-  i(class='icon-font' :class='src' v-if="isIcon")
+  Icon(class='icon-font' :icon='src' v-if="isIconify")
+  i(class='icon-font' :class='src' v-else-if="isIcon")
   img(class='icon-img' v-else :src="src")
 </template>
 
