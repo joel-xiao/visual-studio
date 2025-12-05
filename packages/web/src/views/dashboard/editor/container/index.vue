@@ -16,7 +16,7 @@ div.editor-container(
 </template>
 
 <script setup lang="ts">
-import GridLine from './components/grid-line.vue';
+import GridLine from '../components/canvas-widgets/grid-line.vue';
 import ContainerNode from './node.vue';
 import { ref, nextTick, onMounted, onBeforeUnmount } from 'vue';
 import { useDrag } from './../hooks/drag-context';

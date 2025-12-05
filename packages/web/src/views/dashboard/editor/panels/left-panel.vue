@@ -23,9 +23,9 @@ div.editor-left-panel
 </template>
 
 <script setup lang="ts">
-import PanelTabBar from './components/panel-tab-bar/index.vue';
-import PanelLayer from './components/panel-layer/index.vue';
-import PanelComponent from './components/panel-component/index.vue';
+import PanelTabBar from '../components/panel-tab-bar/index.vue';
+import PanelLayer from '../components/panel-layer/index.vue';
+import PanelComponent from '../components/panel-component/index.vue';
 import { ref, reactive } from 'vue';
 import { useDrag } from './../hooks/drag-context';
 import { useComponentContext } from './../hooks/component-context';

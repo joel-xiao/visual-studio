@@ -56,7 +56,7 @@ watch(
   --color-divider: var(--theme-color-gray-100);
 
   width: 100%;
-  height: var(--panel-schema-tabs-wrapper-height);
+  height: var(--schema-renderer-tabs-wrapper-height);
   border-top: 1px solid var(--color-divider);
 
   .schemas-tabs-nav-wrapper {

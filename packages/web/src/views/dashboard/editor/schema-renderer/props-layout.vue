@@ -34,7 +34,7 @@ onMounted(() => {
 </script>
 
 <style lang="scss">
-.editor-panel-schema .schema-props-layout {
+.editor-schema-renderer .schema-props-layout {
   --color-divider: var(--theme-color-gray-100);
 
   display: grid;

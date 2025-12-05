@@ -47,7 +47,7 @@ const style = computed(() => {
 </script>
 
 <style lang="scss">
-.editor-panel-schema .schema-props-item {
+.editor-schema-renderer .schema-props-item {
   min-height: 30px;
   width: 100%;
   display: grid;

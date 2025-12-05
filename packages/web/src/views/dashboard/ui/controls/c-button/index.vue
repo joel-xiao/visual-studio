@@ -13,8 +13,8 @@ export default {
 </script>
 
 <script setup lang="ts">
-import BasicBox from '../components/basic-box.vue';
-import BasicIcon from '../components/basic-icon.vue';
+import BasicBox from '../../base/basic-box.vue';
+import BasicIcon from '../../base/basic-icon.vue';
 import { reactive } from 'vue';
 interface Props {
   type?: string; // status-button button

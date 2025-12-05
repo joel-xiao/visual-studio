@@ -23,11 +23,11 @@ export default {
 </script>
 <script setup lang="ts">
 import { reactive, watch } from 'vue';
-import PropsLayout from '../components/props-layout.vue';
-import PropsItem from './../components/props-item.vue';
-import Input from './../../../../../components/basic/c-input/index.vue';
-import Button from './../../../../../components/basic/c-button/index.vue';
-import Radius from './../components/input-group/index.vue';
+import PropsLayout from '../props-layout.vue';
+import PropsItem from './../props-item.vue';
+import Input from '../../../ui/controls/c-input/index.vue';
+import Button from '../../../ui/controls/c-button/index.vue';
+import Radius from './../input-group/index.vue';
 
 type PanelSchemaLayout = {
   x: number;
@@ -70,7 +70,7 @@ const onRotate = function (type: string) {
 </script>
 
 <style lang="scss">
-.editor-panel-schema .component-layout {
+.editor-schema-renderer .component-layout {
   .component-layout-rotate {
     grid-template-columns: 1fr 1fr;
     display: grid;

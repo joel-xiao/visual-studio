@@ -6,8 +6,8 @@ div.editor-right-panel
 </template>
 
 <script setup lang="ts">
-import PanelTabBar from './components/panel-tab-bar/index.vue';
-import PanelSchema from './components/panel-schema/index.vue';
+import PanelTabBar from '../components/panel-tab-bar/index.vue';
+import PanelSchema from '../schema-renderer/index.vue';
 </script>
 
 <style lang="scss">

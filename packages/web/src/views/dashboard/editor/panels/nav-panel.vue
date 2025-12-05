@@ -16,7 +16,7 @@ div.editor-nav-panel
 </template>
 
 <script setup lang="ts">
-import CButton from './../../components/basic/c-button/index.vue';
+import CButton from '../../ui/controls/c-button/index.vue';
 import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';

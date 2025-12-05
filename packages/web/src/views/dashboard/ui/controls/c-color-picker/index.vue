@@ -13,9 +13,9 @@ export default {
 
 <script setup lang="ts">
 import { ref, computed, withDefaults } from 'vue';
-import BasicBox from '../components/basic-box.vue';
-import BasicColorPicker from '../components/basic-color-picker.vue';
-import BasicInput from '../components/basic-input.vue';
+import BasicBox from '../../base/basic-box.vue';
+import BasicColorPicker from '../../base/basic-color-picker.vue';
+import BasicInput from '../../base/basic-input.vue';
 
 interface IProps {
   type?: string; // color-input color

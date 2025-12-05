@@ -19,7 +19,7 @@ div(class='editor-panel-component')
 <script setup lang="ts">
 import { ref, reactive, provide, withDefaults, computed } from 'vue';
 import ComponentItem from './component-item.vue';
-import CInput from './../../../../components/basic/c-input/index.vue';
+import CInput from '../../../ui/controls/c-input/index.vue';
 
 interface Props {
   data?: PanelComponentData[];

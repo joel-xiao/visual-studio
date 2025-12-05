@@ -10,9 +10,9 @@ export default {
 };
 </script>
 <script setup lang="ts">
-import PropsLayout from './components/props-layout.vue';
-import PropsItem from './components/props-item.vue';
-import PropsCtrl from './components/props-ctrl.vue';
+import PropsLayout from './props-layout.vue';
+import PropsItem from './props-item.vue';
+import PropsCtrl from './props-ctrl.vue';
 import { computed } from 'vue';
 
 interface Props {

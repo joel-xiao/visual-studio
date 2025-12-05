@@ -46,9 +46,9 @@ export default {
 
 <script setup lang="ts">
 import { ref, reactive, computed, provide, withDefaults } from 'vue';
-import BasicBox from '../components/basic-box.vue';
-import BasicIcon from '../components/basic-icon.vue';
-import BasicInput from '../components/basic-input.vue';
+import BasicBox from '../../base/basic-box.vue';
+import BasicIcon from '../../base/basic-icon.vue';
+import BasicInput from '../../base/basic-input.vue';
 
 interface IProps {
   type?: string;

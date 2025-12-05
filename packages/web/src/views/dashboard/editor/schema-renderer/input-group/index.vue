@@ -23,8 +23,8 @@ export default {
 
 <script setup lang="ts">
 import { reactive, nextTick } from 'vue';
-import Input from './../../../../../../components/basic/c-input/index.vue';
-import Button from './../../../../../../components/basic/c-button/index.vue';
+import Input from '../../../ui/controls/c-input/index.vue';
+import Button from '../../../ui/controls/c-button/index.vue';
 
 interface Props {
   modelValue: number[];
@@ -59,7 +59,7 @@ function onUpdate() {
 </script>
 
 <style lang="scss">
-.editor-panel-schema .schema-input-group {
+.editor-schema-renderer .schema-input-group {
   display: grid;
   grid-template-rows: auto;
   grid-template-columns: 1fr 30px;

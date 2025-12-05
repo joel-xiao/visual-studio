@@ -1,7 +1,8 @@
 <template lang="pug">
-div(class="editor-panel-schema")
-  div(class="editor-panel-schema-wrapper" ref="panelSchemaWrapperRef")
+div(class="editor-schema-renderer")
+  div(class="editor-schema-renderer-wrapper" ref="panelSchemaWrapperRef")
     template(v-for="(item, idx) in PanelSchemaTypes.propsTypes")
+
       template(v-if="isComponent(item.name)")
         component(:is="getComponent(item.name)" v-model="PropsData[item.key]" @update="onUpdate(item.key, item.schema, $event)")
       template(v-else)
@@ -20,8 +21,8 @@ import { cloneDeep } from 'lodash';
 import PropsWarp from './props-warp.vue';
 import Layout from './layout/index.vue';
 import Tabs from './tabs/index.vue';
-import { useComponentContext } from '../../../hooks/component-context';
-import { useNodeContext } from './../../../hooks/node-context';
+import { useComponentContext } from '../hooks/component-context';
+import { useNodeContext } from '../hooks/node-context';
 
 const components = reactive({
   [Layout.schema_name as string]: markRaw(Layout),
@@ -64,7 +65,7 @@ const panelSchemaWrapperRef = ref<HTMLElement>();
 const TabsStyle = computed(() => {
   const rect = panelSchemaWrapperRef.value?.getBoundingClientRect() || { height: 0 };
   return {
-    '--panel-schema-tabs-wrapper-height': `calc(100% - ${rect.height}px)`
+    '--schema-renderer-tabs-wrapper-height': `calc(100% - ${rect.height}px)`
   };
 });
 
@@ -75,13 +76,13 @@ function onSelectTab(data: CategorySchemaType) {
 </script>
 
 <style lang="scss">
-.editor-panel-schema {
+.editor-schema-renderer {
   width: 100%;
   height: 100%;
   position: relative;
   overflow-x: hidden;
 
-  .editor-panel-schema-wrapper {
+  .editor-schema-renderer-wrapper {
     // padding: 0 6px 90px 12px;
     padding: 0 6px 0px 12px;
   }

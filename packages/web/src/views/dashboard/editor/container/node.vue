@@ -5,7 +5,7 @@ DragResize(ref="resize" :data="dragDataset" @resizing="onResizing" @mousedown.st
 </template>
 
 <script setup lang="ts">
-import DragResize from './components/drag-resize.vue';
+import DragResize from '../components/canvas-widgets/drag-resize.vue';
 import { ref, reactive, markRaw, readonly, withDefaults, watch, onMounted } from 'vue';
 import { useNodeContext } from './../hooks/node-context';
 import { getNodeStyle } from './../hooks/node-context/example';
