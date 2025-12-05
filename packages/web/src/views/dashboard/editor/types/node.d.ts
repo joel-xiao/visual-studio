@@ -30,6 +30,7 @@ declare interface INode extends IAddNode {
   select?: boolean;
   lock?: boolean;
   z: number;
+  rotate?: number;
 }
 
 declare interface INodeDelta {

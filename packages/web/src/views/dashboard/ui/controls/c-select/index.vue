@@ -45,7 +45,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ref, reactive, computed, provide, withDefaults } from 'vue';
+import { ref, reactive, computed, provide, withDefaults, nextTick } from 'vue';
 import BasicBox from '../../base/basic-box.vue';
 import BasicIcon from '../../base/basic-icon.vue';
 import BasicInput from '../../base/basic-input.vue';
@@ -76,11 +76,6 @@ const emit = defineEmits(['update', 'update:modelValue']);
 const Type = computed(() => {
   return props.type === 'input-select' ? 'input-select' : 'select';
 });
-
-const items = ref<Item[]>([
-  { label: 'item1', value: 'item1' },
-  { label: 'item2', value: 'item2' }
-]);
 
 const Items = computed(() => {
   const result = [...(props.options || [])];
@@ -124,12 +119,52 @@ function onOpenWrapper(event_type: string) {
   }
 
   if (selectMaskRef.value && selectWrapperRef.value && boxRef.value) {
+    enterValue.value = currValue.value;
     const boxRect = boxRef.value.getRect();
     selectMaskRef.value.style.display = 'block';
     selectWrapperRef.value.style.display = 'block';
+    selectWrapperRef.value.style.visibility = 'hidden';
     selectWrapperRef.value.style.width = boxRect.width + 'px';
     selectWrapperRef.value.style.top = boxRect.top + 'px';
     selectWrapperRef.value.style.left = boxRect.left + 'px';
+
+    nextTick(() => {
+      if (selectWrapperRef.value) {
+        const activeItem = selectWrapperRef.value.querySelector('.active') as HTMLElement;
+        let targetTop = boxRect.top;
+        let targetScrollTop = 0;
+
+        if (activeItem) {
+          targetTop = boxRect.top - activeItem.offsetTop;
+        }
+
+        // Adjust for top boundary
+        if (targetTop < 10) {
+          const diff = 10 - targetTop;
+          targetTop = 10;
+          targetScrollTop += diff;
+        }
+
+        // Adjust for bottom boundary
+        const wrapperHeight = selectWrapperRef.value.offsetHeight;
+        const windowHeight = window.innerHeight;
+
+        if (targetTop + wrapperHeight > windowHeight - 10) {
+          const diff = targetTop + wrapperHeight - (windowHeight - 10);
+          targetTop -= diff;
+          targetScrollTop -= diff;
+        }
+
+        // Clamp scrollTop
+        const maxScroll = selectWrapperRef.value.scrollHeight - selectWrapperRef.value.offsetHeight;
+        if (targetScrollTop < 0) targetScrollTop = 0;
+        if (targetScrollTop > maxScroll) targetScrollTop = maxScroll;
+
+        selectWrapperRef.value.style.top = targetTop + 'px';
+        selectWrapperRef.value.scrollTop = targetScrollTop;
+        selectWrapperRef.value.style.visibility = 'visible';
+      }
+    });
   }
 }
 
@@ -215,6 +250,8 @@ function onItemClick(item: Item) {
     border-radius: 6px;
     display: none;
     z-index: 1;
+    max-height: 260px;
+    overflow-y: auto;
 
     .c-select-item {
       margin: 0 6px;

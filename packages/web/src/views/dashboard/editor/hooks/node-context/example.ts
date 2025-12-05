@@ -11,10 +11,12 @@ export function getNodeStyle(node: INode) {
     '--node-width': string;
     '--node-height': string;
     overflow: string;
+    transform: string;
   }>(() => {
     const radius = node?.radius.map(r => (r || 0) + 'px') || [];
     const width = (node?.width || 0) + 'px';
     const height = (node?.height || 0) + 'px';
+    const rotate = (node?.rotate || 0) + 'deg';
     return {
       'border-top-left-radius': radius[0] || '0px',
       'border-top-right-radius': radius[1] || '0px',
@@ -24,7 +26,8 @@ export function getNodeStyle(node: INode) {
       height: height,
       '--node-width': width,
       '--node-height': height,
-      overflow: 'hidden'
+      overflow: 'hidden',
+      transform: `rotate(${rotate})`
     };
   });
 }

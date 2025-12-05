@@ -69,7 +69,7 @@ const schema: ISchemaExport = {
         size: 'small',
         click: props => {
           if (typeof props.rotate === 'number') {
-            props.rotate = 180 - props.rotate;
+            props.rotate = -props.rotate;
           }
         }
       },
