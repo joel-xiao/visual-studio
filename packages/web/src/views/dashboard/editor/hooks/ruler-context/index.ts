@@ -23,6 +23,7 @@ class Ruler {
   #rulerXEl?: HTMLCanvasElement;
   #rulerYEl?: HTMLCanvasElement;
   #rulerRectEl?: HTMLDivElement;
+  #resizeObserver?: ResizeObserver;
   #pos = { x: 0, y: 0 };
   #scaleOffset = { x: 0, y: 0 };
   #scale = 1;
@@ -314,9 +315,9 @@ class Ruler {
     el.height = config.height || 0;
   }
 
-  #onResize(_event: Event): void {
+  #onResize = (_event?: Event | ResizeObserverEntry[]) => {
     this.#draw();
-  }
+  };
 
   setRulerPos(pos: RulerPos) {
     this.#setRulerPos(pos);
@@ -368,21 +369,30 @@ class Ruler {
       this.#parentEl.appendChild(this.#rulerYEl);
       this.#parentEl.appendChild(this.#rulerXEl);
       this.#parentEl.appendChild(this.#rulerRectEl);
+
+      this.#resizeObserver = new ResizeObserver(() => {
+        this.#draw();
+      });
+      this.#resizeObserver.observe(this.#parentEl);
     }
     this.#draw();
 
-    document.addEventListener('resize', this.#onResize);
+    window.addEventListener('resize', this.#onResize);
   }
 
   uninstall(): void {
     this.#uninstall();
   }
   #uninstall(): void {
-    document.removeEventListener('resize', this.#onResize);
+    window.removeEventListener('resize', this.#onResize);
+    this.#resizeObserver?.disconnect();
+    this.#resizeObserver = undefined;
     this.#rulerXEl?.remove();
-    this.#rulerXEl?.remove();
+    this.#rulerYEl?.remove();
+    this.#rulerRectEl?.remove();
     this.#rulerYEl = undefined;
     this.#rulerXEl = undefined;
+    this.#rulerRectEl = undefined;
   }
 }
 
