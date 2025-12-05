@@ -77,6 +77,7 @@ defineExpose({ focus, blur, getRect });
 #dashboard .basic-box {
   border-radius: 6px;
   height: 30px;
+  min-width: 30px;
   position: relative;
   display: flex;
   -webkit-box-align: center;
@@ -101,6 +102,9 @@ defineExpose({ focus, blur, getRect });
   &.status-button-box {
     height: 30px;
     width: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     box-shadow: 0 0 0 1px var(--db-color-button-status-border) inset;
     color: var(--db-color-button-status-color);
 
