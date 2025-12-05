@@ -1,4 +1,4 @@
-const use: IUseUILibraryComponent = {
+const use: IUseMaterialComponent = {
   name: '散点图',
   id: 'apache-e-charts-scatter'
 };

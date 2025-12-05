@@ -1,6 +1,6 @@
 <template lang="pug">
 div.editor-tab-bar
-  .tab_container
+  .tab-bar__list
     div(class="tab_item transition" :class="{ 'active': modelValue === item }" v-for="(item, idx) in data" :key="idx" @click="onSelect(item)") {{ item.name }}
 </template>
 
@@ -29,7 +29,7 @@ const onSelect = function (tab: PanelTab): void {
 .editor-tab-bar {
   height: 100%;
 
-  .tab_container {
+  .tab-bar__list {
     display: flex;
     align-items: center;
     height: 100%;

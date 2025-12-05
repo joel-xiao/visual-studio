@@ -35,7 +35,7 @@ const onDrag = function (event: DragEvent): void {
 const getType = inject('getType');
 </script>
 <template lang="pug">
-div.component-box__container(v-for="(item, idx) in Items" v-show="data.component || data.AFold" v-if="Array.isArray(data.children) && data.children.length > 0" :key="(item.id || '') + idx")
+div.component-box__item-wrapper(v-for="(item, idx) in Items" v-show="data.component || data.AFold" v-if="Array.isArray(data.children) && data.children.length > 0" :key="(item.id || '') + idx")
   template(v-if="data.component")
     div.component-box__swapper(:class="typeof getType === 'function' ? getType() : ''")
       div.component-item__content(
@@ -65,7 +65,7 @@ div.component-box__container(v-for="(item, idx) in Items" v-show="data.component
 
 <style lang="scss">
 .editor-resource-library {
-  .component-box__container {
+  .component-box__item-wrapper {
     flex: none;
 
     .component-box__title {

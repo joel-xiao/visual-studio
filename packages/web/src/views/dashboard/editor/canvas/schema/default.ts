@@ -1,11 +1,11 @@
 const schema: IComponentSchemaExport = {
   name: '根容器',
-  type: 'CANVAS_CONTAINER',
+  type: 'CANVAS_ROOT',
   icon: 'qw.png',
   schemas: [
     {
       type: 'schema',
-      schema: 'COMMON_CONTAINER_LAYOUT',
+      schema: 'COMMON_CANVAS_LAYOUT',
       default: {
         width: 1000,
         height: 600
@@ -14,7 +14,7 @@ const schema: IComponentSchemaExport = {
 
     {
       type: 'schema',
-      schema: 'COMMON_CONTAINER_FILL',
+      schema: 'COMMON_CANVAS_FILL',
       default: {
         color: ''
       }

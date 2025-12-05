@@ -32,7 +32,7 @@ let data = reactive<IEditorData>({
       id: 'root',
       icon: '',
       component: 'root',
-      schema: './canvas/schema/default.ts',
+      schema: '../../canvas/schema/default.ts',
       name: '根容器',
       width: 1000,
       height: 600,

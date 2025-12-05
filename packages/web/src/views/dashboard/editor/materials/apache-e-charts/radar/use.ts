@@ -1,4 +1,4 @@
-const use: IUseUILibraryComponent = {
+const use: IUseMaterialComponent = {
   name: '雷达图',
   id: 'apache-e-charts-radar'
 };

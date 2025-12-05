@@ -1,4 +1,4 @@
-const SCHEMA_NAME = 'COMMON_CONTAINER_FILL';
+const SCHEMA_NAME = 'COMMON_CANVAS_FILL';
 const SCHEMA_LABEL = '填充';
 const SCHEMA_KEY = 'fill';
 

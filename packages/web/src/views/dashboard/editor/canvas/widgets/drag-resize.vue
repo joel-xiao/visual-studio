@@ -3,7 +3,7 @@ div(
   class="editor-drag-resize"
   v-drag-resize="dragDataComputed"
   )
-  div.editor-drag-resize-container
+  div.editor-drag-resize__inner
     slot
 </template>
 
@@ -48,7 +48,7 @@ defineExpose({ setActive, setPos, setScale });
 
 <style lang="scss">
 .editor-drag-resize {
-  .editor-drag-resize-container {
+  .editor-drag-resize__inner {
     width: 100%;
     height: 100%;
     overflow: hidden;
