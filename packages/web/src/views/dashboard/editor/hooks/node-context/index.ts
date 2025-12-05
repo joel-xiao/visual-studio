@@ -64,7 +64,7 @@ class CreateNodeContext {
 
   #addTreeNode(node: INode) {
     this.#nodesTreeSource.push({
-      parentId: node.container,
+      parentId: node.parentId,
       icon: node.icon,
       id: node.id,
       name: node.name,
@@ -72,7 +72,7 @@ class CreateNodeContext {
       data: {
         name: node.name,
         id: node.id,
-        container: node.container,
+        parentId: node.parentId,
         type: node.type,
         z: node.z
       }
@@ -235,10 +235,10 @@ class CreateNodeContext {
     }
   }
 
-  #onAddNode(addNode: IAddNode, container: string, pos: INodePointerPos) {
+  #onAddNode(addNode: IAddNode, parentId: string, pos: INodePointerPos) {
     if (addNode instanceof Object) {
       const node: INode = {
-        container: container,
+        parentId: parentId,
         id: getUuid(),
         name: addNode.name,
         icon: addNode.icon,
@@ -268,13 +268,13 @@ class CreateNodeContext {
     }
   }
 
-  onAddNode(nodes: IAddNode[] | IAddNode, container: string, pos: INodePointerPos) {
+  onAddNode(nodes: IAddNode[] | IAddNode, parentId: string, pos: INodePointerPos) {
     if (Array.isArray(nodes)) {
       nodes.forEach((node: IAddNode) => {
-        this.#onAddNode(node, container, pos);
+        this.#onAddNode(node, parentId, pos);
       });
     } else if (nodes instanceof Object) {
-      return this.#onAddNode(nodes, container, pos);
+      return this.#onAddNode(nodes, parentId, pos);
     }
   }
 

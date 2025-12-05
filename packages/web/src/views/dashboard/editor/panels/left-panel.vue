@@ -23,9 +23,9 @@ div.editor-left-panel
 </template>
 
 <script setup lang="ts">
-import PanelTabBar from '../components/panel-tab-bar/index.vue';
-import PanelLayer from '../components/panel-layer/index.vue';
-import PanelComponent from '../components/panel-component/index.vue';
+import PanelTabBar from './tab-bar/index.vue';
+import PanelLayer from './layer-tree/index.vue';
+import PanelComponent from './resource-library/index.vue';
 import { ref, reactive } from 'vue';
 import { useDrag } from './../hooks/drag-context';
 import { useComponentContext } from './../hooks/component-context';
@@ -77,8 +77,8 @@ const componentTab = ref<PanelTab>(componentTabBars[0]);
 
 const { onDragStart, onDragStop } = useDrag();
 
-const { getUiLibrary } = useComponentContext();
-const componentData = reactive<PanelComponentData[]>(getUiLibrary());
+const { getMaterials } = useComponentContext();
+const componentData = reactive<PanelComponentData[]>(getMaterials());
 </script>
 
 <style lang="scss">
@@ -110,7 +110,7 @@ const componentData = reactive<PanelComponentData[]>(getUiLibrary());
         }
       }
 
-      .editor-panel-component {
+      .editor-resource-library {
         height: calc(100% - var(--db-editor-tab-bar-height));
       }
     }

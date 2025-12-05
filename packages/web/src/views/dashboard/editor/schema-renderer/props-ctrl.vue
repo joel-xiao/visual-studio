@@ -18,11 +18,15 @@ import type { Component } from 'vue';
 interface Props {
   ctrl: string;
   ctrlType: string;
+  layout?: string;
+  label?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   ctrl: '',
-  ctrlType: ''
+  ctrlType: '',
+  layout: '',
+  label: ''
 });
 
 const component_models = import.meta.glob(

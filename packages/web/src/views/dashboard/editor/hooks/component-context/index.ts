@@ -3,27 +3,27 @@ import { cloneDeep } from 'lodash';
 import { createComponent } from '@hooks/vue-hooks';
 
 export class CreateComponentContext {
-  UILibraryUses: Record<string, { [key: string]: IUseUILibraryComponent }>;
-  UILibraryComponentUses: Record<string, { [key: string]: IUseUILibraryComponent }>;
+  MaterialUses: Record<string, { [key: string]: IUseMaterialComponent }>;
+  MaterialComponentUses: Record<string, { [key: string]: IUseMaterialComponent }>;
 
   #schemas: { [key: string]: ISchemaExport };
-  containerSchemas: Record<string, { [key: string]: IComponentSchemaExport }>;
+  canvasSchemas: Record<string, { [key: string]: IComponentSchemaExport }>;
   componentSchemas: Record<string, { [key: string]: IComponentSchemaExport }>;
   components: Record<string, { [key: string]: App }>;
   constructor() {
-    this.UILibraryUses = {};
-    this.UILibraryComponentUses = {};
+    this.MaterialUses = {};
+    this.MaterialComponentUses = {};
 
     this.#schemas = {};
 
-    this.containerSchemas = {};
+    this.canvasSchemas = {};
     this.componentSchemas = {};
     this.components = {};
 
     this.install = this.install.bind(this);
     this.uninstall = this.uninstall.bind(this);
 
-    this.getUiLibrary = this.getUiLibrary.bind(this);
+    this.getMaterials = this.getMaterials.bind(this);
 
     this.getComponentProps = this.getComponentProps.bind(this);
     this.formatterComponentProp = this.formatterComponentProp.bind(this);
@@ -44,14 +44,14 @@ export class CreateComponentContext {
       }
     });
 
-    this.components = import.meta.glob(['./../../ui-library/*/*/index.vue'], {
+    this.components = import.meta.glob(['./../../materials/*/*/index.vue'], {
       eager: true,
       import: 'default'
     });
 
-    this.containerSchemas = import.meta.glob('./../../container/schema/*.ts', { eager: true });
+    this.canvasSchemas = import.meta.glob('./../../canvas/schema/*.ts', { eager: true });
 
-    this.componentSchemas = import.meta.glob('./../../ui-library/*/*/schema/*.ts', { eager: true });
+    this.componentSchemas = import.meta.glob('./../../materials/*/*/schema/*.ts', { eager: true });
   }
   install() {
     this.#install();
@@ -97,11 +97,11 @@ export class CreateComponentContext {
   #getLibraryComponents(library_path: string): PanelComponentData[] {
     const components: PanelComponentData[] = [];
 
-    for (const path of Object.keys(this.UILibraryComponentUses).filter(
+    for (const path of Object.keys(this.MaterialComponentUses).filter(
       key => key && key.startsWith(library_path)
     )) {
       const component_path = path.substring(0, path.lastIndexOf('/use.ts') + 1);
-      const component: IUseUILibraryComponent = this.UILibraryComponentUses[path].default;
+      const component: IUseMaterialComponent = this.MaterialComponentUses[path].default;
       components.push({
         dot: true,
         component: true,
@@ -114,18 +114,18 @@ export class CreateComponentContext {
     return components;
   }
 
-  getUiLibrary(): PanelComponentData[] {
-    this.UILibraryComponentUses = import.meta.glob('./../../ui-library/*/*/use.ts', {
+  getMaterials(): PanelComponentData[] {
+    this.MaterialComponentUses = import.meta.glob('./../../materials/*/*/use.ts', {
       eager: true
     });
-    this.UILibraryUses = import.meta.glob('./../../ui-library/*/use.ts', {
+    this.MaterialUses = import.meta.glob('./../../materials/*/use.ts', {
       eager: true
     });
 
     const children: PanelComponentData[] = [];
-    for (const path of Object.keys(this.UILibraryUses)) {
+    for (const path of Object.keys(this.MaterialUses)) {
       const library_path = path.substring(0, path.lastIndexOf('/use.ts') + 1);
-      const library: IUseUILibraryComponent = this.UILibraryUses[path].default;
+      const library: IUseMaterialComponent = this.MaterialUses[path].default;
       children.push({
         name: library.name,
         id: library.id,
@@ -133,8 +133,8 @@ export class CreateComponentContext {
       });
     }
 
-    this.UILibraryUses = {};
-    this.UILibraryComponentUses = {};
+    this.MaterialUses = {};
+    this.MaterialComponentUses = {};
     return [
       {
         name: '本地',
@@ -162,7 +162,7 @@ export class CreateComponentContext {
 
   #getComponentSchema(schema_path: string): IComponentSchemaExport {
     return (
-      this.containerSchemas[schema_path]?.default ||
+      this.canvasSchemas[schema_path]?.default ||
       this.componentSchemas[schema_path]?.default ||
       ({} as IComponentSchemaExport)
     );

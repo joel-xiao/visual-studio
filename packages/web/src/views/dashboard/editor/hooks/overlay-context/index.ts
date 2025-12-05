@@ -11,7 +11,7 @@ export type CallbackUpdate = (
 
 type OverlayOption = {
   parentEl: HTMLElement;
-  containerEl: HTMLElement;
+  canvasEl: HTMLElement;
   key: string;
 };
 
@@ -52,8 +52,8 @@ class Overlay {
       return;
     }
 
-    if (!opt.containerEl) {
-      console.warn('el of Overlay class is not containerEl', 'key=' + this.#option.key);
+    if (!opt.canvasEl) {
+      console.warn('el of Overlay class is not canvasEl', 'key=' + this.#option.key);
       return;
     }
 
@@ -75,15 +75,15 @@ class Overlay {
   }
 
   #initPos(opt: OverlayOption) {
-    const containerRect: Rect = opt.containerEl.getBoundingClientRect() || {
+    const canvasRect: Rect = opt.canvasEl.getBoundingClientRect() || {
       width: 0,
       height: 0
     };
-    const parentRect: Rect = opt.parentEl.getBoundingClientRect() || containerRect;
+    const parentRect: Rect = opt.parentEl.getBoundingClientRect() || canvasRect;
 
     const defaultPos = {
-      x: (parentRect.width - containerRect.width) / 2,
-      y: (parentRect.height - containerRect.height) / 2
+      x: (parentRect.width - canvasRect.width) / 2,
+      y: (parentRect.height - canvasRect.height) / 2
     };
     if (defaultPos.x < 0) defaultPos.x = 0;
     if (defaultPos.y < 0) defaultPos.y = 0;
@@ -183,7 +183,7 @@ class Overlay {
     );
 
     if (this.#option) {
-      this.#option.containerEl.style.translate = `${this.#pos.x + this.#scaleOffset.x}px ${
+      this.#option.canvasEl.style.translate = `${this.#pos.x + this.#scaleOffset.x}px ${
         this.#pos.y + this.#scaleOffset.y
       }px`;
     }

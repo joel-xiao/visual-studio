@@ -1,6 +1,6 @@
 <template lang="pug">
 div#editor(ref='editorRef')
-  Container
+  Canvas
   NavPanel
   //- ToolbarPanel
   LeftPanel
@@ -12,7 +12,7 @@ import NavPanel from './panels/nav-panel.vue';
 // import ToolbarPanel from './panels/toolbar-panel.vue';
 import LeftPanel from './panels/left-panel.vue';
 import RightPanel from './panels/right-panel.vue';
-import Container from './container/index.vue';
+import Canvas from './canvas/index.vue';
 
 import { ref, reactive, onMounted, onUnmounted } from 'vue';
 import { useConfig } from './config';
@@ -28,11 +28,11 @@ let data = reactive<IEditorData>({
   name: '',
   nodes: [
     {
-      container: '',
+      parentId: '',
       id: 'root',
       icon: '',
       component: 'root',
-      schema: '../../container/schema/default.ts',
+      schema: './canvas/schema/default.ts',
       name: '根容器',
       width: 1000,
       height: 600,

@@ -19,7 +19,7 @@ declare interface IAddNode extends IBasicNode {
 }
 
 declare interface INode extends IAddNode {
-  container: string;
+  parentId: string;
   id: string;
   type: string;
   width: number;
@@ -50,7 +50,7 @@ declare interface IEditorData {
 }
 
 interface ITreeNodeData {
-  container?: string | undefined | null;
+  parentId?: string | undefined | null;
   id: string;
   name: string;
   z: number;
