@@ -1,6 +1,7 @@
-<template lang="pug">
-div#layout-content
-    router-view
+<template>
+  <div id="layout-content">
+    <router-view />
+  </div>
 </template>
 
 <script setup lang="ts"></script>

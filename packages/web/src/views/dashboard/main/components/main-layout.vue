@@ -97,45 +97,65 @@ defineExpose({
 });
 </script>
 
-<template lang="pug">
-div#dashboard-my-project
-  div(class='project-manage left')
-    div.manage-title
-      span 我的项目
-      Icon(src="icon-jiahao" class="add-group" button size="small")
-    NavTree(
-      :data="folderTree"
-      itemIcon="/image/dashboard/my-main/folder.svg"
-      size='small'
-      :itemMenus="folderMenus"
-      ref="navRef"
-      @select="selectFolder")
+<template>
+  <div id="dashboard-my-project">
+    <div class="project-manage left">
+      <div class="manage-title">
+        <span>我的项目</span>
+        <Icon src="icon-jiahao" class="add-group" button size="small" />
+      </div>
+      <NavTree
+        ref="navRef"
+        :data="folderTree"
+        item-icon="/image/dashboard/my-main/folder.svg"
+        size="small"
+        :item-menus="folderMenus"
+        @select="selectFolder"
+      />
+    </div>
 
-  div(class="project-screen-list left")
-    div.new-projects
-      div.new-project(
-        v-for="(item, idx) in buttons"
-        @click="onButton(item)"
-        :key="item.id")
-        img(v-if="item.icon" :src="'@a/img/dashboard/main/' + item.icon")
-        span.ellipsis.project-type {{item.name}}
-        Icon(src='icon-jiahao' font-size="16px")
+    <div class="project-screen-list left">
+      <div class="new-projects">
+        <div
+          v-for="item in buttons"
+          :key="item.id"
+          class="new-project"
+          @click="onButton(item)"
+        >
+          <img v-if="item.icon" :src="'@a/img/dashboard/main/' + item.icon" />
+          <span class="ellipsis project-type">{{ item.name }}</span>
+          <Icon src="icon-jiahao" font-size="16px" />
+        </div>
+      </div>
 
-    div.projects-search
-      div.search
-        CInput(placeholder="搜索项目..." :focus="false"  icon="icon-sousuo")
+      <div class="projects-search">
+        <div class="search">
+          <CInput placeholder="搜索项目..." :focus="false" icon="icon-sousuo" />
+        </div>
+      </div>
 
-    div.project-header
-      div.project-title
-        h2.ellipsis {{ currentFolder?.cascades ? currentFolder?.cascades.map( item => item.name).join(' / ') : '' }}
-        span.projects-sum(v-if="currentFolder?.sum")
-          span.projects-number {{ currentFolder?.sum || '0' }}
-          |个
+      <div class="project-header">
+        <div class="project-title">
+          <h2 class="ellipsis">
+            {{
+              currentFolder?.cascades
+                ? currentFolder?.cascades.map((item) => item.name).join(' / ')
+                : ''
+            }}
+          </h2>
+          <span v-if="currentFolder?.sum" class="projects-sum">
+            <span class="projects-number">{{ currentFolder?.sum || '0' }}</span>
+            个
+          </span>
+        </div>
+      </div>
 
-    div.projects-content
-      slot(name="content")
-  //- Loading
-
+      <div class="projects-content">
+        <slot name="content"></slot>
+      </div>
+    </div>
+    <!-- Loading -->
+  </div>
 </template>
 
 <style lang="scss">

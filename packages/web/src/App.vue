@@ -1,7 +1,15 @@
-<template lang="pug">
-n-config-provider(:theme="darkTheme" :theme-overrides="themeOverrides" :locale="native.locale" :date-locale="native.dateLocale" class="app-main")
-  router-view(v-slot="{ Component }")
-    component(:is="Component")
+<template>
+  <n-config-provider
+    :theme="darkTheme"
+    :theme-overrides="themeOverrides"
+    :locale="native.locale"
+    :date-locale="native.dateLocale"
+    class="app-main"
+  >
+    <router-view v-slot="{ Component }">
+      <component :is="Component" />
+    </router-view>
+  </n-config-provider>
 </template>
 
 <script setup lang="ts">

@@ -81,8 +81,8 @@ function onNewProject(opt: DbLayoutCreateProject) {
 }
 </script>
 
-<template lang="pug">
-MainLayout(ref="layoutRef" @create-project="onNewProject")
+<template>
+  <MainLayout ref="layoutRef" @create-project="onNewProject" />
 </template>
 
 <style lang="scss">

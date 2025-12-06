@@ -1,9 +1,12 @@
-<template lang="pug">
-div#layout
-  div(class="layout-header")
-    Header
-  div(class='layout-container')
-    Content
+<template>
+  <div id="layout">
+    <div class="layout-header">
+      <Header />
+    </div>
+    <div class="layout-container">
+      <Content />
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">

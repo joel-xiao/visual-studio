@@ -1,12 +1,14 @@
-<script setup lang="ts"></script>
-
-<template lang="pug">
-div(class="item-card")
-  div.item-card-cover
-    div.item-card-cover_mask
-      img(:src="data?.icon")
-  div(class="item-card-detail")
-    span(class="name ellipsis") {{data?.label}}
+<template>
+  <div class="item-card">
+    <div class="item-card-cover">
+      <div class="item-card-cover_mask">
+        <img :src="data?.icon" />
+      </div>
+    </div>
+    <div class="item-card-detail">
+      <span class="name ellipsis">{{ data?.label }}</span>
+    </div>
+  </div>
 </template>
 <script lang="ts" setup>
 import { ref, reactive, withDefaults } from 'vue';
@@ -16,7 +18,11 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  data: () => ({})
+  data: () => ({
+    icon: '',
+    label: '',
+    id: ''
+  })
 });
 </script>
 <style lang="scss">

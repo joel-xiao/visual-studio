@@ -1,10 +1,13 @@
-<template lang="pug">
-div#layout-header()
-    div.logo
-        img(src='@/assets/img/logo/logo.svg')
-    div.center
-    div.right
-        User
+<template>
+  <div id="layout-header">
+    <div class="logo">
+      <img src="@/assets/img/logo/logo.svg" />
+    </div>
+    <div class="center"></div>
+    <div class="right">
+      <User />
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, reactive, markRaw, onMounted, getCurrentInstance } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+import { noClient } from '@/client/index';
 const router = useRouter();
 const route = useRoute();
 
@@ -37,18 +38,31 @@ function initCurrentNav() {
 }
 </script>
 
-<template lang="pug">
-.dashboard-header
-  .nav-content
-    span.nav-content-span(@click="onNavSelect(item)" :class="{ active: currentNav.id === item.id }" :key="item.id" v-for="(item, idx) in navList")
-      | {{ item.label }}
-  .nav-right(v-if="$noClient()")
-    a(class="download" download="Visual Studio.dmg" href="/apps/visual-studio_0.1.0_x64.dmg")
-      | 下载 macOs 应用
-    a(class="download" download="Visual Studio.msi" href="/apps/visual-studio_0.1.0_x64_en-US.msi")
-      | 下载 Windows 应用
-.dashboard-content
-  router-view
+<template>
+<div class="dashboard-header">
+  <div class="nav-content">
+    <span
+      v-for="item in navList"
+      :key="item.id"
+      class="nav-content-span"
+      :class="{ active: currentNav.id === item.id }"
+      @click="onNavSelect(item)"
+    >
+      {{ item.label }}
+    </span>
+  </div>
+  <div v-if="noClient()" class="nav-right">
+    <a class="download" download="Visual Studio.dmg" href="/apps/visual-studio_0.1.0_x64.dmg">
+      下载 macOs 应用
+    </a>
+    <a class="download" download="Visual Studio.msi" href="/apps/visual-studio_0.1.0_x64_en-US.msi">
+      下载 Windows 应用
+    </a>
+  </div>
+</div>
+<div class="dashboard-content">
+  <router-view />
+</div>
 </template>
 
 <style lang="scss">

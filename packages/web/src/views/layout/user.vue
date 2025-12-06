@@ -1,6 +1,7 @@
-<template lang="pug">
-div#user
-    img(src="@/assets/logo.png")
+<template>
+  <div id="user">
+    <img src="@/assets/logo.png" />
+  </div>
 </template>
 
 <script setup lang="ts"></script>

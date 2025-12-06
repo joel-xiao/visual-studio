@@ -1,5 +1,5 @@
-<template lang="pug">
-Editor
+<template>
+  <Editor />
 </template>
 
 <script setup lang="ts">

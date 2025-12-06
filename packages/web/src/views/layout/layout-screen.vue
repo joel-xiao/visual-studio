@@ -1,5 +1,5 @@
-<template lang="pug">
-Content
+<template>
+  <Content />
 </template>
 
 <script setup lang="ts">

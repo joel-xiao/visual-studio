@@ -61,10 +61,16 @@ function onButtonClick(opt: DbLayoutCreateProject) {
 const projects = ref<IDbLayoutProject[]>([]);
 </script>
 
-<template lang="pug">
-MainLayout(ref="layoutRef" @button-click="onButtonClick")
-  div.content
-    ItemCard(v-for="(item, idx) in projects" :data="item" :key="item.id + '_' + idx")
+<template>
+  <MainLayout ref="layoutRef" @button-click="onButtonClick">
+    <div class="content">
+      <ItemCard
+        v-for="(item, idx) in projects"
+        :key="item.id + '_' + idx"
+        :data="item"
+      />
+    </div>
+  </MainLayout>
 </template>
 
 <style lang="scss"></style>

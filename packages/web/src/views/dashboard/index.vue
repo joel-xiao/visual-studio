@@ -1,6 +1,7 @@
-<template lang="pug">
-div#dashboard(class="not-select")
-  router-view
+<template>
+  <div id="dashboard" class="not-select">
+    <router-view />
+  </div>
 </template>
 
 <script setup lang="ts"></script>
