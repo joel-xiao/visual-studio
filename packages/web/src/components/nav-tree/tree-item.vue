@@ -58,6 +58,7 @@ const onCommand = function (event: PointerEvent, cmd: ITreeItemMenu, item: ITree
         <Icon v-if="IsArrow(item)" class="arrow" block src="icon-shouqi2" :size="size" :class="{ active: item.AFold }" @click.stop="onArrow(item)" />
         <span v-else-if="IsDot" class="dot"></span>
         <Icon v-if="(item.icon || itemIcon) && !item.prefix" class="name-icon" block :src="item.icon || itemIcon" />
+        <!-- eslint-disable-next-line vue/no-v-html -->
         <span v-else-if="item.prefix" class="name-prefix" v-html="item.prefix"></span>
         <span v-else class="name-icon-margin"></span>
         <span class="tree-item-labe">{{ item.name }}</span>
@@ -67,7 +68,7 @@ const onCommand = function (event: PointerEvent, cmd: ITreeItemMenu, item: ITree
       </div>
     </div>
     <div v-if="!!item?.children?.length" class="tree-item-swapper" :class="{expand: item.AFold}" :style="{'--tree-item-sum': item?.children?.length || item?.children?.length}">
-      <TreeItem :recursion="recursion + 1" :size="size" :data="item.children" :itemIcon="itemIcon" :itemMenus="itemMenus" :currentNav="currentNav" @select="onSelect($event, true)" @command="onCommand" />
+      <TreeItem :recursion="recursion + 1" :size="size" :data="item.children" :item-icon="itemIcon" :item-menus="itemMenus" :current-nav="currentNav" @select="onSelect($event, true)" @command="onCommand" />
     </div>
   </div>
 </template>

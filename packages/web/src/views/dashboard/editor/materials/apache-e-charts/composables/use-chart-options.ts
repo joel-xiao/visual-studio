@@ -8,7 +8,7 @@ export function useChartOptions(props: { config?: IComponentProps }, defaultOpti
     () => config?.value,
     (newVal) => {
       // Cast to any to access dynamic properties safely
-      const code = newVal?.code as Record<string, any> | undefined;
+      const code = newVal?.code as Record<string, unknown> | undefined;
       const optionsStr = code?.options;
 
       if (typeof optionsStr === 'string') {

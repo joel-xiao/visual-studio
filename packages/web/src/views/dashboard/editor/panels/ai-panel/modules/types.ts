@@ -1,4 +1,4 @@
-import type { IAIMessage, IAIResponse } from '@/service/api/ai';
+import type { IAIMessage } from '@/service/api/ai';
 
 export interface ISceneAction {
   label: string;
@@ -25,8 +25,8 @@ export interface IScene {
    * Can involve multiple steps, API calls, and state updates
    */
   run(
-    addMessage: (role: 'user' | 'assistant', content: string, type?: 'text' | 'code' | 'action', actions?: any[], id?: string) => string,
-    generateApi: (scene: string, params: any) => Promise<any>,
+    addMessage: (role: 'user' | 'assistant', content: string, type?: 'text' | 'code' | 'action', actions?: ISceneAction[], id?: string) => string,
+    generateApi: (scene: string, params: unknown) => Promise<unknown>,
     params?: string
   ): Promise<void>;
 }

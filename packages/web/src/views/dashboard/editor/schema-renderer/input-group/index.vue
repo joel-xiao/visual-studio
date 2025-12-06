@@ -48,8 +48,8 @@ const emit = defineEmits(['update:modelValue', 'update']);
 const data = reactive({
   icon: Array.isArray(props.icon) ? props.icon : [props.icon, props.icon, props.icon, props.icon],
   isMore: false,
-  modelValue: [...props.modelValue],
-  oldValue: props.modelValue[0]
+  modelValue: [...(props.modelValue || [])],
+  oldValue: props.modelValue?.[0] || 0
 });
 
 watch(() => props.modelValue, (newVal) => {

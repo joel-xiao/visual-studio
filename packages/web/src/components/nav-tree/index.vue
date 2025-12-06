@@ -96,9 +96,9 @@ defineExpose({
     <TreeItem
       :data="tree"
       :size="size"
-      :itemIcon="itemIcon"
-      :itemMenus="itemMenus"
-      :currentNav="currentNav"
+      :item-icon="itemIcon"
+      :item-menus="itemMenus"
+      :current-nav="currentNav"
       @select="onNavSelect"
       @command="onCommand"
     />

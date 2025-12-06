@@ -2,7 +2,7 @@
 import { ref, nextTick } from 'vue';
 import { aiApi } from '@/service/api/ai';
 import { scenes, getScene } from './modules/scene-manager';
-import type { IChatMessage, IScene } from './modules/types';
+import type { IChatMessage, IScene, ISceneAction } from './modules/types';
 
 const messages = ref<IChatMessage[]>([
   {
@@ -17,7 +17,7 @@ const messages = ref<IChatMessage[]>([
 const inputValue = ref('');
 const loading = ref(false);
 const chatContainerRef = ref<HTMLElement | null>(null);
-const currentScene = ref<any | null>(null);
+const currentScene = ref<IScene | null>(null);
 
 const scrollToBottom = async () => {
   await nextTick();
@@ -26,7 +26,7 @@ const scrollToBottom = async () => {
   }
 };
 
-const addMessage = (role: 'user' | 'assistant', content: string, type: 'text' | 'code' | 'action' = 'text', actions?: any[], id?: string): string => {
+const addMessage = (role: 'user' | 'assistant', content: string, type: 'text' | 'code' | 'action' = 'text', actions?: ISceneAction[], id?: string): string => {
   if (id) {
     const msg = messages.value.find(m => m.id === id);
     if (msg) {
@@ -114,7 +114,7 @@ const handleSend = async () => {
         messages: apiMessages
       });
 
-      addMessage('assistant', res.content, res.type as any, res.actions);
+      addMessage('assistant', res.content, res.type, res.actions as ISceneAction[]);
     }
   } catch (error) {
     addMessage('assistant', '请求失败: ' + error);
@@ -130,7 +130,7 @@ const handleSend = async () => {
       <h3>AI 助手</h3>
     </div>
 
-    <div class="chat-container" ref="chatContainerRef">
+    <div ref="chatContainerRef" class="chat-container">
       <div v-for="msg in messages" :key="msg.id" :class="['message-row', msg.role]">
         <div class="avatar">{{ msg.role === 'assistant' ? '🤖' : '👤' }}</div>
         <div class="message-content">
@@ -147,9 +147,9 @@ const handleSend = async () => {
                 v-for="action in msg.actions"
                 :key="action.value"
                 :disabled="action.disabled || loading"
-                @click="!action.disabled && !loading && handleActionClick(action.value)"
                 class="action-btn"
                 :class="{ disabled: action.disabled || loading }"
+                @click="!action.disabled && !loading && handleActionClick(action.value)"
               >
                 {{ action.label }}
               </button>
@@ -173,7 +173,7 @@ const handleSend = async () => {
         placeholder="输入指令..."
         @keydown.enter.prevent="handleSend"
       ></textarea>
-      <button class="send-btn" @click="handleSend" :disabled="loading">
+      <button class="send-btn" :disabled="loading" @click="handleSend">
         <i class="iconfont icon-send"></i> 发送
       </button>
     </div>

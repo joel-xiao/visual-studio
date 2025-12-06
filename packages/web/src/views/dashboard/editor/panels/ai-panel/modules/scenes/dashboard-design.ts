@@ -119,7 +119,7 @@ const parseJsonContent = <T = unknown>(content: string): T => {
       // 二次尝试：如果标准解析失败，尝试使用 Function (支持 JS 对象格式，如无引号 key、尾随逗号、单引号等)
       // 注意：这里假设 AI 返回的内容是相对安全的
       return new Function('return ' + jsonStr)() as T;
-    } catch (err) {
+    } catch (_err) {
       console.error('JSON Parse Error:', e, jsonStr);
       throw e;
     }
@@ -245,7 +245,7 @@ ${JSON.stringify(layoutSchema)}
  * 角色 2: 数据可视化专家
  * 职责: 为给定的图表节点生成真实的 ECharts 配置数据。
  */
-const generateChartData = async (chartName: string, chartType: string, themeColors: string[], themeConfig: Record<string, any>, onStream?: (content: string) => void): Promise<Record<string, unknown>> => {
+const generateChartData = async (chartName: string, chartType: string, themeColors: string[], themeConfig: Record<string, unknown>, onStream?: (content: string) => void): Promise<Record<string, unknown>> => {
   const systemPrompt = `你是一位 ECharts 数据可视化专家。
 请为类型为 "${chartType}"，名称为 "${chartName}" 的图表生成一个 ECharts 的 option 配置对象 (JSON)。
 

@@ -7,7 +7,7 @@ export interface IAIOptions {
   temperature?: number;
   maxTokens?: number;
   stream?: boolean;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface IAIMessage {
@@ -19,7 +19,7 @@ export interface IAIResponse {
   role: 'assistant';
   content: string;
   type?: 'text' | 'code' | 'action';
-  actions?: any[];
+  actions?: unknown[];
   usage?: {
     promptTokens: number;
     completionTokens: number;
@@ -172,9 +172,9 @@ export const aiApi = {
           throw new Error('No response from Qwen');
         }
       }
-    } catch (e: any) {
+    } catch (e) {
       console.error('Qwen API Call Failed:', e);
-      throw new Error(e.message || 'Qwen API Request failed');
+      throw new Error((e as Error).message || 'Qwen API Request failed');
     }
   }
 };

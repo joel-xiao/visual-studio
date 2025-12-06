@@ -67,8 +67,8 @@ export type EchartsRenderer = 'svg' | 'canvas';
 // Default theme detail config
 type ThemeJsonType = typeof themeJson
 export interface GlobalThemeJsonType extends Partial<ThemeJsonType> {
-  dataset?: any,
+  dataset?: unknown,
   renderer?: EchartsRenderer,
-  [T:string]: any
+  [T:string]: unknown
 }
 export const globalThemeJson = {...themeJson, dataset: null, renderer: 'svg' as const }
