@@ -17,7 +17,6 @@
     "naive-ui": "^2.43.1",
     "pinia": "^3.0.4",
     "pinia-plugin-persist": "^1.0.0",
-    "pug": "^3.0.3",
     "sass": "^1.94.0",
     "vfonts": "^0.1.0",
     "vite-plugin-compression": "^0.5.1",
