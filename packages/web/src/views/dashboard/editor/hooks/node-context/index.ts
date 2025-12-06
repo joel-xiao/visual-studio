@@ -6,7 +6,7 @@ class CreateNodeContext {
   #nodes: ComputedRef<INode[]> | [] = [];
   #selectedNodes: ComputedRef<INode[]> | [] = [];
   #currentNode: Ref<INode> = ref({} as INode);
-  #nodesTreeSource: TreeNode[] = [];
+  #nodesTreeSource: TreeNode[] = reactive([]);
   #nodesTree: ComputedRef<TreeNode[]> | [] = [];
   #nodeInstances?: {
     [nodeId: string]: INodeInstance;
@@ -19,11 +19,13 @@ class CreateNodeContext {
     this.getNodes = this.getNodes.bind(this);
     this.getSelectedNodes = this.getSelectedNodes.bind(this);
     this.getCurrentNode = this.getCurrentNode.bind(this);
+    this.getRootRef = this.getRootRef.bind(this);
     this.getRoot = this.getRoot.bind(this);
-    this.getRootStyle = this.getRootStyle.bind(this);
     this.getNode = this.getNode.bind(this);
     this.updateNode = this.updateNode.bind(this);
     this.updateNodeProps = this.updateNodeProps.bind(this);
+    this.updateNodeProp = this.updateNodeProp.bind(this);
+    this.update = this.update.bind(this);
     this.onAddNode = this.onAddNode.bind(this);
     this.onSelectNode = this.onSelectNode.bind(this);
     this.addNodeInstance = this.addNodeInstance.bind(this);
@@ -38,21 +40,28 @@ class CreateNodeContext {
   }
 
   #createNodeTree(): void {
-    this.#nodesTreeSource = reactive<TreeNode[]>([]);
+    // Clear existing array without breaking reference
+    this.#nodesTreeSource.splice(0, this.#nodesTreeSource.length);
+
     this.#data?.nodes.forEach(node => {
       this.#addTreeNode(node);
     });
 
-    let nodesTree: TreeNode[] = [];
+    // Set initial state for root node if needed
     const rootNode = this.#nodesTreeSource.find(node => node.id === 'root');
     if (rootNode) {
       rootNode.AFold = true;
-      nodesTree = [rootNode];
     }
-    this.#nodesTree = computed<TreeNode[]>(() => {
-      this.#formatTreeNode(this.#nodesTreeSource, nodesTree);
-      return nodesTree;
-    });
+
+    if (Array.isArray(this.#nodesTree)) {
+      this.#nodesTree = computed<TreeNode[]>(() => {
+        const rootNode = this.#nodesTreeSource.find(node => node.id === 'root');
+        if (!rootNode) return [];
+        const nodesTree = [rootNode];
+        this.#formatTreeNode(this.#nodesTreeSource, nodesTree);
+        return nodesTree;
+      });
+    }
   }
 
   #formatTreeNode(nodes: TreeNode[], nodesTree: TreeNode[]): void {
@@ -117,50 +126,105 @@ class CreateNodeContext {
     return this.#currentNode;
   }
 
-  getRoot() {
-    const node: INode | undefined = this.#data?.nodes.find(node => node.id === 'root');
-    return readonly(node ? node : ({} as INode));
+  getRootRef() {
+    return readonly(computed(() => {
+      const node = this.#data?.nodes.find(node => node.id === 'root');
+      return node ? node : ({} as INode);
+    }));
   }
 
-  getRootStyle() {
-    const root = this.getRoot();
-    return computed<{ width: string; height: string }>(() => {
-      return {
-        width: root.width + 'px',
-        height: root.height + 'px'
-      };
-    });
+  getRoot() {
+    const node = this.#data?.nodes.find(node => node.id === 'root');
+    return readonly( node ? node : ({} as INode));
   }
 
   getNode(id: string) {
-    const node: INode | undefined = this.#data?.nodes.find(node => node.id === id);
-    return readonly(node ? node : ({} as INode));
+    const node = this.#data?.nodes.find(node => node.id === id);
+    return readonly( node ? node : ({} as INode));
   }
 
   /**
    * @parma {
-   *  change_type: update_node_props | ''
+   *  syncLayout: boolean
    * }
    * **/
-  updateNode(id: string, delta: INodeDelta, change_type = ''): void {
+  updateNode(id: string, delta: INodeDelta, syncLayout = true): void {
     const node = this.#data?.nodes.find(node => node.id === id);
     if (node && delta) {
-      Object.keys(delta).forEach((key: string): void => {
-        (node as unknown as Record<string, unknown>)[key] = (delta as Record<string, unknown>)[key];
-      });
+      Object.assign(node, delta);
 
       this.#nodeInstances?.[node.id]?.updatePos?.();
 
       // INode binds to  Pros Layout
-      if (change_type !== 'update_node_props') {
-        this.updateNodeProps(node.id, undefined, 'update_node');
+      if (syncLayout) {
+        const layoutUpdates: { key: string; value: ComponentPropValue }[] = [];
+        if (delta.x !== undefined) layoutUpdates.push({ key: 'layout.x', value: delta.x });
+        if (delta.y !== undefined) layoutUpdates.push({ key: 'layout.y', value: delta.y });
+        if (delta.width !== undefined) layoutUpdates.push({ key: 'layout.width', value: delta.width });
+        if (delta.height !== undefined) layoutUpdates.push({ key: 'layout.height', value: delta.height });
+
+        if (layoutUpdates.length > 0) {
+          this.updateNodeProps(node.id, layoutUpdates, false);
+        }
       }
     }
   }
 
   /**
    * @parma {
-   *  change_type: update_node | on_add_node |  ''
+   *  syncNode: boolean
+   * }
+   * **/
+  updateNodeProp(
+    id: string,
+    key: string,
+    value: ComponentPropValue,
+    syncNode = true
+  ): void {
+    const node = this.#data?.nodes.find(node => node.id === id);
+    if (!node || !key) return;
+
+    const keyArr = key.split('.');
+    let current: Record<string, unknown> = node.props as unknown as Record<string, unknown>;
+
+    if (!current) {
+      node.props = {} as IComponentProps;
+      current = node.props as unknown as Record<string, unknown>;
+    }
+
+    for (let i = 0; i < keyArr.length - 1; i++) {
+      const k = keyArr[i];
+      if (!current[k] || typeof current[k] !== 'object') {
+        current[k] = {};
+      }
+      current = current[k] as Record<string, unknown>;
+    }
+    const lastKey = keyArr[keyArr.length - 1];
+    current[lastKey] = value;
+
+    if (syncNode && key.startsWith('layout.')) {
+      const field = key.split('.')[1];
+      const nodeUpdates: INodeDelta = {};
+      switch (field) {
+        case 'x':
+        case 'y':
+        case 'width':
+        case 'height':
+          nodeUpdates[field] = Number(value);
+          break;
+        case 'radius':
+          (nodeUpdates as Record<string, unknown>).radius = value;
+          break;
+      }
+      if (Object.keys(nodeUpdates).length > 0) {
+        this.updateNode(id, nodeUpdates, false);
+      }
+    }
+  }
+
+  /**
+   * @parma {
+   *  syncNode: boolean
    * }
    * **/
   updateNodeProps(
@@ -169,70 +233,31 @@ class CreateNodeContext {
       | undefined
       | { key: string; value: ComponentPropValue }
       | { key: string; value: ComponentPropValue }[],
-    change_type = ''
+    syncNode = true
   ): void {
-    const node = this.#data?.nodes.find(node => node.id === id);
-    if (!node) return;
+    if (!opts) return;
+    const options = Array.isArray(opts) ? opts : [opts];
+    for (const opt of options) {
+      this.updateNodeProp(id, opt.key, opt.value, syncNode);
+    }
+  }
 
-    // Pros Layout binds to  INode
-    if (!opts) {
-      switch (change_type) {
-        case 'update_node':
-          opts = [
-            { key: 'layout.x', value: node.x },
-            { key: 'layout.y', value: node.y },
-            { key: 'layout.width', value: node.width },
-            { key: 'layout.height', value: node.height }
-          ];
-          break;
-        case 'on_add_node_size':
-          opts = [
-            { key: 'layout.width', value: node.props.layout.width || node.width },
-            { key: 'layout.height', value: node.props.layout.height || node.height },
-            { key: 'layout.radius', value: node.props.layout.radius || node.radius }
-          ];
-          break;
-        case 'on_add_node_pos':
-          opts = [
-            { key: 'layout.x', value: node.x },
-            { key: 'layout.y', value: node.y }
-          ];
-          break;
-        default:
-          break;
-      }
+  /**
+   * Update the entire editor data (nodes)
+   */
+  update(data: IEditorData): void {
+    if (!this.#data || !data || !data.nodes) return;
+
+    if (this.#data.nodes) {
+      this.#data.nodes.splice(0, this.#data.nodes.length);
+      data.nodes.forEach((node: INode) => {
+        this.#data?.nodes.push(node);
+      });
     }
 
-    opts = Array.isArray(opts) ? opts : opts ? [opts] : [];
-    for (const opt of opts) {
-      const key = opt.key;
-      const value = opt.value;
-      if (key && (value || value === 0)) {
-        const keyArr = key.split('.');
-        let data: unknown = node?.props;
-        keyArr.forEach((k, i) => {
-          if (typeof data === 'object' && data !== null && i === keyArr.length - 1) {
-            (data as Record<string, unknown>)[k] = value;
-
-            //  Pros Layout binds to  INode
-            if (change_type !== 'update_node') {
-              const keys = [
-                'layout.x',
-                'layout.y',
-                'layout.width',
-                'layout.height',
-                'layout.radius'
-              ];
-              if (keys.some(r => key && key.includes(r))) {
-                this.updateNode(id, { [k]: value }, 'update_node_props');
-              }
-            }
-          } else {
-            data = typeof data === 'object' && data !== null ? (data as Record<string, unknown>)[k] : undefined;
-          }
-        });
-      }
-    }
+    this.#createNodeTree();
+    this.onSelectNode('root');
+    this.#initSelectedNode();
   }
 
   #onAddNode(addNode: IAddNode, parentId: string, pos: INodePointerPos) {
@@ -258,11 +283,9 @@ class CreateNodeContext {
 
       this.#data?.nodes.push(node);
 
-      this.updateNodeProps(node.id, undefined, 'on_add_node_size');
       node.x = pos.x - node.width / 2;
       node.y = pos.y - node.height / 2;
-      this.updateNodeProps(node.id, undefined, 'on_add_node_pos');
-
+      this.updateNode(node.id, node);
       this.#addTreeNode(node);
       return node;
     }

@@ -22,7 +22,7 @@ import CanvasNode from './node.vue';
 import { ref, nextTick, onMounted, onBeforeUnmount } from 'vue';
 import { useDrag } from './../hooks/drag-context';
 import { useNodeContext } from './../hooks/node-context';
-import { getRootStyle } from './../hooks/node-context/example';
+import { getRootStyle } from './../hooks/node-context/style';
 import { useComponentContext } from './../hooks/component-context';
 import { useBindKeysContext } from './../hooks/bind-keys-context';
 import { useRuler } from './../hooks/ruler-context';
@@ -32,13 +32,13 @@ import { removeCanvas, useCanvas } from '../hooks/canvas';
 // interface Props {}
 // const props = withDefaults(defineProps<Props>(), {});
 
-const { getRoot, getNodes, onSelectNode, onAddNode } = useNodeContext();
+const { getRootRef, getNodes, onSelectNode, onAddNode } = useNodeContext();
 const nodes = getNodes();
-const root = getRoot();
-const rootStyle = getRootStyle(root as INode);
+const root = getRootRef();
+const rootStyle = getRootStyle(root);
 
 const onDown = function (): void {
-  onSelectNode(root.id);
+  onSelectNode(root.value.id);
 };
 
 const middleEl = ref<HTMLElement>();

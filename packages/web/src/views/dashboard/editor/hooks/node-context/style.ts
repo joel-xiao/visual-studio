@@ -1,6 +1,8 @@
-import { computed } from 'vue';
+import { computed, unref, type MaybeRef, type Ref, type DeepReadonly } from 'vue';
 
-export function getNodeStyle(node: INode) {
+type StyleNode = INode | DeepReadonly<INode>;
+
+export function getNodeStyle(nodeOrRef: MaybeRef<StyleNode> | Readonly<Ref<StyleNode>>) {
   return computed<{
     'border-top-left-radius': string;
     'border-top-right-radius': string;
@@ -13,7 +15,8 @@ export function getNodeStyle(node: INode) {
     overflow: string;
     transform: string;
   }>(() => {
-    const radius = node?.radius.map(r => (r || 0) + 'px') || [];
+    const node = unref(nodeOrRef);
+    const radius = Array.isArray(node?.radius) ? node.radius.map(r => (r || 0) + 'px') : [];
     const width = (node?.width || 0) + 'px';
     const height = (node?.height || 0) + 'px';
     const rotate = (node?.rotate || 0) + 'deg';
@@ -32,15 +35,16 @@ export function getNodeStyle(node: INode) {
   });
 }
 
-export function getRootStyle(node: INode) {
+export function getRootStyle(nodeOrRef: MaybeRef<StyleNode> | Readonly<Ref<StyleNode>>) {
   return computed(() => {
+    const node = unref(nodeOrRef);
     const style = {
-      width: node.width + 'px',
-      height: node.height + 'px',
+      width: (node?.width || 0) + 'px',
+      height: (node?.height || 0) + 'px',
       'background-color': ''
     };
 
-    if (node.props.fill.color) {
+    if (node?.props?.fill?.color) {
       style['background-color'] = node.props.fill.color as string;
     }
 

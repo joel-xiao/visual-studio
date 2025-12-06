@@ -8,7 +8,7 @@
 import DragResize from './widgets/drag-resize.vue';
 import { ref, reactive, markRaw, readonly, withDefaults, watch, onMounted } from 'vue';
 import { useNodeContext } from './../hooks/node-context';
-import { getNodeStyle } from './../hooks/node-context/example';
+import { getNodeStyle } from './../hooks/node-context/style';
 import { useComponentContext } from './../hooks/component-context';
 import { useCanvas } from '../hooks/canvas';
 
@@ -20,7 +20,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const { getNode, updateNode, onSelectNode, addNodeInstance } = useNodeContext();
-const node = getNode(props.id) as INode;
+const node = getNode(props.id);
 const nodeStyle = getNodeStyle(node);
 
 const { getScale, addCanvasUpdated } = useCanvas();

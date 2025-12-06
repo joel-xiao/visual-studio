@@ -3,7 +3,7 @@
     <Canvas />
     <NavPanel @change="handleTabChange" />
     <!-- <ToolbarPanel /> -->
-    <LeftPanel v-show="activeTab === 'design'" />
+    <LeftPanel />
     <RightPanel v-show="activeTab === 'design'" />
     <AIPanel v-show="activeTab === 'ai'" />
   </div>

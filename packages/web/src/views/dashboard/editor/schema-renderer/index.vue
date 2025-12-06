@@ -48,7 +48,7 @@ const getComponent = (schema_name: string) => {
   return components[schema_name];
 };
 
-const { getCurrentNode, updateNodeProps } = useNodeContext();
+const { getCurrentNode, updateNodeProp } = useNodeContext();
 const currentNode = getCurrentNode();
 const PropsData = computed(() => currentNode.value.props);
 
@@ -63,13 +63,14 @@ const onUpdate = function (
   schema: SchemaKeyTypes,
   [prop_key, prop_value]: [key: string, value: number | string | boolean | undefined | number[]]
 ) {
-  updateNodeProps(currentNode.value.id, {
-    key: `${key}.${prop_key}`,
-    value: formatterComponentProp(schema, {
+  updateNodeProp(
+    currentNode.value.id,
+    `${key}.${prop_key}`,
+    formatterComponentProp(schema, {
       key: prop_key,
       value: prop_value
     })
-  });
+  );
 };
 
 const panelSchemaWrapperRef = ref<HTMLElement>();
