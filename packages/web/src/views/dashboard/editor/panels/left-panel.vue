@@ -1,9 +1,10 @@
 ya
-<template lang="pug">
-div.editor-left-panel
-  div.panel-tab_bar
-    PanelTabBar(:data="tabBars" v-model="selectTab" @select="onSelect")
-  PanelLayer(
+<template>
+<div class="editor-left-panel">
+  <div class="panel-tab_bar">
+    <PanelTabBar :data="tabBars" v-model="selectTab" @select="onSelect" />
+  </div>
+  <PanelLayer
     v-if="tabBars[0].show"
     v-show="selectTab === tabBars[0]"
     :data="layerData"
@@ -11,15 +12,17 @@ div.editor-left-panel
     @select="onLayerSelect"
     @command="onLayerCommand"
     temIcon="icon-wenjianjia"
-    )
-  div.panel-component(
+    />
+  <div class="panel-component"
     v-if="tabBars[1].show"
     v-show="selectTab === tabBars[1]"
-    )
-    div.panel-component-tab_bar
-      PanelTabBar(:data="componentTabBars" v-model="componentTab")
-    PanelComponent( :drag="true" :data="componentData" @drag-start="onDragStart" @drag-stop="onDragStop")
-
+    >
+    <div class="panel-component-tab_bar">
+      <PanelTabBar :data="componentTabBars" v-model="componentTab" />
+    </div>
+    <PanelComponent :drag="true" :data="componentData" @drag-start="onDragStart" @drag-stop="onDragStop" />
+  </div>
+</div>
 </template>
 
 <script setup lang="ts">

@@ -1,8 +1,10 @@
-<template lang="pug">
-div.editor-right-panel
-  .panel-tab_bar
-    PanelTabBar
-  PanelSchema
+<template>
+<div class="editor-right-panel">
+  <div class="panel-tab_bar">
+    <PanelTabBar />
+  </div>
+  <PanelSchema />
+</div>
 </template>
 
 <script setup lang="ts">

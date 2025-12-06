@@ -1,18 +1,20 @@
-<template lang="pug">
-div.editor-canvas(
+<template>
+<div class="editor-canvas"
   ref="middleEl"
   id="editor-canvas"
   @drop="onDrop"
   @dragenter="onDragenter"
   @dragover="onDragover"
-  )
-  div.editor-canvas-root(
+  >
+  <div class="editor-canvas-root"
     ref="canvasRootEl"
     id="editor-canvas-root"
     :style="rootStyle"
-    @mousedown.stop.prevent="onDown")
-    GridLine(@mousedown.stop.prevent="onDown")
-    CanvasNode(v-for="(node, idx) in nodes" :key="node.id" :id="node.id")
+    @mousedown.stop.prevent="onDown">
+    <GridLine @mousedown.stop.prevent="onDown" />
+    <CanvasNode v-for="(node, idx) in nodes" :key="node.id" :id="node.id" />
+  </div>
+</div>
 </template>
 
 <script setup lang="ts">

@@ -1,7 +1,7 @@
-<template lang="pug">
-DragResize(ref="resize" :data="dragDataset" @resizing="onResizing" @mousedown.stop.prevent="onDown")
-  div.middle-node( ref="vm" :style="nodeStyle")
-
+<template>
+<DragResize ref="resize" :data="dragDataset" @resizing="onResizing" @mousedown.stop.prevent="onDown">
+  <div class="middle-node" ref="vm" :style="nodeStyle"></div>
+</DragResize>
 </template>
 
 <script setup lang="ts">

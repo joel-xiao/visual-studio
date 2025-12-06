@@ -1,18 +1,22 @@
-<template lang="pug">
-div.editor-nav-panel
-  .nav-panel-left
-    div.mas-button-icon
-      Icon(button size="small" src="icon-gengduo")
-    n-breadcrumb
-      n-breadcrumb-item( v-for="(item, idx) in crumbs" :key="item.id" @click="onCrumbClick(item, idx)") {{ item.name }}
+<template>
+<div class="editor-nav-panel">
+  <div class="nav-panel-left">
+    <div class="mas-button-icon">
+      <Icon button size="small" src="icon-gengduo" />
+    </div>
+    <n-breadcrumb>
+      <n-breadcrumb-item v-for="(item, idx) in crumbs" :key="item.id" @click="onCrumbClick(item, idx)">{{ item.name }}</n-breadcrumb-item>
+    </n-breadcrumb>
+  </div>
 
-  .nav-panel-content
-    span.nav-panel-content-span(:class="{ active: currentTab.id === item.id }" :key="item.id" v-for="(item, idx) in tabs" @click="onTabSelect(item, idx)")
-      | {{ item.label }}
-  .nav-panel-right
-    CButton(class="share-btn" @click="onShare")
-      | 分享
-    CButton(size="medium" circle icon="icon-yulan")
+  <div class="nav-panel-content">
+    <span class="nav-panel-content-span" :class="{ active: currentTab.id === item.id }" :key="item.id" v-for="(item, idx) in tabs" @click="onTabSelect(item, idx)">{{ item.label }}</span>
+  </div>
+  <div class="nav-panel-right">
+    <CButton class="share-btn" @click="onShare">分享</CButton>
+    <CButton size="medium" circle icon="icon-yulan" />
+  </div>
+</div>
 </template>
 
 <script setup lang="ts">

@@ -1,12 +1,14 @@
-<template lang="pug">
-div(class="schema-blends")
-  div(class="schema-blends-item" v-for="(item, index) in list" :key="index")
-    CBlend(
+<template>
+<div class="schema-blends">
+  <div class="schema-blends-item" v-for="(item, index) in list" :key="index">
+    <CBlend
       v-model="list[index]"
       v-bind="$attrs"
       @update="onUpdate"
-    )
-    Button(icon="icon-remove" type="hover" @click="onRemove(index)")
+    />
+    <Button icon="icon-remove" type="hover" @click="onRemove(index)" />
+  </div>
+</div>
 </template>
 
 <script lang="ts">

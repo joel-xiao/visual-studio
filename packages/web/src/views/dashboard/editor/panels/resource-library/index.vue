@@ -1,19 +1,22 @@
-<template lang="pug">
-div(class='editor-resource-library')
-  div.component-header
-    div.search
-      CInput(icon="icon-sousuo" v-model="keyword" input @update="onUpdateKeyword" :focus="false" placeholder="搜索组件...")
-    Icon(button @click="onSwitchType" size="small" :src="currentType.icon" class="icon-btn")
+<template>
+  <div class="editor-resource-library">
+    <div class="component-header">
+      <div class="search">
+        <CInput icon="icon-sousuo" v-model="keyword" input @update="onUpdateKeyword" :focus="false" placeholder="搜索组件..." />
+      </div>
+      <Icon button @click="onSwitchType" size="small" :src="currentType.icon" class="icon-btn" />
+    </div>
 
-  div.component-masters
-    div.master-collapse( v-for="(item, idx) in Data" :key="(item.id || '') + idx")
-      div(class="master-collapse__title" @click="onArrow(item)")
-        div.master-collapse__title__text {{ item.name }}
-        Icon(src="icon-shouqi2" class="arrow" :class="{ 'active': item.AFold }")
-      ComponentItem(:data="item" :drag="!!drag" @arrow="onArrow" @drag-start="onDragStart" @drag-stop="onDragStop")
-
-
-
+    <div class="component-masters">
+      <div class="master-collapse" v-for="(item, idx) in Data" :key="(item.id || '') + idx">
+        <div class="master-collapse__title" @click="onArrow(item)">
+          <div class="master-collapse__title__text">{{ item.name }}</div>
+          <Icon src="icon-shouqi2" class="arrow" :class="{ 'active': item.AFold }" />
+        </div>
+        <ComponentItem :data="item" :drag="!!drag" @arrow="onArrow" @drag-start="onDragStart" @drag-stop="onDragStop" />
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">

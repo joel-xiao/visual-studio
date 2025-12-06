@@ -1,19 +1,25 @@
-<template lang="pug">
-PropsLayout(keyValue="component-layout" class="component-layout")
-  PropsItem
-    Input(v-model="modelValue.x" @update="onUpdate('x', $event)")
-    Input(v-model="modelValue.y" @update="onUpdate('y', $event)")
-  PropsItem
-    Input(v-model="modelValue.width" @update="onUpdate('width', $event)")
-    Input(v-model="modelValue.height" @update="onUpdate('height', $event)")
-    Button(v-model="data.isLockScale" type="status-button")
-  PropsItem
-    Input(v-model="modelValue.rotate" @update="onUpdate('rotate', $event)")
-    div(class="component-layout-rotate")
-      Button(@click="onRotate('x')")
-      Button(@click="onRotate('y')")
-  PropsItem(:gridTemplateColumns="['largely']")
-    Radius(v-model="modelValue.radius" @update="onUpdate('radius', $event)")
+<template>
+<PropsLayout keyValue="component-layout" class="component-layout">
+  <PropsItem>
+    <Input v-model="modelValue.x" @update="onUpdate('x', $event)" />
+    <Input v-model="modelValue.y" @update="onUpdate('y', $event)" />
+  </PropsItem>
+  <PropsItem>
+    <Input v-model="modelValue.width" @update="onUpdate('width', $event)" />
+    <Input v-model="modelValue.height" @update="onUpdate('height', $event)" />
+    <Button v-model="data.isLockScale" type="status-button" />
+  </PropsItem>
+  <PropsItem>
+    <Input v-model="modelValue.rotate" @update="onUpdate('rotate', $event)" />
+    <div class="component-layout-rotate">
+      <Button @click="onRotate('x')" />
+      <Button @click="onRotate('y')" />
+    </div>
+  </PropsItem>
+  <PropsItem :gridTemplateColumns="['largely']">
+    <Radius v-model="modelValue.radius" :icon="['icon-radius-tl', 'icon-radius-tr', 'icon-radius-br', 'icon-radius-bl']" @update="onUpdate('radius', $event)" />
+  </PropsItem>
+</PropsLayout>
 </template>
 
 <script lang="ts">

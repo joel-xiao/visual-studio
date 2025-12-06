@@ -1,10 +1,12 @@
-<template lang="pug">
-div(
+<template>
+<div
   class="editor-drag-resize"
   v-drag-resize="dragDataComputed"
-  )
-  div.editor-drag-resize__inner
-    slot
+  >
+  <div class="editor-drag-resize__inner">
+    <slot></slot>
+  </div>
+</div>
 </template>
 
 <script setup lang="ts">

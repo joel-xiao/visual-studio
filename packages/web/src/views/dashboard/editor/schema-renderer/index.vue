@@ -1,18 +1,28 @@
-<template lang="pug">
-div(class="editor-schema-renderer")
-  div(class="editor-schema-renderer-wrapper" ref="panelSchemaWrapperRef")
-    template(v-for="(item, idx) in PanelSchemaTypes.propsTypes")
-
-      template(v-if="isComponent(item.name)")
-        component(:is="getComponent(item.name)" v-model="PropsData[item.key]" @update="onUpdate(item.key, item.schema, $event)")
-      template(v-else)
-        component(:is="getComponent('PANEL_PROPS_WRAP')" :keyValue="item.key" :propsType="item" v-model="PropsData[item.key]" @update="onUpdate(item.key, item.schema, $event)")
-  Tabs(:style="TabsStyle" :tabs="PanelSchemaTypes.categorySchemas" @select-tab="onSelectTab")
-    template( v-if="currentTab" v-for="(item, idx) in currentTab.propsTypes")
-      template(v-if="isComponent(item.name)")
-        component(:is="getComponent(item.name)" v-model="PropsData[item.key]" @update="onUpdate(item.key, item.schema, $event)")
-      template(v-else)
-        component(:is="getComponent('PANEL_PROPS_WRAP')" :keyValue="item.key" :propsType="item" v-model="PropsData[item.key]" @update="onUpdate(item.key, item.schema, $event)")
+<template>
+<div class="editor-schema-renderer">
+  <div class="editor-schema-renderer-wrapper" ref="panelSchemaWrapperRef">
+    <template v-for="item in PanelSchemaTypes.propsTypes" :key="item.key">
+      <template v-if="isComponent(item.name) && item.name !== 'PANEL_PROPS_WRAP'">
+        <component :is="getComponent(item.name) as any" v-model="PropsData[item.key]" @update="onUpdate(item.key, item.schema as any, $event)" />
+      </template>
+      <template v-else>
+        <component :is="getComponent('PANEL_PROPS_WRAP') as any" :keyValue="item.key" :propsType="item" v-model="PropsData[item.key]" @update="onUpdate(item.key, item.schema as any, $event)" />
+      </template>
+    </template>
+  </div>
+  <Tabs :style="TabsStyle" :tabs="PanelSchemaTypes.categorySchemas as any" @select-tab="onSelectTab">
+    <template v-if="currentTab">
+      <template v-for="item in currentTab.propsTypes" :key="item.key">
+        <template v-if="isComponent(item.name) && item.name !== 'PANEL_PROPS_WRAP'">
+          <component :is="getComponent(item.name) as any" v-model="PropsData[item.key]" @update="onUpdate(item.key, item.schema as any, $event)" />
+        </template>
+        <template v-else>
+          <component :is="getComponent('PANEL_PROPS_WRAP') as any" :keyValue="item.key" :propsType="item" v-model="PropsData[item.key]" @update="onUpdate(item.key, item.schema as any, $event)" />
+        </template>
+      </template>
+    </template>
+  </Tabs>
+</div>
 </template>
 
 <script setup lang="ts">

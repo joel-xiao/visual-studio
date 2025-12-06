@@ -87,20 +87,23 @@ const onCommand = function (
 };
 </script>
 
-<template lang="pug">
-div(class='editor-layer-tree')
-  LayerItem(
-    @select="onNavSelect"
-    @command="onCommand"
-    :data="tree"
-    :itemIcon="itemIcon"
-    :itemMenus="itemMenus")
-  ICClickMenu(
-    v-model='clickMenu.show'
-    :data="commandData?.cmd?.children || []"
-    :x="clickMenu.x"
-    :y="clickMenu.y"
-    @command="onMenuCommand")
+<template>
+  <div class="editor-layer-tree">
+    <LayerItem
+      @select="onNavSelect"
+      @command="onCommand"
+      :data="tree"
+      :itemIcon="itemIcon"
+      :itemMenus="itemMenus"
+    />
+    <ICClickMenu
+      v-model="clickMenu.show"
+      :data="commandData?.cmd?.children || []"
+      :x="clickMenu.x"
+      :y="clickMenu.y"
+      @command="onMenuCommand"
+    />
+  </div>
 </template>
 
 <style lang="scss">

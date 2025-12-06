@@ -1,6 +1,7 @@
-<template lang="pug">
-div(class="schema-props-item" :style="style")
-  slot
+<template>
+<div class="schema-props-item" :style="style">
+  <slot></slot>
+</div>
 </template>
 
 <script lang="ts">

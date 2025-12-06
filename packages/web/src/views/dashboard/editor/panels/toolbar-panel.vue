@@ -1,7 +1,6 @@
-ya
-<template lang="pug">
-div.editor-toolbar-panel
-  |
+<template>
+<div class="editor-toolbar-panel">
+</div>
 </template>
 
 <script setup lang="ts"></script>

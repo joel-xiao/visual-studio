@@ -1,17 +1,25 @@
-<template lang="pug">
-div(class="schema-input-group")
-  ul(class="schema-input-group__options")
-    li
-      Input(v-model="modelValue[0]" :icon="data.icon[0]" :placeholder="data.isMore ? '' : '多个值'" @update="onUpdate")
-    template(v-if="data.isMore")
-      li
-        Input(v-model="modelValue[1]" :icon="data.icon[1]" @update="onUpdate")
-      li
-        Input(v-model="modelValue[2]" :icon="data.icon[2]" @update="onUpdate")
-      li
-        Input(v-model="modelValue[3]" :icon="data.icon[3]" @update="onUpdate")
-  div(class="schema-input-group__button-switch")
-    Button(v-model="data.isMore" icon="icon-spread-out" type="status-button")
+<template>
+<div class="schema-input-group">
+  <ul class="schema-input-group__options">
+    <li>
+      <Input v-model="modelValue[0]" :icon="data.icon[0]" :placeholder="data.isMore ? '' : '多个值'" @update="onUpdate" />
+    </li>
+    <template v-if="data.isMore">
+      <li>
+        <Input v-model="modelValue[1]" :icon="data.icon[1]" @update="onUpdate" />
+      </li>
+      <li>
+        <Input v-model="modelValue[2]" :icon="data.icon[2]" @update="onUpdate" />
+      </li>
+      <li>
+        <Input v-model="modelValue[3]" :icon="data.icon[3]" @update="onUpdate" />
+      </li>
+    </template>
+  </ul>
+  <div class="schema-input-group__button-switch">
+    <Button v-model="data.isMore" icon="icon-spread-out" type="status-button" />
+  </div>
+</div>
 </template>
 
 <script lang="ts">

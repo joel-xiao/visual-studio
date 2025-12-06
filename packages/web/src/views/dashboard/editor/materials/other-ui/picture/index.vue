@@ -1,5 +1,5 @@
-<template lang="pug">
-img( class="controls_picture" src="https://picsum.photos/seed/picsum/300" alt="picture" )
+<template>
+  <img class="controls_picture" src="https://picsum.photos/seed/picsum/300" alt="picture" />
 </template>
 
 <script setup lang="ts">

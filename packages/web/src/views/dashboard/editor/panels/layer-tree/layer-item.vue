@@ -37,19 +37,24 @@ const onCommand = function (
   emit('command', event, cmd, item);
 };
 </script>
-<template lang="pug">
-.layer-item(v-for="item in data" :key="item.id" :class="{ 'layer-item_check': item.select }")
-  .layer-item-nav(@click="onSelect(item)" :class="{ active: item.select }" :style="layerItemStyle")
-    .layer-item-left
-      Icon.arrow(block src="icon-zhankai" :class="{ active: item.AFold }" v-if="item?.children?.length" @click.stop="onArrow(item)")
-      span.dot(v-else)
-      Icon.name-icon( block v-if="item.icon || itemIcon" :src="item.icon || itemIcon")
-      span.name-icon-margin(v-else)
-      span.layer-item-labe {{ item.name }}
-    .layer-item-handle(v-if="item.handle !== false")
-      Icon(button v-for="cmd in itemMenus" :key="cmd.id" :class="cmd.id" @click.stop.prevent="onCommand($event, cmd, item)" :src="cmd.icon")
-  .layer-item-swapper(v-if="!!item?.children?.length" v-show="item.AFold")
-    LayerItem(:recursion="recursion + 1" @select="onSelect" @command="onCommand" :data="item.children" :itemIcon="itemIcon" :itemMenus="itemMenus")
+<template>
+  <div class="layer-item" v-for="item in data" :key="item.id" :class="{ 'layer-item_check': item.select }">
+    <div class="layer-item-nav" @click="onSelect(item)" :class="{ active: item.select }" :style="layerItemStyle">
+      <div class="layer-item-left">
+        <Icon class="arrow" block src="icon-zhankai" :class="{ active: item.AFold }" v-if="item?.children?.length" @click.stop="onArrow(item)" />
+        <span class="dot" v-else></span>
+        <Icon class="name-icon" block v-if="item.icon || itemIcon" :src="item.icon || itemIcon" />
+        <span class="name-icon-margin" v-else></span>
+        <span class="layer-item-labe">{{ item.name }}</span>
+      </div>
+      <div class="layer-item-handle" v-if="item.handle !== false">
+        <Icon button v-for="cmd in itemMenus" :key="cmd.id" :class="cmd.id" @click.stop.prevent="onCommand($event, cmd, item)" :src="cmd.icon" />
+      </div>
+    </div>
+    <div class="layer-item-swapper" v-if="!!item?.children?.length" v-show="item.AFold">
+      <LayerItem :recursion="recursion + 1" @select="onSelect" @command="onCommand" :data="item.children" :itemIcon="itemIcon" :itemMenus="itemMenus" />
+    </div>
+  </div>
 </template>
 
 <style lang="scss">

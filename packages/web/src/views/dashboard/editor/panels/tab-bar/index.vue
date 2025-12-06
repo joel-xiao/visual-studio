@@ -1,7 +1,11 @@
-<template lang="pug">
-div.editor-tab-bar
-  .tab-bar__list
-    div(class="tab_item transition" :class="{ 'active': modelValue === item }" v-for="(item, idx) in data" :key="idx" @click="onSelect(item)") {{ item.name }}
+<template>
+  <div class="editor-tab-bar">
+    <div class="tab-bar__list">
+      <div class="tab_item transition" :class="{ 'active': modelValue === item }" v-for="(item, idx) in data" :key="idx" @click="onSelect(item)">
+        {{ item.name }}
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">

@@ -33,34 +33,49 @@ const onDrag = function (event: DragEvent): void {
 };
 
 const getType = inject('getType');
+
+const currentData = computed(() => props.data as PanelComponentData);
 </script>
-<template lang="pug">
-div.component-box__item-wrapper(v-for="(item, idx) in Items" v-show="data.component || data.AFold" v-if="Array.isArray(data.children) && data.children.length > 0" :key="(item.id || '') + idx")
-  template(v-if="data.component")
-    div.component-box__swapper(:class="typeof getType === 'function' ? getType() : ''")
-      div.component-item__content(
-        :draggable="drag ? true : false"
-        @dragstart="onDragStart($event, item)"
-        @dragend="onDragStop"
-        @dragover="onDrag"
-        @dragenter="onDrag"
-        )
-        img(:src="item.icon")
-      div.component-item__label {{ item.name }}
+<template>
+  <template v-if="Array.isArray(data.children) && data.children.length > 0">
+    <div class="component-box__item-wrapper" v-for="(item, idx) in Items" v-show="currentData.component || currentData.AFold" :key="(item.id || '') + idx">
+      <template v-if="currentData.component">
+        <div class="component-box__swapper" :class="typeof getType === 'function' ? getType() : ''">
+          <div class="component-item__content"
+            :draggable="drag ? true : false"
+            @dragstart="onDragStart($event, item)"
+            @dragend="onDragStop"
+            @dragover="onDrag"
+            @dragenter="onDrag"
+          >
+            <img :src="item.icon" />
+          </div>
+          <div class="component-item__label">{{ item.name }}</div>
+        </div>
+      </template>
 
-  template(v-else-if="!item.dot")
-    div(class="component-box__title transition" @click="onArrow(item)")
-      Icon(src="icon-zhankai" class="arrow" :class="{ 'active': item.AFold }")
-      div.component-box__title__text {{ item.name }}
-  template(v-else)
-    div(class="component-box__title dot")
-      div.component-box__title__text {{ item.name }}
+      <template v-else-if="!item.dot">
+        <div class="component-box__title transition" @click="onArrow(item)">
+          <Icon src="icon-zhankai" class="arrow" :class="{ 'active': item.AFold }" />
+          <div class="component-box__title__text">{{ item.name }}</div>
+        </div>
+      </template>
+      <template v-else>
+        <div class="component-box__title dot">
+          <div class="component-box__title__text">{{ item.name }}</div>
+        </div>
+      </template>
 
-  template(v-if="!item.component")
-    ComponentItem(:data="item" :drag="drag" @drag-start="onDragStart"  @drag-stop="onDragStop" v-if="Array.isArray(item.children) && item.children.length > 0")
-  template(v-else)
-    div.component-box__list
-      ComponentItem(:data="item" :drag="drag" @drag-start="onDragStart"  @drag-stop="onDragStop" v-if="Array.isArray(item.children) && item.children.length > 0")
+      <template v-if="!item.component">
+        <ComponentItem :data="item" :drag="drag" @drag-start="onDragStart" @drag-stop="onDragStop" v-if="Array.isArray(item.children) && item.children.length > 0" />
+      </template>
+      <template v-else>
+        <div class="component-box__list">
+          <ComponentItem :data="item" :drag="drag" @drag-start="onDragStart" @drag-stop="onDragStop" v-if="Array.isArray(item.children) && item.children.length > 0" />
+        </div>
+      </template>
+    </div>
+  </template>
 </template>
 
 <style lang="scss">

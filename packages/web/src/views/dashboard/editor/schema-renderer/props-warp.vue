@@ -1,7 +1,20 @@
-<template lang="pug">
-PropsLayout(:keyValue="'props-warp-' + keyValue" :label="propsType.label")
-  PropsItem(v-for="(props, idx) in Schema" :key="idx" :gridTemplateColumns="getGridTemplateColumns(idx)")
-    PropsCtrl(v-for="(prop, ctrl_idx) in props" :key="ctrl_idx" :dataType="prop.type" :ctrl="prop.ctrl" :icon="prop.icon" :ctrlType="prop.ctrl_type" v-model="modelValue[prop.key]" :options="prop?.options" @update="onUpdate(prop.key, $event)" @click="onClick(prop)" )
+<template>
+<PropsLayout :keyValue="'props-warp-' + keyValue" :label="propsType.label">
+  <PropsItem v-for="(props, idx) in Schema" :key="idx" :gridTemplateColumns="getGridTemplateColumns(idx)">
+    <PropsCtrl
+      v-for="(prop, ctrl_idx) in props"
+      :key="ctrl_idx"
+      :dataType="prop.type"
+      :ctrl="prop.ctrl"
+      :icon="prop.icon"
+      :ctrlType="prop.ctrl_type || ''"
+      v-model="modelValue[prop.key!]"
+      :options="prop?.options"
+      @update="onUpdate(prop.key!, $event)"
+      @click="onClick(prop)"
+    />
+  </PropsItem>
+</PropsLayout>
 </template>
 
 <script lang="ts">

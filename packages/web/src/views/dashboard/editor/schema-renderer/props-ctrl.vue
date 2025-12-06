@@ -1,9 +1,11 @@
-<template lang="pug">
-div(class="editor-schema-renderer-props-ctrl")
-  template(v-if="layout === 'inline'")
-    div(class="editor-schema-renderer-props-ctrl-label") {{ label }}
-  component(v-if="isComponent(ctrl)" :is="getComponent(ctrl)" :type="ctrlType" v-bind="$attrs")
-  div(v-else) IS NO {{ ctrl }}
+<template>
+<div class="editor-schema-renderer-props-ctrl">
+  <template v-if="layout === 'inline'">
+    <div class="editor-schema-renderer-props-ctrl-label">{{ label }}</div>
+  </template>
+  <component v-if="isComponent(ctrl)" :is="getComponent(ctrl)" :type="ctrlType" v-bind="$attrs" />
+  <div v-else>IS NO {{ ctrl }}</div>
+</div>
 </template>
 
 <script lang="ts">

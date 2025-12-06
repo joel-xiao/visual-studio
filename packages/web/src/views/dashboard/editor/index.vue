@@ -1,10 +1,11 @@
-<template lang="pug">
-div#editor(ref='editorRef')
-  Canvas
-  NavPanel
-  //- ToolbarPanel
-  LeftPanel
-  RightPanel
+<template>
+  <div id="editor" ref="editorRef">
+    <Canvas />
+    <NavPanel />
+    <!-- <ToolbarPanel /> -->
+    <LeftPanel />
+    <RightPanel />
+  </div>
 </template>
 
 <script setup lang="ts">

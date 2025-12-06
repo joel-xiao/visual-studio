@@ -1,11 +1,15 @@
-<template lang="pug">
-div(class="schema-props-layout" ref="propsLayout" :key="keyValue")
-  div(class="schema-props-layout_title" v-if="showLabel")
-    div(class="schema-props-layout_title-text") {{ label }}
-    div(class="schema-props-layout_title-right_content")
-      slot(name="title")
-  div(class="schema-props-layout_content")
-    slot
+<template>
+<div class="schema-props-layout" ref="propsLayout" :key="keyValue">
+  <div class="schema-props-layout_title" v-if="showLabel">
+    <div class="schema-props-layout_title-text">{{ label }}</div>
+    <div class="schema-props-layout_title-right_content">
+      <slot name="title"></slot>
+    </div>
+  </div>
+  <div class="schema-props-layout_content">
+    <slot></slot>
+  </div>
+</div>
 </template>
 
 <script lang="ts">
