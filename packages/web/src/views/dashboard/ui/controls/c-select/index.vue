@@ -1,39 +1,26 @@
 <template>
   <div class="c-select">
     <BasicBox ref="boxRef" :type="Type" @click="onOpenWrapper('wrapper')">
-      <BasicIcon :lock="lock" :icon="icon" />
-      <div class="c-select-label-wrapper">
+      <BasicIcon :lock="lock" :icon="icon" @mousedown="onMouseDown" :style="iconStyle" />
+      <div v-if="Type === 'input-select'" class="c-select-label-wrapper">
         <BasicInput
-          v-if="Type === 'input-select'"
           v-model="modelValue"
           :disabled="lock"
           v-bind="$attrs"
           type="text"
           @update="onUpdate"
         />
-        <div v-else class="c-select-current-label">{{ CurrLabel }}</div>
       </div>
-      <div class="c-select-icon" @click="onOpenWrapper('arrow')">
-        <i class="icon-font icon-shouqi2"></i>
-      </div>
+      <BasicSelect
+        ref="basicSelectRef"
+        :model-value="modelValue"
+        :options="Items"
+        :show-label="Type !== 'input-select'"
+        :disabled="lock"
+        @update="onUpdate"
+        @click="onOpenWrapper('arrow')"
+      />
     </BasicBox>
-    <div ref="selectMaskRef" class="c-select-mask" @click="onClose"></div>
-    <div ref="selectWrapperRef" class="c-select-wrapper">
-      <template v-for="(item, idx) of Items" :key="idx">
-        <div
-          class="c-select-item"
-          :class="enterValue === item.value ? 'active' : ''"
-          @mouseenter="onItemEnter(item)"
-          @click="onItemClick(item)"
-        >
-          <div class="c-select-item-icon">
-            <i v-if="currValue === item.value" class="icon-font icon-shouqi2"></i>
-          </div>
-          <span>{{ item.label }}</span>
-        </div>
-        <div v-if="item.splitLine" class="c-select-item-split-line"></div>
-      </template>
-    </div>
   </div>
 </template>
 
@@ -45,10 +32,11 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ref, reactive, computed, provide, withDefaults, nextTick } from 'vue';
+import { ref, computed, withDefaults } from 'vue';
 import BasicBox from '../../base/basic-box.vue';
 import BasicIcon from '../../base/basic-icon.vue';
 import BasicInput from '../../base/basic-input.vue';
+import BasicSelect from '../../base/basic-select.vue';
 
 interface IProps {
   type?: string;
@@ -95,11 +83,6 @@ const modelValue = ref(props.modelValue);
 const currValue = ref(modelValue.value);
 const enterValue = ref(currValue.value);
 
-const CurrLabel = computed(() => {
-  const item = Items.value.find(item => item.value === currValue.value);
-  return item ? item.label : '';
-});
-
 const onUpdate = function (value: string | number) {
   modelValue.value = value;
   currValue.value = value;
@@ -108,9 +91,51 @@ const onUpdate = function (value: string | number) {
   emit('update', value);
 };
 
+const iconStyle = computed(() => {
+  return !props.lock && props.options?.length ? { cursor: 'ew-resize' } : {};
+});
+
+const onMouseDown = (e: MouseEvent) => {
+  if (props.lock || !props.options?.length) return;
+
+  e.preventDefault();
+  const startX = e.clientX;
+  let lastX = startX;
+  const threshold = 10; // pixels to move to change one item
+
+  const onMouseMove = (event: MouseEvent) => {
+    const currentX = event.clientX;
+    const delta = currentX - lastX;
+
+    if (Math.abs(delta) >= threshold) {
+      const step = delta > 0 ? 1 : -1;
+      const currentIndex = Items.value.findIndex(item => item.value === currValue.value);
+      let newIndex = currentIndex + step;
+
+      // Clamp index
+      if (newIndex < 0) newIndex = 0;
+      if (newIndex >= Items.value.length) newIndex = Items.value.length - 1;
+
+      if (newIndex !== currentIndex) {
+        onUpdate(Items.value[newIndex].value);
+        lastX = currentX; // Reset reference point
+      }
+    }
+  };
+
+  const onMouseUp = () => {
+    window.removeEventListener('mousemove', onMouseMove);
+    window.removeEventListener('mouseup', onMouseUp);
+    document.body.style.cursor = '';
+  };
+
+  window.addEventListener('mousemove', onMouseMove);
+  window.addEventListener('mouseup', onMouseUp);
+  document.body.style.cursor = 'ew-resize';
+};
+
 const boxRef = ref<null | InstanceType<typeof BasicBox>>(null);
-const selectMaskRef = ref<null | HTMLElement>(null);
-const selectWrapperRef = ref<null | HTMLElement>(null);
+const basicSelectRef = ref<null | InstanceType<typeof BasicSelect>>(null);
 
 function onOpenWrapper(event_type: string) {
   // input-select type should not open wrapper
@@ -118,70 +143,9 @@ function onOpenWrapper(event_type: string) {
     return;
   }
 
-  if (selectMaskRef.value && selectWrapperRef.value && boxRef.value) {
-    enterValue.value = currValue.value;
-    const boxRect = boxRef.value.getRect();
-    selectMaskRef.value.style.display = 'block';
-    selectWrapperRef.value.style.display = 'block';
-    selectWrapperRef.value.style.visibility = 'hidden';
-    selectWrapperRef.value.style.width = boxRect.width + 'px';
-    selectWrapperRef.value.style.top = boxRect.top + 'px';
-    selectWrapperRef.value.style.left = boxRect.left + 'px';
-
-    nextTick(() => {
-      if (selectWrapperRef.value) {
-        const activeItem = selectWrapperRef.value.querySelector('.active') as HTMLElement;
-        let targetTop = boxRect.top;
-        let targetScrollTop = 0;
-
-        if (activeItem) {
-          targetTop = boxRect.top - activeItem.offsetTop;
-        }
-
-        // Adjust for top boundary
-        if (targetTop < 10) {
-          const diff = 10 - targetTop;
-          targetTop = 10;
-          targetScrollTop += diff;
-        }
-
-        // Adjust for bottom boundary
-        const wrapperHeight = selectWrapperRef.value.offsetHeight;
-        const windowHeight = window.innerHeight;
-
-        if (targetTop + wrapperHeight > windowHeight - 10) {
-          const diff = targetTop + wrapperHeight - (windowHeight - 10);
-          targetTop -= diff;
-          targetScrollTop -= diff;
-        }
-
-        // Clamp scrollTop
-        const maxScroll = selectWrapperRef.value.scrollHeight - selectWrapperRef.value.offsetHeight;
-        if (targetScrollTop < 0) targetScrollTop = 0;
-        if (targetScrollTop > maxScroll) targetScrollTop = maxScroll;
-
-        selectWrapperRef.value.style.top = targetTop + 'px';
-        selectWrapperRef.value.scrollTop = targetScrollTop;
-        selectWrapperRef.value.style.visibility = 'visible';
-      }
-    });
+  if (basicSelectRef.value && boxRef.value) {
+    basicSelectRef.value.open(boxRef.value.$el as HTMLElement);
   }
-}
-
-function onClose() {
-  if (selectMaskRef.value && selectWrapperRef.value) {
-    selectMaskRef.value.style.display = 'none';
-    selectWrapperRef.value.style.display = 'none';
-  }
-}
-
-function onItemEnter(item: Item) {
-  enterValue.value = item.value;
-}
-
-function onItemClick(item: Item) {
-  onUpdate(item.value);
-  onClose();
 }
 </script>
 
@@ -189,102 +153,15 @@ function onItemClick(item: Item) {
 #dashboard .c-select {
   width: 100%;
 
-  .c-select-icon {
-    margin-right: 2px;
-    line-height: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex: none;
-    color: var(--db-color-select-arrow);
-    user-select: none;
-    position: relative;
-    transform: scale(0.9) rotate(90deg);
-    font-weight: normal;
-
-    width: 26.6px;
-    height: 26.6px;
-    border-radius: 3px;
-  }
-
-  &:hover {
-    .c-select-icon {
-      background-color: var(--db-color-select-arrow-bg-hover);
-    }
-
-    .select-box {
-      .c-select-icon {
-        background: none;
-      }
-    }
-  }
-
   .c-select-label-wrapper {
-    width: 100%;
+    flex: 1;
+    min-width: 0;
     color: #fff;
-
-    .c-select-current-label {
-      width: 100%;
-      box-sizing: border-box;
-    }
   }
 
-  .c-select-mask {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    display: none;
-    z-index: 1;
-  }
-
-  .c-select-wrapper {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 0;
-    padding: 6px 0px;
-    background-color: var(--db-color-select-wrapper-background);
-    border: 1px solid var(--theme-color-gray-100);
-    border-radius: 6px;
-    display: none;
-    z-index: 1;
-    max-height: 260px;
-    overflow-y: auto;
-
-    .c-select-item {
-      margin: 0 6px;
-      height: 30px;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      padding: 0px 4px;
-      font-weight: normal;
-
-      &:hover,
-      &.active {
-        background-color: var(--db-color-select-item-bg-hover);
-      }
-
-      .c-select-item-icon {
-        width: 24px;
-        height: 24px;
-        display: flex;
-        align-items: center;
-      }
-
-      span {
-        color: var(--db-color-select-item-text);
-        font-size: 12px;
-      }
-    }
-
-    .c-select-item-split-line {
-      height: 1px;
-      background-color: var(--theme-color-gray-100);
-      margin: 6px 6px;
-    }
+  .basic-select {
+    margin-right: 2px;
+    flex-shrink: 0;
   }
 }
 </style>
