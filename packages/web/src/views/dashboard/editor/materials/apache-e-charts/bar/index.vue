@@ -13,11 +13,15 @@ import {
   GridComponent
 } from 'echarts/components';
 import VChart from 'vue-echarts';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 
 use([CanvasRenderer, BarChart, TitleComponent, TooltipComponent, LegendComponent, GridComponent]);
 
 // provide(THEME_KEY, 'dark');
+
+const props = defineProps<{
+  config?: IComponentProps;
+}>();
 
 const option = ref({
   xAxis: {
@@ -34,6 +38,14 @@ const option = ref({
     }
   ]
 });
+
+// Merge props into option if needed
+ watch(() => props.config, (newVal) => {
+  if (newVal) {
+    console.log(props.config)
+    // update option logic
+  }
+ }, { deep: true });
 </script>
 
 <style>

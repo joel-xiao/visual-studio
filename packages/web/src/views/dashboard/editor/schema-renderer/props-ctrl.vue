@@ -30,7 +30,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const component_models = import.meta.glob(
-  ['../../ui/controls/*/index.vue', './input-group/index.vue'],
+  ['../../ui/controls/*/index.vue', './input-group/index.vue', './blends/index.vue'],
   {
     eager: true,
     import: 'default'

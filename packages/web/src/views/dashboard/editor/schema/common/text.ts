@@ -22,7 +22,7 @@ const schema: ISchemaExport = {
       {
         key: 'fontFamily',
         type: String,
-        default: '',
+        default: 'SimSun',
         icon: 'icon-font-family',
         ctrl: 'C_SELECT',
         options: options.FontFamilyOptions

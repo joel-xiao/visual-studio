@@ -30,7 +30,25 @@ interface ISchemaArrayData extends IDefaultSchemaKeyData {
   icon?: string | string[];
   default: number[];
 }
+interface ISchemaBlendData extends IDefaultSchemaKeyData {
+  type: ObjectConstructor;
+  ctrl: 'C_BLEND';
+  default: {
+    mix: string;
+    opacity: number;
+    visible: boolean;
+  };
+}
 
+interface ISchemaBlendsData extends IDefaultSchemaKeyData {
+  type: ArrayConstructor;
+  ctrl: 'BLENDS';
+  default: {
+    mix: string;
+    opacity: number;
+    visible: boolean;
+  }[];
+}
 interface ISchemaFunctionData extends IDefaultSchemaKeyData {
   type: FunctionConstructor;
   default: () => void;
@@ -40,7 +58,9 @@ declare type SchemaKeyType =
   | ISchemaKeyNumberData
   | ISchemaKeyStringData
   | ISchemaKeyBooleanData
-  | ISchemaArrayData;
+  | ISchemaArrayData
+  | ISchemaBlendData
+  | ISchemaBlendsData;
 
 declare type SchemaKeyTypes = { [key: string]: SchemaKeyType } | SchemaKeyType[][];
 

@@ -369,12 +369,12 @@ export class CreateComponentContext {
     parentEl: HTMLElement | undefined,
     component: string
   ) {
-    return createComponent<{ data: IComponentProps }>(
+    return createComponent<{ config: IComponentProps }>(
       'component',
       parentEl,
       this.#getComponent(component),
       {
-        data: props
+        config: props
       }
     );
   }

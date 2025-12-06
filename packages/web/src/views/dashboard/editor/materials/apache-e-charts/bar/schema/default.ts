@@ -14,6 +14,17 @@ const schema: IComponentSchemaExport = {
         rotate: 0,
         radius: [0, 0, 0, 0]
       }
+    },
+    {
+      type: 'schema',
+      schema: 'COMMON_LAYER',
+      default: {
+        layer: [{
+        mix: 'normal',
+        opacity: 1,
+        visible: true
+      }]
+      }
     }
   ],
 
