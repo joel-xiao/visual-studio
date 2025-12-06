@@ -1,21 +1,28 @@
 <template>
   <div id="editor" ref="editorRef">
     <Canvas />
-    <NavPanel />
+    <NavPanel @change="handleTabChange" />
     <!-- <ToolbarPanel /> -->
-    <LeftPanel />
-    <RightPanel />
+    <LeftPanel v-show="activeTab === 'design'" />
+    <RightPanel v-show="activeTab === 'design'" />
+    <AIPanel v-show="activeTab === 'ai'" />
   </div>
 </template>
 
 <script setup lang="ts">
 import NavPanel from './panels/nav-panel.vue';
+import AIPanel from './panels/ai-panel/index.vue';
 // import ToolbarPanel from './panels/toolbar-panel.vue';
 import LeftPanel from './panels/left-panel.vue';
 import RightPanel from './panels/right-panel.vue';
 import Canvas from './canvas/index.vue';
 
 import { ref, reactive, onMounted, onUnmounted } from 'vue';
+
+const activeTab = ref('design');
+const handleTabChange = (tabId: string) => {
+  activeTab.value = tabId;
+};
 import { useConfig } from './config';
 import { useNodeContext, removeNodeContext } from './hooks/node-context';
 import { createBindKeysContext, removeBindKeysContext } from './hooks/bind-keys-context';

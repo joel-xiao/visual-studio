@@ -41,13 +41,17 @@ interface Tab {
 }
 const tabs: Tab[] = reactive([
   { label: '设计', id: 'design' },
-  { label: '数据', id: 'data' }
+  { label: '数据', id: 'data' },
+  { label: 'AI', id: 'ai' }
   // { label: '蓝图', id: 'blueprint' }
 ]);
+
+const emit = defineEmits(['change']);
 
 const currentTab = ref<Tab>(tabs[0]);
 const onTabSelect = function (item: Tab, idx: number): void {
   currentTab.value = item;
+  emit('change', item.id);
 };
 
 const onShare = function (): void {

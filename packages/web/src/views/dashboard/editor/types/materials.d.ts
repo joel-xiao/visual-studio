@@ -1,4 +1,4 @@
-declare type ComponentPropValue = number | string | number[] | boolean | Record<string, unknown>[] | undefined;
+declare type ComponentPropValue = number | string | number[] | boolean | Record<string, unknown> | Record<string, unknown>[] | undefined;
 
 declare type ComponentProp = { [key: string]: ComponentPropValue };
 
