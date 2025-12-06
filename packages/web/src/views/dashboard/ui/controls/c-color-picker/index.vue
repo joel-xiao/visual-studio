@@ -1,6 +1,6 @@
 <template lang="pug">
 BasicBox(ref='box' class="c-color-picker" type="input")
-  BasicColorPicker(v-bind="$attrs"  v-model="modelValue")
+  BasicColorPicker(v-bind="$attrs"  v-model="modelValue" @click="onFocus" @focus="onFocus" @blur="onBlur")
   BasicInput( v-if="type === 'color-input'" v-bind="$attrs" v-model="modelValue" @focus="onFocus" @blur="onBlur" @update="onUpdate" type="text")
 </template>
 

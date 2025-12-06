@@ -13,6 +13,7 @@
       </div>
       <div class="c-blend-input">
         <BasicInput
+          class="c-blend-input"
           v-bind="$attrs"
           :model-value="opacityModel"
           :disabled="lock || !visibleModel"
@@ -148,11 +149,11 @@ function toggleVisible() {
     display: flex;
     align-items: center;
     margin-right: 8px;
-    width: 55%;
+    width: 50%;
   }
 
   .c-blend-input {
-    width: calc(45% - 24px);
+    width: 60px;
   }
 }
 </style>
