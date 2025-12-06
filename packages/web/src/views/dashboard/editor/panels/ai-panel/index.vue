@@ -1,18 +1,70 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { NSelect, NButton, NInput, NSpace, NCard } from 'naive-ui';
+import { ref, nextTick, onMounted, reactive } from 'vue';
 
+interface ChatMessage {
+  id: string;
+  role: 'user' | 'ai';
+  content: string;
+  type?: 'text' | 'code' | 'action';
+  actions?: { label: string; value: string; disabled?: boolean }[];
+}
+
+const messages = ref<ChatMessage[]>([]);
+const inputValue = ref('');
+const chatContainerRef = ref<HTMLElement>();
+
+// Scene Options
 const sceneOptions = [
   { label: '场景1: 大屏设计', value: 'scene1' },
-  // 预留位置
   { label: '场景2: 暂定', value: 'scene2', disabled: true }
 ];
 
-const selectedScene = ref('scene1');
-const generatedCode = ref('');
+// Initialize Chat
+onMounted(() => {
+  addMessage('ai', '你好！我是 AI 智能助手。请选择一个场景开始设计：', 'action', sceneOptions);
+});
 
-const generateScene1 = () => {
-  // 内部多角色逻辑处理
+const addMessage = (role: 'user' | 'ai', content: string, type: 'text' | 'code' | 'action' = 'text', actions?: { label: string; value: string; disabled?: boolean }[]) => {
+  messages.value.push({
+    id: Date.now().toString(),
+    role,
+    content,
+    type,
+    actions
+  });
+  scrollToBottom();
+};
+
+const scrollToBottom = () => {
+  nextTick(() => {
+    if (chatContainerRef.value) {
+      chatContainerRef.value.scrollTop = chatContainerRef.value.scrollHeight;
+    }
+  });
+};
+
+const handleActionClick = (actionValue: string) => {
+  if (actionValue === 'scene1') {
+    addMessage('user', '开始场景1: 大屏设计');
+    processScene1();
+  }
+};
+
+const handleSend = () => {
+  if (!inputValue.value.trim()) return;
+  addMessage('user', inputValue.value);
+  const text = inputValue.value;
+  inputValue.value = '';
+
+  // Simple mock response for free text
+  setTimeout(() => {
+    addMessage('ai', `收到: "${text}"。目前仅支持点击场景按钮进行生成。`);
+  }, 500);
+};
+
+// --- Generation Logic ---
+
+const generateScene1Data = () => {
   // Role 1: Generate base structure
   const baseData = {
     folder: '',
@@ -49,26 +101,19 @@ const generateScene1 = () => {
     ]
   };
 
-  // Role 2: Enhance with ECharts options (internal logic applied to Role 1 result)
-  // 这里模拟 Role 2 对 Role 1 结果的增强
+  // Role 2: Enhance with ECharts options
   const enhancedData = JSON.parse(JSON.stringify(baseData));
   if (enhancedData.nodes && enhancedData.nodes.length > 0) {
     enhancedData.nodes[0].props.code = {
       options: {
         title: {
           text: 'ECharts Example',
-          textStyle: {
-            color: '#fff'
-          }
+          textStyle: { color: '#fff' }
         },
-        tooltip: {
-          trigger: 'axis'
-        },
+        tooltip: { trigger: 'axis' },
         legend: {
           data: ['Sales', 'Marketing'],
-          textStyle: {
-            color: '#ccc'
-          }
+          textStyle: { color: '#ccc' }
         },
         grid: {
           left: '3%',
@@ -80,20 +125,12 @@ const generateScene1 = () => {
           type: 'category',
           boundaryGap: false,
           data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-          axisLabel: {
-            color: '#ccc'
-          }
+          axisLabel: { color: '#ccc' }
         },
         yAxis: {
           type: 'value',
-          axisLabel: {
-            color: '#ccc'
-          },
-          splitLine: {
-            lineStyle: {
-              color: '#333'
-            }
-          }
+          axisLabel: { color: '#ccc' },
+          splitLine: { lineStyle: { color: '#333' } }
         },
         series: [
           {
@@ -101,9 +138,6 @@ const generateScene1 = () => {
             type: 'line',
             stack: 'Total',
             areaStyle: {},
-            emphasis: {
-              focus: 'series'
-            },
             data: [120, 132, 101, 134, 90, 230, 210]
           },
           {
@@ -111,57 +145,76 @@ const generateScene1 = () => {
             type: 'line',
             stack: 'Total',
             areaStyle: {},
-            emphasis: {
-              focus: 'series'
-            },
             data: [220, 182, 191, 234, 290, 330, 310]
           }
         ]
       }
     };
   }
-
-  generatedCode.value = JSON.stringify(enhancedData, null, 2);
+  return JSON.stringify(enhancedData, null, 2);
 };
 
-const onGenerate = () => {
-  if (selectedScene.value === 'scene1') {
-    generateScene1();
-  }
+const processScene1 = async () => {
+  addMessage('ai', '正在执行多角色设计流程...');
+
+  await new Promise(r => setTimeout(r, 800));
+  addMessage('ai', '角色1 (布局设计师): 已生成基础大屏结构。');
+
+  await new Promise(r => setTimeout(r, 800));
+  addMessage('ai', '角色2 (数据可视化专家): 已补充 ECharts 图表配置并进行美化。');
+
+  await new Promise(r => setTimeout(r, 500));
+  const code = generateScene1Data();
+  addMessage('ai', code, 'code');
+  addMessage('ai', '代码已生成完毕！');
 };
+
 </script>
 
 <template>
   <div class="ai-panel">
-    <div class="ai-sidebar">
-      <n-space vertical size="large">
-        <div class="ai-header">
-          <h3>AI 智能助手</h3>
-          <p class="subtitle">选择场景并生成代码</p>
-        </div>
-
-        <n-card title="场景选择" size="small">
-          <n-space vertical>
-            <n-select v-model:value="selectedScene" :options="sceneOptions" />
-            <div class="role-desc">
-              <p v-if="selectedScene === 'scene1'">场景1: 自动执行多角色设计流程（布局设计 -> 数据可视化美化）</p>
-              <p v-else>更多场景开发中...</p>
-            </div>
-            <n-button type="primary" block @click="onGenerate">
-              生成代码
-            </n-button>
-          </n-space>
-        </n-card>
-      </n-space>
+    <div class="chat-header">
+      <h3>AI 助手</h3>
     </div>
-    <div class="ai-content">
-      <n-input
-        v-model:value="generatedCode"
-        type="textarea"
-        placeholder="AI 生成的代码将显示在这里..."
-        class="code-output"
-        :autosize="{ minRows: 20 }"
-      />
+
+    <div class="chat-container" ref="chatContainerRef">
+      <div v-for="msg in messages" :key="msg.id" :class="['message-row', msg.role]">
+        <div class="avatar">{{ msg.role === 'ai' ? '🤖' : '👤' }}</div>
+        <div class="message-content">
+          <div v-if="msg.type === 'text'" class="text-bubble">{{ msg.content }}</div>
+
+          <div v-else-if="msg.type === 'code'" class="code-block">
+            <pre>{{ msg.content }}</pre>
+          </div>
+
+          <div v-else-if="msg.type === 'action'" class="action-bubble">
+            <p>{{ msg.content }}</p>
+            <div class="action-buttons">
+              <button
+                v-for="action in msg.actions"
+                :key="action.value"
+                :disabled="action.disabled"
+                @click="!action.disabled && handleActionClick(action.value)"
+                class="action-btn"
+                :class="{ disabled: action.disabled }"
+              >
+                {{ action.label }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-area">
+      <textarea
+        v-model="inputValue"
+        placeholder="输入指令..."
+        @keydown.enter.prevent="handleSend"
+      ></textarea>
+      <button class="send-btn" @click="handleSend">
+        <i class="iconfont icon-send"></i> 发送
+      </button>
     </div>
   </div>
 </template>
@@ -178,45 +231,172 @@ const onGenerate = () => {
   border-left: 1px solid var(--db-editor-color-canvas);
   background-color: var(--db-editor-color-panel-bg);
   z-index: 100;
+  color: var(--theme-color-text);
 
-  .ai-sidebar {
-    width: 100%;
-    padding: 12px;
-    border-bottom: 1px solid var(--db-border-color);
-
-    .ai-header {
-      margin-bottom: 20px;
-      h3 {
-        margin: 0 0 8px 0;
-        color: var(--text-color-primary);
-      }
-      .subtitle {
-        margin: 0;
-        color: var(--text-color-secondary);
-        font-size: 12px;
-      }
-    }
-
-    .role-desc {
-      font-size: 12px;
-      color: var(--text-color-secondary);
-      margin-bottom: 8px;
+  .chat-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--db-border-color, #333);
+    h3 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 600;
     }
   }
 
-  .ai-content {
+  .chat-container {
     flex: 1;
-    width: 100%;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .message-row {
+      display: flex;
+      gap: 8px;
+      max-width: 100%;
+
+      &.user {
+        flex-direction: row-reverse;
+        .message-content {
+          align-items: flex-end;
+        }
+        .text-bubble {
+          background-color: var(--db-color-button-primary-bg, #1890ff);
+          color: white;
+          border-radius: 8px 0 8px 8px;
+        }
+      }
+
+      &.ai {
+        .text-bubble {
+          background-color: var(--db-color-input-background, #2c2c2c);
+          border: 1px solid var(--db-border-color, #333);
+          border-radius: 0 8px 8px 8px;
+        }
+      }
+
+      .avatar {
+        width: 24px;
+        height: 24px;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .message-content {
+        display: flex;
+        flex-direction: column;
+        max-width: calc(100% - 40px);
+        overflow: hidden;
+      }
+
+      .text-bubble {
+        padding: 8px 12px;
+        font-size: 13px;
+        line-height: 1.5;
+        word-break: break-all;
+      }
+
+      .code-block {
+        background-color: #1e1e1e;
+        border-radius: 4px;
+        padding: 8px;
+        border: 1px solid #333;
+        width: 100%;
+        overflow-x: auto;
+
+        pre {
+          margin: 0;
+          font-family: 'Menlo', 'Monaco', monospace;
+          font-size: 11px;
+          color: #d4d4d4;
+        }
+      }
+
+      .action-bubble {
+        background-color: var(--db-color-input-background, #2c2c2c);
+        padding: 12px;
+        border-radius: 0 8px 8px 8px;
+        border: 1px solid var(--db-border-color, #333);
+
+        p {
+          margin: 0 0 8px 0;
+          font-size: 13px;
+        }
+
+        .action-buttons {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+
+          .action-btn {
+            text-align: left;
+            padding: 6px 10px;
+            background-color: var(--db-editor-color-canvas-bg, #333);
+            border: 1px solid var(--db-border-color, #444);
+            color: var(--theme-color-text);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+
+            &:hover:not(.disabled) {
+              background-color: var(--db-color-button-primary-bg, #1890ff);
+              color: white;
+              border-color: var(--db-color-button-primary-bg, #1890ff);
+            }
+
+            &.disabled {
+              opacity: 0.5;
+              cursor: not-allowed;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .input-area {
     padding: 12px;
-    background-color: #1e1e1e; // Dark background for code
-    overflow: hidden;
+    border-top: 1px solid var(--db-border-color, #333);
+    background-color: var(--db-editor-color-panel-bg);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 
-    .code-output {
-      height: 100%;
-      font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+    textarea {
+      width: 100%;
+      height: 60px;
+      background-color: var(--db-color-input-background, #1f1f1f);
+      border: 1px solid var(--db-border-color, #333);
+      color: var(--theme-color-text);
+      border-radius: 4px;
+      padding: 8px;
+      resize: none;
+      font-family: inherit;
+      font-size: 12px;
+      outline: none;
 
-      :deep(.n-input__textarea-el) {
-        height: 100% !important;
+      &:focus {
+        border-color: var(--db-color-button-primary-bg, #1890ff);
+      }
+    }
+
+    .send-btn {
+      align-self: flex-end;
+      padding: 4px 12px;
+      background-color: var(--db-color-button-primary-bg, #1890ff);
+      color: white;
+      border: none;
+      border-radius: 2px;
+      cursor: pointer;
+      font-size: 12px;
+
+      &:hover {
+        opacity: 0.9;
       }
     }
   }
