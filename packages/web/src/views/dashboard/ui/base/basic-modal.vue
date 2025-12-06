@@ -59,13 +59,13 @@ function onMaskClick() {
 }
 
 .basic-modal-wrapper {
-  background-color: #2b2b2b;
+  background-color: var(--db-main-color-card-bg);
   border-radius: 4px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-m);
   display: flex;
   flex-direction: column;
   max-height: 90vh;
-  color: #fff;
+  color: var(--theme-color-text-primary);
 }
 
 .basic-modal-header {
@@ -74,17 +74,17 @@ function onMaskClick() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid #3c3c3c;
-  font-size: 14px;
+  border-bottom: 1px solid var(--theme-color-real-gray-600);
+  font-size: var(--font-size-md);
   font-weight: 500;
 
   .basic-modal-close {
     cursor: pointer;
-    color: #999;
+    color: var(--theme-color-text-secondary);
     transition: color 0.2s;
 
     &:hover {
-      color: #fff;
+      color: var(--theme-color-text-primary);
     }
   }
 }
@@ -98,7 +98,7 @@ function onMaskClick() {
 
 .basic-modal-footer {
   padding: 12px 16px;
-  border-top: 1px solid #3c3c3c;
+  border-top: 1px solid var(--theme-color-real-gray-600);
   display: flex;
   justify-content: flex-end;
 }

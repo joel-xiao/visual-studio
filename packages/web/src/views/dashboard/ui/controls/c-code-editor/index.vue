@@ -4,7 +4,7 @@ div(class="c-code-editor")
     span(class="c-code-editor-text") {{ previewText }}
     div(class="c-code-editor-icon")
       i(class="icon-font icon-kuozhan")
-  
+
   BasicModal(
     v-model="showModal"
     :title="label || 'Code Editor'"
@@ -91,18 +91,18 @@ function onConfirm() {
   align-items: center;
   justify-content: space-between;
   padding: 4px 8px;
-  background-color: #212121;
-  border: 1px solid #3c3c3c;
+  background-color: var(--db-color-input-background);
+  border: 1px solid var(--theme-color-real-gray-600);
   border-radius: 4px;
   cursor: pointer;
   transition: border-color 0.2s;
   height: 28px;
-  font-size: 12px;
-  color: #ccc;
+  font-size: var(--font-size-xs);
+  color: var(--theme-color-text-secondary);
 
   &:hover {
-    border-color: #666;
-    color: #fff;
+    border-color: var(--theme-color-gray-500);
+    color: var(--theme-color-text-primary);
   }
 
   .c-code-editor-text {
@@ -125,22 +125,22 @@ function onConfirm() {
 
   .c-button {
     padding: 6px 16px;
-    background-color: #3c3c3c;
+    background-color: var(--theme-color-real-gray-600);
     border: none;
     border-radius: 4px;
-    color: #fff;
+    color: var(--theme-color-text-primary);
     cursor: pointer;
-    font-size: 12px;
+    font-size: var(--font-size-xs);
 
     &:hover {
-      background-color: #4c4c4c;
+      background-color: var(--theme-color-real-gray-500);
     }
 
     &.primary {
-      background-color: #007acc;
+      background-color: var(--theme-color-blue-700);
 
       &:hover {
-        background-color: #0062a3;
+        background-color: var(--theme-color-blue-800);
       }
     }
   }
