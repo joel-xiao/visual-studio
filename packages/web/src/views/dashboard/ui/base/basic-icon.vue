@@ -4,14 +4,17 @@ import { computed } from 'vue';
 interface IProps {
   lock?: boolean;
   icon?: string;
+  hover?: boolean;
 }
 const props = withDefaults(defineProps<IProps>(), {
   lock: false,
-  icon: ''
+  icon: '',
+  hover: false
 });
 
 const iconClass = computed(() => ({
-  lock: !!props.lock
+  lock: !!props.lock,
+  hover: !!props.hover
 }));
 
 const isIcon = computed(() => {
@@ -46,6 +49,17 @@ div(class="basic-icon" :class="iconClass")
 
   &.lock {
     opacity: 0.5;
+  }
+
+  &.hover {
+    width: 26.6px;
+    height: 26.6px;
+    border-radius: 3px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: var(--db-color-select-arrow-bg-hover);
+    }
   }
 
   .basic-icon-text {
