@@ -1,27 +1,23 @@
 <script setup lang="ts">
 import { ref, nextTick } from 'vue';
-import { aiApi, type IAIMessage } from '@/service/api/ai';
+import { aiApi } from '@/service/api/ai';
+import { scenes, getScene } from './modules/scene-manager';
+import type { IChatMessage, IScene } from './modules/types';
 
-interface ChatMessage extends IAIMessage {
-  id: string;
-}
-
-const messages = ref<ChatMessage[]>([
+const messages = ref<IChatMessage[]>([
   {
     id: 'welcome',
     role: 'assistant',
     content: '你好！我是你的 AI 助手。请选择一个场景开始，或直接输入指令。',
     type: 'action',
-    actions: [
-      { label: '场景1: 大屏设计', value: 'scene1' },
-      { label: '场景2: 暂定', value: 'scene2', disabled: true }
-    ]
+    actions: scenes.map(s => ({ label: s.label, value: s.value, disabled: s.disabled }))
   }
 ]);
 
 const inputValue = ref('');
 const loading = ref(false);
 const chatContainerRef = ref<HTMLElement | null>(null);
+const currentScene = ref<any | null>(null);
 
 const scrollToBottom = async () => {
   await nextTick();
@@ -30,49 +26,61 @@ const scrollToBottom = async () => {
   }
 };
 
-const addMessage = (role: 'user' | 'assistant', content: string, type: 'text' | 'code' | 'action' = 'text', actions?: any[]) => {
+const addMessage = (role: 'user' | 'assistant', content: string, type: 'text' | 'code' | 'action' = 'text', actions?: any[], id?: string): string => {
+  if (id) {
+    const msg = messages.value.find(m => m.id === id);
+    if (msg) {
+      msg.content = content;
+      if (type) msg.type = type;
+      if (actions) msg.actions = actions;
+      scrollToBottom();
+      return id;
+    }
+  }
+
+  // Deduplication check: prevent adding identical message to the end
+  const lastMsg = messages.value[messages.value.length - 1];
+  if (!id && lastMsg && lastMsg.role === role && lastMsg.content === content && lastMsg.type === type) {
+    return lastMsg.id;
+  }
+
+  const newId = Date.now().toString() + Math.random().toString(36).substr(2, 9);
   messages.value.push({
-    id: Date.now().toString(),
+    id: newId,
     role,
     content,
     type,
     actions
   });
   scrollToBottom();
+  return newId;
 };
 
 const handleActionClick = async (value: string) => {
-  if (value === 'scene1') {
-    await processScene1();
-  }
-};
+  if (loading.value) return;
 
-const processScene1 = async () => {
-  // Check if last message was user clicking action, if not add user message
-  // But usually clicking an action is an implicit user intent.
-  // We can add a system message or just start.
-  addMessage('user', '执行场景1: 大屏设计');
-  loading.value = true;
+  const [sceneId, ...rest] = value.split(':');
+  const params = rest.join(':'); // Reconstruct the rest if there are multiple colons
+  const scene = getScene(sceneId);
 
-  addMessage('assistant', '正在启动多角色设计流程...');
-
-  try {
-    // Simulate internal role steps (User request: "Multi-role is internal logic")
-    await new Promise(r => setTimeout(r, 1000));
-    addMessage('assistant', '角色1 (布局设计师): 已生成基础大屏结构。');
-
-    await new Promise(r => setTimeout(r, 1000));
-    addMessage('assistant', '角色2 (数据可视化专家): 正在补充 ECharts 图表配置并进行美化...');
-
-    // Call API
-    const result = await aiApi.generate('scene1', {});
-
-    addMessage('assistant', JSON.stringify(result, null, 2), 'code');
-    addMessage('assistant', '代码已生成完毕！');
-  } catch (error) {
-    addMessage('assistant', '生成失败: ' + error);
-  } finally {
-    loading.value = false;
+  if (scene && scene.run) {
+    currentScene.value = scene;
+    loading.value = true;
+    try {
+      await scene.run(
+        addMessage,
+        // Adapter for scene to call API - currently mapped to chat or mock
+        async () => {
+          // In the future, map sceneId to specific prompts/providers
+          throw new Error('Direct API call from adapter not implemented');
+        },
+        params
+      );
+    } catch (e) {
+      addMessage('assistant', '场景执行出错: ' + e);
+    } finally {
+      loading.value = false;
+    }
   }
 };
 
@@ -85,12 +93,29 @@ const handleSend = async () => {
 
   loading.value = true;
   try {
-    const apiMessages = messages.value.map(m => ({
-      role: m.role,
-      content: m.content
-    }));
-    const res = await aiApi.chat(apiMessages);
-    addMessage('assistant', res.reply, res.type as any, res.actions);
+    if (currentScene.value) {
+      // Delegate to current scene
+      await currentScene.value.run(
+        addMessage,
+        async () => {
+            throw new Error('Direct API call from adapter not implemented');
+        },
+        content
+      );
+    } else {
+      // Fallback to default chat if no scene selected
+      const apiMessages = messages.value.map(m => ({
+        role: m.role,
+        content: m.content
+      }));
+
+      const res = await aiApi.chat({
+        provider: 'qwen', // Default to Qwen as per user request
+        messages: apiMessages
+      });
+
+      addMessage('assistant', res.content, res.type as any, res.actions);
+    }
   } catch (error) {
     addMessage('assistant', '请求失败: ' + error);
   } finally {
@@ -121,10 +146,10 @@ const handleSend = async () => {
               <button
                 v-for="action in msg.actions"
                 :key="action.value"
-                :disabled="action.disabled"
-                @click="!action.disabled && handleActionClick(action.value)"
+                :disabled="action.disabled || loading"
+                @click="!action.disabled && !loading && handleActionClick(action.value)"
                 class="action-btn"
-                :class="{ disabled: action.disabled }"
+                :class="{ disabled: action.disabled || loading }"
               >
                 {{ action.label }}
               </button>
