@@ -59,11 +59,17 @@
   --db-color-button-bg-active: var(--theme-color-gray-200);
   --db-color-button-active: var(--theme-color-text-primary-white);
 
+  --db-color-button-text: var(--theme-color-text-primary);
+  --db-color-button-primary-bg: var(--theme-color-blue-700);
+  --db-color-button-primary-bg-hover: var(--theme-color-blue-800);
+  --db-color-button-cancel-bg: var(--theme-color-real-gray-600);
+  --db-color-button-cancel-bg-hover: var(--theme-color-real-gray-500);
+
   --db-color-button-status-border: var(--theme-color-tran-6);
   --db-color-button-status-color: var(--theme-color-gray-800);
   --db-color-button-status-hover-border: var(--theme-color-tran-12);
-  --db-color-button-status-bg-active: var(--theme-color-blue-700);
-  
+  --db-color-button-status-bg-active: var(--theme-color-blue-700)
+
   // Color Picker color
   --db-color-picker-panel-bg: var(--db-color-bg-dark);
 

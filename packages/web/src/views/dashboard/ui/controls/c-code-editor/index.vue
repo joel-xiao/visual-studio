@@ -1,13 +1,18 @@
 <template lang="pug">
 div(class="c-code-editor")
-  div(class="c-code-editor-trigger" @click="openModal")
-    span(class="c-code-editor-text") {{ previewText }}
-    div(class="c-code-editor-icon")
-      i(class="icon-font icon-kuozhan")
+  div(class="c-code-editor-content")
+    BasicCodeEditor(
+      v-model="currentValue"
+      :language="language"
+      :theme="theme"
+      style="height: 200px"
+    )
+    div(class="c-code-editor-expand")
+      BasicIcon(icon="icon-kuozhan" hover @click="openModal")
 
   BasicModal(
     v-model="showModal"
-    :title="label || 'Code Editor'"
+    :title="label"
     width="80vw"
   )
     BasicCodeEditor(
@@ -18,14 +23,22 @@ div(class="c-code-editor")
     )
     template(#footer)
       div(class="c-code-editor-footer")
-        button(class="c-button" @click="onCancel") Cancel
-        button(class="c-button primary" @click="onConfirm") OK
+        CButton(@click="onCancel" cancel) 取消
+        CButton(@click="onConfirm" primary) 确定
 </template>
 
+<script lang="ts">
+export default {
+  name: 'C_CODE_EDITOR',
+  inheritAttrs: false
+};
+</script>
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import BasicModal from '../../base/basic-modal.vue';
 import BasicCodeEditor from '../../base/basic-code-editor.vue';
+import BasicIcon from '../../base/basic-icon.vue';
+import CButton from '../c-button/index.vue';
 
 interface Props {
   modelValue?: string;
@@ -36,12 +49,12 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   modelValue: '',
-  label: 'Edit Code',
+  label: '代码编辑',
   language: 'javascript',
   theme: 'vs-dark'
 });
 
-const emit = defineEmits(['update:modelValue', 'change']);
+const emit = defineEmits(['update:modelValue', 'update']);
 
 const showModal = ref(false);
 const internalValue = ref('');
@@ -58,14 +71,7 @@ const currentValue = computed({
   set: (val) => internalValue.value = val
 });
 
-const previewText = computed(() => {
-  if (!props.modelValue) return 'Empty';
-  const firstLine = props.modelValue.split('\n')[0];
-  return firstLine.length > 20 ? firstLine.slice(0, 20) + '...' : firstLine;
-});
-
 function openModal() {
-  internalValue.value = props.modelValue;
   showModal.value = true;
 }
 
@@ -76,7 +82,7 @@ function onCancel() {
 
 function onConfirm() {
   emit('update:modelValue', internalValue.value);
-  emit('change', internalValue.value);
+  emit('update', internalValue.value);
   showModal.value = false;
 }
 </script>
@@ -86,63 +92,21 @@ function onConfirm() {
   width: 100%;
 }
 
-.c-code-editor-trigger {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 4px 8px;
-  background-color: var(--db-color-input-background);
+.c-code-editor-content {
+  position: relative;
   border: 1px solid var(--theme-color-real-gray-600);
-  border-radius: 4px;
-  cursor: pointer;
-  transition: border-color 0.2s;
-  height: 28px;
-  font-size: var(--font-size-xs);
-  color: var(--theme-color-text-secondary);
+  border-radius: var(--border-radius-4);
+  overflow: hidden;
+}
 
-  &:hover {
-    border-color: var(--theme-color-gray-500);
-    color: var(--theme-color-text-primary);
-  }
-
-  .c-code-editor-text {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    flex: 1;
-    margin-right: 8px;
-  }
-
-  .c-code-editor-icon {
-    display: flex;
-    align-items: center;
-  }
+.c-code-editor-expand {
+  position: absolute;
+  top: 8px;
+  right: 8px;
 }
 
 .c-code-editor-footer {
   display: flex;
   gap: 8px;
-
-  .c-button {
-    padding: 6px 16px;
-    background-color: var(--theme-color-real-gray-600);
-    border: none;
-    border-radius: 4px;
-    color: var(--theme-color-text-primary);
-    cursor: pointer;
-    font-size: var(--font-size-xs);
-
-    &:hover {
-      background-color: var(--theme-color-real-gray-500);
-    }
-
-    &.primary {
-      background-color: var(--theme-color-blue-700);
-
-      &:hover {
-        background-color: var(--theme-color-blue-800);
-      }
-    }
-  }
 }
 </style>

@@ -24,7 +24,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   type: 'button',
   icon: '',
-  dataType: Boolean
+  dataType: Boolean,
 });
 
 const buttonTextClass = reactive({
@@ -44,6 +44,24 @@ const onUpdate = function (value: boolean) {
 
     &.no-padding {
       padding: 0px;
+    }
+  }
+
+  &[primary] {
+    background: var(--db-color-button-primary-bg);
+    color: var(--theme-color-text-primary-white);
+
+    &:hover {
+      background: var(--db-color-button-primary-bg-hover);
+    }
+  }
+
+  &[cancel] {
+    background: var(--db-color-button-cancel-bg);
+    color: var(--db-color-button-text);
+
+    &:hover {
+      background: var(--db-color-button-cancel-bg-hover);
     }
   }
 }

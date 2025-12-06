@@ -25,6 +25,13 @@ const schema: IComponentSchemaExport = {
         visible: true
       }]
       }
+    },
+    {
+      type: 'schema',
+      schema: 'COMMON_CODE_EDITOR',
+      default: {
+        value: ''
+      }
     }
   ],
 

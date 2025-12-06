@@ -1,5 +1,5 @@
 <template lang="pug">
-teleport(to="body")
+teleport(to="#dashboard")
   transition(name="fade")
     div(v-if="modelValue" class="basic-modal-mask" @click="onMaskClick")
       div(class="basic-modal-wrapper" :style="{ width: width }" @click.stop)
@@ -27,7 +27,7 @@ const props = withDefaults(defineProps<Props>(), {
   modelValue: false,
   title: 'Edit',
   width: '800px',
-  maskClosable: true
+  maskClosable: true,
 });
 
 const emit = defineEmits(['update:modelValue', 'close']);
@@ -60,7 +60,7 @@ function onMaskClick() {
 
 .basic-modal-wrapper {
   background-color: var(--db-main-color-card-bg);
-  border-radius: 4px;
+  border-radius: var(--border-radius-4);
   box-shadow: var(--shadow-m);
   display: flex;
   flex-direction: column;
