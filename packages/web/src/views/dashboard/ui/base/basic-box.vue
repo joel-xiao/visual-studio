@@ -36,13 +36,13 @@ const boxStyle = computed(() => ({
 }));
 
 const onMouseDown = function () {
-  if (props.type === 'button') {
+  if (props.type === 'button' || props.type === 'hover') {
     model.value = true;
   }
 };
 
 const onMouseUp = function () {
-  if (props.type === 'button') {
+  if (props.type === 'button' || props.type === 'hover') {
     model.value = false;
   }
 };
@@ -86,7 +86,8 @@ defineExpose({ focus, blur, getRect });
   overflow: hidden;
 
   &.button-box,
-  &.select-box {
+  &.select-box,
+  &.hover-box {
     justify-content: center;
     background: var(--db-color-input-background);
 
@@ -97,6 +98,11 @@ defineExpose({ focus, blur, getRect });
     &.active {
       background: var(--db-color-button-bg-active);
     }
+  }
+
+  &.hover-box {
+    background: transparent;
+    cursor: pointer;
   }
 
   &.status-button-box {
