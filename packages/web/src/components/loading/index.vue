@@ -1,7 +1,9 @@
-<template lang="pug">
-div(class='c-loading')
-  n-space
-    n-spin(size="large")
+<template>
+  <div class="c-loading">
+    <n-space>
+      <n-spin size="large" />
+    </n-space>
+  </div>
 </template>
 
 <script lang="ts" setup></script>

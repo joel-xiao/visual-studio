@@ -1,5 +1,5 @@
-<template lang="pug">
-div(ref="editorContainer" class="code-editor-container")
+<template>
+  <div ref="editorContainer" class="code-editor-container"></div>
 </template>
 
 <script setup lang="ts">

@@ -1,5 +1,5 @@
-<template lang="pug">
-n-color-picker(v-model:value="modelValue" :swatches="swatches")
+<template>
+  <n-color-picker v-model:value="modelValue" :swatches="swatches" />
 </template>
 
 <script lang="ts">

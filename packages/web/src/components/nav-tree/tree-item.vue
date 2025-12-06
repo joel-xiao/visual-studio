@@ -51,20 +51,25 @@ const onCommand = function (event: PointerEvent, cmd: ITreeItemMenu, item: ITree
   emit('command', event, cmd, item);
 };
 </script>
-<template lang="pug">
-.tree-item(v-for="item in data" :key="item.id")
-  .tree-item-nav(@click="onSelect(item)" :class="{ active: currentNav === item }" :style="treeItemStyle")
-    .tree-item-left
-      Icon.arrow(block src="icon-shouqi2" :size="size" :class="{ active: item.AFold }" v-if="IsArrow(item)" @click.stop="onArrow(item)")
-      span.dot(v-else-if="IsDot")
-      Icon.name-icon(block v-if="(item.icon || itemIcon) && !item.prefix" :src="item.icon || itemIcon")
-      span(v-else-if="item.prefix" class="name-prefix" v-html="item.prefix")
-      span.name-icon-margin(v-else)
-      span.tree-item-labe {{ item.name }}
-    .tree-item-handle(v-if="item.handle !== false")
-      Icon(button :size="size" v-for="cmd in itemMenus" :key="cmd.id" :class="cmd.id" @click.stop.prevent="onCommand($event, cmd, item)" :src="cmd.icon")
-  .tree-item-swapper(v-if="!!item?.children?.length" :class="{expand: item.AFold}" :style="{'--tree-item-sum': item?.children?.length || item?.children?.length}")
-    TreeItem(:recursion="recursion + 1" :size="size" @select="onSelect($event, true)" @command="onCommand" :data="item.children" :itemIcon="itemIcon" :itemMenus="itemMenus" :currentNav="currentNav")
+<template>
+  <div v-for="item in data" :key="item.id" class="tree-item">
+    <div class="tree-item-nav" :class="{ active: currentNav === item }" :style="treeItemStyle" @click="onSelect(item, false)">
+      <div class="tree-item-left">
+        <Icon v-if="IsArrow(item)" class="arrow" block src="icon-shouqi2" :size="size" :class="{ active: item.AFold }" @click.stop="onArrow(item)" />
+        <span v-else-if="IsDot" class="dot"></span>
+        <Icon v-if="(item.icon || itemIcon) && !item.prefix" class="name-icon" block :src="item.icon || itemIcon" />
+        <span v-else-if="item.prefix" class="name-prefix" v-html="item.prefix"></span>
+        <span v-else class="name-icon-margin"></span>
+        <span class="tree-item-labe">{{ item.name }}</span>
+      </div>
+      <div v-if="item.handle !== false" class="tree-item-handle">
+        <Icon v-for="cmd in itemMenus" :key="cmd.id" button :size="size" :class="cmd.id" :src="cmd.icon" @click.stop.prevent="onCommand($event, cmd, item)" />
+      </div>
+    </div>
+    <div v-if="!!item?.children?.length" class="tree-item-swapper" :class="{expand: item.AFold}" :style="{'--tree-item-sum': item?.children?.length || item?.children?.length}">
+      <TreeItem :recursion="recursion + 1" :size="size" :data="item.children" :itemIcon="itemIcon" :itemMenus="itemMenus" :currentNav="currentNav" @select="onSelect($event, true)" @command="onCommand" />
+    </div>
+  </div>
 </template>
 
 <style lang="scss">

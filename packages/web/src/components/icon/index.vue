@@ -31,11 +31,12 @@ const isIcon = computed(() => {
 });
 </script>
 
-<template lang="pug">
-span(class='c-icon-font' v-bind="$attrs" :style="Style" :class="[button ? 'button' : '', block ? 'block' : '', size, !isIcon ? 'img' : '']")
-  Icon(class='icon-font' :icon='src' v-if="isIconify")
-  i(class='icon-font' :class='src' v-else-if="isIcon")
-  img(class='icon-img' v-else :src="src")
+<template>
+  <span class="c-icon-font" v-bind="$attrs" :style="Style" :class="[button ? 'button' : '', block ? 'block' : '', size, !isIcon ? 'img' : '']">
+    <Icon v-if="isIconify" class="icon-font" :icon="src" />
+    <i v-else-if="isIcon" class="icon-font" :class="src"></i>
+    <img v-else class="icon-img" :src="src" />
+  </span>
 </template>
 
 <style lang="scss">

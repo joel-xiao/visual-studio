@@ -51,15 +51,15 @@ const onMenuCommand = function (cmd: ICClickMenu): void {
 };
 </script>
 
-<template lang="pug">
-transition(name='c-click-menu-fade')
-  div.c-click-menu(:style="contentMenuStyle" v-show="modelValue")
-    div.content-menu-item(v-for="(item) in data" :key="item.id" @click.prevent="onMenuCommand(item)")
-      Icon(
-        class="menu-item-icon"
-        :size="size"
-        :src="item.icon")
-      span(class="menu-item-label") {{ item.name }}
+<template>
+  <transition name="c-click-menu-fade">
+    <div v-show="modelValue" class="c-click-menu" :style="contentMenuStyle">
+      <div v-for="item in data" :key="item.id" class="content-menu-item" @click.prevent="onMenuCommand(item)">
+        <Icon class="menu-item-icon" :size="size" :src="item.icon" />
+        <span class="menu-item-label">{{ item.name }}</span>
+      </div>
+    </div>
+  </transition>
 </template>
 
 <style lang="scss">

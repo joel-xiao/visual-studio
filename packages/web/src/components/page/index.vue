@@ -1,6 +1,7 @@
-<template lang="pug">
-div(class='c-page')
-  slot
+<template>
+  <div class="c-page">
+    <slot></slot>
+  </div>
 </template>
 
 <script lang="ts" setup></script>

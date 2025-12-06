@@ -91,22 +91,25 @@ defineExpose({
 });
 </script>
 
-<template lang="pug">
-div(class='c-nav-tree' :class="size")
-  TreeItem(
-    @select="onNavSelect"
-    @command="onCommand"
-    :data="tree"
-    :size="size"
-    :itemIcon="itemIcon"
-    :itemMenus="itemMenus"
-    :currentNav="currentNav")
-  ICClickMenu(
-    v-model='clickMenu.show'
-    :data="commandData?.cmd?.children || []"
-    :x="clickMenu.x"
-    :y="clickMenu.y"
-    @command="onMenuCommand")
+<template>
+  <div class="c-nav-tree" :class="size">
+    <TreeItem
+      :data="tree"
+      :size="size"
+      :itemIcon="itemIcon"
+      :itemMenus="itemMenus"
+      :currentNav="currentNav"
+      @select="onNavSelect"
+      @command="onCommand"
+    />
+    <ICClickMenu
+      v-model="clickMenu.show"
+      :data="commandData?.cmd?.children || []"
+      :x="clickMenu.x"
+      :y="clickMenu.y"
+      @command="onMenuCommand"
+    />
+  </div>
 </template>
 
 <style lang="scss">
