@@ -1,18 +1,17 @@
 <template>
-<div class="editor-canvas"
-  ref="middleEl"
+<div
   id="editor-canvas"
+  ref="middleEl"
+  class="editor-canvas"
   @drop="onDrop"
   @dragenter="onDragenter"
   @dragover="onDragover"
-  >
-  <div class="editor-canvas-root"
-    ref="canvasRootEl"
-    id="editor-canvas-root"
-    :style="rootStyle"
-    @mousedown.stop.prevent="onDown">
-    <GridLine @mousedown.stop.prevent="onDown" />
-    <CanvasNode v-for="(node, idx) in nodes" :key="node.id" :id="node.id" />
+>
+  <div ref="canvasRootEl" class="editor-canvas-root" :style="rootStyle" @mousedown.stop="onDown">
+    <GridLine />
+    <template v-for="item in nodes" :key="item.id">
+      <CanvasNode :id="item.id" />
+    </template>
   </div>
 </div>
 </template>

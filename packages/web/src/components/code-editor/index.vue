@@ -61,7 +61,10 @@ watch(() => props.modelValue, (newValue) => {
 
 watch(() => props.language, (newLang) => {
   if (editorInstance.value) {
-    monaco.editor.setModelLanguage(editorInstance.value.getModel()!, newLang);
+    const model = editorInstance.value.getModel();
+    if (model) {
+      monaco.editor.setModelLanguage(model, newLang);
+    }
   }
 });
 

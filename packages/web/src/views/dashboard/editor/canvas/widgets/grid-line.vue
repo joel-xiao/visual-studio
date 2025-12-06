@@ -1,18 +1,21 @@
 <template>
 <svg class="grid" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <pattern id="smallGrid"
+    <pattern
+id="smallGrid"
         width="1"
         height="1"
         patternUnits="userSpaceOnUse">
-      <path d="M 1 0 L 0 0 0 1"
+      <path
+d="M 1 0 L 0 0 0 1"
           fill="none"
           stroke="#fff"
           stroke-width="0.001" />
     </pattern>
     <pattern id="grid" width="1" height="1" patternUnits="userSpaceOnUse">
       <rect width="1" height="1" fill="url(#smallGrid)" />
-      <path d="M 1 0 L 0 0 0 1"
+      <path
+d="M 1 0 L 0 0 0 1"
         fill="none"
         stroke="#fff"
         stroke-width="0.001" />

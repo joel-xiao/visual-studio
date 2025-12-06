@@ -1,6 +1,6 @@
 <template>
 <div class="schema-blends">
-  <div class="schema-blends-item" v-for="(item, index) in list" :key="index">
+  <div v-for="(item, index) in list" :key="index" class="schema-blends-item">
     <CBlend
       v-model="list[index]"
       v-bind="$attrs"

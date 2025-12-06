@@ -2,13 +2,13 @@
   <div class="editor-resource-library">
     <div class="component-header">
       <div class="search">
-        <CInput icon="icon-sousuo" v-model="keyword" input @update="onUpdateKeyword" :focus="false" placeholder="搜索组件..." />
+        <CInput v-model="keyword" icon="icon-sousuo" input :focus="false" placeholder="搜索组件..." @update="onUpdateKeyword" />
       </div>
-      <Icon button @click="onSwitchType" size="small" :src="currentType.icon" class="icon-btn" />
+      <Icon button size="small" :src="currentType.icon" class="icon-btn" @click="onSwitchType" />
     </div>
 
     <div class="component-masters">
-      <div class="master-collapse" v-for="(item, idx) in Data" :key="(item.id || '') + idx">
+      <div v-for="(item, idx) in Data" :key="(item.id || '') + idx" class="master-collapse">
         <div class="master-collapse__title" @click="onArrow(item)">
           <div class="master-collapse__title__text">{{ item.name }}</div>
           <Icon src="icon-shouqi2" class="arrow" :class="{ 'active': item.AFold }" />

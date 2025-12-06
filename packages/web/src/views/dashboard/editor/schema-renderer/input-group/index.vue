@@ -2,17 +2,17 @@
 <div class="schema-input-group">
   <ul class="schema-input-group__options">
     <li>
-      <Input v-model="modelValue[0]" :icon="data.icon[0]" :placeholder="data.isMore ? '' : '多个值'" @update="onUpdate" />
+      <Input v-model="data.modelValue[0]" :icon="data.icon[0]" :placeholder="data.isMore ? '' : '多个值'" @update="onUpdate" />
     </li>
     <template v-if="data.isMore">
       <li>
-        <Input v-model="modelValue[1]" :icon="data.icon[1]" @update="onUpdate" />
+        <Input v-model="data.modelValue[1]" :icon="data.icon[1]" @update="onUpdate" />
       </li>
       <li>
-        <Input v-model="modelValue[2]" :icon="data.icon[2]" @update="onUpdate" />
+        <Input v-model="data.modelValue[2]" :icon="data.icon[2]" @update="onUpdate" />
       </li>
       <li>
-        <Input v-model="modelValue[3]" :icon="data.icon[3]" @update="onUpdate" />
+        <Input v-model="data.modelValue[3]" :icon="data.icon[3]" @update="onUpdate" />
       </li>
     </template>
   </ul>
@@ -30,7 +30,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { reactive, nextTick } from 'vue';
+import { reactive, nextTick, watch } from 'vue';
 import Input from '../../../ui/controls/c-input/index.vue';
 import Button from '../../../ui/controls/c-button/index.vue';
 
@@ -48,8 +48,13 @@ const emit = defineEmits(['update:modelValue', 'update']);
 const data = reactive({
   icon: Array.isArray(props.icon) ? props.icon : [props.icon, props.icon, props.icon, props.icon],
   isMore: false,
-  modelValue: props.modelValue,
+  modelValue: [...props.modelValue],
   oldValue: props.modelValue[0]
+});
+
+watch(() => props.modelValue, (newVal) => {
+  data.modelValue = [...newVal];
+  data.oldValue = newVal[0];
 });
 
 function onUpdate() {
@@ -62,7 +67,8 @@ function onUpdate() {
   }
 
   data.oldValue = data.modelValue[0];
-  emit('update', props.modelValue);
+  emit('update', [...data.modelValue]);
+  emit('update:modelValue', [...data.modelValue]);
 }
 </script>
 

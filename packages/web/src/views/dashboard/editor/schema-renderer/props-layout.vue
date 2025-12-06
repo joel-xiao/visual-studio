@@ -1,6 +1,6 @@
 <template>
-<div class="schema-props-layout" ref="propsLayout" :key="keyValue">
-  <div class="schema-props-layout_title" v-if="showLabel">
+<div ref="propsLayout" :key="keyValue" class="schema-props-layout">
+  <div v-if="showLabel" class="schema-props-layout_title">
     <div class="schema-props-layout_title-text">{{ label }}</div>
     <div class="schema-props-layout_title-right_content">
       <slot name="title"></slot>

@@ -1,7 +1,7 @@
 <template>
   <div class="c-select">
     <BasicBox ref="boxRef" :type="Type" @click="onOpenWrapper('wrapper')">
-      <BasicIcon :lock="lock" :icon="icon" @mousedown="onMouseDown" :style="iconStyle" />
+      <BasicIcon :lock="lock" :icon="icon" :style="iconStyle" @mousedown="onMouseDown" />
       <div v-if="Type === 'input-select'" class="c-select-label-wrapper">
         <BasicInput
           v-model="modelValue"

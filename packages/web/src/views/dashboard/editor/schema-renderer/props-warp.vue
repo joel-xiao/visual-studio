@@ -1,18 +1,19 @@
 <template>
-<PropsLayout :keyValue="'props-warp-' + keyValue" :label="propsType.label">
-  <PropsItem v-for="(props, idx) in Schema" :key="idx" :gridTemplateColumns="getGridTemplateColumns(idx)">
-    <PropsCtrl
-      v-for="(prop, ctrl_idx) in props"
-      :key="ctrl_idx"
-      :dataType="prop.type"
-      :ctrl="prop.ctrl"
-      :icon="prop.icon"
-      :ctrlType="prop.ctrl_type || ''"
-      v-model="modelValue[prop.key!]"
-      :options="prop?.options"
-      @update="onUpdate(prop.key!, $event)"
-      @click="onClick(prop)"
-    />
+<PropsLayout :key-value="'props-warp-' + keyValue" :label="propsType.label">
+  <PropsItem v-for="(schemaRow, idx) in Schema" :key="idx" :grid-template-columns="getGridTemplateColumns(idx)">
+    <template v-for="(prop, ctrl_idx) in schemaRow" :key="ctrl_idx">
+      <PropsCtrl
+        v-if="prop.key"
+        :model-value="modelValue[prop.key]"
+        :data-type="prop.type"
+        :ctrl="prop.ctrl"
+        :icon="prop.icon"
+        :ctrl-type="prop.ctrl_type || ''"
+        :options="prop?.options"
+        @update="onUpdate(prop.key, $event)"
+        @click="onClick(prop)"
+      />
+    </template>
   </PropsItem>
 </PropsLayout>
 </template>

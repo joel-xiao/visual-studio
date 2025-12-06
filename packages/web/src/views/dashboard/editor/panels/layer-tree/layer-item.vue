@@ -38,21 +38,21 @@ const onCommand = function (
 };
 </script>
 <template>
-  <div class="layer-item" v-for="item in data" :key="item.id" :class="{ 'layer-item_check': item.select }">
-    <div class="layer-item-nav" @click="onSelect(item)" :class="{ active: item.select }" :style="layerItemStyle">
+  <div v-for="item in data" :key="item.id" class="layer-item" :class="{ 'layer-item_check': item.select }">
+    <div class="layer-item-nav" :class="{ active: item.select }" :style="layerItemStyle" @click="onSelect(item)">
       <div class="layer-item-left">
-        <Icon class="arrow" block src="icon-zhankai" :class="{ active: item.AFold }" v-if="item?.children?.length" @click.stop="onArrow(item)" />
-        <span class="dot" v-else></span>
-        <Icon class="name-icon" block v-if="item.icon || itemIcon" :src="item.icon || itemIcon" />
-        <span class="name-icon-margin" v-else></span>
+        <Icon v-if="item?.children?.length" class="arrow" block src="icon-zhankai" :class="{ active: item.AFold }" @click.stop="onArrow(item)" />
+        <span v-else class="dot"></span>
+        <Icon v-if="item.icon || itemIcon" class="name-icon" block :src="item.icon || itemIcon" />
+        <span v-else class="name-icon-margin"></span>
         <span class="layer-item-labe">{{ item.name }}</span>
       </div>
-      <div class="layer-item-handle" v-if="item.handle !== false">
-        <Icon button v-for="cmd in itemMenus" :key="cmd.id" :class="cmd.id" @click.stop.prevent="onCommand($event, cmd, item)" :src="cmd.icon" />
+      <div v-if="item.handle !== false" class="layer-item-handle">
+        <Icon v-for="cmd in itemMenus" :key="cmd.id" button :class="cmd.id" :src="cmd.icon" @click.stop.prevent="onCommand($event, cmd, item)" />
       </div>
     </div>
-    <div class="layer-item-swapper" v-if="!!item?.children?.length" v-show="item.AFold">
-      <LayerItem :recursion="recursion + 1" @select="onSelect" @command="onCommand" :data="item.children" :itemIcon="itemIcon" :itemMenus="itemMenus" />
+    <div v-if="!!item?.children?.length" v-show="item.AFold" class="layer-item-swapper">
+      <LayerItem :recursion="recursion + 1" :data="item.children" :item-icon="itemIcon" :item-menus="itemMenus" @select="onSelect" @command="onCommand" />
     </div>
   </div>
 </template>

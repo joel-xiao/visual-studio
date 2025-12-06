@@ -1,7 +1,7 @@
 <template>
   <div class="editor-tab-bar">
     <div class="tab-bar__list">
-      <div class="tab_item transition" :class="{ 'active': modelValue === item }" v-for="(item, idx) in data" :key="idx" @click="onSelect(item)">
+      <div v-for="(item, idx) in data" :key="idx" class="tab_item transition" :class="{ 'active': modelValue === item }" @click="onSelect(item)">
         {{ item.name }}
       </div>
     </div>

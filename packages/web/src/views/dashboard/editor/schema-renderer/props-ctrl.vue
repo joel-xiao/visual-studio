@@ -3,7 +3,7 @@
   <template v-if="layout === 'inline'">
     <div class="editor-schema-renderer-props-ctrl-label">{{ label }}</div>
   </template>
-  <component v-if="isComponent(ctrl)" :is="getComponent(ctrl)" :type="ctrlType" v-bind="$attrs" />
+  <component :is="getComponent(ctrl)" v-if="isComponent(ctrl)" :type="ctrlType" v-bind="$attrs" />
   <div v-else>IS NO {{ ctrl }}</div>
 </div>
 </template>

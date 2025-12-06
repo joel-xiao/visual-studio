@@ -1,7 +1,7 @@
 <template>
 <div
-  class="editor-drag-resize"
   v-drag-resize="dragDataComputed"
+  class="editor-drag-resize"
   >
   <div class="editor-drag-resize__inner">
     <slot></slot>

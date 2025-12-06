@@ -1,23 +1,23 @@
 <template>
-<PropsLayout keyValue="component-layout" class="component-layout">
+<PropsLayout key-value="component-layout" class="component-layout">
   <PropsItem>
-    <Input v-model="modelValue.x" @update="onUpdate('x', $event)" />
-    <Input v-model="modelValue.y" @update="onUpdate('y', $event)" />
+    <Input :model-value="modelValue.x" @update="onUpdate('x', $event)" />
+    <Input :model-value="modelValue.y" @update="onUpdate('y', $event)" />
   </PropsItem>
   <PropsItem>
-    <Input v-model="modelValue.width" @update="onUpdate('width', $event)" />
-    <Input v-model="modelValue.height" @update="onUpdate('height', $event)" />
+    <Input :model-value="modelValue.width" @update="onUpdate('width', $event)" />
+    <Input :model-value="modelValue.height" @update="onUpdate('height', $event)" />
     <Button v-model="data.isLockScale" type="status-button" />
   </PropsItem>
   <PropsItem>
-    <Input v-model="modelValue.rotate" @update="onUpdate('rotate', $event)" />
+    <Input :model-value="modelValue.rotate" @update="onUpdate('rotate', $event)" />
     <div class="component-layout-rotate">
       <Button @click="onRotate('x')" />
       <Button @click="onRotate('y')" />
     </div>
   </PropsItem>
-  <PropsItem :gridTemplateColumns="['largely']">
-    <Radius v-model="modelValue.radius" :icon="['icon-radius-tl', 'icon-radius-tr', 'icon-radius-br', 'icon-radius-bl']" @update="onUpdate('radius', $event)" />
+  <PropsItem :grid-template-columns="['largely']">
+    <Radius :model-value="modelValue.radius" :icon="['icon-radius-tl', 'icon-radius-tr', 'icon-radius-br', 'icon-radius-bl']" @update="onUpdate('radius', $event)" />
   </PropsItem>
 </PropsLayout>
 </template>
@@ -69,9 +69,10 @@ const onUpdate = function (key: string, value: string | number | boolean | undef
 };
 
 const onRotate = function (type: string) {
-  const modelValue = reactive(props.modelValue);
-  if (type === 'x') modelValue.rotate = 180 - modelValue.rotate;
-  if (type === 'y') modelValue.rotate = -modelValue.rotate;
+  let newRotate = props.modelValue.rotate;
+  if (type === 'x') newRotate = 180 - newRotate;
+  if (type === 'y') newRotate = -newRotate;
+  emit('update', ['rotate', newRotate]);
 };
 </script>
 

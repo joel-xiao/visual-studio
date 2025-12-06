@@ -1,23 +1,23 @@
 <template>
 <div class="editor-schema-renderer">
-  <div class="editor-schema-renderer-wrapper" ref="panelSchemaWrapperRef">
+  <div ref="panelSchemaWrapperRef" class="editor-schema-renderer-wrapper">
     <template v-for="item in PanelSchemaTypes.propsTypes" :key="item.key">
       <template v-if="isComponent(item.name) && item.name !== 'PANEL_PROPS_WRAP'">
-        <component :is="getComponent(item.name) as any" v-model="PropsData[item.key]" @update="onUpdate(item.key, item.schema as any, $event)" />
+        <component :is="getComponent(item.name) as Component" v-model="PropsData[item.key]" @update="onUpdate(item.key, item.schema as SchemaKeyTypes, $event)" />
       </template>
       <template v-else>
-        <component :is="getComponent('PANEL_PROPS_WRAP') as any" :keyValue="item.key" :propsType="item" v-model="PropsData[item.key]" @update="onUpdate(item.key, item.schema as any, $event)" />
+        <component :is="getComponent('PANEL_PROPS_WRAP') as Component" v-model="PropsData[item.key]" :key-value="item.key" :props-type="item" @update="onUpdate(item.key, item.schema as SchemaKeyTypes, $event)" />
       </template>
     </template>
   </div>
-  <Tabs :style="TabsStyle" :tabs="PanelSchemaTypes.categorySchemas as any" @select-tab="onSelectTab">
+  <Tabs :style="TabsStyle" :tabs="PanelSchemaTypes.categorySchemas as CategorySchemaTypes" @select-tab="onSelectTab">
     <template v-if="currentTab">
       <template v-for="item in currentTab.propsTypes" :key="item.key">
         <template v-if="isComponent(item.name) && item.name !== 'PANEL_PROPS_WRAP'">
-          <component :is="getComponent(item.name) as any" v-model="PropsData[item.key]" @update="onUpdate(item.key, item.schema as any, $event)" />
+          <component :is="getComponent(item.name) as Component" v-model="PropsData[item.key]" @update="onUpdate(item.key, item.schema as SchemaKeyTypes, $event)" />
         </template>
         <template v-else>
-          <component :is="getComponent('PANEL_PROPS_WRAP') as any" :keyValue="item.key" :propsType="item" v-model="PropsData[item.key]" @update="onUpdate(item.key, item.schema as any, $event)" />
+          <component :is="getComponent('PANEL_PROPS_WRAP') as Component" v-model="PropsData[item.key]" :key-value="item.key" :props-type="item" @update="onUpdate(item.key, item.schema as SchemaKeyTypes, $event)" />
         </template>
       </template>
     </template>
@@ -27,6 +27,7 @@
 
 <script setup lang="ts">
 import { computed, reactive, markRaw, watchEffect, ref } from 'vue';
+import type { Component } from 'vue';
 import { cloneDeep } from 'lodash';
 import PropsWarp from './props-warp.vue';
 import Layout from './layout/index.vue';

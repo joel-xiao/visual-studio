@@ -2,23 +2,24 @@ ya
 <template>
 <div class="editor-left-panel">
   <div class="panel-tab_bar">
-    <PanelTabBar :data="tabBars" v-model="selectTab" @select="onSelect" />
+    <PanelTabBar v-model="selectTab" :data="tabBars" @select="onSelect" />
   </div>
   <PanelLayer
     v-if="tabBars[0].show"
     v-show="selectTab === tabBars[0]"
     :data="layerData"
-    :itemMenus="layerMenus"
+    :item-menus="layerMenus"
+    tem-icon="icon-wenjianjia"
     @select="onLayerSelect"
     @command="onLayerCommand"
-    temIcon="icon-wenjianjia"
     />
-  <div class="panel-component"
-    v-if="tabBars[1].show"
+  <div
+v-if="tabBars[1].show"
     v-show="selectTab === tabBars[1]"
+    class="panel-component"
     >
     <div class="panel-component-tab_bar">
-      <PanelTabBar :data="componentTabBars" v-model="componentTab" />
+      <PanelTabBar v-model="componentTab" :data="componentTabBars" />
     </div>
     <PanelComponent :drag="true" :data="componentData" @drag-start="onDragStart" @drag-stop="onDragStop" />
   </div>

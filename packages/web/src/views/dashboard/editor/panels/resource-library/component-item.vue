@@ -38,10 +38,11 @@ const currentData = computed(() => props.data as PanelComponentData);
 </script>
 <template>
   <template v-if="Array.isArray(data.children) && data.children.length > 0">
-    <div class="component-box__item-wrapper" v-for="(item, idx) in Items" v-show="currentData.component || currentData.AFold" :key="(item.id || '') + idx">
+    <div v-for="(item, idx) in Items" v-show="currentData.component || currentData.AFold" :key="(item.id || '') + idx" class="component-box__item-wrapper">
       <template v-if="currentData.component">
         <div class="component-box__swapper" :class="typeof getType === 'function' ? getType() : ''">
-          <div class="component-item__content"
+          <div
+class="component-item__content"
             :draggable="drag ? true : false"
             @dragstart="onDragStart($event, item)"
             @dragend="onDragStop"
@@ -67,11 +68,11 @@ const currentData = computed(() => props.data as PanelComponentData);
       </template>
 
       <template v-if="!item.component">
-        <ComponentItem :data="item" :drag="drag" @drag-start="onDragStart" @drag-stop="onDragStop" v-if="Array.isArray(item.children) && item.children.length > 0" />
+        <ComponentItem v-if="Array.isArray(item.children) && item.children.length > 0" :data="item" :drag="drag" @drag-start="onDragStart" @drag-stop="onDragStop" />
       </template>
       <template v-else>
         <div class="component-box__list">
-          <ComponentItem :data="item" :drag="drag" @drag-start="onDragStart" @drag-stop="onDragStop" v-if="Array.isArray(item.children) && item.children.length > 0" />
+          <ComponentItem v-if="Array.isArray(item.children) && item.children.length > 0" :data="item" :drag="drag" @drag-start="onDragStart" @drag-stop="onDragStop" />
         </div>
       </template>
     </div>

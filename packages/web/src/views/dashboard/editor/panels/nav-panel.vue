@@ -10,7 +10,7 @@
   </div>
 
   <div class="nav-panel-content">
-    <span class="nav-panel-content-span" :class="{ active: currentTab.id === item.id }" :key="item.id" v-for="(item, idx) in tabs" @click="onTabSelect(item, idx)">{{ item.label }}</span>
+    <span v-for="(item, idx) in tabs" :key="item.id" class="nav-panel-content-span" :class="{ active: currentTab.id === item.id }" @click="onTabSelect(item, idx)">{{ item.label }}</span>
   </div>
   <div class="nav-panel-right">
     <CButton class="share-btn" @click="onShare">分享</CButton>

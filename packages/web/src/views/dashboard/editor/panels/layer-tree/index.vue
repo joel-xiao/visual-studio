@@ -90,11 +90,11 @@ const onCommand = function (
 <template>
   <div class="editor-layer-tree">
     <LayerItem
+      :data="tree"
+      :item-icon="itemIcon"
+      :item-menus="itemMenus"
       @select="onNavSelect"
       @command="onCommand"
-      :data="tree"
-      :itemIcon="itemIcon"
-      :itemMenus="itemMenus"
     />
     <ICClickMenu
       v-model="clickMenu.show"
