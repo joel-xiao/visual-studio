@@ -1,8 +1,8 @@
 import { IScene } from '../types';
 import { aiApi } from '@/service/api/ai';
-import { chartColorsSearch, type ChartColorsNameType, globalThemeJson } from '../../../../hooks/chart-themes-context/data';
-import { useNodeContext } from '../../../../hooks/node-context';
-import { useChartThemesContext } from '../../../../hooks/chart-themes-context';
+import { chartColorsSearch, type ChartColorsNameType, globalThemeJson } from '../../hooks/chart-themes-context/data';
+import { useNodeContext } from '../../hooks/node-context';
+import { useChartThemesContext } from '../../hooks/chart-themes-context';
 
 // 用户提供的示例 JSON 结构，作为 Few-Shot 示例或 Schema 参考
 const layoutSchema = {
@@ -94,7 +94,7 @@ const layoutSchema = {
  * 辅助函数：解析 AI 返回的 JSON 内容
  * 增强版：支持 Markdown 代码块提取、大括号匹配提取、宽松 JSON 解析 (new Function)
  */
-const parseJsonContent = <T = unknown>(content: string): T => {
+export const parseJsonContent = <T = unknown>(content: string): T => {
   let jsonStr = '';
 
   // 1. 优先尝试匹配 Markdown 代码块
@@ -251,7 +251,7 @@ ${JSON.stringify(layoutSchema)}
  * 角色 2: 数据可视化专家
  * 职责: 为给定的图表节点生成真实的 ECharts 配置数据。
  */
-const generateChartData = async (chartName: string, chartType: string, themeColors: string[], themeConfig: Record<string, unknown>, onStream?: (content: string) => void): Promise<Record<string, unknown>> => {
+export const generateChartData = async (chartName: string, chartType: string, themeColors: string[], themeConfig: Record<string, unknown>, onStream?: (content: string) => void): Promise<Record<string, unknown>> => {
   const systemPrompt = `你是一位 ECharts 数据可视化专家。
 请为类型为 "${chartType}"，名称为 "${chartName}" 的图表生成一个 ECharts 的 option 配置对象 (JSON)。
 
@@ -309,7 +309,7 @@ export const DashboardDesignScene: IScene = {
 
   async run(addMessage, generateApi, params) {
     if (!params) {
-        addMessage('assistant', '👋 您好！我是您的智能大屏设计助手。\n\n我可以帮您规划大屏布局并自动生成图表数据。请告诉我您的需求，例如：\n> “帮我设计一个销售监控大屏，包含销售趋势、地区分布和产品占比图”');
+        addMessage('assistant', '👋 您好！我是您的智能大屏设计助手。\n请先选择一个喜欢的主题风格，或者直接描述您的大屏需求。', 'theme-selection');
         return;
     }
 
@@ -319,6 +319,10 @@ export const DashboardDesignScene: IScene = {
 
     const knownThemes = Object.keys(chartColorsSearch) as ChartColorsNameType[];
     let themeDetected = false;
+
+    // 判断用户输入是否仅为主题名称（通常来自点击主题选择器）
+    const isThemeSelection = knownThemes.some(t => t.toLowerCase() === params.trim().toLowerCase());
+
     for (const t of knownThemes) {
         if (params.toLowerCase().includes(t.toLowerCase())) {
             themeName = t;
@@ -329,8 +333,19 @@ export const DashboardDesignScene: IScene = {
 
     if (themeDetected) {
         setTheme(themeName);
-        addMessage('assistant', `🎨 已识别设计风格: **${themeName}**，将为您应用相应的主题配色。`);
+        if (isThemeSelection) {
+             addMessage('assistant', `🎨 已切换主题为: **${themeName}**。\n请描述您想要设计的大屏内容，例如：\n> “帮我设计一个智慧城市监控大屏”\n> “销售数据分析看板，包含地图和趋势图”`);
+             return;
+        } else {
+             addMessage('assistant', `🎨 已识别设计风格: **${themeName}**，将为您应用相应的主题配色。`);
+        }
     } else {
+        // 如果没有识别到主题，且不是纯主题选择，则使用当前主题继续
+        // 但如果输入太短（< 4字符）且不是明确指令，可能是误触，可以提示
+        if (params.length < 2) {
+             addMessage('assistant', '请描述更详细的大屏需求，例如：“设计一个生产监控看板”。');
+             return;
+        }
         addMessage('assistant', `🎨 使用当前主题: **${themeName}** 进行设计。`);
     }
 

@@ -10,6 +10,7 @@ const config: {
       tab_bar_height: 42,
       left_menu_width: 241,
       right_menu_width: 252,
+      ai_panel_width: 350,
       ruler_size: 18
     }
   })

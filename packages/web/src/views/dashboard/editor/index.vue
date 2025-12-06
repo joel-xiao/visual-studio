@@ -11,13 +11,13 @@
 
 <script setup lang="ts">
 import NavPanel from './panels/nav-panel.vue';
-import AIPanel from './panels/ai-panel/index.vue';
+import AIPanel from './panels/ai-panel.vue';
 // import ToolbarPanel from './panels/toolbar-panel.vue';
 import LeftPanel from './panels/left-panel.vue';
 import RightPanel from './panels/right-panel.vue';
 import Canvas from './canvas/index.vue';
 
-import { ref, reactive, onMounted, onUnmounted } from 'vue';
+import { ref, reactive, onMounted, onUnmounted, computed } from 'vue';
 
 const activeTab = ref('design');
 const handleTabChange = (tabId: string) => {
@@ -73,6 +73,9 @@ defineExpose({ init });
 //  Get Layout Config
 const { getConfig } = useConfig();
 const layout = getConfig('layout');
+const rightMenuWidth = computed(() => {
+  return activeTab.value === 'ai' ? layout.ai_panel_width : layout.right_menu_width;
+});
 
 // Create  Node
 const { install: initIEditorData } = useNodeContext();
@@ -115,7 +118,7 @@ onUnmounted(() => {
   --db-editor-tool-bar-height: v-bind(`${layout.tool_bar_height}px`);
   --db-editor-tab-bar-height: v-bind(`${layout.tab_bar_height}px`);
   --db-editor-left-menu-width: v-bind(`${layout.left_menu_width}px`);
-  --db-editor-right-menu-width: v-bind(`${layout.right_menu_width}px`);
+  --db-editor-right-menu-width: v-bind(`${rightMenuWidth}px`);
   position: relative;
   width: 100%;
   height: 100%;
