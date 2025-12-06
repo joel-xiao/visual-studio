@@ -7,13 +7,13 @@
   <PropsItem>
     <Input :model-value="modelValue.width" @update="onUpdate('width', $event)" />
     <Input :model-value="modelValue.height" @update="onUpdate('height', $event)" />
-    <Button v-model="data.isLockScale" type="status-button" />
+    <Button v-model="data.isLockScale" type="status-button" icon="icon-locking-ratio" />
   </PropsItem>
   <PropsItem>
     <Input :model-value="modelValue.rotate" @update="onUpdate('rotate', $event)" />
     <div class="component-layout-rotate">
-      <Button @click="onRotate('x')" />
-      <Button @click="onRotate('y')" />
+      <Button icon="icon-reverse-x" @click="onRotate('x')" />
+      <Button icon="icon-reverse-y" @click="onRotate('y')" />
     </div>
   </PropsItem>
   <PropsItem :grid-template-columns="['largely']">
@@ -32,7 +32,7 @@ import { reactive, watch } from 'vue';
 import PropsLayout from '../props-layout.vue';
 import PropsItem from './../props-item.vue';
 import Input from '../../../ui/controls/c-input/index.vue';
-import CButton from '../../../ui/controls/c-button/index.vue';
+import Button from '../../../ui/controls/c-button/index.vue';
 import Radius from './../input-group/index.vue';
 
 type PanelSchemaLayout = {

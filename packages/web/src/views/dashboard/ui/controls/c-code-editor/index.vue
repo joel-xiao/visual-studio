@@ -8,7 +8,7 @@
       style="height: 200px"
     />
     <div class="c-code-editor-expand">
-      <BasicIcon icon="icon-kuozhan" hover @click="openModal" />
+      <BasicIcon icon="icon-spread-out" hover @click="openModal" />
     </div>
   </div>
 

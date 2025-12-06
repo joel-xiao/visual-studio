@@ -3,14 +3,13 @@
   <PropsItem v-for="(schemaRow, idx) in Schema" :key="idx" :grid-template-columns="getGridTemplateColumns(idx)">
     <template v-for="(prop, ctrl_idx) in schemaRow" :key="ctrl_idx">
       <PropsCtrl
-        v-if="prop.key"
-        :model-value="modelValue[prop.key]"
+        :model-value="modelValue[prop.key || '']"
         :data-type="prop.type"
         :ctrl="prop.ctrl"
         :icon="prop.icon"
         :ctrl-type="prop.ctrl_type || ''"
         :options="prop?.options"
-        @update="onUpdate(prop.key, $event)"
+        @update="onUpdate(prop.key || '', $event)"
         @click="onClick(prop)"
       />
     </template>

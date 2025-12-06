@@ -61,7 +61,7 @@ const schema: ISchemaExport = {
         size: 'middle'
       },
       {
-        key: '',
+        key: 'reverse-y',
         type: Boolean,
         default: false,
         icon: 'icon-reverse-y',
@@ -74,7 +74,7 @@ const schema: ISchemaExport = {
         }
       },
       {
-        key: '',
+        key: 'reverse-x',
         type: Boolean,
         default: false,
         icon: 'icon-reverse-x',

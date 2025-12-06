@@ -11,7 +11,6 @@
           @update="onMixUpdate"
         />
       </div>
-      <div class="c-blend-input">
         <BasicInput
           class="c-blend-input"
           v-bind="$attrs"
@@ -22,7 +21,6 @@
           @focus="onFocus"
           @blur="onBlur"
         />
-      </div>
 
       <!-- Eye Icon -->
        <BasicIcon hover :icon="visibleModel ? 'icon-eye' : 'icon-eye-close'" :lock="lock" @click="toggleVisible" />
@@ -149,11 +147,11 @@ function toggleVisible() {
     display: flex;
     align-items: center;
     margin-right: 8px;
-    width: 50%;
+    width: 65%;
   }
 
   .c-blend-input {
-    width: 60px;
+    width: calc(35%)
   }
 }
 </style>
