@@ -1,5 +1,5 @@
 <template>
-  <v-chart class="chart" :option="option" autoresize />
+  <BaseChart :config="config" :default-option="defaultOption" />
 </template>
 
 <script setup lang="ts">
@@ -12,8 +12,7 @@ import {
   LegendComponent,
   GridComponent
 } from 'echarts/components';
-import VChart from 'vue-echarts';
-import { ref } from 'vue';
+import BaseChart from '../components/BaseChart.vue';
 
 use([
   CanvasRenderer,
@@ -24,9 +23,11 @@ use([
   GridComponent
 ]);
 
-// provide(THEME_KEY, 'dark');
+const props = defineProps<{
+  config?: IComponentProps;
+}>();
 
-const option = ref({
+const defaultOption = {
   xAxis: {
     data: ['2017-10-24', '2017-10-25', '2017-10-26', '2017-10-27']
   },
@@ -42,12 +43,5 @@ const option = ref({
       ]
     }
   ]
-});
+};
 </script>
-
-<style>
-.chart {
-  height: var(--node-height);
-  width: var(--node-width);
-}
-</style>

@@ -1,5 +1,5 @@
 <template>
-  <v-chart class="chart" :option="option" autoresize />
+  <BaseChart :config="config" :default-option="defaultOption" />
 </template>
 
 <script setup lang="ts">
@@ -7,14 +7,15 @@ import { use } from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
 import { RadarChart } from 'echarts/charts';
 import { TitleComponent, TooltipComponent, LegendComponent } from 'echarts/components';
-import VChart from 'vue-echarts';
-import { ref } from 'vue';
+import BaseChart from '../components/BaseChart.vue';
 
 use([CanvasRenderer, RadarChart, TitleComponent, TooltipComponent, LegendComponent]);
 
-// provide(THEME_KEY, 'dark');
+const props = defineProps<{
+  config?: IComponentProps;
+}>();
 
-const option = ref({
+const defaultOption = {
   title: {
     text: 'Basic Radar Chart'
   },
@@ -48,12 +49,5 @@ const option = ref({
       ]
     }
   ]
-});
+};
 </script>
-
-<style>
-.chart {
-  height: var(--node-height);
-  width: var(--node-width);
-}
-</style>
