@@ -30,24 +30,23 @@ interface ISchemaArrayData extends IDefaultSchemaKeyData {
   icon?: string | string[];
   default: number[];
 }
+
+declare interface BlendType {
+  mix: string;
+  opacity: number | string;
+  visible: boolean;
+}
+
 interface ISchemaBlendData extends IDefaultSchemaKeyData {
   type: ObjectConstructor;
   ctrl: 'C_BLEND';
-  default: {
-    mix: string;
-    opacity: number;
-    visible: boolean;
-  };
+  default: BlendType;
 }
 
 interface ISchemaBlendsData extends IDefaultSchemaKeyData {
   type: ArrayConstructor;
   ctrl: 'BLENDS';
-  default: {
-    mix: string;
-    opacity: number;
-    visible: boolean;
-  }[];
+  default: BlendType[];
 }
 interface ISchemaFunctionData extends IDefaultSchemaKeyData {
   type: FunctionConstructor;

@@ -1,4 +1,6 @@
-declare type ComponentProp = { [key: string]: number | string | number[] | boolean | undefined };
+declare type ComponentPropValue = number | string | number[] | boolean | { [key: string]: any }[] | undefined;
+
+declare type ComponentProp = { [key: string]: ComponentPropValue };
 
 declare interface IComponentProps {
   [key: string]: ComponentProp;

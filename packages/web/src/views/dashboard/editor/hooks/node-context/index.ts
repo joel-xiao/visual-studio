@@ -167,8 +167,8 @@ class CreateNodeContext {
     id: string,
     opts:
       | undefined
-      | { key: string; value: number | string | boolean | undefined | number[] }
-      | { key: string; value: number | string | boolean | undefined | number[] }[],
+      | { key: string; value: ComponentPropValue }
+      | { key: string; value: ComponentPropValue }[],
     change_type = ''
   ): void {
     const node = this.#data?.nodes.find(node => node.id === id);

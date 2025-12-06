@@ -19,7 +19,7 @@ const schema: IComponentSchemaExport = {
       type: 'schema',
       schema: 'COMMON_LAYER',
       default: {
-        layer: [{
+        blends: [{
         mix: 'normal',
         opacity: 1,
         visible: true
@@ -29,26 +29,6 @@ const schema: IComponentSchemaExport = {
   ],
 
   categorySchemas: [
-    // {
-    //   name: '图表',
-    //   icon: '',
-    //   category: 'CHART',
-
-    //   schemas: [
-    //     {
-    //       type: 'schema',
-    //       schema: 'COMMON_LAYOUT',
-    //       default: {
-    //         x: 0,
-    //         y: 0,
-    //         width: 300,
-    //         height: 300,
-    //         rotate: 0,
-    //         radius: [0, 0, 0, 0]
-    //       }
-    //     }
-    //   ],
-    // },
     {
       name: '标题',
       icon: '',
