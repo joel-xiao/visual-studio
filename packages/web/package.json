@@ -13,6 +13,7 @@
     "@tauri-apps/api": "^2.9.0",
     "axios": "^1.13.2",
     "echarts": "^6.0.0",
+    "monaco-editor": "^0.55.1",
     "naive-ui": "^2.43.1",
     "pinia": "^3.0.4",
     "pinia-plugin-persist": "^1.0.0",
