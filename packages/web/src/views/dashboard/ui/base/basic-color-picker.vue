@@ -1,5 +1,5 @@
-<template lang="pug">
-ColorPicker(v-bind="$attrs")
+<template>
+<ColorPicker v-bind="$attrs" />
 </template>
 
 <script setup lang="ts"></script>

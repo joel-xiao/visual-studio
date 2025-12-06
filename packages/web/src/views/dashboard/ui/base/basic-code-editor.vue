@@ -1,12 +1,13 @@
-<template lang="pug">
-div(class="basic-code-editor")
-  CodeEditor(
+<template>
+<div class="basic-code-editor">
+  <CodeEditor
     v-model="modelValue"
     :language="language"
     :theme="theme"
     :read-only="readOnly"
     @change="onChange"
-  )
+  />
+</div>
 </template>
 
 <script setup lang="ts">

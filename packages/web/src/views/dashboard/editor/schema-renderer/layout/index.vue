@@ -32,7 +32,7 @@ import { reactive, watch } from 'vue';
 import PropsLayout from '../props-layout.vue';
 import PropsItem from './../props-item.vue';
 import Input from '../../../ui/controls/c-input/index.vue';
-import Button from '../../../ui/controls/c-button/index.vue';
+import CButton from '../../../ui/controls/c-button/index.vue';
 import Radius from './../input-group/index.vue';
 
 type PanelSchemaLayout = {

@@ -55,7 +55,7 @@ const Schema = computed(() => {
 
 const getGridTemplateColumns = computed(() => {
   return (idx: number) => {
-    return Array.isArray(Schema.value[idx]) ? Schema.value[idx].map(prop => prop?.size) : [];
+    return Array.isArray(Schema.value[idx]) ? Schema.value[idx].map(prop => prop?.size || 'default') : [];
   };
 });
 

@@ -1,8 +1,10 @@
-<template lang="pug">
-BasicBox(class="c-button" v-bind="$attrs" :type="type || 'button'" @update="onUpdate")
-  BasicIcon(:icon="icon" v-if="icon")
-  div( class="c-button-text" :class="buttonTextClass")
-    <slot/>
+<template>
+<BasicBox class="c-button" v-bind="$attrs" :type="type || 'button'" @update="onUpdate">
+  <BasicIcon v-if="icon" :icon="icon" />
+  <div class="c-button-text" :class="buttonTextClass">
+    <slot ></slot>
+  </div>
+</BasicBox>
 </template>
 
 <script lang="ts">

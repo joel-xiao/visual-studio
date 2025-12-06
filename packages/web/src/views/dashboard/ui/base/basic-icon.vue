@@ -26,11 +26,11 @@ const isIconText = computed(() => {
 });
 </script>
 
-<template lang="pug">
-div(class="basic-icon" :class="iconClass")
-  span(class='basic-icon-text' v-if="isIconText")
-    | {{ icon }}
-  i(class='icon-font' :class='icon' v-else-if="isIcon")
+<template>
+<div class="basic-icon" :class="iconClass">
+  <span v-if="isIconText" class="basic-icon-text">{{ icon }}</span>
+  <i v-else-if="isIcon" class="icon-font" :class="icon"></i>
+</div>
 </template>
 
 <style lang="scss">

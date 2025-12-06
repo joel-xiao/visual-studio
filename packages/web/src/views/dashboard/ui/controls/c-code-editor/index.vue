@@ -1,30 +1,36 @@
-<template lang="pug">
-div(class="c-code-editor")
-  div(class="c-code-editor-content")
-    BasicCodeEditor(
+<template>
+<div class="c-code-editor">
+  <div class="c-code-editor-content">
+    <BasicCodeEditor
       v-model="currentValue"
       :language="language"
       :theme="theme"
       style="height: 200px"
-    )
-    div(class="c-code-editor-expand")
-      BasicIcon(icon="icon-kuozhan" hover @click="openModal")
+    />
+    <div class="c-code-editor-expand">
+      <BasicIcon icon="icon-kuozhan" hover @click="openModal" />
+    </div>
+  </div>
 
-  BasicModal(
+  <BasicModal
     v-model="showModal"
     :title="label"
     width="80vw"
-  )
-    BasicCodeEditor(
+  >
+    <BasicCodeEditor
       v-model="currentValue"
       :language="language"
       :theme="theme"
       style="height: 60vh"
-    )
-    template(#footer)
-      div(class="c-code-editor-footer")
-        CButton(@click="onCancel" cancel) 取消
-        CButton(@click="onConfirm" primary) 确定
+    />
+    <template #footer>
+      <div class="c-code-editor-footer">
+        <CButton cancel @click="onCancel">取消</CButton>
+        <CButton primary @click="onConfirm">确定</CButton>
+      </div>
+    </template>
+  </BasicModal>
+</div>
 </template>
 
 <script lang="ts">

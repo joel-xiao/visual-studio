@@ -1,7 +1,8 @@
-<template lang="pug">
-BasicBox(ref='box' type="input")
-  BasicIcon(:lock="lock" :icon="icon" @mousedown="onMouseDown" :style="iconStyle")
-  BasicInput(:disabled="lock" v-bind="$attrs" :model-value="modelValue" @focus="onFocus" @blur="onBlur" @update="onUpdate" type="text")
+<template>
+<BasicBox ref="box" type="input">
+  <BasicIcon :lock="lock" :icon="icon" :style="iconStyle" @mousedown="onMouseDown" />
+  <BasicInput :disabled="lock" v-bind="$attrs" :model-value="modelValue" type="text" @focus="onFocus" @blur="onBlur" @update="onUpdate" />
+</BasicBox>
 </template>
 
 <script lang="ts">

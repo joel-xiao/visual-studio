@@ -1,5 +1,5 @@
-<template lang="pug">
-input(class="basic-input" type="input" v-model="modelValue" v-bind="$attrs" @focus="onFocus" @blur="onBlur")
+<template>
+<input v-model="modelValue" class="basic-input" type="input" v-bind="$attrs" @focus="onFocus" @blur="onBlur" />
 </template>
 
 <script setup lang="ts">

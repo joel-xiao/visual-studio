@@ -1,16 +1,24 @@
-<template lang="pug">
-teleport(to="#dashboard")
-  transition(name="fade")
-    div(v-if="modelValue" class="basic-modal-mask" @click="onMaskClick")
-      div(class="basic-modal-wrapper" :style="{ width: width }" @click.stop)
-        div(class="basic-modal-header")
-          span(class="basic-modal-title") {{ title }}
-          div(class="basic-modal-close" @click="onClose")
-            i(class="icon-font icon-guanbi")
-        div(class="basic-modal-body")
-          slot
-        div(v-if="$slots.footer" class="basic-modal-footer")
-          slot(name="footer")
+<template>
+<teleport to="#dashboard">
+  <transition name="fade">
+    <div v-if="modelValue" class="basic-modal-mask" @click="onMaskClick">
+      <div class="basic-modal-wrapper" :style="{ width: width }" @click.stop>
+        <div class="basic-modal-header">
+          <span class="basic-modal-title">{{ title }}</span>
+          <div class="basic-modal-close" @click="onClose">
+            <i class="icon-font icon-guanbi"></i>
+          </div>
+        </div>
+        <div class="basic-modal-body">
+          <slot></slot>
+        </div>
+        <div v-if="$slots.footer" class="basic-modal-footer">
+          <slot name="footer"></slot>
+        </div>
+      </div>
+    </div>
+  </transition>
+</teleport>
 </template>
 
 <script setup lang="ts">

@@ -1,21 +1,27 @@
-<template lang="pug">
-div(class="basic-select" :class="{ 'has-label': showLabel, disabled: disabled }" @click="onTriggerClick")
-  div(v-if="showLabel" class="basic-select-label" :style="{ textAlign: labelAlign }") {{ currLabel }}
-  div(class="basic-select-arrow")
-    i(class="icon-font icon-shouqi2")
-  div(ref="selectMaskRef" class="basic-select-mask" @click.stop="onClose")
-  div(ref="selectWrapperRef" class="basic-select-wrapper" @click.stop)
-    template(v-for="(item, idx) of options" :key="idx")
-      div(
+<template>
+<div class="basic-select" :class="{ 'has-label': showLabel, disabled: disabled }" @click="onTriggerClick">
+  <div v-if="showLabel" class="basic-select-label" :style="{ textAlign: labelAlign }">{{ currLabel }}</div>
+  <div class="basic-select-arrow">
+    <i class="icon-font icon-shouqi2"></i>
+  </div>
+  <div ref="selectMaskRef" class="basic-select-mask" @click.stop="onClose"></div>
+  <div ref="selectWrapperRef" class="basic-select-wrapper" @click.stop>
+    <template v-for="(item, idx) of options" :key="idx">
+      <div
         class="basic-select-item"
         :class="enterValue === item.value ? 'active' : ''"
         @mouseenter="onItemEnter(item)"
         @click.stop="onItemClick(item)"
-      )
-        div(class="basic-select-item-icon")
-          i(v-if="modelValue === item.value" class="icon-font icon-shouqi2")
-        span {{ item.label }}
-      div(v-if="item.splitLine" class="basic-select-item-split-line")
+      >
+        <div class="basic-select-item-icon">
+          <i v-if="modelValue === item.value" class="icon-font icon-shouqi2"></i>
+        </div>
+        <span>{{ item.label }}</span>
+      </div>
+      <div v-if="item.splitLine" class="basic-select-item-split-line"></div>
+    </template>
+  </div>
+</div>
 </template>
 
 <script setup lang="ts">

@@ -1,6 +1,7 @@
-<template lang="pug">
-div(class="basic-box transition" ref="boxRef" :class="boxStyle" @click="onClick" @mousedown="onMouseDown" @mouseup="onMouseUp")
-  slot
+<template>
+<div ref="boxRef" class="basic-box transition" :class="boxStyle" @click="onClick" @mousedown="onMouseDown" @mouseup="onMouseUp">
+  <slot></slot>
+</div>
 </template>
 
 <script setup lang="ts">
