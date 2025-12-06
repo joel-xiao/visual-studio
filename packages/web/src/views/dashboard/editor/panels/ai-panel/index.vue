@@ -1,30 +1,36 @@
 <script setup lang="ts">
-import { ref, nextTick, onMounted, reactive } from 'vue';
+import { ref, nextTick } from 'vue';
+import { aiApi, type IAIMessage } from '@/service/api/ai';
 
-interface ChatMessage {
+interface ChatMessage extends IAIMessage {
   id: string;
-  role: 'user' | 'ai';
-  content: string;
-  type?: 'text' | 'code' | 'action';
-  actions?: { label: string; value: string; disabled?: boolean }[];
 }
 
-const messages = ref<ChatMessage[]>([]);
+const messages = ref<ChatMessage[]>([
+  {
+    id: 'welcome',
+    role: 'assistant',
+    content: '你好！我是你的 AI 助手。请选择一个场景开始，或直接输入指令。',
+    type: 'action',
+    actions: [
+      { label: '场景1: 大屏设计', value: 'scene1' },
+      { label: '场景2: 暂定', value: 'scene2', disabled: true }
+    ]
+  }
+]);
+
 const inputValue = ref('');
-const chatContainerRef = ref<HTMLElement>();
+const loading = ref(false);
+const chatContainerRef = ref<HTMLElement | null>(null);
 
-// Scene Options
-const sceneOptions = [
-  { label: '场景1: 大屏设计', value: 'scene1' },
-  { label: '场景2: 暂定', value: 'scene2', disabled: true }
-];
+const scrollToBottom = async () => {
+  await nextTick();
+  if (chatContainerRef.value) {
+    chatContainerRef.value.scrollTop = chatContainerRef.value.scrollHeight;
+  }
+};
 
-// Initialize Chat
-onMounted(() => {
-  addMessage('ai', '你好！我是 AI 智能助手。请选择一个场景开始设计：', 'action', sceneOptions);
-});
-
-const addMessage = (role: 'user' | 'ai', content: string, type: 'text' | 'code' | 'action' = 'text', actions?: { label: string; value: string; disabled?: boolean }[]) => {
+const addMessage = (role: 'user' | 'assistant', content: string, type: 'text' | 'code' | 'action' = 'text', actions?: any[]) => {
   messages.value.push({
     id: Date.now().toString(),
     role,
@@ -35,140 +41,62 @@ const addMessage = (role: 'user' | 'ai', content: string, type: 'text' | 'code' 
   scrollToBottom();
 };
 
-const scrollToBottom = () => {
-  nextTick(() => {
-    if (chatContainerRef.value) {
-      chatContainerRef.value.scrollTop = chatContainerRef.value.scrollHeight;
-    }
-  });
-};
-
-const handleActionClick = (actionValue: string) => {
-  if (actionValue === 'scene1') {
-    addMessage('user', '开始场景1: 大屏设计');
-    processScene1();
+const handleActionClick = async (value: string) => {
+  if (value === 'scene1') {
+    await processScene1();
   }
-};
-
-const handleSend = () => {
-  if (!inputValue.value.trim()) return;
-  addMessage('user', inputValue.value);
-  const text = inputValue.value;
-  inputValue.value = '';
-
-  // Simple mock response for free text
-  setTimeout(() => {
-    addMessage('ai', `收到: "${text}"。目前仅支持点击场景按钮进行生成。`);
-  }, 500);
-};
-
-// --- Generation Logic ---
-
-const generateScene1Data = () => {
-  // Role 1: Generate base structure
-  const baseData = {
-    folder: '',
-    id: '',
-    type: '',
-    name: '',
-    nodes: [
-      {
-        parentId: '',
-        id: 'root',
-        icon: '',
-        component: 'root',
-        schema: '../../canvas/schema/default.ts',
-        name: '根容器',
-        width: 1000,
-        height: 600,
-        radius: [0, 0, 0, 0],
-        type: '',
-        x: 0,
-        y: 0,
-        z: 0,
-        select: true,
-        lock: false,
-        props: {
-          layout: {
-            width: 1000,
-            height: 600
-          },
-          fill: {
-            color: 'hsla(0, 0%, 13% , 1)'
-          }
-        }
-      }
-    ]
-  };
-
-  // Role 2: Enhance with ECharts options
-  const enhancedData = JSON.parse(JSON.stringify(baseData));
-  if (enhancedData.nodes && enhancedData.nodes.length > 0) {
-    enhancedData.nodes[0].props.code = {
-      options: {
-        title: {
-          text: 'ECharts Example',
-          textStyle: { color: '#fff' }
-        },
-        tooltip: { trigger: 'axis' },
-        legend: {
-          data: ['Sales', 'Marketing'],
-          textStyle: { color: '#ccc' }
-        },
-        grid: {
-          left: '3%',
-          right: '4%',
-          bottom: '3%',
-          containLabel: true
-        },
-        xAxis: {
-          type: 'category',
-          boundaryGap: false,
-          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-          axisLabel: { color: '#ccc' }
-        },
-        yAxis: {
-          type: 'value',
-          axisLabel: { color: '#ccc' },
-          splitLine: { lineStyle: { color: '#333' } }
-        },
-        series: [
-          {
-            name: 'Sales',
-            type: 'line',
-            stack: 'Total',
-            areaStyle: {},
-            data: [120, 132, 101, 134, 90, 230, 210]
-          },
-          {
-            name: 'Marketing',
-            type: 'line',
-            stack: 'Total',
-            areaStyle: {},
-            data: [220, 182, 191, 234, 290, 330, 310]
-          }
-        ]
-      }
-    };
-  }
-  return JSON.stringify(enhancedData, null, 2);
 };
 
 const processScene1 = async () => {
-  addMessage('ai', '正在执行多角色设计流程...');
+  // Check if last message was user clicking action, if not add user message
+  // But usually clicking an action is an implicit user intent.
+  // We can add a system message or just start.
+  addMessage('user', '执行场景1: 大屏设计');
+  loading.value = true;
 
-  await new Promise(r => setTimeout(r, 800));
-  addMessage('ai', '角色1 (布局设计师): 已生成基础大屏结构。');
+  addMessage('assistant', '正在启动多角色设计流程...');
 
-  await new Promise(r => setTimeout(r, 800));
-  addMessage('ai', '角色2 (数据可视化专家): 已补充 ECharts 图表配置并进行美化。');
+  try {
+    // Simulate internal role steps (User request: "Multi-role is internal logic")
+    await new Promise(r => setTimeout(r, 1000));
+    addMessage('assistant', '角色1 (布局设计师): 已生成基础大屏结构。');
 
-  await new Promise(r => setTimeout(r, 500));
-  const code = generateScene1Data();
-  addMessage('ai', code, 'code');
-  addMessage('ai', '代码已生成完毕！');
+    await new Promise(r => setTimeout(r, 1000));
+    addMessage('assistant', '角色2 (数据可视化专家): 正在补充 ECharts 图表配置并进行美化...');
+
+    // Call API
+    const result = await aiApi.generate('scene1', {});
+
+    addMessage('assistant', JSON.stringify(result, null, 2), 'code');
+    addMessage('assistant', '代码已生成完毕！');
+  } catch (error) {
+    addMessage('assistant', '生成失败: ' + error);
+  } finally {
+    loading.value = false;
+  }
 };
 
+const handleSend = async () => {
+  if (!inputValue.value.trim() || loading.value) return;
+
+  const content = inputValue.value;
+  inputValue.value = '';
+  addMessage('user', content);
+
+  loading.value = true;
+  try {
+    const apiMessages = messages.value.map(m => ({
+      role: m.role,
+      content: m.content
+    }));
+    const res = await aiApi.chat(apiMessages);
+    addMessage('assistant', res.reply, res.type as any, res.actions);
+  } catch (error) {
+    addMessage('assistant', '请求失败: ' + error);
+  } finally {
+    loading.value = false;
+  }
+};
 </script>
 
 <template>
@@ -179,7 +107,7 @@ const processScene1 = async () => {
 
     <div class="chat-container" ref="chatContainerRef">
       <div v-for="msg in messages" :key="msg.id" :class="['message-row', msg.role]">
-        <div class="avatar">{{ msg.role === 'ai' ? '🤖' : '👤' }}</div>
+        <div class="avatar">{{ msg.role === 'assistant' ? '🤖' : '👤' }}</div>
         <div class="message-content">
           <div v-if="msg.type === 'text'" class="text-bubble">{{ msg.content }}</div>
 
@@ -204,6 +132,14 @@ const processScene1 = async () => {
           </div>
         </div>
       </div>
+      <div v-if="loading" class="message-row assistant">
+        <div class="avatar">🤖</div>
+        <div class="message-content">
+          <div class="text-bubble loading">
+            <span>.</span><span>.</span><span>.</span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="input-area">
@@ -212,7 +148,7 @@ const processScene1 = async () => {
         placeholder="输入指令..."
         @keydown.enter.prevent="handleSend"
       ></textarea>
-      <button class="send-btn" @click="handleSend">
+      <button class="send-btn" @click="handleSend" :disabled="loading">
         <i class="iconfont icon-send"></i> 发送
       </button>
     </div>
@@ -224,8 +160,9 @@ const processScene1 = async () => {
   display: flex;
   flex-direction: column;
   position: absolute;
-  top: var(--db-editor-nav-bar-height);
+  // Position aligned with Right Panel
   right: 0;
+  top: var(--db-editor-nav-bar-height);
   bottom: 0;
   width: var(--db-editor-right-menu-width);
   border-left: 1px solid var(--db-editor-color-canvas);
@@ -268,7 +205,7 @@ const processScene1 = async () => {
         }
       }
 
-      &.ai {
+      &.assistant {
         .text-bubble {
           background-color: var(--db-color-input-background, #2c2c2c);
           border: 1px solid var(--db-border-color, #333);
@@ -277,81 +214,88 @@ const processScene1 = async () => {
       }
 
       .avatar {
-        width: 24px;
-        height: 24px;
-        font-size: 16px;
+        width: 32px;
+        height: 32px;
         display: flex;
         align-items: center;
         justify-content: center;
-        flex-shrink: 0;
+        background-color: var(--db-color-input-background, #333);
+        border-radius: 50%;
+        font-size: 16px;
       }
 
       .message-content {
         display: flex;
         flex-direction: column;
-        max-width: calc(100% - 40px);
-        overflow: hidden;
-      }
+        max-width: 85%;
+        gap: 8px;
 
-      .text-bubble {
-        padding: 8px 12px;
-        font-size: 13px;
-        line-height: 1.5;
-        word-break: break-all;
-      }
-
-      .code-block {
-        background-color: #1e1e1e;
-        border-radius: 4px;
-        padding: 8px;
-        border: 1px solid #333;
-        width: 100%;
-        overflow-x: auto;
-
-        pre {
-          margin: 0;
-          font-family: 'Menlo', 'Monaco', monospace;
-          font-size: 11px;
-          color: #d4d4d4;
-        }
-      }
-
-      .action-bubble {
-        background-color: var(--db-color-input-background, #2c2c2c);
-        padding: 12px;
-        border-radius: 0 8px 8px 8px;
-        border: 1px solid var(--db-border-color, #333);
-
-        p {
-          margin: 0 0 8px 0;
+        .text-bubble {
+          padding: 8px 12px;
           font-size: 13px;
+          line-height: 1.5;
+          word-break: break-word;
+          white-space: pre-wrap;
+
+          &.loading {
+            span {
+              animation: blink 1.4s infinite both;
+            }
+            span:nth-child(2) { animation-delay: 0.2s; }
+            span:nth-child(3) { animation-delay: 0.4s; }
+          }
         }
 
-        .action-buttons {
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
-
-          .action-btn {
-            text-align: left;
-            padding: 6px 10px;
-            background-color: var(--db-editor-color-canvas-bg, #333);
-            border: 1px solid var(--db-border-color, #444);
-            color: var(--theme-color-text);
-            border-radius: 4px;
-            cursor: pointer;
+        .code-block {
+          background-color: #1e1e1e;
+          border-radius: 4px;
+          padding: 12px;
+          width: 100%;
+          overflow-x: auto;
+          pre {
+            margin: 0;
+            font-family: 'Menlo', 'Monaco', monospace;
             font-size: 12px;
-            transition: all 0.2s;
+            color: #d4d4d4;
+          }
+        }
 
-            &:hover:not(.disabled) {
-              background-color: var(--db-color-button-primary-bg, #1890ff);
-              color: white;
-              border-color: var(--db-color-button-primary-bg, #1890ff);
-            }
+        .action-bubble {
+          background-color: var(--db-color-input-background, #2c2c2c);
+          border: 1px solid var(--db-border-color, #333);
+          border-radius: 0 8px 8px 8px;
+          padding: 12px;
 
-            &.disabled {
-              opacity: 0.5;
-              cursor: not-allowed;
+          p {
+            margin: 0 0 12px 0;
+            font-size: 13px;
+          }
+
+          .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+
+            .action-btn {
+              padding: 6px 12px;
+              background-color: var(--db-color-button-background, #333);
+              border: 1px solid var(--db-border-color, #444);
+              color: var(--theme-color-text);
+              border-radius: 4px;
+              cursor: pointer;
+              font-size: 12px;
+              transition: all 0.2s;
+              text-align: left;
+
+              &:hover:not(.disabled) {
+                background-color: var(--db-color-button-bg-hover, #444);
+                border-color: var(--db-color-button-primary-bg, #1890ff);
+              }
+
+              &.disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+              }
             }
           }
         }
@@ -394,11 +338,25 @@ const processScene1 = async () => {
       border-radius: 2px;
       cursor: pointer;
       font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
 
-      &:hover {
+      &:hover:not(:disabled) {
         opacity: 0.9;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
       }
     }
   }
+}
+
+@keyframes blink {
+  0% { opacity: 0.2; }
+  20% { opacity: 1; }
+  100% { opacity: 0.2; }
 }
 </style>
