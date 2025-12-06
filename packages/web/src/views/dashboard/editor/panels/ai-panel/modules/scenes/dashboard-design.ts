@@ -175,21 +175,27 @@ const extractJsonObject = (str: string): string => {
  * 角色 1: 布局设计师
  * 职责: 根据用户需求生成大屏的布局结构 (JSON)，但不填充图表的具体数据配置。
  */
-const generateLayout = async (userRequirement: string, onStream?: (content: string) => void): Promise<IEditorData> => {
+const generateLayout = async (userRequirement: string, themeName: string, themeConfig: Record<string, unknown>, onStream?: (content: string) => void): Promise<IEditorData> => {
   const systemPrompt = `你是一位专业的数据可视化大屏布局设计师。
-你的任务是根据用户的需求（如屏幕尺寸、图表类型等），设计一个完整的大屏 JSON 结构。
+  你的任务是根据用户的需求（如屏幕尺寸、图表类型等），设计一个完整的大屏 JSON 结构。
 
-### 核心要求：
-1. **Strict JSON Only**: 请只输出标准的 JSON 代码，**严禁**包含 Markdown 标记（如 \`\`\`json），**严禁**包含任何解释性文字。
-2. **Schema Compliance**: 输出的 JSON 结构必须严格符合下方的【参考示例】格式，确保字段完整性。
-3. **Canvas Size**: 根容器 (root) 的尺寸必须严格匹配用户要求的尺寸。如果不明确，默认使用 1920*1080。
-4. **Layout Algorithm (Strict)**:
-   - **无重叠约束**: 任何两个组件的矩形区域 (x, y, x+width, y+height) 绝对不能有交集。请在生成前进行坐标计算校验。
-   - **边界约束**: 所有子组件必须完全包含在根容器内 (x>=0, y>=0, x+w<=root.w, y+h<=root.h)。
-   - **美观性**: 布局应整齐对称，充分利用画布空间，避免出现大片空白或过于拥挤。
-   - **组件数量**: 除非用户指定，否则请生成 **6-10 个** 关键图表组件以丰富内容。
-5. **Data Handling**: 对于所有图表节点，props.code.options 字段必须设置为空对象 {}，数据填充将由后续步骤完成。
-6. **Component Mapping**: 请严格使用下方提供的【可用组件列表】中的 component, schema, icon 路径。
+  ### 核心要求：
+  1. **Strict JSON Only**: 请只输出标准的 JSON 代码，**严禁**包含 Markdown 标记（如 \`\`\`json），**严禁**包含任何解释性文字。
+  2. **Schema Compliance**: 输出的 JSON 结构必须严格符合下方的【参考示例】格式，确保字段完整性。
+  3. **Canvas Size**: 根容器 (root) 的尺寸必须严格匹配用户要求的尺寸。如果不明确，默认使用 1920*1080。
+  4. **Layout Algorithm (Strict)**:
+     - **无重叠约束**: 任何两个组件的矩形区域 (x, y, x+width, y+height) 绝对不能有交集。请在生成前进行坐标计算校验。
+     - **边界约束**: 所有子组件必须完全包含在根容器内 (x>=0, y>=0, x+w<=root.w, y+h<=root.h)。
+     - **美观性**: 布局应整齐对称，充分利用画布空间，避免出现大片空白或过于拥挤。
+     - **组件数量**: 除非用户指定，否则请生成 **6-10 个** 关键图表组件以丰富内容。
+  5. **Data Handling**: 对于所有图表节点，props.code.options 字段必须设置为空对象 {}，数据填充将由后续步骤完成。
+  6. **Component Mapping**: 请严格使用下方提供的【可用组件列表】中的 component, schema, icon 路径。
+
+  ### 视觉风格与主题 (Visual Style & Theme):
+  1. **Current Theme**: ${themeName}
+  2. **Background Color**: 请根据主题设置根容器 (root) 的背景色。
+     - 参考 themeConfig 中的背景色配置，或根据主题风格自适应（深色主题用深色背景，浅色主题用浅色背景）。
+     - Theme Config: ${JSON.stringify(themeConfig)}
 
 ### 可用组件列表 (Component Registry):
    - **柱状图 (Bar)**:
@@ -338,7 +344,7 @@ export const DashboardDesignScene: IScene = {
     let layoutFullContent = '';
 
     try {
-        layoutResult = await generateLayout(params, (delta) => {
+        layoutResult = await generateLayout(params, themeName, globalThemeJson, (delta: string) => {
             layoutFullContent += delta;
             addMessage('assistant', layoutFullContent, 'code', undefined, layoutMsgId);
         });
@@ -376,7 +382,7 @@ export const DashboardDesignScene: IScene = {
                 const chartType = node.component.split('apache-e-charts/')[1]?.split('/')[0] || 'bar';
 
                 try {
-                    const options = await generateChartData(node.name, chartType, themeColors, globalThemeJson, (delta) => {
+                    const options = await generateChartData(node.name, chartType, themeColors, globalThemeJson, (delta: string) => {
                         chartContent += delta;
                         addMessage('assistant', chartContent, 'code', undefined, chartMsgId);
                     });
