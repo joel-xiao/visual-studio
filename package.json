@@ -56,5 +56,6 @@
     "typescript-eslint": "^8.46.4",
     "vue-eslint-parser": "^10.2.0",
     "wait-on": "^9.0.3"
-  }
+  },
+  "dependencies": {}
 }

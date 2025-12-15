@@ -10,6 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^1.0.18",
+    "ai": "^4.0.36",
+    "zod": "^3.24.1",
+    "@iconify/vue": "^5.0.0",
     "@tauri-apps/api": "^2.9.0",
     "axios": "^1.13.2",
     "echarts": "^6.0.0",
@@ -26,7 +30,6 @@
     "vue-router": "^4.6.3"
   },
   "devDependencies": {
-    "@iconify/vue": "^5.0.0",
     "@tauri-apps/cli": "^2.9.4",
     "@vitejs/plugin-vue": "^6.0.1",
     "typescript": "^5.9.3",
