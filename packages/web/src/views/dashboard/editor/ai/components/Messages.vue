@@ -1,5 +1,5 @@
 <template>
-  <div class="messages" ref="messagesRef">
+  <div ref="messagesRef" class="messages">
     <transition-group name="message-fade">
       <Message
         v-for="msg in messages"
