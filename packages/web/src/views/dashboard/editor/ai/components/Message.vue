@@ -37,7 +37,7 @@
         </div>
 
         <div v-else-if="message.type === 'chart'">
-          <div class="text-content mb-3" v-if="message.content">{{ message.content }}</div>
+          <div v-if="message.content" class="text-content mb-3">{{ message.content }}</div>
           <ChartPreview v-if="message.data" :data="message.data" />
         </div>
       </div>
@@ -134,7 +134,7 @@ const getAgentName = (agent?: AgentRole) => {
       align-items: flex-start;
 
       .agent-name {
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 600;
         color: var(--theme-color-text-secondary);
         margin-bottom: 3px;

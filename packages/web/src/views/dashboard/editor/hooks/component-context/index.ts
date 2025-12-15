@@ -1,4 +1,4 @@
-import { readonly, createVNode, type App, type Component as VueComponent } from 'vue';
+import { readonly, createVNode, type Component as VueComponent } from 'vue';
 import { cloneDeep } from 'lodash';
 import { createComponent } from '@hooks/vue-hooks';
 
