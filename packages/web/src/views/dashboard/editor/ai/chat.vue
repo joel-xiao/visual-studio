@@ -1,38 +1,79 @@
 <script setup lang="ts">
-import { ref, nextTick, unref } from 'vue';
-import { aiApi } from '@/service/api/ai';
-import { scenes, getScene } from './scene-manager';
-import type { IChatMessage, IScene, ISceneAction } from './types';
-import SceneSelector from './components/SceneSelector.vue';
-import ThemeSelector from './components/ThemeSelector.vue';
-import ChartMessage from './components/ChartMessage.vue';
+import { ref, nextTick, unref, computed } from 'vue';
+import { AgentOrchestrator } from './core/orchestrator';
+import type { IChatMessage, ISceneAction, AgentRole } from './core/types';
+import { getPromptSuggestions, type IPromptSuggestion } from './modules/prompt/suggestions';
 import { useChartThemesContext } from '../hooks/chart-themes-context';
+import { useNodeContext } from '../hooks/node-context';
+import { useComponentContext } from '../hooks/component-context';
+import { globalThemeJson } from '../hooks/chart-themes-context/data';
+import { merge } from 'lodash';
+import Messages from './components/Messages.vue';
+import InputArea from './components/InputArea.vue';
 
-const { setTheme } = useChartThemesContext();
+const { setTheme, registerCustomTheme } = useChartThemesContext();
+const nodeContext = useNodeContext();
+const { getComponentProps } = useComponentContext();
+const orchestrator = new AgentOrchestrator();
+
+const selectedNodes = computed(() => unref(nodeContext.getSelectedNodes()));
+const currentSelectionName = computed(() => {
+  const nodes = selectedNodes.value;
+  if (nodes.length === 1) {
+    return nodes[0].name || '未命名组件';
+  } else if (nodes.length > 1) {
+    return `${nodes.length} 个组件`;
+  }
+  return '';
+});
+
+const suggestions = computed(() => {
+  const nodes = unref(nodeContext.getNodes());
+  const selected = unref(nodeContext.getSelectedNodes());
+  return getPromptSuggestions({
+    hasSelection: selected.length > 0,
+    selectionType: selected.length > 0 ? selected[0].component : undefined,
+    nodeCount: nodes.length
+  });
+});
+
+const chatMode = computed(() => {
+  const nodes = selectedNodes.value;
+  return nodes.length > 0 && nodes[0].id !== 'root' ? 'context' : 'global';
+});
+
+const placeholderText = computed(() => {
+  if (chatMode.value === 'context') {
+    return `正在调整 "${currentSelectionName.value}"... (例如："改成红色", "显示前5条")`;
+  }
+  return "输入您的需求，例如：'帮我生成一个销售大屏'...";
+});
+
+const clearSelection = () => {
+  nodeContext.onSelectNode('root');
+};
+
+const handleSuggestionClick = (suggestion: IPromptSuggestion) => {
+  inputValue.value = suggestion.value;
+  handleSend();
+};
 
 const messages = ref<IChatMessage[]>([
   {
     id: 'welcome',
     role: 'assistant',
-    content: '你好！我是你的 AI 助手。请选择一个场景开始，或直接输入指令。',
-    type: 'scene-selection',
-    actions: []
+    content: '你好！我是你的 AI 大屏设计团队。\n我可以帮你：\n- 🏗️ **生成布局**\n- 📊 **创建图表**\n- 🧠 **分析数据**\n- 🎨 **设计主题**\n\n请直接告诉我你的需求，例如：“帮我做一个销售监控大屏”。',
+    type: 'text',
+    actions: [],
+    agent: 'orchestrator'
   }
 ]);
 
 const inputValue = ref('');
 const loading = ref(false);
 const chatContainerRef = ref<HTMLElement | null>(null);
-const currentScene = ref<IScene | null>(null);
 
-const scrollToBottom = async () => {
-  await nextTick();
-  if (chatContainerRef.value) {
-    chatContainerRef.value.scrollTop = chatContainerRef.value.scrollHeight;
-  }
-};
-
-const addMessage = (role: 'user' | 'assistant', content: string, type: 'text' | 'code' | 'action' | 'chart' | 'theme-selection' | 'scene-selection' = 'text', actions?: ISceneAction[], id?: string, data?: any): string => {
+const addMessage = (role: 'user' | 'assistant', content: string, type: IChatMessage['type'] = 'text', actions?: ISceneAction[], id?: string, data?: any, agent?: AgentRole): string => {
   if (id) {
     const msg = messages.value.find(m => m.id === id);
     if (msg) {
@@ -40,85 +81,113 @@ const addMessage = (role: 'user' | 'assistant', content: string, type: 'text' | 
       if (type) msg.type = type;
       if (actions) msg.actions = actions;
       if (data) msg.data = data;
-      scrollToBottom();
+      if (agent) msg.agent = agent;
       return id;
     }
   }
 
-  // Deduplication check: prevent adding identical message to the end
   const lastMsg = messages.value[messages.value.length - 1];
   if (!id && lastMsg && lastMsg.role === role && lastMsg.content === content && lastMsg.type === type) {
     return lastMsg.id;
   }
 
-  const newId = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+  const newId = Date.now().toString() + Math.random().toString(36).slice(2, 11);
   messages.value.push({
     id: newId,
     role,
     content,
     type,
     actions,
-    data
+    data,
+    agent
   });
-  scrollToBottom();
   return newId;
 };
 
-const handleSceneSelect = async (scene: IScene) => {
-  if (loading.value) return;
-  if (scene.disabled) return;
+const handleThemeSelect = async (themeName: string) => {
+  setTheme(themeName);
+  addMessage('assistant', `🎨 主题 **${themeName}** 已应用。`, 'text', undefined, undefined, undefined, 'theme-engine');
 
-  // Add user selection message
-  addMessage('user', `选择场景：${scene.label}`);
+  const nodes = unref(nodeContext.getNodes());
+  const hasCharts = nodes.some((n: any) => n.component && (n.component.includes('APACHE_ECHARTS') || n.component.includes('apache-e-charts')));
 
-  if (scene && scene.run) {
-    currentScene.value = scene;
-    loading.value = true;
-    try {
-      await scene.run(
-        addMessage,
-        // Adapter for scene to call API - currently mapped to chat or mock
-        async () => {
-          // In the future, map sceneId to specific prompts/providers
-          throw new Error('Direct API call from adapter not implemented');
-        },
-        ''
-      );
-    } catch (e) {
-      addMessage('assistant', '场景执行出错: ' + e);
-    } finally {
-      loading.value = false;
-    }
+  if (hasCharts) {
+      setTimeout(() => {
+          inputValue.value = `Optimize all charts to match the ${themeName} theme.`;
+          handleSend();
+      }, 500);
   }
 };
 
-const handleThemeSelect = (themeName: string) => {
-  setTheme(themeName);
-  addMessage('user', `已切换主题：${themeName}`);
-  addMessage('assistant', `🎨 主题 **${themeName}** 已应用。`);
-};
+const applyResponseData = (data: any) => {
+  if (!data) return;
 
-const handleActionClick = async (value: string) => {
-  if (loading.value) return;
-
-  const [sceneId, ...rest] = value.split(':');
-  const params = rest.join(':');
-  const scene = getScene(sceneId);
-
-  if (scene && scene.run) {
-    currentScene.value = scene;
-    loading.value = true;
-    try {
-      await scene.run(
-        addMessage,
-        async () => { throw new Error('Not implemented'); },
-        params
+  if (data.nodes && Array.isArray(data.nodes)) {
+      const validNodes = data.nodes.filter((node: any) =>
+        node && typeof node === 'object' && !Array.isArray(node) && node.id
       );
-    } catch (e) {
-      addMessage('assistant', '场景执行出错: ' + e);
-    } finally {
-      loading.value = false;
-    }
+
+      if (validNodes.length > 0) {
+        const hydratedNodes = validNodes.map((node: any) => {
+          const nodeCopy = { ...node };
+          if (nodeCopy.schema) {
+            const defaultProps = getComponentProps(nodeCopy.schema);
+            nodeCopy.props = merge({}, defaultProps, nodeCopy.props);
+          }
+
+          if (data.chartDataMap && data.chartDataMap[nodeCopy.id]) {
+            const chartData = data.chartDataMap[nodeCopy.id];
+            nodeCopy.props = nodeCopy.props || {};
+            nodeCopy.props.code = nodeCopy.props.code || {};
+            try {
+              const existingOptions = typeof nodeCopy.props.code.options === 'string'
+                ? JSON.parse(nodeCopy.props.code.options || '{}')
+                : (nodeCopy.props.code.options || {});
+              nodeCopy.props.code.options = JSON.stringify(merge({}, existingOptions, chartData), null, 2);
+            } catch (e) {
+              console.warn('[Chat] Failed to parse/merge chart options:', e);
+            }
+          }
+
+          if (data.chartOptions && data.chartOptions[nodeCopy.id]) {
+            const beautifiedOptions = data.chartOptions[nodeCopy.id];
+            nodeCopy.props = nodeCopy.props || {};
+            nodeCopy.props.code = nodeCopy.props.code || {};
+            try {
+               const existingOptions = typeof nodeCopy.props.code.options === 'string'
+                ? JSON.parse(nodeCopy.props.code.options || '{}')
+                : (nodeCopy.props.code.options || {});
+               nodeCopy.props.code.options = JSON.stringify(merge({}, existingOptions, beautifiedOptions), null, 2);
+            } catch (e) {
+               console.warn('[Chat] Failed to merge beautified chart options:', e);
+            }
+          }
+
+          return nodeCopy;
+        });
+
+        nodeContext.update({ ...data, nodes: hydratedNodes });
+      }
+  }
+  else if (data.chartOptions) {
+     Object.keys(data.chartOptions).forEach(nodeId => {
+       const options = data.chartOptions[nodeId];
+       const currentNode = unref(nodeContext.getNodes()).find(n => n.id === nodeId);
+       if (currentNode) {
+           try {
+               const currentOpts = typeof currentNode.props?.code?.options === 'string'
+                ? JSON.parse(currentNode.props.code.options || '{}')
+                : (currentNode.props?.code?.options || {});
+
+               nodeContext.updateNodeProps(nodeId, {
+                 key: 'code.options',
+                 value: JSON.stringify(merge({}, currentOpts, options), null, 2)
+               });
+           } catch(e) {
+               console.warn(`[Chat] Stream update failed for ${nodeId}`, e);
+           }
+       }
+     });
   }
 };
 
@@ -130,25 +199,60 @@ const handleSend = async () => {
   addMessage('user', content);
 
   loading.value = true;
+  const assistantMsgId = addMessage('assistant', 'Thinking...', 'text', undefined, undefined, undefined, 'orchestrator');
+
   try {
-    if (currentScene.value) {
-      // Delegate to current scene
-      await currentScene.value.run(
-        addMessage,
-        async () => {
-          return await aiApi.chat({
-             provider: 'qwen',
-             messages: [{ role: 'user', content }],
-             options: { stream: true }
-          });
-        },
-        content
-      );
-    } else {
-       addMessage('assistant', '请先选择一个场景开始对话。', 'scene-selection');
+    const { getAvailableComponents } = useComponentContext();
+    const context = {
+      nodes: unref(nodeContext.getNodes()),
+      selectedNodes: unref(nodeContext.getSelectedNodes()),
+      availableComponents: getAvailableComponents ? getAvailableComponents() : []
+    };
+
+    const response = await orchestrator.process(content, context, (partial) => {
+       addMessage(
+         'assistant',
+         partial.content || 'Processing...',
+         partial.type,
+         partial.actions,
+         assistantMsgId,
+         partial.data,
+         partial.nextAgent
+       );
+
+       if (partial.data) {
+          applyResponseData(partial.data);
+       }
+    });
+
+    addMessage(
+      'assistant',
+      response.content,
+      response.type,
+      response.actions,
+      assistantMsgId,
+      response.data,
+      response.nextAgent
+    );
+
+    if (!response.isError && response.data) {
+        applyResponseData(response.data);
+        if (response.data.nodes) {
+             addMessage('assistant', '✅ 已为您应用新的大屏布局。', 'text');
+        }
     }
+
+    if (response.type === 'theme-selection' && response.data?.theme) {
+       if (response.data.colors && Array.isArray(response.data.colors)) {
+         const newTheme = { ...globalThemeJson, color: response.data.colors };
+         registerCustomTheme(response.data.theme, newTheme);
+         addMessage('assistant', `🎨 已为您生成随机主题：**${response.data.theme}**`, 'text');
+       }
+       setTheme(response.data.theme);
+    }
+
   } catch (e) {
-    addMessage('assistant', '出错啦: ' + e, 'text', undefined, undefined, { isError: true });
+    addMessage('assistant', '出错啦: ' + e, 'text', undefined, assistantMsgId, { isError: true });
   } finally {
     loading.value = false;
   }
@@ -156,326 +260,52 @@ const handleSend = async () => {
 </script>
 
 <template>
-  <div class="chat-container" ref="chatContainerRef">
-      <div v-for="msg in messages" :key="msg.id" class="message-wrapper" :class="[msg.role, { 'full-width': msg.type === 'chart' }]">
-        <div class="message-content">
-          <!-- Text Message -->
-          <div v-if="msg.type === 'text'" class="text-content markdown-body" v-html="msg.content"></div>
+  <div ref="chatContainerRef" class="chat-container">
+    <Messages
+      :messages="messages"
+      @theme-select="handleThemeSelect"
+    />
 
-          <!-- Code Message -->
-          <div v-else-if="msg.type === 'code'" class="code-content">
-             <div class="code-header">
-               <span>JSON</span>
-               <i class="iconfont icon-copy"></i>
-             </div>
-             <pre><code>{{ msg.content }}</code></pre>
-          </div>
-
-          <!-- Scene Selection -->
-          <div v-else-if="msg.type === 'scene-selection'" class="scene-selection-content">
-             <div class="text-content mb-3">{{ msg.content }}</div>
-             <SceneSelector :scenes="scenes" @select="handleSceneSelect" />
-          </div>
-
-          <!-- Theme Selection -->
-          <div v-else-if="msg.type === 'theme-selection'" class="theme-selection-content">
-             <div class="text-content mb-3">{{ msg.content }}</div>
-             <ThemeSelector @select="handleThemeSelect" />
-          </div>
-
-           <!-- Chart Message -->
-          <div v-else-if="msg.type === 'chart'" class="chart-content">
-             <div class="text-content mb-3">{{ msg.content }}</div>
-             <ChartMessage :data="msg.data" />
-          </div>
-
-          <!-- Action Buttons (Legacy/Generic) -->
-          <div v-else-if="msg.type === 'action'" class="action-content">
-             <div class="text-content mb-2">{{ msg.content }}</div>
-             <div class="actions-list">
-               <button
-                 v-for="action in msg.actions"
-                 :key="action.value"
-                 class="action-btn"
-                 :disabled="action.disabled"
-                 @click="handleActionClick(action.value)"
-               >
-                 {{ action.label }}
-               </button>
-             </div>
-          </div>
-        </div>
-      </div>
+    <div class="input-area-wrapper">
+      <InputArea
+        v-model="inputValue"
+        :placeholder="placeholderText"
+        :suggestions="suggestions"
+        :loading="loading"
+        :show-mode-indicator="chatMode === 'context'"
+        :target-name="currentSelectionName"
+        @send="handleSend"
+        @suggestion-click="handleSuggestionClick"
+        @clear-selection="clearSelection"
+      />
     </div>
-
-    <div class="input-wrapper">
-      <div class="input-container">
-        <textarea
-          v-model="inputValue"
-          placeholder="输入您的需求，例如：'帮我生成一个柱状图'..."
-          @keydown.enter.prevent="handleSend"
-          :disabled="loading"
-          rows="1"
-        ></textarea>
-        <button class="send-btn" @click="handleSend" :disabled="loading || !inputValue.trim()">
-          <i class="iconfont icon-send"></i>
-        </button>
-      </div>
-    </div>
+  </div>
 </template>
 
 <style scoped lang="scss">
 .chat-container {
   flex: 1;
-  overflow-y: auto;
-  padding: 12px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  background-color: var(--db-editor-color-panel-bg);
+  background: linear-gradient(180deg,
+    var(--db-editor-color-panel-bg) 0%,
+    rgba(var(--db-editor-color-panel-bg-rgb, 38, 38, 38), 0.98) 100%
+  );
+  position: relative;
+  overflow: hidden;
 
-  &::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: var(--theme-color-gray-600);
-    border-radius: 3px;
-  }
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  .message-wrapper {
-    display: flex;
-    max-width: 95%;
-
-    &.full-width {
-      width: 100%;
-      max-width: 100%;
-
-      .message-content {
-        width: 100%;
-      }
-    }
-
-    &.user {
-      align-self: flex-end;
-
-      .message-content {
-        background: var(--db-color-button-primary-bg, #409eff);
-        color: white;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-
-        .text-content {
-          color: white;
-        }
-      }
-    }
-
-    &.assistant {
-      align-self: flex-start;
-
-      .message-content {
-        background-color: transparent;
-        border: none;
-        box-shadow: none;
-        color: var(--theme-color-text);
-      }
-    }
-
-    .message-content {
-      padding: 8px 12px;
-      font-size: 13px;
-      line-height: 1.5;
-      overflow-x: hidden;
-      position: relative;
-      min-width: 60px;
-
-      .text-content {
-        white-space: pre-wrap;
-        word-break: break-word;
-      }
-
-      .mb-3 {
-          margin-bottom: 8px;
-      }
-      .mb-2 {
-          margin-bottom: 6px;
-      }
-
-      .code-content {
-        background-color: var(--db-color-bg-dark);
-        border-radius: 8px;
-        overflow: hidden;
-        margin-top: 8px;
-        border: 1px solid var(--theme-color-gray-700);
-
-        .code-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 4px 10px;
-          background-color: rgba(255, 255, 255, 0.03);
-          border-bottom: 1px solid var(--theme-color-gray-700);
-
-          span {
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--theme-color-text-secondary);
-          }
-
-          .iconfont {
-            font-size: 14px;
-            color: var(--theme-color-text-secondary);
-            cursor: pointer;
-            &:hover { color: var(--theme-color-text); }
-          }
-        }
-
-        pre {
-          margin: 0;
-          padding: 10px;
-          white-space: pre-wrap;
-          word-break: break-all;
-          color: var(--db-main-color-get, #4caf50);
-          font-family: 'Fira Code', monospace;
-          font-size: 12px;
-          max-height: 240px;
-          overflow-y: auto;
-
-          &::-webkit-scrollbar {
-            width: 4px;
-            height: 4px;
-          }
-          &::-webkit-scrollbar-thumb {
-            background: var(--theme-color-gray-600);
-            border-radius: 2px;
-          }
-        }
-      }
-
-      .actions-list {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        margin-top: 8px;
-
-        .action-btn {
-          padding: 4px 10px;
-          border-radius: 12px;
-          border: 1px solid var(--db-color-button-primary-bg, #409eff);
-          background-color: var(--db-editor-color-select-light);
-          color: var(--db-color-button-primary-bg, #409eff);
-          cursor: pointer;
-          font-size: 12px;
-          font-weight: 500;
-          transition: all 0.2s;
-
-          &:hover:not(:disabled) {
-            background-color: var(--db-color-button-primary-bg, #409eff);
-            color: white;
-            transform: translateY(-1px);
-            box-shadow: 0 2px 5px rgba(64, 158, 255, 0.3);
-          }
-
-          &:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            border-color: var(--theme-color-gray-500);
-            color: var(--theme-color-gray-500);
-            box-shadow: none;
-            transform: none;
-          }
-        }
-      }
-    }
-  }
-}
-
-.input-wrapper {
-  padding: 12px;
-  background-color: var(--db-editor-color-panel-bg);
-  border-top: 1px solid var(--theme-color-gray-600, #444);
-
-  .input-container {
-    display: flex;
-    align-items: flex-end;
-    gap: 8px;
-    background-color: var(--db-color-input-background);
-    border: 1px solid var(--theme-color-gray-600);
-    border-radius: 20px;
-    padding: 6px 6px 6px 12px;
-    transition: all 0.2s;
-
-    &:focus-within {
-      border-color: var(--db-color-button-primary-bg);
-      background-color: var(--db-editor-color-panel-bg-lighter, #262626);
-      box-shadow: 0 0 0 2px var(--db-editor-color-select-light);
-    }
-
-    textarea {
-      flex: 1;
-      max-height: 100px;
-      min-height: 24px;
-      resize: none;
-      background: transparent;
-      border: none;
-      padding: 4px 0;
-      color: var(--theme-color-text);
-      font-family: inherit;
-      font-size: 13px;
-      line-height: 1.5;
-
-      &:focus {
-        outline: none;
-      }
-
-      &::placeholder {
-        color: var(--theme-color-text-disabled);
-      }
-
-      &:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-      }
-    }
-
-    .send-btn {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background-color: var(--db-color-button-primary-bg, #409eff);
-      color: white;
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-      flex-shrink: 0;
-
-      &:hover:not(:disabled) {
-        transform: scale(1.05);
-        background-color: var(--db-color-button-primary-bg-hover);
-      }
-
-      &:active:not(:disabled) {
-        transform: scale(0.95);
-      }
-
-      &:disabled {
-        background-color: var(--theme-color-gray-600);
-        color: var(--theme-color-text-disabled);
-        cursor: not-allowed;
-      }
-
-      .iconfont {
-        font-size: 14px;
-        margin-left: -1px; /* Visual correction */
-      }
-    }
+  .input-area-wrapper {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 10px 14px 14px 14px;
+    background: linear-gradient(to top,
+      var(--db-editor-color-panel-bg) 92%,
+      rgba(var(--db-editor-color-panel-bg-rgb, 38, 38, 38), 0.96) 98%,
+      transparent 100%
+    );
+    z-index: 10;
   }
 }
 </style>
