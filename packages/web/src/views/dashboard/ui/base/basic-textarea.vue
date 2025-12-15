@@ -4,10 +4,10 @@
     class="basic-textarea"
     :value="modelValue"
     :rows="rows"
+    v-bind="$attrs"
     @input="handleInput"
     @focus="onFocus"
     @blur="onBlur"
-    v-bind="$attrs"
   ></textarea>
 </template>
 
