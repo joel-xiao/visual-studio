@@ -13,16 +13,14 @@ export function useChartOptions(props: { config?: IComponentProps }, defaultOpti
 
       if (typeof optionsStr === 'string') {
         try {
-          // Check if options string is empty or just braces
-          if (!optionsStr || optionsStr.trim() === '{}') {
-             return;
-          }
-
+          if (!optionsStr || optionsStr.trim() === '{}') return;
           const newOptions = JSON.parse(optionsStr);
           option.value = { ...option.value, ...newOptions };
         } catch (e) {
           console.warn('Failed to parse chart options:', e);
         }
+      } else if (typeof optionsStr === 'object' && optionsStr !== null) {
+        option.value = { ...option.value, ...optionsStr };
       }
     },
     { deep: true, immediate: true }

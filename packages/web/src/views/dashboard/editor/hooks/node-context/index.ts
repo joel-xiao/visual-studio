@@ -287,6 +287,7 @@ class CreateNodeContext {
       node.y = pos.y - node.height / 2;
       this.updateNode(node.id, node);
       this.#addTreeNode(node);
+      console.log(this.#data)
       return node;
     }
   }
