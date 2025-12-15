@@ -116,6 +116,8 @@ const onDrop = function (event: DragEvent): void {
     right: var(--db-editor-right-menu-width);
     bottom: 0px;
     background-color: var(--db-editor-color-canvas-bg);
+    background-image: radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
 
     .editor-canvas-root {
       position: absolute;
