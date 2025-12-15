@@ -8,7 +8,7 @@
     :max-height="maxHeight"
     @focus="onFocus"
     @blur="onBlur"
-    @update:modelValue="onUpdate"
+    @update:model-value="onUpdate"
   />
 </BasicBox>
 </template>
