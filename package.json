@@ -57,5 +57,10 @@
     "vue-eslint-parser": "^10.2.0",
     "wait-on": "^9.0.3"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "pnpm": {
+    "overrides": {
+      "@electron/node-gyp": "10.2.0-electron.2"
+    }
+  }
 }
