@@ -55,13 +55,13 @@ const onClick = function () {
 };
 
 const focus = function () {
-  if (props.type === 'input') {
+  if (props.type === 'input' || props.type === 'textarea') {
     model.value = true;
   }
 };
 
 const blur = function () {
-  if (props.type === 'input') {
+  if (props.type === 'input' || props.type === 'textarea') {
     model.value = false;
   }
 };
@@ -127,12 +127,19 @@ defineExpose({ focus, blur, getRect });
   }
 
   &.input-box,
+  &.textarea-box,
   &.input-select-box {
     background: var(--db-color-input-background);
 
     &.active {
       box-shadow: 0 0 0 2px var(--db-color-button-focus-border) inset;
     }
+  }
+
+  &.textarea-box {
+    height: auto;
+    min-height: 30px;
+    align-items: flex-start;
   }
 
   &[circle] {

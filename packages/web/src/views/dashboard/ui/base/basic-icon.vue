@@ -1,34 +1,43 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { Icon } from '@iconify/vue';
 
 interface IProps {
   lock?: boolean;
   icon?: string;
   hover?: boolean;
+  size?: 'small' | 'medium' | 'large';
 }
 const props = withDefaults(defineProps<IProps>(), {
   lock: false,
   icon: '',
-  hover: false
+  hover: false,
+  size: 'medium'
 });
 
 const iconClass = computed(() => ({
   lock: !!props.lock,
-  hover: !!props.hover
+  hover: !!props.hover,
+  [props.size]: true
 }));
+
+const isIconify = computed(() => {
+  return props.icon?.includes(':');
+});
 
 const isIcon = computed(() => {
   return !props.icon?.includes('.');
 });
 
 const isIconText = computed(() => {
-  return isIcon.value && !props.icon?.startsWith('icon');
+  return isIcon.value && !props.icon?.startsWith('icon') && !isIconify.value;
 });
 </script>
 
 <template>
 <div class="basic-icon" :class="iconClass">
-  <span v-if="isIconText" class="basic-icon-text">{{ icon }}</span>
+  <Icon v-if="isIconify" :icon="icon" />
+  <span v-else-if="isIconText" class="basic-icon-text">{{ icon }}</span>
   <i v-else-if="isIcon" class="icon-font" :class="icon"></i>
 </div>
 </template>
@@ -36,8 +45,6 @@ const isIconText = computed(() => {
 <style lang="scss">
 #dashboard .basic-icon {
   line-height: 1;
-  width: 24px;
-  height: 100%;
   display: flex;
   flex: none;
   justify-content: center;
@@ -47,15 +54,34 @@ const isIconText = computed(() => {
   position: relative;
   font-weight: normal;
 
+  &.small {
+    width: 20px;
+    font-size: 14px;
+    .iconfont { font-size: 14px; }
+  }
+
+  &.medium {
+    width: 24px;
+    font-size: 16px;
+    .iconfont { font-size: 16px; }
+  }
+
+  &.large {
+    width: 32px;
+    font-size: 20px;
+    .iconfont { font-size: 20px; }
+  }
+
   &.lock {
     opacity: 0.5;
   }
 
   &.hover {
-    width: 26.6px;
-    height: 26.6px;
     border-radius: 3px;
     cursor: pointer;
+    &.small { width: 24px; height: 24px; }
+    &.medium { width: 28px; height: 28px; }
+    &.large { width: 36px; height: 36px; }
 
     &:hover {
       background-color: var(--db-color-select-arrow-bg-hover);
@@ -63,9 +89,8 @@ const isIconText = computed(() => {
   }
 
   .basic-icon-text {
-    font-size: 12px;
+    font-size: 0.8em; // Relative to parent font size
     font-weight: normal;
-    transform: scale(0.9);
   }
 }
 </style>
