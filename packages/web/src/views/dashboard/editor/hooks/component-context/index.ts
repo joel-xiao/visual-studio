@@ -35,6 +35,8 @@ export class CreateComponentContext {
     this.getComponentPropsTypes = this.getComponentPropsTypes.bind(this);
     this.createNodeComponent = this.createNodeComponent.bind(this);
     this.createNodeComponentApp = this.createNodeComponentApp.bind(this);
+    this.getAvailableComponents = this.getAvailableComponents.bind(this);
+    this.getComponentIcon = this.getComponentIcon.bind(this);
   }
 
   #install() {
@@ -205,6 +207,30 @@ export class CreateComponentContext {
   getComponentIcon(schemaType: string): string {
     const schema = this.#getComponentSchema(schemaType);
     return schema?.icon ? this.#getIcon(schema.icon) : '';
+  }
+
+  getAvailableComponents(): Array<{ type: string; name: string; category: 'canvas' | 'chart' }> {
+    const components: Array<{ type: string; name: string; category: 'canvas' | 'chart' }> = [];
+
+    // Canvas schemas (e.g., CANVAS_ROOT)
+    for (const [type, schema] of Object.entries(this.#canvasSchemas)) {
+      components.push({
+        type,
+        name: schema.name || type,
+        category: 'canvas'
+      });
+    }
+
+    // Component schemas (e.g., APACHE_ECHARTS_BAR_SIMPLE)
+    for (const [type, schema] of Object.entries(this.#componentSchemas)) {
+      components.push({
+        type,
+        name: schema.name || type,
+        category: 'chart'
+      });
+    }
+
+    return components;
   }
 
   #parseSchema(exportSchemas: ComponentSchemaExportSchemas) {

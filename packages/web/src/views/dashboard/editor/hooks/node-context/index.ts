@@ -201,6 +201,7 @@ class CreateNodeContext {
     }
     const lastKey = keyArr[keyArr.length - 1];
     current[lastKey] = value;
+    console.log(node);
 
     if (syncNode && key.startsWith('layout.')) {
       const field = key.split('.')[1];
