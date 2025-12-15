@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import { darkTheme } from 'naive-ui';
+import { darkTheme, NConfigProvider } from 'naive-ui';
 import native from '@/plugins/native-i18n';
 import themeOverrides from '@a/style/native/native-ui-theme-overrides.json';
 </script>
