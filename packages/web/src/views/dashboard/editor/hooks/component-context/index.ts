@@ -1,24 +1,29 @@
-import { readonly, createVNode, type App } from 'vue';
+import { readonly, createVNode, type App, type Component as VueComponent } from 'vue';
 import { cloneDeep } from 'lodash';
 import { createComponent } from '@hooks/vue-hooks';
+
+type ComponentRegistry = Record<string, VueComponent>;
+type ComponentSchemaRegistry = Record<string, IComponentSchemaExport>;
 
 export class CreateComponentContext {
   MaterialUses: Record<string, { [key: string]: IUseMaterialComponent }>;
   MaterialComponentUses: Record<string, { [key: string]: IUseMaterialComponent }>;
 
-  #schemas: { [key: string]: ISchemaExport };
-  canvasSchemas: Record<string, { [key: string]: IComponentSchemaExport }>;
-  componentSchemas: Record<string, { [key: string]: IComponentSchemaExport }>;
-  components: Record<string, { [key: string]: App }>;
+  #schemas: Record<string, ISchemaExport>;
+  #canvasSchemas: ComponentSchemaRegistry;
+  #componentSchemas: ComponentSchemaRegistry;
+  #components: ComponentRegistry;
+  #componentPathMap: Record<string, string>;
+
   constructor() {
     this.MaterialUses = {};
     this.MaterialComponentUses = {};
 
     this.#schemas = {};
-
-    this.canvasSchemas = {};
-    this.componentSchemas = {};
-    this.components = {};
+    this.#canvasSchemas = {};
+    this.#componentSchemas = {};
+    this.#components = {};
+    this.#componentPathMap = {};
 
     this.install = this.install.bind(this);
     this.uninstall = this.uninstall.bind(this);
@@ -39,29 +44,61 @@ export class CreateComponentContext {
         import: 'default'
       })
     ).forEach(schema => {
-      if (schema) {
+      if (schema?.name) {
         this.#schemas[schema.name] = schema;
       }
     });
 
-    this.components = import.meta.glob(['./../../materials/*/*/index.vue'], {
-      eager: true,
-      import: 'default'
-    });
+    const rawCanvasSchemas = import.meta.glob<{ default: IComponentSchemaExport }>(
+      './../../canvas/schema/*.ts',
+      { eager: true }
+    );
+    for (const [, module] of Object.entries(rawCanvasSchemas)) {
+      const schema = module.default;
+      if (schema?.type) {
+        this.#canvasSchemas[schema.type] = schema;
+      }
+    }
 
-    this.canvasSchemas = import.meta.glob('./../../canvas/schema/*.ts', { eager: true });
+    const rawComponentSchemas = import.meta.glob<{ default: IComponentSchemaExport }>(
+      './../../materials/*/*/schema/*.ts',
+      { eager: true }
+    );
 
-    this.componentSchemas = import.meta.glob('./../../materials/*/*/schema/*.ts', { eager: true });
+    const rawComponents = import.meta.glob<VueComponent>(
+      ['./../../materials/*/*/index.vue'],
+      { eager: true, import: 'default' }
+    );
+
+    for (const [schemaPath, module] of Object.entries(rawComponentSchemas)) {
+      const schema = module.default;
+      if (schema?.type) {
+        const componentPath = schemaPath
+          .substring(0, schemaPath.lastIndexOf('/schema/'))
+          .concat('/index.vue');
+
+        this.#componentSchemas[schema.type] = schema;
+        this.#componentPathMap[schema.type] = componentPath;
+
+        if (rawComponents[componentPath]) {
+          this.#components[schema.type] = rawComponents[componentPath];
+        }
+      }
+    }
   }
+
   install() {
     this.#install();
   }
 
   #uninstall() {
-    this.components = {};
+    this.#components = {};
     this.#schemas = {};
-    this.componentSchemas = {};
+    this.#componentSchemas = {};
+    this.#canvasSchemas = {};
+    this.#componentPathMap = {};
   }
+
   uninstall() {
     this.#uninstall();
   }
@@ -73,22 +110,22 @@ export class CreateComponentContext {
   #getComponentSchemas(component_path: string): PanelComponentData[] {
     const schemas: PanelComponentData[] = [];
 
-    for (const path of Object.keys(this.componentSchemas).filter(
-      key => key && key.startsWith(component_path)
-    )) {
-      const component_path = path.substring(0, path.lastIndexOf('/schema/') + 1);
-      const schema: IComponentSchemaExport = this.componentSchemas[path].default;
-      schemas.push({
-        name: schema.name,
-        id: schema.type,
-        icon: this.#getIcon(schema.icon),
-        data: {
-          name: schema.name,
-          icon: this.#getIcon(schema.icon),
-          component: component_path + 'index.vue',
-          schema: path
+    for (const [schemaType, componentPath] of Object.entries(this.#componentPathMap)) {
+      if (componentPath.startsWith(component_path.replace('/use.ts', ''))) {
+        const schema = this.#componentSchemas[schemaType];
+        if (schema) {
+          schemas.push({
+            name: schema.name,
+            id: schema.type,
+            icon: this.#getIcon(schema.icon),
+            data: {
+              name: schema.name,
+              component: schemaType,
+              schema: schemaType
+            }
+          });
         }
-      });
+      }
     }
 
     return schemas;
@@ -144,28 +181,30 @@ export class CreateComponentContext {
     ];
   }
 
-  #getSchemas(schema_names?: string | string[]): { [key: string]: ISchemaExport } {
-    const schemas: { [key: string]: ISchemaExport } = {};
-
+  #getSchemas(schema_names?: string | string[]): Record<string, ISchemaExport> {
     if (typeof schema_names === 'string') {
-      schemas[schema_names] = this.#schemas[schema_names];
+      return { [schema_names]: this.#schemas[schema_names] };
     } else if (Array.isArray(schema_names)) {
-      schema_names.forEach(schema_name => {
-        schemas[schema_name] = this.#schemas[schema_name];
+      const schemas: Record<string, ISchemaExport> = {};
+      schema_names.forEach(name => {
+        schemas[name] = this.#schemas[name];
       });
-    } else {
-      return this.#schemas;
+      return schemas;
     }
-
-    return schemas;
+    return this.#schemas;
   }
 
-  #getComponentSchema(schema_path: string): IComponentSchemaExport {
+  #getComponentSchema(schemaType: string): IComponentSchemaExport {
     return (
-      this.canvasSchemas[schema_path]?.default ||
-      this.componentSchemas[schema_path]?.default ||
+      this.#canvasSchemas[schemaType] ||
+      this.#componentSchemas[schemaType] ||
       ({} as IComponentSchemaExport)
     );
+  }
+
+  getComponentIcon(schemaType: string): string {
+    const schema = this.#getComponentSchema(schemaType);
+    return schema?.icon ? this.#getIcon(schema.icon) : '';
   }
 
   #parseSchema(exportSchemas: ComponentSchemaExportSchemas) {
@@ -292,7 +331,7 @@ export class CreateComponentContext {
   }
 
   #getComponentProps(schema_path: string): IComponentProps {
-    this.#getSchemas(); // 确保 schemas 已加载
+    this.#getSchemas();
     const componentSchemas = this.#getComponentSchema(schema_path);
     const isSchemaObject = componentSchemas && typeof componentSchemas === 'object';
 
@@ -354,12 +393,17 @@ export class CreateComponentContext {
     return value;
   }
 
-  #getComponent(component_path: string) {
-    return this.components[component_path];
+  #getComponent(schemaType: string): VueComponent | undefined {
+    return this.#components[schemaType];
   }
 
   createNodeComponent(props: IComponentProps, component: string) {
-    return createVNode(this.#getComponent(component), {
+    const comp = this.#getComponent(component);
+    if (!comp) {
+      console.warn(`[ComponentContext] Component not found: ${component}`);
+      return null;
+    }
+    return createVNode(comp, {
       data: props
     });
   }
@@ -369,10 +413,15 @@ export class CreateComponentContext {
     parentEl: HTMLElement | undefined,
     component: string
   ) {
+    const comp = this.#getComponent(component);
+    if (!comp) {
+      console.warn(`[ComponentContext] Component not found: ${component}`);
+      return null;
+    }
     return createComponent<{ config: IComponentProps }>(
       'component',
       parentEl,
-      this.#getComponent(component),
+      comp,
       {
         config: props
       }

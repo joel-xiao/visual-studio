@@ -38,9 +38,8 @@ let data = reactive<IEditorData>({
     {
       parentId: '',
       id: 'root',
-      icon: '',
-      component: 'root',
-      schema: '../../canvas/schema/default.ts',
+      component: 'CANVAS_ROOT',
+      schema: 'CANVAS_ROOT',
       name: '根容器',
       width: 1000,
       height: 600,

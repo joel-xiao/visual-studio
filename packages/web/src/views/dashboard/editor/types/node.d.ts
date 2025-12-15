@@ -5,14 +5,12 @@ declare interface INodePointerPos {
 
 declare interface IBasicNode {
   name: string;
-  icon: string;
   component: string;
   schema: string;
 }
 
 declare interface IAddNode extends IBasicNode {
   name: string;
-  icon: string;
   component: string;
   schema: string;
   props: IComponentProps;

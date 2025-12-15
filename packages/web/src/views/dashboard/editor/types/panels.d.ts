@@ -21,7 +21,8 @@ declare type PanelComponentData = PanelComponent & {
 
 declare type PanelLayerItemData = {
   name?: string;
-  icon: string;
+  icon?: string;
+  schema?: string;
   id: string;
   sum?: number;
   children?: PanelLayerItemData[];

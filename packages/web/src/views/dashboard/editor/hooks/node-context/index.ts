@@ -74,9 +74,9 @@ class CreateNodeContext {
   #addTreeNode(node: INode) {
     this.#nodesTreeSource.push({
       parentId: node.parentId,
-      icon: node.icon,
       id: node.id,
       name: node.name,
+      schema: node.schema,
       select: node.select,
       data: {
         name: node.name,
@@ -91,8 +91,8 @@ class CreateNodeContext {
   #createNodes() {
     this.#nodes = this.#data
       ? computed<INode[]>(() =>
-          this.#data ? this.#data.nodes.filter(node => node.id !== 'root') : []
-        )
+        this.#data ? this.#data.nodes.filter(node => node.id !== 'root') : []
+      )
       : [];
   }
 
@@ -135,12 +135,12 @@ class CreateNodeContext {
 
   getRoot() {
     const node = this.#data?.nodes.find(node => node.id === 'root');
-    return readonly( node ? node : ({} as INode));
+    return readonly(node ? node : ({} as INode));
   }
 
   getNode(id: string) {
     const node = this.#data?.nodes.find(node => node.id === id);
-    return readonly( node ? node : ({} as INode));
+    return readonly(node ? node : ({} as INode));
   }
 
   /**
@@ -266,7 +266,6 @@ class CreateNodeContext {
         parentId: parentId,
         id: getUuid(),
         name: addNode.name,
-        icon: addNode.icon,
         schema: addNode.schema,
         component: addNode.component,
         props: addNode.props,

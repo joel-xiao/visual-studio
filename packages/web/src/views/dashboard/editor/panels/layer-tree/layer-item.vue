@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { ref, reactive, withDefaults } from 'vue';
+import { useComponentContext } from '../../hooks/component-context';
 
 interface Props {
   recursion?: number;
@@ -17,6 +18,16 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits(['select', 'command']);
+
+const componentContext = useComponentContext();
+
+const getItemIcon = (item: PanelLayerItemData): string => {
+  if (item.icon) return item.icon;
+  if (item.schema && componentContext?.getComponentIcon) {
+    return componentContext.getComponentIcon(item.schema);
+  }
+  return props.itemIcon;
+};
 
 const onSelect = function (item: PanelLayerItemData): void {
   emit('select', item);
@@ -43,7 +54,7 @@ const onCommand = function (
       <div class="layer-item-left">
         <Icon v-if="item?.children?.length" class="arrow" block src="icon-zhankai" :class="{ active: item.AFold }" @click.stop="onArrow(item)" />
         <span v-else class="dot"></span>
-        <Icon v-if="item.icon || itemIcon" class="name-icon" block :src="item.icon || itemIcon" />
+        <Icon v-if="getItemIcon(item)" class="name-icon" block :src="getItemIcon(item)" />
         <span v-else class="name-icon-margin"></span>
         <span class="layer-item-labe">{{ item.name }}</span>
       </div>

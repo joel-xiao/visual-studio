@@ -1,7 +1,7 @@
 const schema: IComponentSchemaExport = {
   name: '根容器',
   type: 'CANVAS_ROOT',
-  icon: 'qw.png',
+  icon: '',
   schemas: [
     {
       type: 'schema',
