@@ -1,5 +1,5 @@
 <template>
-  <div ref="messagesRef" class="messages">
+  <div ref="messagesRef" class="messages" :style="{ paddingBottom: `${props.inputAreaHeight}px` }">
     <transition-group name="message-fade">
       <Message
         v-for="msg in messages"
@@ -12,15 +12,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick, watch } from 'vue';
+import { ref, nextTick, watch, withDefaults } from 'vue';
 import type { IChatMessage } from '../core/types';
 import Message from './Message.vue';
 
 interface Props {
   messages: IChatMessage[];
+  inputAreaHeight?: number;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  inputAreaHeight: 130
+});
+
 defineEmits<{
   'theme-select': [themeName: string];
 }>();
@@ -47,7 +51,6 @@ watch(() => props.messages.length, () => {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  padding-bottom: 130px;
 
   &::-webkit-scrollbar {
     width: 6px;

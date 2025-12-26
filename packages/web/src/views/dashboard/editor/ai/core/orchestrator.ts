@@ -1,10 +1,11 @@
 import { IAgent, IAgentResponse, AgentRole } from './types';
-import { LayoutArchitect } from '../modules/layout/architect';
-import { ChartCreator } from '../materials/apache-e-charts/creator';
-import { DataAnalyst } from '../modules/data/analyst';
-import { ThemeEngine } from '../modules/theme/engine';
 import { generateText } from 'ai';
 import { defaultModel } from './config';
+import { useChartCreator } from '../hooks/agents/use-chart-creator';
+import { useLayoutArchitect } from '../hooks/agents/use-layout-architect';
+import { useDataAnalyst } from '../hooks/agents/use-data-analyst';
+import { useThemeEngine } from '../hooks/agents/use-theme-engine';
+import { extractJSON } from './json-utils';
 
 export class AgentOrchestrator {
   private agents: Map<AgentRole, IAgent>;
@@ -12,10 +13,11 @@ export class AgentOrchestrator {
 
   constructor() {
     this.agents = new Map();
-    this.agents.set('layout-architect', new LayoutArchitect());
-    this.agents.set('chart-creator', new ChartCreator());
-    this.agents.set('data-analyst', new DataAnalyst());
-    this.agents.set('theme-engine', new ThemeEngine());
+    // 使用 hooks 创建 agents
+    this.agents.set('layout-architect', useLayoutArchitect());
+    this.agents.set('chart-creator', useChartCreator());
+    this.agents.set('data-analyst', useDataAnalyst());
+    this.agents.set('theme-engine', useThemeEngine());
   }
 
   /**
@@ -61,9 +63,8 @@ ${historyStr}`;
       });
 
       // Parse JSON from response
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[0]);
+      const parsed = extractJSON(text);
+      if (parsed && parsed.agent) {
         return {
           role: parsed.agent as AgentRole,
           refinedInput: parsed.refinedInput || input
