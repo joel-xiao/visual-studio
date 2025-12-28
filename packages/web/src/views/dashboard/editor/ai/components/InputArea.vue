@@ -47,7 +47,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { type IPromptSuggestion } from '../modules/prompt/suggestions';
+import type { IPromptSuggestion } from '../hooks/chat/use-chat-context';
 import CIcon from '../../../ui/controls/c-icon/index.vue';
 import CTextarea from '../../../ui/controls/c-textarea/index.vue';
 import CButton from '../../../ui/controls/c-button/index.vue';

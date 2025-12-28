@@ -1,40 +1,31 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import type { IPromptSuggestion } from './modules/prompt/suggestions';
+import type { IPromptSuggestion } from './hooks/chat/use-chat-context';
 import Messages from './components/Messages.vue';
 import InputArea from './components/InputArea.vue';
-import { useChatMessages } from './hooks/use-chat-messages';
-import { useChatSelection } from './hooks/use-chat-selection';
-import { useChatInput } from './hooks/use-chat-input';
-import { useInputAreaHeight } from './hooks/use-input-area-height';
-import { useChatOrchestrator } from './hooks/use-chat-orchestrator';
+import { useChat } from './hooks/chat/use-chat';
+import { useChatContext } from './hooks/chat/use-chat-context';
+import { initAIContextExplicit } from './hooks/core/use-ai-context';
 
-// 消息管理
-const { messages, addMessage } = useChatMessages();
+// 初始化 AI Context（单例模式）
+initAIContextExplicit();
 
-// 选择相关逻辑
+// 输入区域引用
+const inputAreaWrapperRef = ref<HTMLElement | null>(null);
+
+// 统一的聊天 Hook（整合消息管理 + 输入状态 + 高度监听）
+const { messages, sendMessage, inputValue, loading, inputAreaHeight } = useChat({
+  inputAreaWrapperRef
+});
+
+// 聊天上下文（选择、建议等）
 const {
   currentSelectionName,
   suggestions,
   chatMode,
   placeholderText,
   clearSelection
-} = useChatSelection();
-
-// 输入状态管理
-const { inputValue, loading } = useChatInput();
-
-// 输入区域高度监听
-const inputAreaWrapperRef = ref<HTMLElement | null>(null);
-const { inputAreaHeight } = useInputAreaHeight(inputAreaWrapperRef);
-
-// Orchestrator 和消息发送
-const { handleThemeSelect, sendMessage } = useChatOrchestrator(
-  messages,
-  addMessage,
-  inputValue,
-  loading
-);
+} = useChatContext();
 
 // 建议点击处理
 const handleSuggestionClick = (suggestion: IPromptSuggestion) => {
@@ -50,7 +41,6 @@ const chatContainerRef = ref<HTMLElement | null>(null);
     <Messages
       :messages="messages"
       :input-area-height="inputAreaHeight"
-      @theme-select="handleThemeSelect"
     />
 
     <div ref="inputAreaWrapperRef" class="input-area-wrapper">

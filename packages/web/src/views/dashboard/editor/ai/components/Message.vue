@@ -1,14 +1,20 @@
 <template>
   <div class="message-wrapper" :class="[message.role, { 'full-width': message.type === 'chart' }]">
     <div v-if="message.role === 'assistant'" class="avatar-column">
-      <div class="agent-avatar" :class="message.agent">
-        <CIcon :icon="getAgentIcon(message.agent)" size="large" />
+      <div
+        class="agent-avatar"
+        :style="agentSchema?.color ? {
+          background: `linear-gradient(135deg, ${agentSchema.color} 0%, ${agentSchema.color}dd 100%)`,
+          boxShadow: `0 4px 12px ${agentSchema.color}66, 0 2px 6px ${agentSchema.color}4d, inset 0 1px 0 rgba(255, 255, 255, 0.2)`
+        } : {}"
+      >
+        <CIcon :icon="agentSchema?.icon || 'mdi:robot-outline'" size="large" />
       </div>
     </div>
 
     <div class="message-body">
       <div v-if="message.role === 'assistant' && message.agent" class="agent-name">
-        {{ getAgentName(message.agent) }}
+        {{ agentSchema?.displayName || 'AI助手' }}
       </div>
 
       <div class="message-bubble">
@@ -31,14 +37,15 @@
           <pre><code>{{ typeof message.data === 'object' ? JSON.stringify(message.data, null, 2) : message.content }}</code></pre>
         </div>
 
-        <div v-else-if="message.type === 'theme-selection'" class="theme-selection-content">
-          <div class="text-content mb-3">{{ message.content }}</div>
-          <ThemePicker @select="$emit('theme-select', $event)" />
-        </div>
-
-        <div v-else-if="message.type === 'chart'">
+        <!-- 自动渲染 agent 组件 -->
+        <div v-else-if="agentComponent" class="agent-content">
           <div v-if="message.content" class="text-content mb-3">{{ message.content }}</div>
-          <ChartPreview v-if="message.data" :data="message.data" />
+          <component
+            :is="agentComponent"
+            v-if="message.data"
+            :data="message.data"
+            @apply="handleAgentApply"
+          />
         </div>
       </div>
     </div>
@@ -46,38 +53,38 @@
 </template>
 
 <script setup lang="ts">
-import type { IChatMessage, AgentRole } from '../core/types';
+import { computed } from 'vue';
+import type { IChatMessage, AgentRole } from '../types';
 import CIcon from '../../../ui/controls/c-icon/index.vue';
-import ThemePicker from './ThemePicker.vue';
-import ChartPreview from './ChartPreview.vue';
+import { useAIContext } from '../hooks/core/use-ai-context';
+import { applyAgentData, getAgentSchema, getAgentComponentByMessageType } from '../agent/registry';
 
 interface Props {
   message: IChatMessage;
 }
 
-defineProps<Props>();
-defineEmits<{
-  'theme-select': [themeName: string];
-}>();
+const props = defineProps<Props>();
 
-const getAgentIcon = (agent?: AgentRole) => {
-  switch (agent) {
-    case 'layout-architect': return 'mdi:view-dashboard-outline';
-    case 'chart-creator': return 'mdi:chart-bar';
-    case 'data-analyst': return 'mdi:table-large';
-    case 'theme-engine': return 'mdi:palette';
-    case 'orchestrator':
-    default: return 'mdi:robot-outline';
-  }
-};
+// 获取 context（用于 applyAgentData）
+const aiContext = useAIContext();
 
-const getAgentName = (agent?: AgentRole) => {
-  switch (agent) {
-    case 'layout-architect': return '布局师';
-    case 'chart-creator': return '图表师';
-    case 'data-analyst': return '数据师';
-    case 'theme-engine': return '主题师';
-    default: return 'AI助手';
+// 根据 message type 自动获取对应的组件
+const agentComponent = computed(() => {
+  const messageType = props.message.type;
+  return getAgentComponentByMessageType(messageType || '');
+});
+
+// 从 schema 获取 agent 信息（统一获取，避免重复计算）
+const agentSchema = computed(() => {
+  if (!props.message.agent) return null;
+  return getAgentSchema(props.message.agent);
+});
+
+// 统一处理所有 agent 组件的 apply 事件
+const handleAgentApply = (data: unknown) => {
+  // 直接使用 message.agent，不需要判断
+  if (props.message.agent) {
+    applyAgentData(props.message.agent, aiContext, data);
   }
 };
 </script>
@@ -217,41 +224,7 @@ const getAgentName = (agent?: AgentRole) => {
         filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
       }
 
-      &.layout-architect {
-        background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
-        box-shadow:
-          0 4px 12px rgba(230, 126, 34, 0.4),
-          0 2px 6px rgba(230, 126, 34, 0.3),
-          inset 0 1px 0 rgba(255, 255, 255, 0.2);
-      }
-      &.chart-creator {
-        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-        box-shadow:
-          0 4px 12px rgba(41, 128, 185, 0.4),
-          0 2px 6px rgba(41, 128, 185, 0.3),
-          inset 0 1px 0 rgba(255, 255, 255, 0.2);
-      }
-      &.data-analyst {
-        background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
-        box-shadow:
-          0 4px 12px rgba(39, 174, 96, 0.4),
-          0 2px 6px rgba(39, 174, 96, 0.3),
-          inset 0 1px 0 rgba(255, 255, 255, 0.2);
-      }
-      &.theme-engine {
-        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-        box-shadow:
-          0 4px 12px rgba(192, 57, 43, 0.4),
-          0 2px 6px rgba(192, 57, 43, 0.3),
-          inset 0 1px 0 rgba(255, 255, 255, 0.2);
-      }
-      &.orchestrator {
-        background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
-        box-shadow:
-          0 4px 12px rgba(142, 68, 173, 0.4),
-          0 2px 6px rgba(142, 68, 173, 0.3),
-          inset 0 1px 0 rgba(255, 255, 255, 0.2);
-      }
+      // 样式通过内联 style 动态设置，不再硬编码
     }
   }
 

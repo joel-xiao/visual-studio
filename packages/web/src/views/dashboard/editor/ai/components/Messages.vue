@@ -5,15 +5,14 @@
         v-for="msg in messages"
         :key="msg.id"
         :message="msg"
-        @theme-select="$emit('theme-select', $event)"
       />
     </transition-group>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick, watch, withDefaults } from 'vue';
-import type { IChatMessage } from '../core/types';
+import { ref, nextTick, watch } from 'vue';
+import type { IChatMessage } from '../types';
 import Message from './Message.vue';
 
 interface Props {
@@ -25,9 +24,6 @@ const props = withDefaults(defineProps<Props>(), {
   inputAreaHeight: 130
 });
 
-defineEmits<{
-  'theme-select': [themeName: string];
-}>();
 
 const messagesRef = ref<HTMLElement | null>(null);
 
