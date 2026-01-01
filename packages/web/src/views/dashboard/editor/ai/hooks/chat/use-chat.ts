@@ -2,9 +2,6 @@ import { ref, nextTick, onMounted, onUnmounted, type Ref } from 'vue';
 import type { IChatMessage, AgentRole, IAgentResponse } from '../../types';
 import { useOrchestrator } from '../orchestrator/use-orchestrator';
 
-/**
- * 欢迎消息
- */
 const WELCOME_MESSAGE: IChatMessage = {
   id: 'welcome',
   role: 'assistant',
@@ -13,9 +10,6 @@ const WELCOME_MESSAGE: IChatMessage = {
   agent: 'orchestrator'
 };
 
-/**
- * 统一的聊天 Hook (消息管理 + 输入状态)
- */
 export function useChat(options: { inputAreaWrapperRef?: Ref<HTMLElement | null> } = {}) {
   const { inputAreaWrapperRef } = options;
   const inputValue = ref('');
@@ -24,7 +18,6 @@ export function useChat(options: { inputAreaWrapperRef?: Ref<HTMLElement | null>
   const inputAreaHeight = ref(130);
   const orchestrator = useOrchestrator();
 
-  // 输入区域高度监听
   let resizeObserver: ResizeObserver | null = null;
   onMounted(async () => {
     await nextTick();
@@ -38,9 +31,6 @@ export function useChat(options: { inputAreaWrapperRef?: Ref<HTMLElement | null>
   });
   onUnmounted(() => resizeObserver?.disconnect());
 
-  /**
-   * 更新或添加消息
-   */
   const addOrUpdateMessage = (role: 'user' | 'assistant', partial: Partial<IChatMessage> & { id?: string }) => {
     const { id, ...data } = partial;
     if (id) {
@@ -52,9 +42,6 @@ export function useChat(options: { inputAreaWrapperRef?: Ref<HTMLElement | null>
     return messages.value[messages.value.length - 1];
   };
 
-  /**
-   * 发送消息流程
-   */
   const sendMessage = async () => {
     const content = inputValue.value.trim();
     if (!content || loading.value) return;

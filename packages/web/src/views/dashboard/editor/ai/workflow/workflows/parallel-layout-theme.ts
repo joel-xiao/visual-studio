@@ -1,27 +1,14 @@
 import { WorkflowGraphBuilder } from '../core/graph';
 import type { IWorkflowGraph } from '../core/types';
 
-/**
- * 并行布局和主题工作流
- * 并行创建布局和设置主题
- */
 export function createParallelLayoutThemeWorkflow(): IWorkflowGraph {
   return new WorkflowGraphBuilder()
     .setId('parallel-layout-theme')
     .setName('并行布局和主题工作流')
     .setDescription('并行创建布局和设置主题')
     .setMatchRule({
-      keywords: ['并行', '同时', '一起'],
-      match: (input) => {
-        const lowerInput = input.toLowerCase();
-        // 同时包含布局和主题相关关键词
-        const hasLayout = lowerInput.includes('布局') || lowerInput.includes('创建') || lowerInput.includes('生成');
-        const hasTheme = lowerInput.includes('主题') || lowerInput.includes('风格') || lowerInput.includes('颜色');
-        const hasParallel = lowerInput.includes('并行') || lowerInput.includes('同时') || lowerInput.includes('一起');
-
-        return hasParallel && hasLayout && hasTheme;
-      },
-      priority: 12 // 比单独的工作流优先级更高
+      keywords: ['并行', '同时', '一起', '布局', '主题'],
+      priority: 12
     })
     .addStartNode('start', '开始', { x: 200, y: 100 })
     .addParallelNode('parallel', '并行执行', { x: 200, y: 200 })
@@ -37,4 +24,3 @@ export function createParallelLayoutThemeWorkflow(): IWorkflowGraph {
     .addEdge('merge', 'end')
     .build();
 }
-

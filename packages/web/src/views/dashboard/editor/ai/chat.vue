@@ -7,18 +7,14 @@ import { useChat } from './hooks/chat/use-chat';
 import { useChatContext } from './hooks/chat/use-chat-context';
 import { initAIContextExplicit } from './hooks/core/use-ai-context';
 
-// 初始化 AI Context（单例模式）
 initAIContextExplicit();
 
-// 输入区域引用
 const inputAreaWrapperRef = ref<HTMLElement | null>(null);
 
-// 统一的聊天 Hook（整合消息管理 + 输入状态 + 高度监听）
 const { messages, sendMessage, inputValue, loading, inputAreaHeight } = useChat({
   inputAreaWrapperRef
 });
 
-// 聊天上下文（选择、建议等）
 const {
   currentSelectionName,
   suggestions,
@@ -27,7 +23,6 @@ const {
   clearSelection
 } = useChatContext();
 
-// 建议点击处理
 const handleSuggestionClick = (suggestion: IPromptSuggestion) => {
   inputValue.value = suggestion.value;
   sendMessage();

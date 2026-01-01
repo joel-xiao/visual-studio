@@ -10,9 +10,6 @@ export interface IHistoryItem {
   content: string;
 }
 
-/**
- * AI 任务执行协调器
- */
 export function useOrchestrator() {
   const aiContext = useAIContext();
   const history = ref<IHistoryItem[]>([]);
@@ -22,7 +19,6 @@ export function useOrchestrator() {
     input: string,
     onStream?: (partial: Partial<IAgentResponse>) => void
   ): Promise<IAgentResponse> => {
-    // 1. 记录历史 & 构建上下文
     history.value.push({ role: 'user', content: input });
     const context = {
       input,
@@ -32,11 +28,9 @@ export function useOrchestrator() {
     };
 
     try {
-      // 2. 路由选择
       const workflow = await selector.selectWorkflow(input, context);
       if (!workflow) throw new Error('未能识别您的意图，请尝试换种说法');
 
-      // 3. 执行工作流
       const engine = new WorkflowEngine(workflow);
       const result = await engine.execute(input, context,
         (nodeId, partial) => {
@@ -49,7 +43,6 @@ export function useOrchestrator() {
         }
       );
 
-      // 4. 汇总结果
       const finalResponse = engine.getFinalResponse(result.success, result.error);
       history.value.push({ role: 'assistant', content: finalResponse.content });
       return finalResponse;

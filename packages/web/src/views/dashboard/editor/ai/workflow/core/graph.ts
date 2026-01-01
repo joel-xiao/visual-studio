@@ -1,18 +1,12 @@
 import type { IWorkflowGraph, IWorkflowNode, IWorkflowEdge, IWorkflowMatchRule } from './types';
 import type { AgentRole } from '../../types';
 
-/**
- * 工作流图构建器
- */
 export class WorkflowGraphBuilder {
   private graph: Partial<IWorkflowGraph> = {
     nodes: [],
     edges: []
   };
 
-  /**
-   * 设置工作流基本信息
-   */
   setId(id: string): this {
     this.graph.id = id;
     return this;
@@ -28,9 +22,6 @@ export class WorkflowGraphBuilder {
     return this;
   }
 
-  /**
-   * 添加开始节点
-   */
   addStartNode(id: string = 'start', label: string = '开始', position?: { x: number; y: number }): this {
     this.graph.nodes!.push({
       id,
@@ -42,9 +33,6 @@ export class WorkflowGraphBuilder {
     return this;
   }
 
-  /**
-   * 添加 Agent 节点
-   */
   addAgentNode(
     id: string,
     agent: AgentRole,
@@ -62,9 +50,6 @@ export class WorkflowGraphBuilder {
     return this;
   }
 
-  /**
-   * 添加条件节点
-   */
   addConditionNode(
     id: string,
     condition: (context: any) => boolean,
@@ -81,9 +66,6 @@ export class WorkflowGraphBuilder {
     return this;
   }
 
-  /**
-   * 添加并行节点
-   */
   addParallelNode(
     id: string,
     label: string = '并行执行',
@@ -98,9 +80,6 @@ export class WorkflowGraphBuilder {
     return this;
   }
 
-  /**
-   * 添加合并节点
-   */
   addMergeNode(
     id: string,
     label: string = '合并',
@@ -115,9 +94,6 @@ export class WorkflowGraphBuilder {
     return this;
   }
 
-  /**
-   * 添加结束节点
-   */
   addEndNode(id: string = 'end', label: string = '结束', position?: { x: number; y: number }): this {
     this.graph.nodes!.push({
       id,
@@ -128,9 +104,6 @@ export class WorkflowGraphBuilder {
     return this;
   }
 
-  /**
-   * 添加边（连接）
-   */
   addEdge(
     source: string,
     target: string,
@@ -148,17 +121,11 @@ export class WorkflowGraphBuilder {
     return this;
   }
 
-  /**
-   * 设置匹配规则
-   */
   setMatchRule(rule: IWorkflowMatchRule): this {
     this.graph.matchRule = rule;
     return this;
   }
 
-  /**
-   * 构建工作流图
-   */
   build(): IWorkflowGraph {
     if (!this.graph.id || !this.graph.name || !this.graph.startNodeId) {
       throw new Error('Workflow graph must have id, name, and startNodeId');

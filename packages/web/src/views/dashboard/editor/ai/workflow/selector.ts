@@ -3,7 +3,7 @@ import { useAIConfig } from '../hooks/core/use-ai-config';
 import { extractJSON } from '../utils/json-utils';
 import type { IWorkflowGraph } from './core/types';
 import type { AgentRole } from '../types';
-import { getAgentInfo, matchAgentByRules } from '../agent/registry';
+import { getAgentInfo } from '../agent/registry';
 import { WorkflowRegistry } from './registry';
 
 export class WorkflowSelector {

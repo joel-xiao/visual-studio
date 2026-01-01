@@ -13,7 +13,6 @@ const agentMap: Record<string, IAgent> = {};
 const applyMap: Record<string, (context: IAIContext, data: any) => void> = {};
 const componentMap: Record<string, VueComponent> = {};
 
-// 初始化
 Object.entries(schemaModules).forEach(([path, mod]) => {
   const role = path.split('/')[1];
   if (mod.default) {
@@ -64,21 +63,4 @@ export function getAgentInfo() {
 export function applyAgentData(role: AgentRole, context: IAIContext, data: any) {
   const applyFn = applyMap[role];
   if (applyFn) applyFn(context, data);
-}
-
-
-export function matchAgentByRules(input: string): AgentRole | null {
-  const lowerInput = input.toLowerCase();
-  let bestRole: AgentRole | null = null;
-  let bestScore = 0;
-
-  Object.values(schemaMap).forEach(s => {
-    const score = (s.routing.hints || []).filter((h: string) => lowerInput.includes(h.toLowerCase())).length +
-      (s.routing.tags || []).filter((t: string) => lowerInput.includes(t.toLowerCase())).length * 2;
-    if (score > bestScore) {
-      bestScore = score;
-      bestRole = s.role;
-    }
-  });
-  return bestRole;
 }

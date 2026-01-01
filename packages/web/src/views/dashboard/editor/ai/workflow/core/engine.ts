@@ -8,9 +8,6 @@ import type {
 import type { IAgent, AgentRole, IAgentResponse } from '../../types';
 import { registerAgents } from '../../agent/registry';
 
-/**
- * 工作流执行引擎
- */
 export class WorkflowEngine {
   private agents: Record<AgentRole, IAgent>;
   private graph: IWorkflowGraph;
@@ -21,23 +18,14 @@ export class WorkflowEngine {
     this.agents = registerAgents();
   }
 
-  /**
-   * 获取节点的出边
-   */
   private getOutgoingEdges(nodeId: string): IWorkflowEdge[] {
     return this.graph.edges.filter(e => e.source === nodeId);
   }
 
-  /**
-   * 获取节点的入边
-   */
   private getIncomingEdges(nodeId: string): IWorkflowEdge[] {
     return this.graph.edges.filter(e => e.target === nodeId);
   }
 
-  /**
-   * 检查节点是否所有前置节点都已完成
-   */
   private areAllPredecessorsCompleted(nodeId: string): boolean {
     const incomingEdges = this.getIncomingEdges(nodeId);
     if (incomingEdges.length === 0) return true;
@@ -46,16 +34,10 @@ export class WorkflowEngine {
     return incomingEdges.every(edge => visitedNodes.has(edge.source));
   }
 
-  /**
-   * 获取节点
-   */
   private getNode(nodeId: string): IWorkflowNode | null {
     return this.graph.nodes.find(n => n.id === nodeId) || null;
   }
 
-  /**
-   * 执行 Agent 节点
-   */
   private async executeAgentNode(
     node: IWorkflowNode,
     context: any,
@@ -70,7 +52,6 @@ export class WorkflowEngine {
       throw new Error(`Agent ${node.agent} not found`);
     }
 
-    // 构建上下文，包含工作流全局数据和历史数据
     const workflowContext: Record<string, unknown> = {
       ...context,
       workflowNodeId: node.id,
@@ -78,7 +59,6 @@ export class WorkflowEngine {
       history: this.executionContext!.history
     };
 
-    // 查找最近一个有响应数据的 Agent 节点，作为 previousAgentData 传递
     const lastAgentItem = [...this.executionContext!.history]
       .reverse()
       .find(h => {
@@ -90,18 +70,13 @@ export class WorkflowEngine {
       workflowContext.previousAgentData = lastAgentItem.response.data;
     }
 
-    const response = await agent.process(
+    return await agent.process(
       context.input || '',
       workflowContext,
       onStream
     );
-
-    return response;
   }
 
-  /**
-   * 执行条件节点
-   */
   private executeConditionNode(node: IWorkflowNode, context: any): boolean {
     if (!node.condition) {
       throw new Error(`Condition node ${node.id} must have a condition function`);
@@ -109,9 +84,6 @@ export class WorkflowEngine {
     return node.condition(context);
   }
 
-  /**
-   * 执行节点
-   */
   private async executeNode(
     node: IWorkflowNode,
     context: any,
@@ -124,13 +96,11 @@ export class WorkflowEngine {
 
       switch (node.type) {
         case 'start':
-          // 开始节点，直接返回
           break;
 
         case 'agent':
           response = await this.executeAgentNode(node, context, onStream);
           if (response?.data) {
-            // 合并数据
             this.executionContext!.data = {
               ...this.executionContext!.data,
               ...response.data
@@ -139,27 +109,17 @@ export class WorkflowEngine {
           break;
 
         case 'condition': {
-          // 条件节点不返回响应，只记录结果
           const conditionResult = this.executeConditionNode(node, context);
           this.executionContext!.data[`${node.id}_result`] = conditionResult;
           break;
         }
 
         case 'parallel':
-          // 并行节点，需要等待所有分支完成
-          // 这里返回 null，由 execute 方法处理并行逻辑
-          break;
-
         case 'merge':
-          // 合并节点，合并所有并行分支的数据
-          break;
-
         case 'end':
-          // 结束节点
           break;
       }
 
-      // 记录执行历史
       this.executionContext!.history.push({
         nodeId: node.id,
         timestamp,
@@ -179,76 +139,45 @@ export class WorkflowEngine {
     }
   }
 
-  /**
-   * 获取下一个要执行的节点
-   */
   private getNextNodes(currentNodeId: string, context: any): IWorkflowNode[] {
     const currentNode = this.getNode(currentNodeId);
-    if (!currentNode) {
-      return [];
-    }
+    if (!currentNode) return [];
 
     const outgoingEdges = this.getOutgoingEdges(currentNodeId);
     const nextNodes: IWorkflowNode[] = [];
 
     if (currentNode.type === 'condition') {
-      // 条件节点：根据条件结果选择路径
       const conditionResult = this.executionContext!.data[`${currentNodeId}_result`];
       for (const edge of outgoingEdges) {
         if (edge.condition === String(conditionResult)) {
           const nextNode = this.getNode(edge.target);
-          if (nextNode) {
-            nextNodes.push(nextNode);
-          }
+          if (nextNode) nextNodes.push(nextNode);
         }
       }
-    } else if (currentNode.type === 'parallel') {
-      // 并行节点：返回所有出边的目标节点
-      for (const edge of outgoingEdges) {
-        const nextNode = this.getNode(edge.target);
-        if (nextNode) {
-          nextNodes.push(nextNode);
-        }
+    } else if (currentNode.type === 'parallel' || currentNode.type === 'merge' || currentNode.type === 'agent' || currentNode.type === 'start') {
+      if (currentNode.type === 'merge') {
+        const incomingEdges = this.getIncomingEdges(currentNodeId);
+        const allCompleted = incomingEdges.every(edge =>
+          this.executionContext!.visitedNodes.has(edge.source)
+        );
+        if (!allCompleted) return [];
       }
-    } else if (currentNode.type === 'merge') {
-      // 合并节点：检查是否所有并行分支都已完成
-      const incomingEdges = this.getIncomingEdges(currentNodeId);
-      const allCompleted = incomingEdges.every(edge =>
-        this.executionContext!.visitedNodes.has(edge.source)
-      );
 
-      if (allCompleted) {
-        // 所有分支都完成，继续执行
-        for (const edge of outgoingEdges) {
-          const nextNode = this.getNode(edge.target);
-          if (nextNode) {
-            nextNodes.push(nextNode);
-          }
-        }
-      }
-    } else {
-      // 普通节点：返回所有出边的目标节点
       for (const edge of outgoingEdges) {
         const nextNode = this.getNode(edge.target);
-        if (nextNode) {
-          nextNodes.push(nextNode);
-        }
+        if (nextNode) nextNodes.push(nextNode);
       }
     }
 
     return nextNodes;
   }
 
-  /**
-   * 执行工作流
-   */
   async execute(
     input: string,
     context: any = {},
     onStream?: (nodeId: string, partial: Partial<IAgentResponse>) => void,
     onNodeComplete?: (nodeId: string, response: IAgentResponse) => void
   ): Promise<IWorkflowExecutionResult> {
-    // 初始化执行上下文
     this.executionContext = {
       workflowId: this.graph.id,
       currentNodeId: this.graph.startNodeId,
@@ -266,18 +195,13 @@ export class WorkflowEngine {
         const currentNodeId = nodeQueue.shift()!;
         const currentNode = this.getNode(currentNodeId);
 
-        if (!currentNode) {
-          throw new Error(`Node ${currentNodeId} not found`);
-        }
+        if (!currentNode) throw new Error(`Node ${currentNodeId} not found`);
 
-        // 检查前置条件
         if (!this.areAllPredecessorsCompleted(currentNodeId)) {
-          // 前置节点未完成，重新加入队列
           nodeQueue.push(currentNodeId);
           continue;
         }
 
-        // 跳过已访问的节点（除非是并行节点）
         if (this.executionContext.visitedNodes.has(currentNodeId) && currentNode.type !== 'merge') {
           continue;
         }
@@ -285,26 +209,21 @@ export class WorkflowEngine {
         executionPath.push(currentNodeId);
         this.executionContext.currentNodeId = currentNodeId;
 
-        // 执行节点
         const wrappedOnStream = onStream
           ? (partial: Partial<IAgentResponse>) => onStream(currentNodeId, partial)
           : undefined;
 
         const response = await this.executeNode(currentNode, { ...context, input }, wrappedOnStream);
 
-        // 如果节点有响应，触发完成回调
         if (response && onNodeComplete) {
           onNodeComplete(currentNodeId, response);
         }
 
-        // 获取下一个节点
         const nextNodes = this.getNextNodes(currentNodeId, context);
 
-        // 如果是并行节点，所有分支都加入队列
         if (currentNode.type === 'parallel') {
           nodeQueue.push(...nextNodes.map(n => n.id));
         } else {
-          // 普通节点，按顺序执行
           for (const nextNode of nextNodes) {
             if (!this.executionContext.visitedNodes.has(nextNode.id)) {
               nodeQueue.push(nextNode.id);
@@ -312,10 +231,7 @@ export class WorkflowEngine {
           }
         }
 
-        // 检查是否到达结束节点
-        if (currentNode.type === 'end') {
-          break;
-        }
+        if (currentNode.type === 'end') break;
       }
 
       this.executionContext.status = 'completed';
@@ -338,25 +254,16 @@ export class WorkflowEngine {
     }
   }
 
-  /**
-   * 获取执行上下文
-   */
   getExecutionContext(): IWorkflowExecutionContext | null {
     return this.executionContext;
   }
 
-  /**
-   * 取消执行
-   */
   cancel(): void {
     if (this.executionContext) {
       this.executionContext.status = 'cancelled';
     }
   }
 
-  /**
-   * 获取最终聚合的 IAgentResponse
-   */
   getFinalResponse(success: boolean, error?: Error): IAgentResponse {
     if (!this.executionContext) {
       return {
@@ -369,7 +276,6 @@ export class WorkflowEngine {
     let lastAgentResponse: IAgentResponse | null = null;
     let finalAgentRole: AgentRole | undefined;
 
-    // 从后往前找最后一个有响应内容的 Agent
     for (let i = this.executionContext.history.length - 1; i >= 0; i--) {
       const item = this.executionContext.history[i];
       if (item.response) {
@@ -385,11 +291,10 @@ export class WorkflowEngine {
     return {
       content: lastAgentResponse?.content || (success ? '任务已完成' : `执行失败: ${error?.message}`),
       type: lastAgentResponse?.type || 'text',
-      data: this.executionContext.data, // 使用累积的全局数据
+      data: this.executionContext.data,
       agent: finalAgentRole,
       actions: lastAgentResponse?.actions,
       isError: !success
     };
   }
 }
-
