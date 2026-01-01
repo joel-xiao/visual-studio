@@ -1,4 +1,4 @@
-import type { IAgentSchema } from '../types';
+import type { IAgentSchema } from '../../agent/types';
 
 /**
  * 从 schema 获取消息的辅助函数

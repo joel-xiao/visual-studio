@@ -24,6 +24,7 @@ export function useOrchestrator() {
       input,
       nodes: unref(aiContext.nodeContext.getNodes()),
       selectedNodes: unref(aiContext.nodeContext.getSelectedNodes()),
+      availableComponents: aiContext.componentContext.getAvailableComponents(),
       history: history.value.map(h => ({ role: h.role, content: h.content }))
     };
 
@@ -39,7 +40,11 @@ export function useOrchestrator() {
         },
         (nodeId, nodeRes) => {
           const node = workflow.nodes.find(n => n.id === nodeId);
-          if (nodeRes.data && node?.agent) applyAgentData(node.agent, aiContext, nodeRes.data);
+          // 只在简单单节点工作流中自动应用数据
+          // 多节点工作流需要用户手动确认每一步
+          if (nodeRes.data && node?.agent && workflow.nodes.length <= 3) {
+            applyAgentData(node.agent, aiContext, nodeRes.data);
+          }
         }
       );
 

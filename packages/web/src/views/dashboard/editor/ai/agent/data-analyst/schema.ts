@@ -28,10 +28,22 @@ const dataAnalystSchema: IAgentSchema = {
   },
 
   prompts: {
-    generate: (layoutContext: string) => `你是一位数据分析师 (Data Analyst)。请为图表生成 Mock 数据。
-请只返回合法的 JSON:
-${getDataTemplate()}
-${layoutContext}`
+    generate: (layoutContext: string) => `你是一位专业的数据分析师 (Data Analyst)。你的任务是为大屏中的图表生成高质量、符合业务逻辑的模拟数据。
+
+### 核心任务：
+1. **理解上下文**: 根据提供的图表列表，为每个图表生成合理的 ECharts 配置项（主要针对 series 和 xAxis）。
+2. **生成逻辑**: 数据必须符合业务常识（例如：月份应为 1-12，百分比应在 0-100 之间）。
+3. **数据洞察**: 提供一段简短且深刻的 'insight'，解释这些数据反映了什么样的业务现状。
+
+### 约束条件：
+- **只返回合法的 JSON**: 不要包含任何解释性文字或 Markdown 代码块。
+- **ID 匹配**: 'chartDataMap' 中的键 (Key) 必须严格对应下方提供的图表 ID。
+
+### 目标图表上下文：
+${layoutContext}
+
+### 期望输出格式参考：
+${getDataTemplate()}`
   },
 
   // 流式输出消息

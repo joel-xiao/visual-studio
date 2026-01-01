@@ -11,7 +11,7 @@ initAIContextExplicit();
 
 const inputAreaWrapperRef = ref<HTMLElement | null>(null);
 
-const { messages, sendMessage, inputValue, loading, inputAreaHeight } = useChat({
+const { messages, sendMessage, inputValue, loading, inputAreaHeight, handleContinueWorkflow } = useChat({
   inputAreaWrapperRef
 });
 
@@ -36,6 +36,7 @@ const chatContainerRef = ref<HTMLElement | null>(null);
     <Messages
       :messages="messages"
       :input-area-height="inputAreaHeight"
+      :on-continue-workflow="handleContinueWorkflow"
     />
 
     <div ref="inputAreaWrapperRef" class="input-area-wrapper">

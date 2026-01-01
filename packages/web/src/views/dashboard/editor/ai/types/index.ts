@@ -26,6 +26,14 @@ export interface IAgent {
   apply?(context: any, data: any): void;
 }
 
+export interface IWorkflowControl {
+  isMultiStep: boolean;
+  currentStep: number;
+  totalSteps: number;
+  hasNext: boolean;
+  nextNodeId?: string;
+}
+
 export interface IAgentResponse {
   content: string;
   type: IChatMessage['type'];
@@ -33,5 +41,6 @@ export interface IAgentResponse {
   actions?: ISceneAction[];
   isError?: boolean;
   agent?: AgentRole;
+  workflowControl?: IWorkflowControl;
 }
 

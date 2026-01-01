@@ -5,6 +5,7 @@
         v-for="msg in messages"
         :key="msg.id"
         :message="msg"
+        :on-continue-workflow="onContinueWorkflow"
       />
     </transition-group>
   </div>
@@ -18,6 +19,7 @@ import Message from './Message.vue';
 interface Props {
   messages: IChatMessage[];
   inputAreaHeight?: number;
+  onContinueWorkflow?: (data: any) => void;
 }
 
 const props = withDefaults(defineProps<Props>(), {

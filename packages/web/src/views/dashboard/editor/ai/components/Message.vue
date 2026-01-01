@@ -32,7 +32,8 @@
           :badge="message.type"
           :has-secondary-action="!!agentSchema?.uiHints?.secondaryActionText && hasSelection"
           :secondary-action-text="agentSchema?.uiHints?.secondaryActionText"
-          :primary-action-text="hasSelection ? (agentSchema?.uiHints?.primaryActionText || '解析并应用') : '应用到画布'"
+          :primary-action-text="getPrimaryActionText()"
+          :workflow-control="workflowControl"
           @apply="handleApply"
           @secondary="handleApply($event, 'update')"
         >
@@ -61,9 +62,12 @@ import AgentResponseCard from './AgentResponseCard.vue';
 import { useAIContext } from '../hooks/core/use-ai-context';
 import { applyAgentData, getAgentSchema, getAgentComponent } from '../agent/registry';
 
-const props = defineProps<{ message: IChatMessage }>();
-const aiContext = useAIContext();
+const props = defineProps<{ 
+  message: IChatMessage;
+  onContinueWorkflow?: (data: any) => void;
+}>();
 
+const aiContext = useAIContext();
 const agentSchema = computed(() => props.message.agent ? getAgentSchema(props.message.agent) : null);
 const agentComponent = computed(() => props.message.agent ? getAgentComponent(props.message.agent) : null);
 const hasSelection = computed(() => {
@@ -71,10 +75,30 @@ const hasSelection = computed(() => {
   return Array.isArray(selected) ? selected.length > 0 : !!selected;
 });
 
+const workflowControl = computed(() => (props.message as any).workflowControl);
+const isMultiStepWorkflow = computed(() => !!workflowControl.value?.isMultiStep);
+
 const handleApply = (data?: any, mode: 'create' | 'update' = 'create') => {
   if (!props.message.agent) return;
   const payload = data || props.message.data;
-  applyAgentData(props.message.agent, aiContext, { ...payload, applyMode: mode });
+  
+  if (isMultiStepWorkflow.value && props.onContinueWorkflow) {
+    props.onContinueWorkflow({ ...payload, applyMode: mode });
+  } else {
+    applyAgentData(props.message.agent, aiContext, { ...payload, applyMode: mode });
+  }
+};
+
+const getPrimaryActionText = () => {
+  if (!isMultiStepWorkflow.value) {
+    return hasSelection.value ? (agentSchema.value?.uiHints?.primaryActionText || '解析并应用') : '应用到画布';
+  }
+  
+  const control = workflowControl.value;
+  if (control?.hasNext) {
+    return `应用并继续 (${control.currentStep}/${control.totalSteps})`;
+  }
+  return '应用并完成';
 };
 </script>
 

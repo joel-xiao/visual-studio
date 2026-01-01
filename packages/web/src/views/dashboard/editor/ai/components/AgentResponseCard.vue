@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import CButton from '../../../ui/controls/c-button/index.vue';
 import CIcon from '../../../ui/controls/c-icon/index.vue';
-import type { AgentRole } from '../types';
+import type { AgentRole, IWorkflowControl } from '../types';
 import { getAgentSchema } from '../agent/registry';
 
 interface Props {
@@ -14,6 +14,7 @@ interface Props {
   primaryActionText?: string;
   secondaryActionText?: string;
   hasSecondaryAction?: boolean;
+  workflowControl?: IWorkflowControl;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -33,11 +34,20 @@ const schema = computed(() => props.role ? getAgentSchema(props.role) : null);
 
 <template>
   <div class="agent-card">
-    <div v-if="title || badge" class="card-header">
+    <div v-if="title || badge || workflowControl?.isMultiStep" class="card-header">
       <div class="header-main">
         <CIcon v-if="schema?.icon" :icon="schema.icon" :style="{ color: schema.color }" />
         <span class="title">{{ title || schema?.displayName }}</span>
         <span v-if="badge" class="badge">{{ badge }}</span>
+      </div>
+      <div v-if="workflowControl?.isMultiStep" class="workflow-progress">
+        <span class="progress-text">{{ workflowControl.currentStep }}/{{ workflowControl.totalSteps }}</span>
+        <div class="progress-bar">
+          <div 
+            class="progress-fill" 
+            :style="{ width: `${(workflowControl.currentStep / workflowControl.totalSteps) * 100}%` }"
+          />
+        </div>
       </div>
       <slot name="header-right" />
     </div>
@@ -88,6 +98,8 @@ const schema = computed(() => props.role ? getAgentSchema(props.role) : null);
     align-items: center;
     background: rgba(255, 255, 255, 0.02);
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    flex-wrap: wrap;
+    gap: 8px;
 
     .header-main {
       display: flex;
@@ -112,6 +124,34 @@ const schema = computed(() => props.role ? getAgentSchema(props.role) : null);
         border-radius: 4px;
         text-transform: uppercase;
         font-weight: 700;
+      }
+    }
+
+    .workflow-progress {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+
+      .progress-text {
+        font-size: 10px;
+        color: var(--theme-color-text-secondary);
+        font-weight: 500;
+      }
+
+      .progress-bar {
+        width: 60px;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 2px;
+        overflow: hidden;
+
+        .progress-fill {
+          height: 100%;
+          background: linear-gradient(90deg, #409eff, #67c23a);
+          border-radius: 2px;
+          transition: width 0.3s ease;
+        }
       }
     }
   }

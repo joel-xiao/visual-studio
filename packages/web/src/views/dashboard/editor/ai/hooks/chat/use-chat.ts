@@ -1,6 +1,7 @@
 import { ref, nextTick, onMounted, onUnmounted, type Ref } from 'vue';
 import type { IChatMessage, AgentRole, IAgentResponse } from '../../types';
 import { useOrchestrator } from '../orchestrator/use-orchestrator';
+import { useStepOrchestrator } from '../orchestrator/use-step-orchestrator';
 
 const WELCOME_MESSAGE: IChatMessage = {
   id: 'welcome',
@@ -17,6 +18,7 @@ export function useChat(options: { inputAreaWrapperRef?: Ref<HTMLElement | null>
   const messages = ref<IChatMessage[]>([WELCOME_MESSAGE]);
   const inputAreaHeight = ref(130);
   const orchestrator = useOrchestrator();
+  const stepOrchestrator = useStepOrchestrator();
 
   let resizeObserver: ResizeObserver | null = null;
   onMounted(async () => {
@@ -50,19 +52,59 @@ export function useChat(options: { inputAreaWrapperRef?: Ref<HTMLElement | null>
     loading.value = true;
     addOrUpdateMessage('user', { content });
 
-    const assistantMsg = addOrUpdateMessage('assistant', { content: 'Thinking...', agent: 'orchestrator' });
+    const assistantMsg = addOrUpdateMessage('assistant', { 
+      content: '正在思考...', 
+      agent: 'orchestrator' 
+    });
 
     try {
-      const response = await orchestrator.process(content, (partial) => {
+      const response = await stepOrchestrator.process(content, (partial) => {
         addOrUpdateMessage('assistant', { id: assistantMsg.id, ...partial });
       });
       addOrUpdateMessage('assistant', { id: assistantMsg.id, ...response });
     } catch (e: any) {
-      addOrUpdateMessage('assistant', { id: assistantMsg.id, content: `出错啦: ${e.message}`, isError: true });
+      addOrUpdateMessage('assistant', { 
+        id: assistantMsg.id, 
+        content: `出错啦: ${e.message}`, 
+        isError: true 
+      });
     } finally {
       loading.value = false;
     }
   };
 
-  return { messages, inputValue, loading, inputAreaHeight, sendMessage };
+  const handleContinueWorkflow = async (data: any) => {
+    if (loading.value) return;
+    
+    loading.value = true;
+    const assistantMsg = addOrUpdateMessage('assistant', { 
+      content: '正在继续执行...', 
+      agent: 'orchestrator' 
+    });
+
+    try {
+      const response = await stepOrchestrator.applyAndContinue(data, (partial) => {
+        addOrUpdateMessage('assistant', { id: assistantMsg.id, ...partial });
+      });
+      
+      if (response) {
+        addOrUpdateMessage('assistant', { id: assistantMsg.id, ...response });
+      } else {
+        const msgIndex = messages.value.findIndex(m => m.id === assistantMsg.id);
+        if (msgIndex !== -1) {
+          messages.value.splice(msgIndex, 1);
+        }
+      }
+    } catch (e: any) {
+      addOrUpdateMessage('assistant', { 
+        id: assistantMsg.id, 
+        content: `继续执行出错: ${e.message}`, 
+        isError: true 
+      });
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  return { messages, inputValue, loading, inputAreaHeight, sendMessage, handleContinueWorkflow };
 }
