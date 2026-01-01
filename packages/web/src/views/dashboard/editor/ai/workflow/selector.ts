@@ -65,7 +65,11 @@ ${historyStr}
     const history = Array.isArray(context.history) ? context.history : [];
     if (history.length === 0) return '';
     return '\n最近对话:\n' + history.slice(-3)
-      .map((h: any) => `- ${h.role === 'user' ? '用户' : '助手'}: ${h.content}`)
+      .map((h: any) => {
+        const count = Array.isArray(h.attachments) ? h.attachments.length : 0;
+        const tag = count ? ` [图片${count}]` : '';
+        return `- ${h.role === 'user' ? '用户' : '助手'}: ${h.content}${tag}`;
+      })
       .join('\n');
   }
 

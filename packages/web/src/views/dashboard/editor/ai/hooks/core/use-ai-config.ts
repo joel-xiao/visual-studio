@@ -6,6 +6,7 @@ const openai = createDashScope({
 });
 
 const defaultModel = openai.chat('qwen-max');
+const visionModel = openai.chat('qwen-vl-max');
 
 /**
  * AI Config Hook
@@ -14,7 +15,7 @@ const defaultModel = openai.chat('qwen-max');
 export function useAIConfig() {
   return {
     defaultModel,
+    visionModel,
     openai
   };
 }
-

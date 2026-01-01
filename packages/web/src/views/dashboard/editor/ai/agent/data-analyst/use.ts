@@ -13,7 +13,7 @@ export function useDataAnalyst(): IAgent {
     return processWithAI(schema.prompts.generate(layoutContext), input, onStream, (json) => ({
       type: 'code',
       data: json.data || json
-    }));
+    }), context?.attachments);
   };
 
   return { role: schema.role as any, name: schema.name, description: schema.description, process };

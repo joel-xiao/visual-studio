@@ -6,12 +6,23 @@ export interface ISceneAction {
   disabled?: boolean;
 }
 
+export interface IChatImageAttachment {
+  id: string;
+  kind: 'image';
+  url: string;
+  name?: string;
+  mimeType?: string;
+  size?: number;
+  status?: 'uploading' | 'ready' | 'error';
+}
+
 // 允许扩展的 Agent Role
 export type AgentRole = 'layout-architect' | 'chart-creator' | 'data-analyst' | 'theme-engine' | 'suggestion-generator' | 'orchestrator' | (string & {});
 
 export interface IChatMessage extends IAIMessage {
   id: string;
-  type?: 'text' | 'code' | 'action' | 'chart' | 'theme-selection' | 'scene-selection' | 'agent-thought';
+  type?: 'text' | 'image' | 'code' | 'action' | 'chart' | 'theme-selection' | 'scene-selection' | 'agent-thought';
+  attachments?: IChatImageAttachment[];
   actions?: ISceneAction[];
   isError?: boolean;
   data?: any; // For holding chart options, layout config, or other structured data
@@ -43,4 +54,3 @@ export interface IAgentResponse {
   agent?: AgentRole;
   workflowControl?: IWorkflowControl;
 }
-

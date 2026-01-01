@@ -13,7 +13,7 @@ export function useChartCreator(): IAgent {
     if (chartNodes.length > 0) {
       const chartOptions: Record<string, any> = {};
       for (const node of chartNodes) {
-        const res = await processWithAI(schema.prompts.beautify(node.component), `优化图表: ${node.name}`, onStream);
+        const res = await processWithAI(schema.prompts.beautify(node.component), `优化图表: ${node.name}`, onStream, undefined, context?.attachments);
         if (res.data?.options) chartOptions[node.id] = res.data.options;
       }
       return { content: '图表已美化', type: 'text', data: { chartOptions } };
@@ -26,7 +26,7 @@ export function useChartCreator(): IAgent {
     return processWithAI(schema.prompts.create(targetCtx), input, onStream, (json) => ({
       type: 'chart',
       data: json.data || json.options || json
-    }));
+    }), context?.attachments);
   };
 
   return { role: schema.role, name: schema.name, description: schema.description, process };

@@ -26,20 +26,20 @@ export function useSuggestionGenerator(): IAgent {
         throw new Error('返回建议数据格式错误');
       }
       return { data: json };
-    });
+    }, context?.attachments);
   };
 
-  return { 
-    role: schema.role as any, 
-    name: schema.name, 
-    description: schema.description, 
-    process 
+  return {
+    role: schema.role as any,
+    name: schema.name,
+    description: schema.description,
+    process
   };
 }
 
 function getAvailableAgents(): string {
   const agents: string[] = [];
-  
+
   Object.entries(agentSchemaModules).forEach(([, module]) => {
     if (module.default) {
       const schema = module.default;
@@ -52,16 +52,16 @@ function getAvailableAgents(): string {
 
 function getAvailableWorkflows(): string {
   const workflows: string[] = [];
-  
+
   Object.entries(workflowModules).forEach(([path, module]) => {
     const workflowName = path.split('/').pop()?.replace('.ts', '') || '';
     if (workflowName === 'index') return;
-    
+
     // 查找 create 函数
     const createFnName = Object.keys(module).find(
       key => key.startsWith('create') && key.endsWith('Workflow') && typeof module[key] === 'function'
     );
-    
+
     if (createFnName) {
       try {
         const workflow = module[createFnName]();
@@ -78,13 +78,13 @@ function getAvailableWorkflows(): string {
 function buildContextInfo(nodes: any[], selectedNodes: any[], availableComponents: any[]): string {
   const nodeCount = nodes.filter(n => n.id !== 'root').length;
   const hasSelection = selectedNodes.length > 0 && selectedNodes[0].id !== 'root';
-  
+
   let contextInfo = `画布状态：${nodeCount === 0 ? '空画布' : `包含${nodeCount}个组件`}\n`;
-  
+
   if (hasSelection) {
     const selected = selectedNodes[0];
     contextInfo += `当前选中：${selected.name || '未命名组件'} (类型: ${selected.component || selected.schema})\n`;
-    
+
     if (selected.component?.includes('APACHE_ECHARTS')) {
       contextInfo += `选中组件是图表类型，支持图表相关操作\n`;
     }

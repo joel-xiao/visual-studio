@@ -1,7 +1,7 @@
 <template>
   <div class="message-wrapper" :class="[message.role, { 'full-width': agentSchema?.uiHints?.fullWidth }]">
     <div v-if="message.role === 'assistant'" class="avatar-column">
-      <div 
+      <div
         class="agent-avatar"
         :style="agentSchema?.color ? { background: agentSchema.color } : {}"
       >
@@ -49,6 +49,15 @@
         <div v-else-if="message.data" class="code-content">
           <pre><code>{{ JSON.stringify(message.data, null, 2) }}</code></pre>
         </div>
+
+        <div v-if="imageAttachments.length" class="attachments">
+          <img
+            v-for="img in imageAttachments"
+            :key="img.id"
+            class="attachment-image"
+            :src="img.url"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -62,7 +71,7 @@ import AgentResponseCard from './AgentResponseCard.vue';
 import { useAIContext } from '../hooks/core/use-ai-context';
 import { applyAgentData, getAgentSchema, getAgentComponent } from '../agent/registry';
 
-const props = defineProps<{ 
+const props = defineProps<{
   message: IChatMessage;
   onContinueWorkflow?: (data: any) => void;
 }>();
@@ -77,11 +86,12 @@ const hasSelection = computed(() => {
 
 const workflowControl = computed(() => (props.message as any).workflowControl);
 const isMultiStepWorkflow = computed(() => !!workflowControl.value?.isMultiStep);
+const imageAttachments = computed(() => (props.message.attachments || []).filter(a => a.kind === 'image' && !!a.url));
 
 const handleApply = (data?: any, mode: 'create' | 'update' = 'create') => {
   if (!props.message.agent) return;
   const payload = data || props.message.data;
-  
+
   if (isMultiStepWorkflow.value && props.onContinueWorkflow) {
     props.onContinueWorkflow({ ...payload, applyMode: mode });
   } else {
@@ -93,7 +103,7 @@ const getPrimaryActionText = () => {
   if (!isMultiStepWorkflow.value) {
     return hasSelection.value ? (agentSchema.value?.uiHints?.primaryActionText || '解析并应用') : '应用到画布';
   }
-  
+
   const control = workflowControl.value;
   if (control?.hasNext) {
     return `应用并继续 (${control.currentStep}/${control.totalSteps})`;
@@ -283,6 +293,22 @@ const getPrimaryActionText = () => {
         }
       }
 
+      .attachments {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 8px;
+      }
+
+      .attachment-image {
+        width: 132px;
+        height: 132px;
+        border-radius: 10px;
+        object-fit: cover;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.02);
+      }
+
       .thought-content {
         display: flex;
         align-items: center;
@@ -379,4 +405,3 @@ const getPrimaryActionText = () => {
   }
 }
 </style>
-

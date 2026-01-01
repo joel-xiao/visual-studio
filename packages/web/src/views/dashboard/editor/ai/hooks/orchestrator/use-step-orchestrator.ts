@@ -1,5 +1,5 @@
 import { ref, unref, type Ref } from 'vue';
-import type { IAgentResponse, AgentRole } from '../../types';
+import type { IAgentResponse, IChatImageAttachment, AgentRole } from '../../types';
 import { StepWorkflowEngine } from '../../workflow/core/step-engine';
 import { WorkflowSelector } from '../../workflow/selector';
 import { applyAgentData } from '../../agent/registry';
@@ -8,6 +8,7 @@ import { useAIContext } from '../core/use-ai-context';
 export interface IHistoryItem {
   role: 'user' | 'assistant';
   content: string;
+  attachments?: IChatImageAttachment[];
 }
 
 export interface IStepExecutionState {
@@ -32,15 +33,22 @@ export function useStepOrchestrator() {
 
   const process = async (
     input: string,
-    onStream?: (partial: Partial<IAgentResponse>) => void
+    options: {
+      attachments?: IChatImageAttachment[];
+      onStream?: (partial: Partial<IAgentResponse>) => void;
+    } = {}
   ): Promise<IAgentResponse> => {
-    history.value.push({ role: 'user', content: input });
+    const attachments = options.attachments || [];
+    const onStream = options.onStream;
+
+    history.value.push({ role: 'user', content: input, attachments });
     const context = {
       input,
+      attachments,
       nodes: unref(aiContext.nodeContext.getNodes()),
       selectedNodes: unref(aiContext.nodeContext.getSelectedNodes()),
       availableComponents: aiContext.componentContext.getAvailableComponents(),
-      history: history.value.map(h => ({ role: h.role, content: h.content }))
+      history: history.value.map(h => ({ role: h.role, content: h.content, attachments: h.attachments || [] }))
     };
 
     try {
@@ -48,7 +56,7 @@ export function useStepOrchestrator() {
       if (!workflow) throw new Error('未能识别您的意图，请尝试换种说法');
 
       const isMultiStep = workflow.nodes.filter(n => n.type === 'agent').length > 1;
-      
+
       if (!isMultiStep) {
         const { WorkflowEngine } = await import('../../workflow/core/engine');
         const engine = new WorkflowEngine(workflow);
@@ -82,7 +90,7 @@ export function useStepOrchestrator() {
       if (stepResult.response) {
         executionState.value.lastResponse = stepResult.response;
         executionState.value.isWaitingForConfirmation = stepResult.hasNext;
-        
+
         const enhancedResponse: IAgentResponse = {
           ...stepResult.response,
           workflowControl: {
@@ -138,7 +146,7 @@ export function useStepOrchestrator() {
         nodes: unref(aiContext.nodeContext.getNodes()),
         selectedNodes: unref(aiContext.nodeContext.getSelectedNodes()),
         availableComponents: aiContext.componentContext.getAvailableComponents(),
-        history: history.value.map(h => ({ role: h.role, content: h.content }))
+        history: history.value.map(h => ({ role: h.role, content: h.content, attachments: h.attachments || [] }))
       };
 
       const stepResult = await state.engine.continueExecution('', context, (nodeId, partial) => {
@@ -185,11 +193,11 @@ export function useStepOrchestrator() {
     };
   };
 
-  return { 
-    process, 
+  return {
+    process,
     applyAndContinue,
     executionState: executionState.value,
-    history, 
+    history,
     clearHistory: () => {
       history.value = [];
       resetExecution();

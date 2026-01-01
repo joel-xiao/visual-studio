@@ -11,7 +11,7 @@ initAIContextExplicit();
 
 const inputAreaWrapperRef = ref<HTMLElement | null>(null);
 
-const { messages, sendMessage, inputValue, loading, inputAreaHeight, handleContinueWorkflow } = useChat({
+const { messages, sendMessage, inputValue, pendingAttachments, loading, inputAreaHeight, handleContinueWorkflow } = useChat({
   inputAreaWrapperRef
 });
 
@@ -56,6 +56,7 @@ const chatContainerRef = ref<HTMLElement | null>(null);
     <div ref="inputAreaWrapperRef" class="input-area-wrapper">
       <InputArea
         v-model="inputValue"
+        v-model:attachments="pendingAttachments"
         :placeholder="placeholderText"
         :suggestions="suggestions"
         :loading="loading"

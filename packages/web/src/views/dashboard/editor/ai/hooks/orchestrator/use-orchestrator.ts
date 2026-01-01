@@ -1,5 +1,5 @@
 import { ref, unref, type Ref } from 'vue';
-import type { IAgentResponse, AgentRole } from '../../types';
+import type { IAgentResponse, IChatImageAttachment, AgentRole } from '../../types';
 import { WorkflowEngine } from '../../workflow/core/engine';
 import { WorkflowSelector } from '../../workflow/selector';
 import { applyAgentData } from '../../agent/registry';
@@ -8,6 +8,7 @@ import { useAIContext } from '../core/use-ai-context';
 export interface IHistoryItem {
   role: 'user' | 'assistant';
   content: string;
+  attachments?: IChatImageAttachment[];
 }
 
 export function useOrchestrator() {
@@ -17,15 +18,22 @@ export function useOrchestrator() {
 
   const process = async (
     input: string,
-    onStream?: (partial: Partial<IAgentResponse>) => void
+    options: {
+      attachments?: IChatImageAttachment[];
+      onStream?: (partial: Partial<IAgentResponse>) => void;
+    } = {}
   ): Promise<IAgentResponse> => {
-    history.value.push({ role: 'user', content: input });
+    const attachments = options.attachments || [];
+    const onStream = options.onStream;
+
+    history.value.push({ role: 'user', content: input, attachments });
     const context = {
       input,
+      attachments,
       nodes: unref(aiContext.nodeContext.getNodes()),
       selectedNodes: unref(aiContext.nodeContext.getSelectedNodes()),
       availableComponents: aiContext.componentContext.getAvailableComponents(),
-      history: history.value.map(h => ({ role: h.role, content: h.content }))
+      history: history.value.map(h => ({ role: h.role, content: h.content, attachments: h.attachments || [] }))
     };
 
     try {

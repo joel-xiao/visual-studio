@@ -6,12 +6,12 @@ export function useThemeEngine(): IAgent {
   const schema = themeEngineSchema;
   const { processWithAI } = useBaseAgent(schema);
 
-  const process = async (input: string, _context?: any, onStream?: any): Promise<IAgentResponse> => {
+  const process = async (input: string, context?: any, onStream?: any): Promise<IAgentResponse> => {
     try {
       return await processWithAI(schema.prompts.select(), input, onStream, (json) => ({
         type: 'theme-selection',
         data: json.data || json
-      }));
+      }), context?.attachments);
     } catch (e) {
       // 简单回退逻辑
       const theme = input.toLowerCase().includes('light') ? 'light' : 'dark';

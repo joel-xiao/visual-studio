@@ -7,13 +7,16 @@ export function useLayoutArchitect(): IAgent {
   const { processWithAI } = useBaseAgent(schema);
 
   const process = async (input: string, context?: any, onStream?: any): Promise<IAgentResponse> => {
-    const historyStr = context?.history?.map((h: any) => `${h.role}: ${h.content}`).join('\n') || '';
+    const historyStr = context?.history?.map((h: any) => {
+      const count = Array.isArray(h.attachments) ? h.attachments.length : 0;
+      return `${h.role}: ${h.content}${count ? ` [图片${count}]` : ''}`;
+    }).join('\n') || '';
     const componentList = context?.availableComponents?.map((c: any) => `- ${c.name} (type: ${c.type})`).join('\n') || '';
 
     return processWithAI(schema.prompts.generate(componentList, historyStr), input, onStream, (json) => {
       if (!json.data?.nodes) throw new Error('返回布局数据格式错误');
       return { data: json.data };
-    });
+    }, context?.attachments);
   };
 
   return { role: schema.role as any, name: schema.name, description: schema.description, process };
