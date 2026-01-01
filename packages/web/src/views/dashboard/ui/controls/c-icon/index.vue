@@ -1,6 +1,6 @@
 <template>
   <BasicBox class="c-icon" v-bind="$attrs" :type="type">
-    <BasicIcon :icon="icon" :lock="lock" :hover="hover" :size="size" />
+    <BasicIcon :icon="icon" :lock="lock" :hover="hover" :size="size" :spin="spin" />
   </BasicBox>
 </template>
 
@@ -21,6 +21,7 @@ interface Props {
   lock?: boolean;
   hover?: boolean;
   size?: 'small' | 'medium' | 'large';
+  spin?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -28,7 +29,8 @@ const props = withDefaults(defineProps<Props>(), {
   type: '', // e.g. 'hover', 'button' for box styles
   lock: false,
   hover: false,
-  size: 'medium'
+  size: 'medium',
+  spin: false
 });
 </script>
 

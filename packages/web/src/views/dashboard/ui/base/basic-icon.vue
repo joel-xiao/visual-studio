@@ -7,17 +7,20 @@ interface IProps {
   icon?: string;
   hover?: boolean;
   size?: 'small' | 'medium' | 'large';
+  spin?: boolean;
 }
 const props = withDefaults(defineProps<IProps>(), {
   lock: false,
   icon: '',
   hover: false,
-  size: 'medium'
+  size: 'medium',
+  spin: false
 });
 
 const iconClass = computed(() => ({
   lock: !!props.lock,
   hover: !!props.hover,
+  spinning: props.spin || props.icon === 'mdi:loading',
   [props.size]: true
 }));
 
@@ -92,5 +95,17 @@ const isIconText = computed(() => {
     font-size: 0.8em; // Relative to parent font size
     font-weight: normal;
   }
+
+  &.spinning {
+    svg,
+    i {
+      animation: spin 1s linear infinite;
+    }
+  }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 </style>

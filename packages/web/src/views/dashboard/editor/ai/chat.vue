@@ -4,7 +4,7 @@ import type { IPromptSuggestion } from './hooks/chat/use-chat-context';
 import Messages from './components/Messages.vue';
 import InputArea from './components/InputArea.vue';
 import { useChat } from './hooks/chat/use-chat';
-import { useChatContext } from './hooks/chat/use-chat-context';
+import { useChatContext, useAISuggestionsConfig } from './hooks/chat/use-chat-context';
 import { initAIContextExplicit } from './hooks/core/use-ai-context';
 
 initAIContextExplicit();
@@ -20,12 +20,26 @@ const {
   suggestions,
   chatMode,
   placeholderText,
-  clearSelection
+  clearSelection,
+  refreshSuggestions,
+  aiSuggestionsEnabled
 } = useChatContext();
 
+const { toggle: toggleAISuggestions } = useAISuggestionsConfig();
+
 const handleSuggestionClick = (suggestion: IPromptSuggestion) => {
-  inputValue.value = suggestion.value;
-  sendMessage();
+  const value = (suggestion.value || '').trim();
+  if (!value) {
+    return;
+  }
+
+  const current = inputValue.value || '';
+  if (!current.trim()) {
+    inputValue.value = value;
+    return;
+  }
+
+  inputValue.value = `${current}${current.endsWith('\n') ? '' : '\n'}${value}`;
 };
 
 const chatContainerRef = ref<HTMLElement | null>(null);
@@ -47,9 +61,11 @@ const chatContainerRef = ref<HTMLElement | null>(null);
         :loading="loading"
         :show-mode-indicator="chatMode === 'context'"
         :target-name="currentSelectionName"
+        :ai-suggestions-enabled="aiSuggestionsEnabled"
         @send="sendMessage"
         @suggestion-click="handleSuggestionClick"
         @clear-selection="clearSelection"
+        @toggle-ai-suggestions="toggleAISuggestions"
       />
     </div>
   </div>

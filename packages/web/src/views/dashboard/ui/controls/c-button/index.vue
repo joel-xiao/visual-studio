@@ -1,6 +1,6 @@
 <template>
 <BasicBox class="c-button" v-bind="$attrs" :type="type || 'button'" @update="onUpdate">
-  <BasicIcon v-if="icon" :icon="icon" />
+  <BasicIcon v-if="resolvedIcon" :icon="resolvedIcon" :spin="resolvedIcon === 'mdi:loading'" />
   <div class="c-button-text" :class="buttonTextClass">
     <slot ></slot>
   </div>
@@ -17,21 +17,27 @@ export default {
 <script setup lang="ts">
 import BasicBox from '../../base/basic-box.vue';
 import BasicIcon from '../../base/basic-icon.vue';
-import { reactive } from 'vue';
+import { computed } from 'vue';
 interface Props {
   type?: string; // status-button button
   icon?: string;
+  loading?: boolean;
   dataType?: BooleanConstructor;
 }
 const props = withDefaults(defineProps<Props>(), {
   type: 'button',
   icon: '',
+  loading: false,
   dataType: Boolean,
 });
 
-const buttonTextClass = reactive({
-  'no-padding': !!props.icon
+const resolvedIcon = computed(() => {
+  return props.loading ? 'mdi:loading' : props.icon;
 });
+
+const buttonTextClass = computed(() => ({
+  'no-padding': !!resolvedIcon.value
+}));
 
 const emit = defineEmits(['update']);
 const onUpdate = function (value: boolean) {

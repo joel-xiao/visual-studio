@@ -1,58 +1,22 @@
-import { computed, unref } from 'vue';
+import { computed, unref, ref, watch } from 'vue';
 import { useNodeContext } from '../../../hooks/node-context';
+import type { IPromptSuggestion } from '../../agent/suggestion-generator/presets';
+import { getPresetSuggestions } from '../../agent/suggestion-generator/presets';
+import { useSuggestionGenerator } from '../../agent/suggestion-generator/use';
+import { useAIContext } from '../core/use-ai-context';
+import { useAISuggestionsConfig } from '../../config';
 
-export interface IPromptSuggestion {
-  label: string;
-  value: string;
-  icon?: string;
-  agent?: string;
-  color?: string;
-}
+export { type IPromptSuggestion };
+export { useAISuggestionsConfig };
 
-function generateSuggestions(context: {
-  hasSelection: boolean;
-  selectionType?: string;
-  nodeCount: number;
-}): IPromptSuggestion[] {
-  const { hasSelection, selectionType, nodeCount } = context;
-
-  if (nodeCount === 0 || (!hasSelection && nodeCount > 0)) {
-    return [
-      { label: '生成销售大屏', value: '帮我生成一个销售监控大屏，包含KPI卡片和折线图', icon: 'mdi:view-dashboard-outline', agent: 'layout-architect', color: 'blue' },
-      { label: '生成科技感布局', value: '生成一个深色科技感风格的布局，左侧导航，中间地图，右侧图表', icon: 'mdi:view-dashboard-outline', agent: 'layout-architect', color: 'purple' },
-      { label: '切换暗黑主题', value: '切换到暗黑金主题', icon: 'mdi:palette', agent: 'theme-engine', color: 'orange' }
-    ];
-  }
-
-  if (hasSelection && selectionType?.toUpperCase().includes('APACHE_ECHARTS')) {
-    return [
-      { label: '换成折线图', value: '把这个图表换成折线图', icon: 'mdi:chart-line', agent: 'chart-creator', color: 'blue' },
-      { label: '变成红色', value: '把图表主体颜色改成红色', icon: 'mdi:palette-outline', agent: 'chart-creator', color: 'pink' },
-      { label: '增加标题', value: '给图表加上标题"季度销售额"', icon: 'mdi:format-title', agent: 'chart-creator', color: 'green' },
-      { label: '生成模拟数据', value: '帮我生成一些逼真的模拟数据', icon: 'mdi:database-refresh', agent: 'data-analyst', color: 'cyan' }
-    ];
-  }
-
-  if (hasSelection) {
-    return [
-      { label: '向左移动', value: '把这个组件向左移动 50px', icon: 'mdi:arrow-left', agent: 'layout-architect', color: 'blue' },
-      { label: '放大一点', value: '把组件宽度增加 20%', icon: 'mdi:arrow-expand-all', agent: 'layout-architect', color: 'green' }
-    ];
-  }
-
-  return [
-    { label: '优化布局', value: '帮我优化一下当前的布局排版', icon: 'mdi:view-compact-outline', agent: 'layout-architect', color: 'purple' },
-    { label: '分析数据', value: '分析当前大屏的数据展示逻辑', icon: 'mdi:lightbulb-on-outline', agent: 'data-analyst', color: 'cyan' }
-  ];
-}
-
-/**
- * Chat Context Hook
- * 管理聊天相关的上下文状态（选择、建议等）
- */
 export function useChatContext() {
   const nodeContext = useNodeContext();
+  const aiContext = useAIContext();
+  const suggestionAgent = useSuggestionGenerator();
+  const aiSuggestionsConfig = useAISuggestionsConfig();
+  
   const selectedNodes = computed(() => unref(nodeContext.getSelectedNodes()));
+  const suggestions = ref<IPromptSuggestion[]>([]);
 
   const currentSelectionName = computed(() => {
     const nodes = selectedNodes.value;
@@ -62,16 +26,6 @@ export function useChatContext() {
       return `${nodes.length} 个组件`;
     }
     return '';
-  });
-
-  const suggestions = computed<IPromptSuggestion[]>(() => {
-    const nodes = unref(nodeContext.getNodes());
-    const selected = unref(nodeContext.getSelectedNodes());
-    return generateSuggestions({
-      hasSelection: selected.length > 0,
-      selectionType: selected.length > 0 ? selected[0].component : undefined,
-      nodeCount: nodes.length
-    });
   });
 
   const chatMode = computed(() => {
@@ -86,8 +40,74 @@ export function useChatContext() {
     return "输入您的需求，例如：'帮我生成一个销售大屏'...";
   });
 
+  // 加载建议
+  const loadSuggestions = async () => {
+    const nodes = [...unref(nodeContext.getNodes())];
+    const selected = [...unref(nodeContext.getSelectedNodes())];
+    
+    const nodeCount = nodes.filter(n => n.id !== 'root').length;
+    const hasSelection = selected.length > 0 && selected[0].id !== 'root';
+    const selectionType = hasSelection ? selected[0].component || selected[0].schema : '';
+
+    // 获取预设建议
+    const presetSuggestions = getPresetSuggestions({
+      hasSelection,
+      selectionType,
+      nodeCount
+    });
+
+    // 限制预设建议数量
+    const maxPresetSuggestions = aiSuggestionsConfig.getMaxPresetSuggestions();
+    const limitedPresetSuggestions = presetSuggestions.slice(0, maxPresetSuggestions);
+
+    // 立即显示预设建议
+    suggestions.value = limitedPresetSuggestions;
+
+    // 只有在启用AI建议时才异步加载
+    if (aiSuggestionsConfig.enabled) {
+      try {
+        const context = {
+          nodes,
+          selectedNodes: selected,
+          availableComponents: aiContext.componentContext.getAvailableComponents()
+        };
+
+        const aiResponse = await suggestionAgent.process('生成建议', context);
+        
+        if (aiResponse.data?.suggestions && Array.isArray(aiResponse.data.suggestions)) {
+          const maxAISuggestions = aiSuggestionsConfig.getMaxAISuggestions();
+          const aiSuggestions = aiResponse.data.suggestions
+            .slice(0, maxAISuggestions)
+            .map((s: any) => ({
+              label: s.label,
+              value: s.value,
+              icon: s.icon || 'mdi:lightbulb-outline',
+              agent: s.agent || 'orchestrator',
+              color: s.color || 'blue'
+            }));
+
+          // 追加AI建议到前面
+          suggestions.value = [...aiSuggestions, ...limitedPresetSuggestions];
+        }
+      } catch (error) {
+        console.warn('AI建议生成失败，仅显示预设建议:', error);
+      }
+    }
+  };
+
+  // 监听节点变化
+  watch(
+    [() => unref(nodeContext.getNodes()), selectedNodes],
+    loadSuggestions,
+    { immediate: true, deep: true }
+  );
+
   const clearSelection = () => {
     nodeContext.onSelectNode('root');
+  };
+
+  const refreshSuggestions = () => {
+    loadSuggestions();
   };
 
   return {
@@ -97,7 +117,9 @@ export function useChatContext() {
     chatMode,
     placeholderText,
     clearSelection,
-    nodeContext
+    refreshSuggestions,
+    nodeContext,
+    aiSuggestionsEnabled: aiSuggestionsConfig.enabled
   };
 }
 

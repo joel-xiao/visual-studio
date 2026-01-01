@@ -7,7 +7,7 @@ export interface ISceneAction {
 }
 
 // 允许扩展的 Agent Role
-export type AgentRole = 'layout-architect' | 'chart-creator' | 'data-analyst' | 'theme-engine' | 'orchestrator' | (string & {});
+export type AgentRole = 'layout-architect' | 'chart-creator' | 'data-analyst' | 'theme-engine' | 'suggestion-generator' | 'orchestrator' | (string & {});
 
 export interface IChatMessage extends IAIMessage {
   id: string;

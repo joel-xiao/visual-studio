@@ -46,18 +46,18 @@ const schema = computed(() => props.role ? getAgentSchema(props.role) : null);
           <div 
             class="progress-fill" 
             :style="{ width: `${(workflowControl.currentStep / workflowControl.totalSteps) * 100}%` }"
-          />
+          ></div>
         </div>
       </div>
-      <slot name="header-right" />
+      <slot name="header-right"></slot>
     </div>
 
     <div class="card-body">
-      <slot />
+      <slot></slot>
     </div>
 
     <div v-if="showActions" class="card-actions">
-      <slot name="actions-left" />
+      <slot name="actions-left"></slot>
       <div class="actions-right">
         <CButton 
           v-if="hasSecondaryAction" 
