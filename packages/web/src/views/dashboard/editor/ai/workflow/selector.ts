@@ -22,7 +22,7 @@ export class WorkflowSelector {
 
       const agentInfo = getAgentInfo();
       const agentList = agentInfo.map(agent =>
-        `- **${agent.role}**: ${agent.displayName} - ${agent.description}`
+        `- **${agent.role}**: ${agent.displayName} - ${agent.description} (意图: ${(agent as any).intent || '无'})`
       ).join('\n');
 
       const workflowIds = WorkflowRegistry.getAllIds();
@@ -30,29 +30,35 @@ export class WorkflowSelector {
 
       const firstSelectedNode = selectedNodes.length > 0 ? selectedNodes[0] as { name?: string } : null;
 
-      const systemPrompt = `你是 AI 大屏设计工作流选择器。
-根据用户需求，选择最合适的工作流。
+      const systemPrompt = `你是 AI 大屏设计工作流引擎。
+请根据用户需求，先对指令进行【语义打标】，然后选择最合适的工作流。
+
+### 语义打标指南:
+- [标签: 整体设计]: 涉及“大屏”、“页面”、“布局”、“整页”、“新建屏”等全局概念。
+- [标签: 组件操作]: 涉及“添加”、“创建”、“生成”某个具体的图表或组件。
+- [标签: 样式美化]: 涉及“美化”、“优化”、“好点”、“改样式”、“调颜色”等。
+- [标签: 主题切换]: 涉及“换肤”、“改配色”、“暗黑模式”、“明亮模式”等全局风格。
+- [标签: 数据填充]: 涉及“填充数据”、“换数据”、“Mock”、“分析数据”等。
 
 ### 可用工作流:
 ${workflowList}
 
-### 可用 Agents:
+### 可用 Agents (如果无法匹配工作流，则路由给单个 Agent):
 ${agentList}
 
-### 当前上下文:
-${firstSelectedNode ? `**选中组件**: ${firstSelectedNode.name || 'Unknown'}` : '**未选中组件**'}
-**画布节点数**: ${nodes.length}
+### 决策指南:
+1. 如果包含 [整体设计]，优先选择 \`layout-to-chart\`。
+2. 如果只包含 [组件操作]，优先选择 \`chart-generation\`。
+3. 如果只包含 [样式美化] 且有组件选中，优先选择 \`chart-optimization\`。
+4. 如果包含 [主题切换]，优先选择 \`theme-to-chart\`。
 
 请返回 JSON 格式:
-{"workflow": "${workflowIds.join('|')}", "agent": "layout-architect|chart-creator|data-analyst|theme-engine"}
-
-对话历史:
-${historyStr}`;
+{"tags": ["标签1", "标签2"], "intent": "意图描述", "workflow": "工作流ID", "agent": "AgentRole"}`;
 
       const { text } = await generateText({
         model: this.getDefaultModel(),
         system: systemPrompt,
-        prompt: input
+        prompt: `用户指令: ${input}\n\n当前状态: ${firstSelectedNode ? `已选中[${firstSelectedNode.name}]` : '未选中组件'}\n对话历史:\n${historyStr}`
       });
 
       const parsed = extractJSON(text);
@@ -72,25 +78,44 @@ ${historyStr}`;
     const matchedWorkflows: Array<{ workflow: IWorkflowGraph; priority: number }> = [];
     const workflowIds = WorkflowRegistry.getAllIds();
 
+    // 简易标签提取逻辑
+    const extractedTags: string[] = [];
+    if (lowerInput.includes('屏') || lowerInput.includes('页') || lowerInput.includes('布局') || lowerInput.includes('整体')) extractedTags.push('整体设计');
+    if (lowerInput.includes('加') || lowerInput.includes('创') || lowerInput.includes('图')) extractedTags.push('组件操作');
+    if (lowerInput.includes('美') || lowerInput.includes('优') || lowerInput.includes('调')) extractedTags.push('样式美化');
+    if (lowerInput.includes('主题') || lowerInput.includes('色') || lowerInput.includes('换')) extractedTags.push('主题切换');
+    if (lowerInput.includes('数据') || lowerInput.includes('mock')) extractedTags.push('数据填充');
+
     for (const workflowId of workflowIds) {
       const workflow = WorkflowRegistry.get(workflowId);
       if (!workflow || !workflow.matchRule) continue;
 
       const rule = workflow.matchRule;
-      let matched = false;
+      let score = 0;
 
-      if (rule.keywords && rule.keywords.length > 0) {
-        matched = rule.keywords.some(keyword => lowerInput.includes(keyword.toLowerCase()));
+      // 关键词线索匹配 (作为补充依据)
+      if ((rule as any).hints) {
+        (rule as any).hints.forEach((hint: string) => {
+          if (lowerInput.includes(hint.toLowerCase())) score += 1;
+        });
       }
 
-      if (!matched && rule.match) {
-        matched = rule.match(input, context);
+      // 语义标签匹配 (权重更高)
+      if ((rule as any).tags) {
+        (rule as any).tags.forEach((tag: string) => {
+          if (lowerInput.includes(tag.toLowerCase())) score += 2;
+        });
       }
 
-      if (matched) {
+      // 自定义逻辑判断
+      if (rule.match && rule.match(input, context)) {
+        score += 5;
+      }
+
+      if (score > 0) {
         matchedWorkflows.push({
           workflow,
-          priority: rule.priority || 0
+          priority: (rule.priority || 0) + score
         });
       }
     }

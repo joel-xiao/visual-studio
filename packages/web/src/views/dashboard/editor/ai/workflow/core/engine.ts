@@ -22,13 +22,6 @@ export class WorkflowEngine {
   }
 
   /**
-   * 获取节点
-   */
-  private getNode(nodeId: string): IWorkflowNode | undefined {
-    return this.graph.nodes.find(n => n.id === nodeId);
-  }
-
-  /**
    * 获取节点的出边
    */
   private getOutgoingEdges(nodeId: string): IWorkflowEdge[] {
@@ -54,6 +47,13 @@ export class WorkflowEngine {
   }
 
   /**
+   * 获取节点
+   */
+  private getNode(nodeId: string): IWorkflowNode | null {
+    return this.graph.nodes.find(n => n.id === nodeId) || null;
+  }
+
+  /**
    * 执行 Agent 节点
    */
   private async executeAgentNode(
@@ -70,13 +70,39 @@ export class WorkflowEngine {
       throw new Error(`Agent ${node.agent} not found`);
     }
 
+    // 构建上下文，包含前一个 agent 的数据
+    const workflowContext: Record<string, unknown> = {
+      ...context,
+      workflowNodeId: node.id,
+      workflowData: this.executionContext!.data
+    };
+
+    // 如果前一个节点是 agent 节点，将它的响应数据传递给下一个节点
+    // 查找最近的 agent 节点（排除当前节点和 start/end 节点）
+    const agentHistoryItems = this.executionContext!.history
+      .filter(h => {
+        if (!h.nodeId || h.nodeId === node.id) return false;
+        const prevNode = this.getNode(h.nodeId);
+        return prevNode?.type === 'agent' && h.response?.data;
+      });
+
+    if (agentHistoryItems.length > 0) {
+      // 从后往前找，找到最近一个包含 nodes 的响应数据
+      for (let i = agentHistoryItems.length - 1; i >= 0; i--) {
+        const item = agentHistoryItems[i];
+        if (item?.response?.data) {
+          const data = item.response.data as { nodes?: any[] };
+          if (data.nodes && Array.isArray(data.nodes)) {
+            workflowContext.previousAgentData = { nodes: data.nodes };
+            break;
+          }
+        }
+      }
+    }
+
     const response = await agent.process(
       context.input || '',
-      {
-        ...context,
-        workflowNodeId: node.id,
-        workflowData: this.executionContext!.data
-      },
+      workflowContext,
       onStream
     );
 
@@ -113,7 +139,7 @@ export class WorkflowEngine {
 
         case 'agent':
           response = await this.executeAgentNode(node, context, onStream);
-          if (response && response.data) {
+          if (response?.data) {
             // 合并数据
             this.executionContext!.data = {
               ...this.executionContext!.data,
@@ -229,7 +255,8 @@ export class WorkflowEngine {
   async execute(
     input: string,
     context: any = {},
-    onStream?: (nodeId: string, partial: Partial<IAgentResponse>) => void
+    onStream?: (nodeId: string, partial: Partial<IAgentResponse>) => void,
+    onNodeComplete?: (nodeId: string, response: IAgentResponse) => void
   ): Promise<IWorkflowExecutionResult> {
     // 初始化执行上下文
     this.executionContext = {
@@ -273,7 +300,12 @@ export class WorkflowEngine {
           ? (partial: Partial<IAgentResponse>) => onStream(currentNodeId, partial)
           : undefined;
 
-        await this.executeNode(currentNode, { ...context, input }, wrappedOnStream);
+        const response = await this.executeNode(currentNode, { ...context, input }, wrappedOnStream);
+
+        // 如果节点有响应，触发完成回调
+        if (response && onNodeComplete) {
+          onNodeComplete(currentNodeId, response);
+        }
 
         // 获取下一个节点
         const nextNodes = this.getNextNodes(currentNodeId, context);

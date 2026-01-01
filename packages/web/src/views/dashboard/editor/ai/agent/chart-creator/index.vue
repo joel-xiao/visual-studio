@@ -58,6 +58,7 @@ const props = defineProps<{
     name?: string;
     id?: string;
     theme?: string;
+    targetNodeId?: string;
   };
 }>();
 
@@ -79,14 +80,32 @@ const chartOption = computed(() => {
   return options || {};
 });
 
+// 通过 context 获取选中的节点
+const { nodeContext } = aiContext;
+const selectedNodes = computed(() => {
+  const nodes = nodeContext.getSelectedNodes();
+  return Array.isArray(nodes) ? nodes : (nodes as { value?: INode[] })?.value || [];
+});
+
+// 判断是否有选中节点
+const hasSelectedNode = computed(() => selectedNodes.value.length > 0);
+
 // 只负责 emit 数据，不处理任何逻辑
 const emit = defineEmits<{
-  apply: [data: typeof props.data];
+  apply: [data: typeof props.data, mode: 'create' | 'update'];
 }>();
 
-const handleApply = () => {
-  // 直接 emit 原始数据，由 apply 函数处理所有逻辑
-  emit('apply', props.data);
+const handleCreate = () => {
+  // 创建新图表
+  emit('apply', props.data, 'create');
+};
+
+const handleUpdate = () => {
+  // 更新选中图表
+  const targetNodeId = selectedNodes.value[0]?.id;
+  if (targetNodeId) {
+    emit('apply', { ...props.data, targetNodeId }, 'update');
+  }
 };
 </script>
 
@@ -110,8 +129,11 @@ const handleApply = () => {
 
     <div class="chart-actions">
       <div class="action-footer">
-        <CButton primary @click="handleApply">
-          应用到画布
+        <CButton v-if="hasSelectedNode" @click="handleUpdate">
+          更新选中图表
+        </CButton>
+        <CButton primary @click="handleCreate">
+          {{ hasSelectedNode ? '创建新图表' : '应用到画布' }}
         </CButton>
       </div>
     </div>

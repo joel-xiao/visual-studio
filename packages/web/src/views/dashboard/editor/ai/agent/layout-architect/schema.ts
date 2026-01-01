@@ -17,7 +17,9 @@ const layoutArchitectSchema: IAgentSchema = {
   color: '#f39c12',
 
   routing: {
-    keywords: ['布局', '排版', '大屏', '生成', '创建', '新建', '网格', '位置', '调整大小'],
+    hints: ['布局', '排版', '大屏', '生成', '创建', '新建', '网格', '位置', '调整大小'],
+    tags: ['页面布局', '架构设计', '排版规划', '模块划分', '整体设计'],
+    intent: '负责大屏页面的整体布局结构、模块划分和视觉节奏规划',
     priorityRules: {
       withSelection: '如果用户要求移动位置/调整大小，请路由给 layout-architect',
       withoutSelection: '如果用户要求生成新大屏/图表，路由给 layout-architect'

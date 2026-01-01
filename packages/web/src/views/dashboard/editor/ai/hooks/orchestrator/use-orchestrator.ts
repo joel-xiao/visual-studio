@@ -203,22 +203,23 @@ export function useOrchestrator(options: IOrchestratorOptions = {}) {
       } as Partial<IAgentResponse> & { agent?: AgentRole });
     } : undefined;
 
-    const result = await engine.execute(input, enrichedContext, wrappedOnStream);
+    const onNodeComplete = (nodeId: string, response: IAgentResponse) => {
+      if (response.data) {
+        const node = workflow.nodes.find(n => n.id === nodeId);
+        if (node?.agent) {
+          applyAgentData(node.agent, aiContext, response.data);
+        }
+      }
+    };
+
+    const result = await engine.execute(input, enrichedContext, wrappedOnStream, onNodeComplete);
     addHistory('assistant', JSON.stringify(result.finalData));
 
     const executionContext = engine.getExecutionContext();
     let lastResponse: IAgentResponse | null = null;
 
-    // 应用所有 agent 节点的数据
+    // 找到最后一个响应
     if (executionContext) {
-      for (const historyItem of executionContext.history) {
-        if (historyItem.response?.data) {
-          const node = workflow.nodes.find(n => n.id === historyItem.nodeId);
-          if (node?.agent) {
-            applyAgentData(node.agent, aiContext, historyItem.response.data);
-          }
-        }
-      }
 
       // 找到最后一个响应
       for (let i = executionContext.history.length - 1; i >= 0; i--) {

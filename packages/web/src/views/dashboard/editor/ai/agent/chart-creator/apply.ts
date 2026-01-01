@@ -13,13 +13,34 @@ export function apply(context: IAIContext, data: unknown): void {
 
   const dataObj = data as Record<string, unknown>;
 
-  // 场景1: 批量更新图表配置（来自批量美化）
+  // 场景1: 批量更新图表配置（来自批量美化或工作流）
   if (dataObj.chartOptions && typeof dataObj.chartOptions === 'object') {
     updateChartOptionsBatch(context, dataObj.chartOptions as Record<string, unknown>);
     return;
   }
 
-  // 场景2: 创建新图表（包含完整的图表数据）
+  // 场景2: 根据 applyMode 决定创建或更新
+  const applyMode = dataObj.applyMode as 'create' | 'update' | undefined;
+
+  // 如果指定了更新模式，且有 targetNodeId 或选中节点，则更新
+  if (applyMode === 'update' || dataObj.targetNodeId) {
+    const targetNodeId = dataObj.targetNodeId as string | undefined;
+    const selectedNodes = context.nodeContext.getSelectedNodes();
+    const selectedNodesValue = Array.isArray(selectedNodes)
+      ? selectedNodes
+      : (selectedNodes as { value?: INode[] })?.value || [];
+
+    const nodeId = targetNodeId || selectedNodesValue[0]?.id;
+    if (nodeId && dataObj.options) {
+      const options = typeof dataObj.options === 'string'
+        ? safeParseJSON(dataObj.options, {})
+        : dataObj.options;
+      updateChartOptions(context, nodeId, options);
+      return;
+    }
+  }
+
+  // 场景3: 创建新图表（包含完整的图表数据）
   if (dataObj.options || dataObj.component || dataObj.schema) {
     const { nodeContext, componentContext } = context;
     const component = (dataObj.component as string) || 'APACHE_ECHARTS_BAR_SIMPLE';

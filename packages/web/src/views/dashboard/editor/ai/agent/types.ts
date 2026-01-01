@@ -1,7 +1,9 @@
 import type { AgentRole } from '../types';
 
 export interface IRoutingRules {
-  keywords: string[];
+  hints: string[]; // 关键词线索，作为语义分析的补充参考
+  tags: string[]; // 语义标签，用于意图打标
+  intent: string; // 核心职能描述
   priorityRules: {
     withSelection?: string;
     withoutSelection?: string;

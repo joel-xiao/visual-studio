@@ -81,10 +81,9 @@ const agentSchema = computed(() => {
 });
 
 // 统一处理所有 agent 组件的 apply 事件
-const handleAgentApply = (data: unknown) => {
-  // 直接使用 message.agent，不需要判断
+const handleAgentApply = (data: any, mode?: any) => {
   if (props.message.agent) {
-    applyAgentData(props.message.agent, aiContext, data);
+    applyAgentData(props.message.agent, aiContext, { ...data, applyMode: mode });
   }
 };
 </script>

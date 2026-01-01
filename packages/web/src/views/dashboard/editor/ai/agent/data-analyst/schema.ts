@@ -17,7 +17,9 @@ const dataAnalystSchema: IAgentSchema = {
   color: '#2ecc71',
 
   routing: {
-    keywords: ['数据', 'mock', '分析', '填充数据'],
+    hints: ['数据', 'mock', '分析', '填充数据'],
+    tags: ['数据分析', 'Mock生成', '数据预测', '指标计算', '数据清洗'],
+    intent: '负责理解业务数据需求，生成符合逻辑的模拟数据，以及进行数据层面的深度分析',
     priorityRules: {
       withSelection: '如果用户要求为选中的图表生成或修改数据，请路由给 data-analyst',
       withoutSelection: '如果用户要求生成数据或进行数据分析，路由给 data-analyst'

@@ -16,7 +16,9 @@ const themeEngineSchema: IAgentSchema = {
   color: '#e74c3c',
 
   routing: {
-    keywords: ['主题', '切换', '暗黑', '明亮', '配色', '颜色方案'],
+    hints: ['主题', '切换', '暗黑', '明亮', '配色', '颜色方案'],
+    tags: ['视觉风格', '全局配色', '主题切换', '色彩方案', '品牌调性'],
+    intent: '管理大屏的整体视觉风格，包括全局配色方案、UI主题和视觉规范',
     priorityRules: {
       withSelection: '全局主题切换，不用于单个图表颜色修改',
       withoutSelection: '如果用户要求全局主题切换，路由给 theme-engine'

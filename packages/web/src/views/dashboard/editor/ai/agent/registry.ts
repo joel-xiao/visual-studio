@@ -42,8 +42,8 @@ Object.entries(useModules).forEach(([path, module]) => {
     const agentRole = match[1] as AgentRole;
     const useFnName = `use${agentRole.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join('')}`;
     const useFn = (module as Record<string, unknown>)[useFnName] ||
-                  (module as Record<string, unknown>).default ||
-                  Object.values(module).find(v => typeof v === 'function');
+      (module as Record<string, unknown>).default ||
+      Object.values(module).find(v => typeof v === 'function');
     if (typeof useFn === 'function') {
       useMap[agentRole] = useFn as () => IAgent;
     }
@@ -75,7 +75,9 @@ schemaMap['orchestrator'] = {
   icon: 'mdi:robot-outline',
   color: '#9b59b6',
   routing: {
-    keywords: [],
+    hints: [],
+    tags: ['任务编排', '指令分发', '流程控制'],
+    intent: '协调多个 Agent 共同完成复杂任务',
     priorityRules: {},
     routingPrompt: () => ''
   },
@@ -125,12 +127,16 @@ export function matchAgentByRules(input: string): AgentRole | null {
   schemas.forEach((schema, role) => {
     if (role === 'orchestrator') return;
 
-    const count = schema.routing.keywords.filter(keyword =>
-      lowerInput.includes(keyword.toLowerCase())
+    const hintMatches = schema.routing.hints.filter(hint =>
+      lowerInput.includes(hint.toLowerCase())
     ).length;
 
-    if (count > 0) {
-      matches.push({ role, count });
+    const tagMatches = schema.routing.tags.filter(tag =>
+      lowerInput.includes(tag.toLowerCase())
+    ).length;
+
+    if (hintMatches > 0 || tagMatches > 0) {
+      matches.push({ role, count: hintMatches + (tagMatches * 2) }); // Tag 权重更高
     }
   });
 

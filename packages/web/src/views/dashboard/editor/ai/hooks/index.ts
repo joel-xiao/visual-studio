@@ -21,8 +21,6 @@ export {
   getAgentComponentByMessageType
 } from '../agent/registry';
 export type { IAgentSchema } from '../agent/types';
-export { LangChainDriver, LangGraphDriver } from '../agent/driver';
-export type { IAgentDriver } from '../agent/driver/types';
 export * from '../agent/chart-creator/use';
 export * from '../agent/data-analyst/use';
 export * from '../agent/layout-architect/use';

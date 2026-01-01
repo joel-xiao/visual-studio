@@ -12,20 +12,19 @@ export function createLayoutToChartWorkflow(): IWorkflowGraph {
     .setName('布局到图表工作流')
     .setDescription('创建布局 -> 美化图表 -> 填充数据')
     .setMatchRule({
-      keywords: ['创建', '生成', '大屏', '布局', '新建'],
+      keywords: ['屏', '页', '布局', '排版', '整体'],
       match: (input, context) => {
         const lowerInput = input.toLowerCase();
         const nodes = context?.nodes || [];
-        const matchedRole = matchAgentByRules(input);
 
-        return (
-          lowerInput.includes('创建') ||
-          lowerInput.includes('生成') ||
-          lowerInput.includes('大屏') ||
+        const isDashboardRequest =
+          lowerInput.includes('屏') ||
+          lowerInput.includes('页') ||
+          lowerInput.includes('整体') ||
           lowerInput.includes('布局') ||
-          (lowerInput.includes('新建') && nodes.length === 0) ||
-          matchedRole === 'layout-architect'
-        );
+          (lowerInput.includes('新建') && nodes.length === 0);
+
+        return isDashboardRequest;
       },
       priority: 10
     })

@@ -81,18 +81,13 @@ export function useChat(options: IUseChatOptions = {}) {
     if (id) {
       const msg = messages.value.find(m => m.id === id);
       if (msg) {
-        msg.content = content;
+        if (content !== undefined) msg.content = content;
         if (type) msg.type = type;
         if (actions) msg.actions = actions;
-        if (data) msg.data = data;
+        if (data !== undefined) msg.data = data;
         if (agent) msg.agent = agent;
         return id;
       }
-    }
-
-    const lastMsg = messages.value[messages.value.length - 1];
-    if (!id && lastMsg && 'role' in lastMsg && lastMsg.role === role && 'content' in lastMsg && lastMsg.content === content && lastMsg.type === type) {
-      return lastMsg.id;
     }
 
     const newId = Date.now().toString() + Math.random().toString(36).slice(2, 11);
@@ -122,36 +117,20 @@ export function useChat(options: IUseChatOptions = {}) {
     const assistantMsgId = addMessage('assistant', 'Thinking...', 'text', undefined, undefined, undefined, 'orchestrator');
 
     try {
-      let currentAgentRole: AgentRole | undefined;
+      const updateAssistantMsg = (partial: any) => {
+        addMessage(
+          'assistant',
+          partial.content,
+          partial.type,
+          partial.actions,
+          assistantMsgId,
+          partial.data,
+          partial.agent
+        );
+      };
 
-      const response = await orchestrator.process(content, undefined, (partial: Partial<IAgentResponse> & { agent?: AgentRole }) => {
-        if (partial.agent) {
-          currentAgentRole = partial.agent;
-        }
-
-        if ('content' in partial && partial.content) {
-          addMessage(
-            'assistant',
-            partial.content,
-            partial.type,
-            partial.actions,
-            assistantMsgId,
-            partial.data,
-            currentAgentRole
-          );
-        }
-      });
-
-      const finalAgentRole = currentAgentRole || (response as IAgentResponse & { agent?: AgentRole }).agent;
-      addMessage(
-        'assistant',
-        response.content,
-        response.type,
-        response.actions,
-        assistantMsgId,
-        response.data,
-        finalAgentRole
-      );
+      const response = await orchestrator.process(content, undefined, updateAssistantMsg);
+      updateAssistantMsg(response);
     } catch (e) {
       addMessage('assistant', '出错啦: ' + e, 'text', undefined, assistantMsgId, { isError: true });
     } finally {
