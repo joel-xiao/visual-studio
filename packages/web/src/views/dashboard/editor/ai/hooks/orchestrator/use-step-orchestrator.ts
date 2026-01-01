@@ -98,6 +98,20 @@ export function useStepOrchestrator() {
         return enhancedResponse;
       }
 
+      // 工作流完成但没有响应（可能只有控制节点）
+      if (!stepResult.hasNext) {
+        return {
+          content: '工作流已完成',
+          type: 'text',
+          workflowControl: {
+            isMultiStep: true,
+            currentStep: executionState.value.totalSteps,
+            totalSteps: executionState.value.totalSteps,
+            hasNext: false
+          }
+        };
+      }
+
       throw new Error('工作流执行失败');
 
     } catch (e: any) {

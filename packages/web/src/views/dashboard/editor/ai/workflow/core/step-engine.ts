@@ -180,54 +180,61 @@ export class StepWorkflowEngine {
       this.currentNodeQueue = [this.graph.startNodeId];
     }
 
-    if (this.currentNodeQueue.length === 0) {
-      this.executionContext.status = 'completed';
-      return { response: null, hasNext: false };
-    }
+    // 循环执行直到找到一个agent节点或工作流结束
+    while (this.currentNodeQueue.length > 0) {
+      const currentNodeId = this.currentNodeQueue.shift()!;
+      const currentNode = this.getNode(currentNodeId);
 
-    const currentNodeId = this.currentNodeQueue.shift()!;
-    const currentNode = this.getNode(currentNodeId);
+      if (!currentNode) throw new Error(`Node ${currentNodeId} not found`);
 
-    if (!currentNode) throw new Error(`Node ${currentNodeId} not found`);
+      if (!this.areAllPredecessorsCompleted(currentNodeId)) {
+        this.currentNodeQueue.unshift(currentNodeId); // 放回队列前面
+        continue;
+      }
 
-    if (!this.areAllPredecessorsCompleted(currentNodeId)) {
-      this.currentNodeQueue.push(currentNodeId);
-      return { response: null, hasNext: true, nextNodeId: currentNodeId };
-    }
+      if (this.executionContext.visitedNodes.has(currentNodeId) && currentNode.type !== 'merge') {
+        continue;
+      }
 
-    if (this.executionContext.visitedNodes.has(currentNodeId) && currentNode.type !== 'merge') {
-      return this.executeStep(input, context, onStream);
-    }
+      this.executionContext.currentNodeId = currentNodeId;
 
-    this.executionContext.currentNodeId = currentNodeId;
+      const wrappedOnStream = onStream
+        ? (partial: Partial<IAgentResponse>) => onStream(currentNodeId, partial)
+        : undefined;
 
-    const wrappedOnStream = onStream
-      ? (partial: Partial<IAgentResponse>) => onStream(currentNodeId, partial)
-      : undefined;
+      const response = await this.executeNode(currentNode, { ...context, input }, wrappedOnStream);
 
-    const response = await this.executeNode(currentNode, { ...context, input }, wrappedOnStream);
-
-    const nextNodes = this.getNextNodes(currentNodeId, context);
-    
-    if (currentNode.type === 'parallel') {
-      this.currentNodeQueue.push(...nextNodes.map(n => n.id));
-    } else {
-      for (const nextNode of nextNodes) {
-        if (!this.executionContext.visitedNodes.has(nextNode.id)) {
-          this.currentNodeQueue.push(nextNode.id);
+      const nextNodes = this.getNextNodes(currentNodeId, context);
+      
+      if (currentNode.type === 'parallel') {
+        this.currentNodeQueue.push(...nextNodes.map(n => n.id));
+      } else {
+        for (const nextNode of nextNodes) {
+          if (!this.executionContext.visitedNodes.has(nextNode.id)) {
+            this.currentNodeQueue.push(nextNode.id);
+          }
         }
       }
+
+      // 如果是agent节点且有响应，返回结果
+      if (currentNode.type === 'agent' && response) {
+        const hasNext = this.currentNodeQueue.length > 0 && !nextNodes.some(n => n.type === 'end');
+        const nextNodeId = this.currentNodeQueue[0];
+        return { response, hasNext, nextNodeId };
+      }
+
+      // 如果是end节点，结束工作流
+      if (currentNode.type === 'end') {
+        this.executionContext.status = 'completed';
+        return { response: null, hasNext: false };
+      }
+
+      // 其他类型节点继续循环
     }
 
-    const hasNext = this.currentNodeQueue.length > 0 && !nextNodes.some(n => n.type === 'end');
-    const nextNodeId = this.currentNodeQueue[0];
-
-    if (currentNode.type === 'end') {
-      this.executionContext.status = 'completed';
-      return { response, hasNext: false };
-    }
-
-    return { response, hasNext, nextNodeId };
+    // 队列为空，工作流完成
+    this.executionContext.status = 'completed';
+    return { response: null, hasNext: false };
   }
 
   async continueExecution(
