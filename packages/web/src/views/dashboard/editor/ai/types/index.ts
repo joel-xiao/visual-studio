@@ -22,6 +22,7 @@ export interface IAgent {
   name: string;
   description: string;
   process(input: string, context?: any, onStream?: (partial: Partial<IAgentResponse>) => void): Promise<IAgentResponse>;
+  apply(context: any, data: any): void;
 }
 
 export interface IAgentResponse {
@@ -29,8 +30,7 @@ export interface IAgentResponse {
   type: IChatMessage['type'];
   data?: any;
   actions?: ISceneAction[];
-  isError?: boolean; // Allow error flag
-  requireInteraction?: boolean; // Override schema.isInteractive at runtime
-  agent?: AgentRole; // The agent who generated this response
+  isError?: boolean;
+  agent?: AgentRole;
 }
 

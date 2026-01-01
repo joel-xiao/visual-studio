@@ -1,52 +1,27 @@
 import type { IAgent, IAgentResponse } from '../../types';
 import dataAnalystSchema from './schema';
-import { createAgent } from '../../utils/agent/agent-factory';
-import { processAgentWithAI } from '../../utils/agent/base-agent';
-import { getSchemaMessage } from '../../utils/agent/schema-helpers';
-import { useAIConfig } from '../../hooks/core/use-ai-config';
+import { useBaseAgent } from '../../utils/agent/base-agent';
+import { updateChartOptionsBatch } from '../../utils/agent/apply-helpers';
+import type { IAIContext } from '../../hooks/core/use-ai-context';
 
-interface IContext {
-  previousAgentData?: {
-    nodes?: Array<{ id: string; name: string; component?: string }>;
-  };
-}
-
-/**
- * Data Analyst Agent
- * 使用通用工具函数简化实现
- */
 export function useDataAnalyst(): IAgent {
-  const { defaultModel } = useAIConfig();
   const schema = dataAnalystSchema;
+  const { processWithAI } = useBaseAgent(schema);
 
-  const process = async (
-    input: string,
-    context?: IContext,
-    onStream?: (partial: Partial<IAgentResponse>) => void
-  ): Promise<IAgentResponse> => {
-    const previousData = context?.previousAgentData;
-    const chartNodes = previousData?.nodes?.filter((n) => n.component?.includes('APACHE_ECHARTS')) || [];
+  const process = async (input: string, context?: any, onStream?: any): Promise<IAgentResponse> => {
+    const chartNodes = (context?.previousAgentData?.nodes || []).filter((n: any) => n.component?.includes('ECHARTS'));
+    const layoutContext = chartNodes.length > 0 ? `Charts to fill: ${JSON.stringify(chartNodes.map((n: any) => ({ id: n.id, name: n.name })))}` : '';
 
-    const layoutContext = chartNodes.length > 0
-      ? `\nCharts to fill: ${JSON.stringify(chartNodes.map((n) => ({ id: n.id, name: n.name })))}`
-      : '';
-
-    return processAgentWithAI(
-      { defaultModel, schema, onStream },
-      schema.prompts.generate(layoutContext),
-      input,
-      (result) => {
-    if (result) {
-      return {
-        content: result.content || getSchemaMessage(schema, 'completed'),
-        type: 'code',
-        data: result.data
-      };
-    }
-        return null;
-      }
-    );
+    return processWithAI(schema.prompts.generate(layoutContext), input, onStream, (json) => ({
+      type: 'code',
+      data: json.data || json
+    }));
   };
 
-  return createAgent(schema, process);
+  const apply = (context: IAIContext, data: any) => {
+    if (data.chartOptions) updateChartOptionsBatch(context, data.chartOptions);
+  };
+
+  return { role: schema.role, name: schema.name, description: schema.description, process, apply };
 }
+

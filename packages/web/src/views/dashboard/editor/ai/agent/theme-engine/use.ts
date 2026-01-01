@@ -1,67 +1,29 @@
 import type { IAgent, IAgentResponse } from '../../types';
 import themeEngineSchema from './schema';
-import { createAgent } from '../../utils/agent/agent-factory';
-import { processAgentWithAI } from '../../utils/agent/base-agent';
-import { getSchemaMessage } from '../../utils/agent/schema-helpers';
-import { useAIConfig } from '../../hooks/core/use-ai-config';
+import { useBaseAgent } from '../../utils/agent/base-agent';
+import type { IAIContext } from '../../hooks/core/use-ai-context';
 
-/**
- * 创建回退主题
- */
-const createFallbackTheme = (input: string): IAgentResponse => {
-  const schema = themeEngineSchema;
-  const inputLower = input.toLowerCase();
-  let theme = 'dark';
-
-  const fallbackMap = schema.config?.fallbackThemeMap || {};
-  for (const [key, value] of Object.entries(fallbackMap)) {
-    if (inputLower.includes(key)) {
-      theme = value as string;
-      break;
-    }
-  }
-
-  return {
-    content: getSchemaMessage(schema, 'fallback', theme),
-    type: 'theme-selection' as const,
-    data: { theme }
-  };
-};
-
-/**
- * Theme Engine Agent
- * 使用通用工具函数简化实现
- */
 export function useThemeEngine(): IAgent {
-  const { defaultModel } = useAIConfig();
   const schema = themeEngineSchema;
+  const { processWithAI } = useBaseAgent(schema);
 
-  const process = async (
-    input: string,
-    _context?: unknown,
-    onStream?: (partial: Partial<IAgentResponse>) => void
-  ): Promise<IAgentResponse> => {
+  const process = async (input: string, _context?: any, onStream?: any): Promise<IAgentResponse> => {
     try {
-      return await processAgentWithAI(
-        { defaultModel, schema, onStream },
-        schema.prompts.select(),
-        input,
-        (result) => {
-      if (result) {
-        return {
-          content: result.content || getSchemaMessage(schema, 'completed'),
-          type: 'theme-selection',
-          data: result.data
-        };
-      }
-          return null;
-        }
-      );
-    } catch (error) {
-      console.error('[ThemeEngine] AI failed, using fallback:', error);
-      return createFallbackTheme(input);
+      return await processWithAI(schema.prompts.select(), input, onStream, (json) => ({
+        type: 'theme-selection',
+        data: json.data || json
+      }));
+    } catch (e) {
+      // 简单回退逻辑
+      const theme = input.toLowerCase().includes('light') ? 'light' : 'dark';
+      return { content: `已为您切换至 ${theme} 主题`, type: 'theme-selection', data: { theme } };
     }
   };
 
-  return createAgent(schema, process);
+  const apply = (context: IAIContext, data: any) => {
+    if (data.theme) context.chartThemesContext.setTheme(data.theme);
+  };
+
+  return { role: schema.role, name: schema.name, description: schema.description, process, apply };
 }
+

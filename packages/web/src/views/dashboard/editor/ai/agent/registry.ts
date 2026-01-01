@@ -3,213 +3,75 @@ import type { IAgent, AgentRole } from '../types';
 import type { IAgentSchema } from './types';
 import type { IAIContext } from '../hooks/core/use-ai-context';
 
-const schemaModules = import.meta.glob<{ default: IAgentSchema }>(
-  './*/schema.ts',
-  { eager: true }
-);
+const schemaModules = import.meta.glob<{ default: IAgentSchema }>('./*/schema.ts', { eager: true });
+const useModules = import.meta.glob<{ [key: string]: () => IAgent }>('./*/use.ts', { eager: true });
+const componentModules = import.meta.glob<VueComponent>('./*/index.vue', { eager: true, import: 'default' });
 
-const useModules = import.meta.glob<{ [key: string]: () => IAgent }>(
-  './*/use.ts',
-  { eager: true }
-);
+const schemaMap: Record<string, any> = {};
+const agentMap: Record<string, any> = {};
+const componentMap: Record<string, any> = {};
 
-const applyModules = import.meta.glob<{ apply: (context: IAIContext, data: unknown) => void }>(
-  './*/apply.ts',
-  { eager: true }
-);
-
-const componentModules = import.meta.glob<VueComponent>(
-  './*/index.vue',
-  { eager: true, import: 'default' }
-);
-
-const schemaMap: Record<AgentRole, IAgentSchema> = {} as Record<AgentRole, IAgentSchema>;
-const useMap: Record<AgentRole, () => IAgent> = {} as Record<AgentRole, () => IAgent>;
-const applyMap: Record<AgentRole, (context: IAIContext, data: unknown) => void> = {} as Record<AgentRole, (context: IAIContext, data: unknown) => void>;
-const componentMap: Record<AgentRole, VueComponent> = {} as Record<AgentRole, VueComponent>;
-
-Object.entries(schemaModules).forEach(([path, module]) => {
-  const match = path.match(/\.\/([^/]+)\/schema\.ts$/);
-  if (match && module?.default) {
-    const agentRole = match[1] as AgentRole;
-    schemaMap[agentRole] = module.default;
-  }
+// 初始化
+Object.entries(schemaModules).forEach(([path, mod]) => {
+  const role = path.split('/')[1];
+  if (mod.default) schemaMap[role] = mod.default;
 });
 
-Object.entries(useModules).forEach(([path, module]) => {
-  const match = path.match(/\.\/([^/]+)\/use\.ts$/);
-  if (match && module) {
-    const agentRole = match[1] as AgentRole;
-    const useFnName = `use${agentRole.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join('')}`;
-    const useFn = (module as Record<string, unknown>)[useFnName] ||
-      (module as Record<string, unknown>).default ||
-      Object.values(module).find(v => typeof v === 'function');
-    if (typeof useFn === 'function') {
-      useMap[agentRole] = useFn as () => IAgent;
-    }
-  }
+Object.entries(useModules).forEach(([path, mod]) => {
+  const role = path.split('/')[1];
+  const useFn = Object.values(mod).find(v => typeof v === 'function');
+  if (useFn) agentMap[role] = (useFn as any)();
 });
 
-Object.entries(applyModules).forEach(([path, module]) => {
-  const match = path.match(/\.\/([^/]+)\/apply\.ts$/);
-  if (match && module?.apply) {
-    const agentRole = match[1] as AgentRole;
-    applyMap[agentRole] = module.apply;
-  }
+Object.entries(componentModules).forEach(([path, comp]) => {
+  const role = path.split('/')[1];
+  if (comp) componentMap[role] = comp;
 });
 
-Object.entries(componentModules).forEach(([path, component]) => {
-  const match = path.match(/\.\/([^/]+)\/index\.vue$/);
-  if (match && component) {
-    const agentRole = match[1] as AgentRole;
-    componentMap[agentRole] = component;
-  }
-});
-
-schemaMap['orchestrator'] = {
-  id: 'orchestrator',
-  role: 'orchestrator',
-  name: 'Orchestrator',
-  displayName: '编排器',
-  description: 'Coordinates agent execution',
-  icon: 'mdi:robot-outline',
-  color: '#9b59b6',
-  routing: {
-    hints: [],
-    tags: ['任务编排', '指令分发', '流程控制'],
-    intent: '协调多个 Agent 共同完成复杂任务',
-    priorityRules: {},
-    routingPrompt: () => ''
-  },
-  prompts: {},
-  messages: {}
-};
-
-export function registerAgents(): Record<AgentRole, IAgent> {
-  const agents: Record<string, IAgent> = {};
-
-  Object.entries(useMap).forEach(([role, useFn]) => {
-    if (useFn) {
-      agents[role] = useFn();
-    }
-  });
-
-  return agents as Record<AgentRole, IAgent>;
-}
-
-export function getAgentSchemas(): Map<AgentRole, IAgentSchema> {
-  const schemas = new Map<AgentRole, IAgentSchema>();
-  Object.entries(schemaMap).forEach(([role, schema]) => {
-    schemas.set(role as AgentRole, schema);
-  });
-  return schemas;
-}
-
-export function getAgentSchema(role: AgentRole): IAgentSchema | null {
+export function registerAgents() { return agentMap as Record<AgentRole, IAgent>; }
+export function getAgentSchemas() { return new Map(Object.entries(schemaMap)) as Map<AgentRole, IAgentSchema>; }
+export function getAgentSchema(role: AgentRole) {
+  if (role === 'orchestrator') return {
+    role: 'orchestrator', displayName: '编排器', icon: 'mdi:robot-outline', color: '#9b59b6',
+    routing: { hints: [], tags: [], intent: '任务分发' }
+  } as any;
   return schemaMap[role] || null;
 }
 
-export function getAgentInfo(): Array<{ role: AgentRole; name: string; displayName: string; description: string; intent: string }> {
-  return Array.from(getAgentSchemas().values()).map(schema => ({
-    role: schema.role,
-    name: schema.name,
-    displayName: schema.displayName,
-    description: schema.description,
-    intent: schema.routing.intent
+export function getAgentComponent(role: AgentRole) { return componentMap[role] || null; }
+
+export function getAgentInfo() {
+  return Object.values(schemaMap).map(s => ({
+    role: s.role as AgentRole,
+    name: s.name,
+    displayName: s.displayName,
+    description: s.description,
+    intent: s.routing.intent
   }));
+}
+
+export function applyAgentData(role: AgentRole, context: IAIContext, data: any) {
+  const agent = agentMap[role];
+  if (agent?.apply) agent.apply(context, data);
+}
+
+export function getAgentComponentByMessageType(type: string) {
+  const map: Record<string, AgentRole> = { 'chart': 'chart-creator', 'theme-selection': 'theme-engine' };
+  return componentMap[map[type]] || null;
 }
 
 export function matchAgentByRules(input: string): AgentRole | null {
   const lowerInput = input.toLowerCase();
-  const schemas = getAgentSchemas();
+  let bestRole: AgentRole | null = null;
+  let bestScore = 0;
 
-  const matches: Array<{ role: AgentRole; count: number }> = [];
-
-  schemas.forEach((schema, role) => {
-    if (role === 'orchestrator') return;
-
-    const hintMatches = schema.routing.hints.filter(hint =>
-      lowerInput.includes(hint.toLowerCase())
-    ).length;
-
-    const tagMatches = schema.routing.tags.filter(tag =>
-      lowerInput.includes(tag.toLowerCase())
-    ).length;
-
-    if (hintMatches > 0 || tagMatches > 0) {
-      matches.push({ role, count: hintMatches + (tagMatches * 2) }); // Tag 权重更高
+  Object.values(schemaMap).forEach(s => {
+    const score = (s.routing.hints || []).filter((h: string) => lowerInput.includes(h.toLowerCase())).length +
+      (s.routing.tags || []).filter((t: string) => lowerInput.includes(t.toLowerCase())).length * 2;
+    if (score > bestScore) {
+      bestScore = score;
+      bestRole = s.role;
     }
   });
-
-  if (matches.length === 0) {
-    return null;
-  }
-
-  matches.sort((a, b) => b.count - a.count);
-  return matches[0].role;
-}
-
-export function generateRoutingPrompt(context: unknown): string {
-  const schemas = getAgentSchemas();
-  const contextObj = context && typeof context === 'object' ? context as Record<string, unknown> : {};
-  const selectedNodes = (Array.isArray(contextObj.selectedNodes) ? contextObj.selectedNodes : []) as Array<{ name?: string; id?: string }>;
-
-  let prompt = `你是 AI 大屏设计团队的指挥官 (Orchestrator)。
-请根据用户的需求，将任务分发给最合适的专家 Agent。
-
-### 专家团队:
-`;
-
-  schemas.forEach((schema, role) => {
-    if (role === 'orchestrator') return;
-    prompt += schema.routing.routingPrompt('', contextObj) + '\n';
-  });
-
-  prompt += `\n### 当前上下文:
-`;
-
-  if (selectedNodes.length > 0) {
-    const firstNode = selectedNodes[0];
-    prompt += `**当前选中组件**: ${firstNode.name || 'Unknown'} (ID: ${firstNode.id || 'Unknown'}).\n`;
-  } else {
-    prompt += `**未选中组件** (全局模式)。\n`;
-  }
-
-  const agentRoles = Array.from(schemas.keys()).filter(r => r !== 'orchestrator');
-  prompt += `\n请返回唯一的 JSON 格式决策 (不要解释):
-{"agent": "${agentRoles.join('|')}", "refinedInput": "提炼后的用户指令"}`;
-
-  return prompt;
-}
-
-export function applyAgentData(agentRole: AgentRole, context: IAIContext, data: unknown): void {
-  const applyFn = applyMap[agentRole];
-  if (!applyFn) {
-    console.warn(`[AgentRegistry] No apply function found for agent: ${agentRole}`);
-    return;
-  }
-
-  try {
-    applyFn(context, data);
-  } catch (error) {
-    console.error(`[AgentRegistry] Failed to apply data for ${agentRole}:`, error);
-  }
-}
-
-export function getAgentComponent(role: AgentRole): VueComponent | null {
-  return componentMap[role] || null;
-}
-
-export function getAgentComponentByMessageType(messageType: string): VueComponent | null {
-  const typeToRoleMap: Record<string, AgentRole> = {
-    'chart': 'chart-creator',
-    'theme-selection': 'theme-engine'
-  };
-
-  const role = typeToRoleMap[messageType];
-  if (role) {
-    return getAgentComponent(role);
-  }
-
-  return null;
+  return bestRole;
 }
