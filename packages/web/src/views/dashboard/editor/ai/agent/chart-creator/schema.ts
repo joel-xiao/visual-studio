@@ -41,13 +41,19 @@ const chartCreatorSchema: IAgentSchema = {
 1. 如果输入配置中已有业务数据（dataset 或 series.data），请务必保留原始数据，不要修改它。
 2. 如果输入配置中没有数据，则必须生成一段符合图表类型 and 业务场景的 Mock 数据。
 
-请只返回包含 'options' 字段的合法 JSON。
+图表类型约束（必须严格遵守）：
+- 当前图表组件类型: ${chartType}
+- 如果组件类型包含 BAR：series.type 必须为 "bar"，严禁输出 "line"/"pie"
+- 如果组件类型包含 LINE：series.type 必须为 "line"，严禁输出 "bar"/"pie"
+- 如果组件类型包含 PIE：series.type 必须为 "pie"，严禁输出直角坐标系 axis / grid 配置
+- 如果你无法判断类型，则不要更改现有 series.type（仅做样式与布局优化）
+
+请只返回包含 'options' 字段的合法 JSON（允许可选包含 component 字段）。
 参考模板:
 ${getChartTemplate(chartType)}
 
 【严格禁令】
 1. 严禁设置 'backgroundColor'。图表背景必须保持透明以适配大屏。
-2. 不要设置 'color'，除非用户在输入中明确要求了特定颜色。
 请必须依赖全局的 ECharts 主题 (Theme) 来自动处理配色逻辑。`,
 
     // 场景2: 创建新图表
@@ -57,7 +63,12 @@ ${getChartTemplate(chartType)}
 1. 必须生成一段符合图表类型与业务场景的 Mock 数据（dataset 或 series.data 均可）。
 2. 如果用户明确给了具体数据或业务口径，请以用户输入为准。
 
-请只返回合法的 JSON:
+图表类型约束（必须严格遵守）：
+- 如果用户提供了参考图片：优先识别图片中的图表主类型，只生成该类型（不要混合多种类型）
+- 如果用户在文本中明确了类型（柱状/折线/饼图等）：必须严格按该类型生成
+- 未明确时：默认柱状图
+
+请只返回合法的 JSON（必须包含 component 与 options）:
 ${getChartTemplate('APACHE_ECHARTS_BAR_SIMPLE')}
 
 【严格禁令】

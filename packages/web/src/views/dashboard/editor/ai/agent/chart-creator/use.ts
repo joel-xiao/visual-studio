@@ -30,7 +30,9 @@ export function useChartCreator(): IAgent {
       const chartOptions: Record<string, any> = {};
       for (const node of chartNodes) {
         const res = await processWithAI(schema.prompts.beautify(node.component), `优化图表: ${node.name}`, onStream, undefined, context?.attachments);
-        if (res.data?.options) chartOptions[node.id] = res.data.options;
+        const payload = res.data && typeof res.data === 'object' ? res.data as Record<string, any> : {};
+        const options = payload.options && typeof payload.options === 'object' ? payload.options : payload;
+        if (options && typeof options === 'object') chartOptions[node.id] = options;
       }
       return { content: '图表已美化', type: 'text', data: { chartOptions } };
     }
@@ -39,10 +41,16 @@ export function useChartCreator(): IAgent {
     const target = selectedIsChart ? selected : undefined;
     const targetCtx = target ? `Target: ${target.name} (${target.id})` : 'New Chart';
 
-    return processWithAI(schema.prompts.create(targetCtx), input, onStream, (json) => ({
-      type: 'chart',
-      data: json.data || json.options || json
-    }), context?.attachments);
+    return processWithAI(schema.prompts.create(targetCtx), input, onStream, (json) => {
+      const root = json && typeof json === 'object' ? json as Record<string, any> : {};
+      const dataObj = root.data && typeof root.data === 'object' ? root.data as Record<string, any> : root;
+      const normalized = dataObj.options ? dataObj : { options: dataObj };
+
+      return {
+        type: 'chart',
+        data: normalized
+      };
+    }, context?.attachments);
   };
 
   return { role: schema.role, name: schema.name, description: schema.description, process };

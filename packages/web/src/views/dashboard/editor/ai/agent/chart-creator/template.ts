@@ -1,10 +1,6 @@
-export const getChartTemplate = (_exampleType: string): string => {
-    return JSON.stringify({
-        content: "图表美化",
-        type: "text",
-        data: {
-            options: {}
-        }
-    });
+export const getChartTemplate = (exampleComponent: string): string => {
+  return JSON.stringify({
+    component: exampleComponent,
+    options: {}
+  });
 };
-

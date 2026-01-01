@@ -1,4 +1,4 @@
-import { ref } from 'vue';
+import { ref, nextTick } from 'vue';
 import type { IAgentResponse, IChatImageAttachment } from '../../types';
 import { StepWorkflowEngine } from '../../workflow/core/step-engine';
 import { WorkflowSelector } from '../../workflow/selector';
@@ -14,6 +14,15 @@ export function useStepOrchestrator() {
   const history = ref<IHistoryItem[]>([]);
   const selector = new WorkflowSelector();
   const executionState = ref<IStepExecutionState>(createInitialExecutionState());
+
+  const waitForPaint = () =>
+    new Promise<void>((resolve) => {
+      if (typeof requestAnimationFrame === 'function') {
+        requestAnimationFrame(() => resolve());
+        return;
+      }
+      setTimeout(() => resolve(), 0);
+    });
 
   const hasCanvasComponents = (context: any) => {
     const nodes = Array.isArray(context?.nodes) ? context.nodes : [];
@@ -31,10 +40,12 @@ export function useStepOrchestrator() {
         const node = workflow.nodes.find((n: any) => n.id === nodeId);
         onStream?.({ ...partial, agent: node?.agent });
       },
-      onNodeComplete: (nodeId: string, nodeRes: any) => {
+      onNodeComplete: async (nodeId: string, nodeRes: any) => {
         const node = workflow.nodes.find((n: any) => n.id === nodeId);
         if (nodeRes.data && node?.agent && resolveApplyStrategy(node.agent, node.config, context) === 'auto') {
           applyAgentData(node.agent, aiContext, nodeRes.data);
+          await nextTick();
+          await waitForPaint();
         }
       }
     };
@@ -43,10 +54,12 @@ export function useStepOrchestrator() {
   const createStepEngineOptions = (completedAgentsRef: { value: number }, context: any) => {
     return {
       shouldStopOnAgent: (node: any) => resolveApplyStrategy(node.agent, node.config, context) !== 'auto',
-      onNodeComplete: (_nodeId: string, node: any, nodeRes: any) => {
+      onNodeComplete: async (_nodeId: string, node: any, nodeRes: any) => {
         completedAgentsRef.value++;
         if (node.agent && resolveApplyStrategy(node.agent, node.config, context) === 'auto' && nodeRes.data) {
           applyAgentData(node.agent, aiContext, nodeRes.data);
+          await nextTick();
+          await waitForPaint();
         }
       }
     };
@@ -193,6 +206,8 @@ export function useStepOrchestrator() {
 
       if (state.lastResponse.agent && Object.keys(applyPayload).length > 0) {
         applyAgentData(state.lastResponse.agent, aiContext, applyPayload);
+        await nextTick();
+        await waitForPaint();
       }
 
       if (workflowAction?.kind === 'skip') {

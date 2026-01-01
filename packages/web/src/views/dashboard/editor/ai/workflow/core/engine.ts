@@ -176,7 +176,7 @@ export class WorkflowEngine {
     input: string,
     context: any = {},
     onStream?: (nodeId: string, partial: Partial<IAgentResponse>) => void,
-    onNodeComplete?: (nodeId: string, response: IAgentResponse) => void
+    onNodeComplete?: (nodeId: string, response: IAgentResponse) => void | Promise<void>
   ): Promise<IWorkflowExecutionResult> {
     this.executionContext = {
       workflowId: this.graph.id,
@@ -216,7 +216,7 @@ export class WorkflowEngine {
         const response = await this.executeNode(currentNode, { ...context, input }, wrappedOnStream);
 
         if (response && onNodeComplete) {
-          onNodeComplete(currentNodeId, response);
+          await onNodeComplete(currentNodeId, response);
         }
 
         const nextNodes = this.getNextNodes(currentNodeId, context);

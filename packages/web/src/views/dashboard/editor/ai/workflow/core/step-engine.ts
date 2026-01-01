@@ -180,7 +180,7 @@ export class StepWorkflowEngine {
     onStream?: (nodeId: string, partial: Partial<IAgentResponse>) => void,
     options?: {
       shouldStopOnAgent?: (node: IWorkflowNode, response: IAgentResponse) => boolean;
-      onNodeComplete?: (nodeId: string, node: IWorkflowNode, response: IAgentResponse) => void;
+      onNodeComplete?: (nodeId: string, node: IWorkflowNode, response: IAgentResponse) => void | Promise<void>;
     }
   ): Promise<{ response: IAgentResponse | null; hasNext: boolean; nextNodeId?: string }> {
     if (!this.executionContext) {
@@ -220,7 +220,7 @@ export class StepWorkflowEngine {
       const response = await this.executeNode(currentNode, { ...context, input }, wrappedOnStream);
 
       if (response && currentNode.type === 'agent') {
-        options?.onNodeComplete?.(currentNodeId, currentNode, response);
+        await options?.onNodeComplete?.(currentNodeId, currentNode, response);
       }
 
       const nextNodes = this.getNextNodes(currentNodeId, context);
@@ -264,7 +264,7 @@ export class StepWorkflowEngine {
     onStream?: (nodeId: string, partial: Partial<IAgentResponse>) => void,
     options?: {
       shouldStopOnAgent?: (node: IWorkflowNode, response: IAgentResponse) => boolean;
-      onNodeComplete?: (nodeId: string, node: IWorkflowNode, response: IAgentResponse) => void;
+      onNodeComplete?: (nodeId: string, node: IWorkflowNode, response: IAgentResponse) => void | Promise<void>;
     }
   ): Promise<{ response: IAgentResponse | null; hasNext: boolean; nextNodeId?: string }> {
     return this.executeStep(input, context, onStream, options);
