@@ -9,8 +9,8 @@ import { matchAgentByRules } from '../../agent/registry';
 export function createChartGenerationWorkflow(): IWorkflowGraph {
     return new WorkflowGraphBuilder()
         .setId('chart-generation')
-        .setName('图表生成工作流')
-        .setDescription('图表制作 -> 填充数据')
+        .setName('新增图表与数据')
+        .setDescription('在当前看板中直接插入一个新的图表，并自动生成符合场景的 Mock 数据。适合“加个柱状图”、“生成一张销售图表”等指令。')
         .setMatchRule({
             keywords: ['图表', '柱状图', '折线图', '饼图', '添加', '插入'],
             match: (input) => {

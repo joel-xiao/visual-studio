@@ -109,12 +109,13 @@ export function getAgentSchema(role: AgentRole): IAgentSchema | null {
   return schemaMap[role] || null;
 }
 
-export function getAgentInfo(): Array<{ role: AgentRole; name: string; displayName: string; description: string }> {
+export function getAgentInfo(): Array<{ role: AgentRole; name: string; displayName: string; description: string; intent: string }> {
   return Array.from(getAgentSchemas().values()).map(schema => ({
     role: schema.role,
     name: schema.name,
     displayName: schema.displayName,
-    description: schema.description
+    description: schema.description,
+    intent: schema.routing.intent
   }));
 }
 
