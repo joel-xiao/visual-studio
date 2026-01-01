@@ -6,7 +6,8 @@ export interface ISceneAction {
   disabled?: boolean;
 }
 
-export type AgentRole = 'layout-architect' | 'chart-creator' | 'data-analyst' | 'theme-engine' | 'orchestrator';
+// 允许扩展的 Agent Role
+export type AgentRole = 'layout-architect' | 'chart-creator' | 'data-analyst' | 'theme-engine' | 'orchestrator' | (string & {});
 
 export interface IChatMessage extends IAIMessage {
   id: string;
@@ -22,7 +23,7 @@ export interface IAgent {
   name: string;
   description: string;
   process(input: string, context?: any, onStream?: (partial: Partial<IAgentResponse>) => void): Promise<IAgentResponse>;
-  apply(context: any, data: any): void;
+  apply?(context: any, data: any): void;
 }
 
 export interface IAgentResponse {

@@ -27,6 +27,12 @@ const chartCreatorSchema: IAgentSchema = {
     routingPrompt: (() => '') as (agentList: string, context: unknown) => string
   },
 
+  uiHints: {
+    fullWidth: true,
+    primaryActionText: '应用到画布',
+    secondaryActionText: '更新选中图表'
+  },
+
   prompts: {
     // 场景1: 批量美化图表（来自布局架构师）
     beautify: (chartType: string) => `你是一位专业图表美化师 (Chart Beautifier)。请优化该组件的 ECharts 配置项 (option)。

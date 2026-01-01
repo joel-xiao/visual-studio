@@ -1,7 +1,6 @@
 import type { IAgent, IAgentResponse } from '../../types';
 import themeEngineSchema from './schema';
 import { useBaseAgent } from '../../utils/agent/base-agent';
-import type { IAIContext } from '../../hooks/core/use-ai-context';
 
 export function useThemeEngine(): IAgent {
   const schema = themeEngineSchema;
@@ -20,10 +19,5 @@ export function useThemeEngine(): IAgent {
     }
   };
 
-  const apply = (context: IAIContext, data: any) => {
-    if (data.theme) context.chartThemesContext.setTheme(data.theme);
-  };
-
-  return { role: schema.role, name: schema.name, description: schema.description, process, apply };
+  return { role: schema.role as any, name: schema.name, description: schema.description, process };
 }
-

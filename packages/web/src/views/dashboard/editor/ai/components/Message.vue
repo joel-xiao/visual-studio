@@ -1,14 +1,11 @@
 <template>
-  <div class="message-wrapper" :class="[message.role, { 'full-width': message.type === 'chart' }]">
+  <div class="message-wrapper" :class="[message.role, { 'full-width': agentSchema?.uiHints?.fullWidth }]">
     <div v-if="message.role === 'assistant'" class="avatar-column">
-      <div
+      <div 
         class="agent-avatar"
-        :style="agentSchema?.color ? {
-          background: `linear-gradient(135deg, ${agentSchema.color} 0%, ${agentSchema.color}dd 100%)`,
-          boxShadow: `0 4px 12px ${agentSchema.color}66, 0 2px 6px ${agentSchema.color}4d, inset 0 1px 0 rgba(255, 255, 255, 0.2)`
-        } : {}"
+        :style="agentSchema?.color ? { background: agentSchema.color } : {}"
       >
-        <CIcon :icon="agentSchema?.icon || 'mdi:robot-outline'" size="large" />
+        <CIcon :icon="agentSchema?.icon || 'mdi:robot-outline'" />
       </div>
     </div>
 
@@ -18,34 +15,38 @@
       </div>
 
       <div class="message-bubble">
-        <div v-if="message.type === 'agent-thought'" class="thought-content">
+        <!-- 基础文本 -->
+        <div v-if="message.type === 'text'" class="text-content markdown-body" v-html="message.content"></div>
+
+        <!-- 思考状态 -->
+        <div v-else-if="message.type === 'agent-thought'" class="thought-content">
           <CIcon icon="mdi:loading" class="spin" />
           <span>{{ message.content }}</span>
         </div>
 
-        <div v-else-if="message.type === 'text'" class="text-content markdown-body" v-html="message.content"></div>
-
-        <div v-else-if="message.type === 'code'" class="code-content">
-          <div v-if="message.data && message.data.insight" class="insight-box">
-            <CIcon icon="mdi:lightbulb-on-outline" />
-            <span>{{ message.data.insight }}</span>
-          </div>
-          <div class="code-header">
-            <span>JSON Preview</span>
-            <CIcon icon="mdi:content-copy" />
-          </div>
-          <pre><code>{{ typeof message.data === 'object' ? JSON.stringify(message.data, null, 2) : message.content }}</code></pre>
-        </div>
-
-        <!-- 自动渲染 agent 组件 -->
-        <div v-else-if="agentComponent" class="agent-content">
-          <div v-if="message.content" class="text-content mb-3">{{ message.content }}</div>
+        <!-- 专业 Agent 响应卡片 -->
+        <AgentResponseCard
+          v-else-if="agentComponent"
+          :role="message.agent"
+          :title="message.data?.title || message.data?.name"
+          :badge="message.type"
+          :has-secondary-action="!!agentSchema?.uiHints?.secondaryActionText && hasSelection"
+          :secondary-action-text="agentSchema?.uiHints?.secondaryActionText"
+          :primary-action-text="hasSelection ? (agentSchema?.uiHints?.primaryActionText || '解析并应用') : '应用到画布'"
+          @apply="handleApply"
+          @secondary="handleApply($event, 'update')"
+        >
+          <div v-if="message.content" class="card-intro">{{ message.content }}</div>
           <component
             :is="agentComponent"
-            v-if="message.data"
             :data="message.data"
-            @apply="handleAgentApply"
+            @apply="handleApply"
           />
+        </AgentResponseCard>
+
+        <!-- 代码/JSON 预览 (兜底) -->
+        <div v-else-if="message.data" class="code-content">
+          <pre><code>{{ JSON.stringify(message.data, null, 2) }}</code></pre>
         </div>
       </div>
     </div>
@@ -53,40 +54,30 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import type { IChatMessage, AgentRole } from '../types';
+import { computed, unref } from 'vue';
+import type { IChatMessage } from '../types';
 import CIcon from '../../../ui/controls/c-icon/index.vue';
+import AgentResponseCard from './AgentResponseCard.vue';
 import { useAIContext } from '../hooks/core/use-ai-context';
-import { applyAgentData, getAgentSchema, getAgentComponentByMessageType } from '../agent/registry';
+import { applyAgentData, getAgentSchema, getAgentComponent } from '../agent/registry';
 
-interface Props {
-  message: IChatMessage;
-}
-
-const props = defineProps<Props>();
-
-// 获取 context（用于 applyAgentData）
+const props = defineProps<{ message: IChatMessage }>();
 const aiContext = useAIContext();
 
-// 根据 message type 自动获取对应的组件
-const agentComponent = computed(() => {
-  const messageType = props.message.type;
-  return getAgentComponentByMessageType(messageType || '');
+const agentSchema = computed(() => props.message.agent ? getAgentSchema(props.message.agent) : null);
+const agentComponent = computed(() => props.message.agent ? getAgentComponent(props.message.agent) : null);
+const hasSelection = computed(() => {
+  const selected = unref(aiContext.nodeContext.getSelectedNodes());
+  return Array.isArray(selected) ? selected.length > 0 : !!selected;
 });
 
-// 从 schema 获取 agent 信息（统一获取，避免重复计算）
-const agentSchema = computed(() => {
-  if (!props.message.agent) return null;
-  return getAgentSchema(props.message.agent);
-});
-
-// 统一处理所有 agent 组件的 apply 事件
-const handleAgentApply = (data: any, mode?: any) => {
-  if (props.message.agent) {
-    applyAgentData(props.message.agent, aiContext, { ...data, applyMode: mode });
-  }
+const handleApply = (data?: any, mode: 'create' | 'update' = 'create') => {
+  if (!props.message.agent) return;
+  const payload = data || props.message.data;
+  applyAgentData(props.message.agent, aiContext, { ...payload, applyMode: mode });
 };
 </script>
+
 
 <style scoped lang="scss">
 .message-wrapper {

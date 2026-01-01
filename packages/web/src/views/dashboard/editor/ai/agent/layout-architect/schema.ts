@@ -27,6 +27,11 @@ const layoutArchitectSchema: IAgentSchema = {
     routingPrompt: (() => '') as (agentList: string, context: any) => string
   },
 
+  uiHints: {
+    fullWidth: true,
+    primaryActionText: '应用此布局'
+  },
+
   prompts: {
     generate: (componentList: string, historyStr: string) => `你是一位大屏布局架构师 (Layout Architect)。请生成一个大屏页面的布局 JSON 数据。
 重要要求：

@@ -1,233 +1,65 @@
 <script setup lang="ts">
-/// <reference types="../../../types/node" />
 import { computed } from 'vue';
 import { useAIContext } from '../../hooks/core/use-ai-context';
 import VChart from 'vue-echarts';
 import { use } from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
 import {
-  BarChart,
-  LineChart,
-  PieChart,
-  RadarChart,
-  ScatterChart,
-  CandlestickChart,
-  MapChart,
-  EffectScatterChart
+  BarChart, LineChart, PieChart, RadarChart, ScatterChart, 
+  CandlestickChart, MapChart, EffectScatterChart
 } from 'echarts/charts';
 import {
-  TitleComponent,
-  TooltipComponent,
-  LegendComponent,
-  GridComponent,
-  DatasetComponent,
-  TransformComponent,
-  DataZoomComponent,
-  VisualMapComponent
+  TitleComponent, TooltipComponent, LegendComponent, GridComponent,
+  DatasetComponent, TransformComponent, DataZoomComponent, VisualMapComponent
 } from 'echarts/components';
-import CButton from '../../../../ui/controls/c-button/index.vue';
 import { safeParseJSON } from '../../utils/json-utils';
 
 use([
-  CanvasRenderer,
-  BarChart,
-  LineChart,
-  PieChart,
-  RadarChart,
-  ScatterChart,
-  CandlestickChart,
-  MapChart,
-  EffectScatterChart,
-  TitleComponent,
-  TooltipComponent,
-  LegendComponent,
-  GridComponent,
-  DatasetComponent,
-  TransformComponent,
-  DataZoomComponent,
-  VisualMapComponent
+  CanvasRenderer, BarChart, LineChart, PieChart, RadarChart, ScatterChart,
+  CandlestickChart, MapChart, EffectScatterChart, TitleComponent,
+  TooltipComponent, LegendComponent, GridComponent, DatasetComponent,
+  TransformComponent, DataZoomComponent, VisualMapComponent
 ]);
 
 const props = defineProps<{
   data: {
-    options: Record<string, unknown>;
-    chartType: string;
-    component?: string;
-    schema?: string;
-    title?: string;
-    name?: string;
-    id?: string;
+    options: Record<string, any> | string;
     theme?: string;
-    targetNodeId?: string;
   };
 }>();
 
-// 通过 context 获取主题（如果需要）
 const aiContext = useAIContext();
-const { chartThemesContext } = aiContext;
-const { getCurrentTheme } = chartThemesContext;
+const theme = computed(() => props.data.theme || aiContext.chartThemesContext.getCurrentTheme().value);
 
-// 主题通过 context 获取，如果没有则使用默认值
-const globalTheme = getCurrentTheme();
-const theme = computed(() => props.data.theme || globalTheme.value);
-
-// 渲染图表配置
 const chartOption = computed(() => {
   const options = props.data?.options;
-  if (typeof options === 'string') {
-    return safeParseJSON(options, {});
-  }
-  return options || {};
+  return typeof options === 'string' ? safeParseJSON(options, {}) : (options || {});
 });
-
-// 通过 context 获取选中的节点
-const { nodeContext } = aiContext;
-const selectedNodes = computed(() => {
-  const nodes = nodeContext.getSelectedNodes();
-  return Array.isArray(nodes) ? nodes : (nodes as { value?: INode[] })?.value || [];
-});
-
-// 判断是否有选中节点
-const hasSelectedNode = computed(() => selectedNodes.value.length > 0);
-
-// 只负责 emit 数据，不处理任何逻辑
-const emit = defineEmits<{
-  apply: [data: typeof props.data, mode: 'create' | 'update'];
-}>();
-
-const handleCreate = () => {
-  // 创建新图表
-  emit('apply', props.data, 'create');
-};
-
-const handleUpdate = () => {
-  // 更新选中图表
-  const targetNodeId = selectedNodes.value[0]?.id;
-  if (targetNodeId) {
-    emit('apply', { ...props.data, targetNodeId }, 'update');
-  }
-};
 </script>
 
 <template>
-  <div class="chart-message-container">
-    <div v-if="props.data && (props.data.title || props.data.name)" class="chart-header">
-      <div class="header-left">
-        <span class="chart-title">{{ props.data.title || props.data.name }}</span>
-        <span class="chart-type-badge">{{ props.data.chartType }}</span>
-      </div>
-    </div>
-
-    <div class="chart-preview">
-      <v-chart
-        class="chart"
-        :option="chartOption"
-        :theme="theme"
-        autoresize
-      />
-    </div>
-
-    <div class="chart-actions">
-      <div class="action-footer">
-        <CButton v-if="hasSelectedNode" @click="handleUpdate">
-          更新选中图表
-        </CButton>
-        <CButton primary @click="handleCreate">
-          {{ hasSelectedNode ? '创建新图表' : '应用到画布' }}
-        </CButton>
-      </div>
-    </div>
+  <div class="chart-preview-box">
+    <v-chart
+      class="chart"
+      :option="chartOption"
+      :theme="theme"
+      autoresize
+    />
   </div>
 </template>
 
 <style scoped lang="scss">
-.chart-message-container {
+.chart-preview-box {
+  height: 240px;
   width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  border-radius: 12px;
-  overflow: visible;
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  margin-top: 8px;
-  transition: none;
-  display: block;
-
-  .chart-header {
-    padding: 0 0 8px 0;
-    margin-bottom: 0;
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    background: transparent;
-
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-    }
-
-    .chart-title {
-      font-size: 12.5px;
-      font-weight: 600;
-      color: var(--theme-color-text);
-    }
-
-    .chart-type-badge {
-      font-size: 9.5px;
-      padding: 2px 7px;
-      background: rgba(64, 158, 255, 0.15);
-      color: var(--db-color-button-primary-bg);
-      border-radius: 5px;
-      text-transform: uppercase;
-      font-weight: 600;
-      letter-spacing: 0.25px;
-    }
-  }
-
-  .chart-preview {
-    height: 220px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.1);
+  
+  .chart {
     width: 100%;
-    min-width: 0;
-    flex-shrink: 0;
-    background: transparent;
-    position: relative;
-    overflow: hidden;
-    margin: 0;
-
-    .chart {
-      width: 100%;
-      height: 100%;
-      min-width: 0;
-      position: relative;
-    }
-  }
-
-  .chart-actions {
-    padding: 9px 0 0 0;
-    margin-top: 9px;
-    background: transparent;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
-    display: flex;
-    flex-direction: column;
-    gap: 9px;
-    width: 100%;
-    min-width: 0;
-
-    .action-footer {
-      display: flex;
-      justify-content: flex-end;
-      gap: 6px;
-      align-items: center;
-
-      :deep(.c-button) {
-        font-size: 11px;
-        min-height: 26px;
-        padding: 0 12px;
-      }
-    }
+    height: 100%;
   }
 }
 </style>
+
 

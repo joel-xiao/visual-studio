@@ -1,9 +1,6 @@
 import type { IAgent, IAgentResponse } from '../../types';
 import layoutArchitectSchema from './schema';
 import { useBaseAgent } from '../../utils/agent/base-agent';
-import { merge } from 'lodash';
-import { mergeNodeOptions } from '../../utils/agent/apply-helpers';
-import type { IAIContext } from '../../hooks/core/use-ai-context';
 
 export function useLayoutArchitect(): IAgent {
   const schema = layoutArchitectSchema;
@@ -19,26 +16,5 @@ export function useLayoutArchitect(): IAgent {
     });
   };
 
-  const apply = (context: IAIContext, data: any) => {
-    if (!data?.nodes || !Array.isArray(data.nodes)) return;
-    const { nodeContext, componentContext } = context;
-
-    const hydratedNodes = data.nodes.map((node: any) => {
-      let nodeCopy = { ...node };
-      if (nodeCopy.schema) {
-        nodeCopy.props = merge({}, componentContext.getComponentProps(nodeCopy.schema), nodeCopy.props);
-      }
-      return mergeNodeOptions(nodeCopy, data);
-    });
-
-    nodeContext.update({
-      name: data.name || '',
-      id: data.id || '',
-      type: data.type || '',
-      nodes: hydratedNodes
-    });
-  };
-
-  return { role: schema.role, name: schema.name, description: schema.description, process, apply };
+  return { role: schema.role as any, name: schema.name, description: schema.description, process };
 }
-

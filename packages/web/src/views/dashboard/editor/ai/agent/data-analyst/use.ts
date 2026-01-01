@@ -1,8 +1,6 @@
 import type { IAgent, IAgentResponse } from '../../types';
 import dataAnalystSchema from './schema';
 import { useBaseAgent } from '../../utils/agent/base-agent';
-import { updateChartOptionsBatch } from '../../utils/agent/apply-helpers';
-import type { IAIContext } from '../../hooks/core/use-ai-context';
 
 export function useDataAnalyst(): IAgent {
   const schema = dataAnalystSchema;
@@ -18,10 +16,5 @@ export function useDataAnalyst(): IAgent {
     }));
   };
 
-  const apply = (context: IAIContext, data: any) => {
-    if (data.chartOptions) updateChartOptionsBatch(context, data.chartOptions);
-  };
-
-  return { role: schema.role, name: schema.name, description: schema.description, process, apply };
+  return { role: schema.role as any, name: schema.name, description: schema.description, process };
 }
-

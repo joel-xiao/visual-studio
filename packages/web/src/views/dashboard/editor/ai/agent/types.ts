@@ -20,6 +20,11 @@ export interface IAgentSchema {
   icon?: string;
   color?: string;
   routing: IRoutingRules;
+  uiHints?: {
+    fullWidth?: boolean;
+    primaryActionText?: string;
+    secondaryActionText?: string;
+  };
   prompts: Record<string, (...args: any[]) => string>;
   messages: Record<string, string | ((...args: any[]) => string)>;
   config?: Record<string, any>;
