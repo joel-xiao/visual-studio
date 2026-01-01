@@ -70,34 +70,24 @@ export class WorkflowEngine {
       throw new Error(`Agent ${node.agent} not found`);
     }
 
-    // 构建上下文，包含前一个 agent 的数据
+    // 构建上下文，包含工作流全局数据和历史数据
     const workflowContext: Record<string, unknown> = {
       ...context,
       workflowNodeId: node.id,
-      workflowData: this.executionContext!.data
+      workflowData: this.executionContext!.data,
+      history: this.executionContext!.history
     };
 
-    // 如果前一个节点是 agent 节点，将它的响应数据传递给下一个节点
-    // 查找最近的 agent 节点（排除当前节点和 start/end 节点）
-    const agentHistoryItems = this.executionContext!.history
-      .filter(h => {
-        if (!h.nodeId || h.nodeId === node.id) return false;
-        const prevNode = this.getNode(h.nodeId);
+    // 查找最近一个有响应数据的 Agent 节点，作为 previousAgentData 传递
+    const lastAgentItem = [...this.executionContext!.history]
+      .reverse()
+      .find(h => {
+        const prevNode = h.nodeId ? this.getNode(h.nodeId) : null;
         return prevNode?.type === 'agent' && h.response?.data;
       });
 
-    if (agentHistoryItems.length > 0) {
-      // 从后往前找，找到最近一个包含 nodes 的响应数据
-      for (let i = agentHistoryItems.length - 1; i >= 0; i--) {
-        const item = agentHistoryItems[i];
-        if (item?.response?.data) {
-          const data = item.response.data as { nodes?: any[] };
-          if (data.nodes && Array.isArray(data.nodes)) {
-            workflowContext.previousAgentData = { nodes: data.nodes };
-            break;
-          }
-        }
-      }
+    if (lastAgentItem?.response?.data) {
+      workflowContext.previousAgentData = lastAgentItem.response.data;
     }
 
     const response = await agent.process(

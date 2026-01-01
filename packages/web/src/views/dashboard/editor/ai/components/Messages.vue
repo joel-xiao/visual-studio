@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick, watch } from 'vue';
+import { ref, nextTick, watch, onMounted } from 'vue';
 import type { IChatMessage } from '../types';
 import Message from './Message.vue';
 
@@ -30,13 +30,20 @@ const messagesRef = ref<HTMLElement | null>(null);
 const scrollToBottom = async () => {
   await nextTick();
   if (messagesRef.value) {
-    messagesRef.value.scrollTop = messagesRef.value.scrollHeight;
+    messagesRef.value.scrollTo({
+      top: messagesRef.value.scrollHeight,
+      behavior: 'smooth'
+    });
   }
 };
 
 watch(() => props.messages, () => {
   scrollToBottom();
-}, { deep: true, immediate: true });
+}, { deep: true });
+
+onMounted(() => {
+  scrollToBottom();
+});
 </script>
 
 <style scoped lang="scss">

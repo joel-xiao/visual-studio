@@ -55,7 +55,9 @@ export function getAgentInfo() {
     name: s.name,
     displayName: s.displayName,
     description: s.description,
-    intent: s.routing.intent
+    intent: s.routing.intent,
+    hints: s.routing.hints || [],
+    tags: s.routing.tags || []
   }));
 }
 

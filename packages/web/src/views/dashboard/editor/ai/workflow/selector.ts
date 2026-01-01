@@ -31,11 +31,12 @@ ${stateStr}
 ${historyStr}
 
 ### 决策逻辑:
-1. **识别复杂意图**: 如果涉及多步协作（如创建、整体调整），选 [Workflow]。
-2. **识别单一意图**: 如果直接指向特定原子功能（如改颜色、换数据），选 [Agent]。
+1. **识别复杂意图**: 如果涉及多步协作（如创建、整体调整、多组件协同），必须选择 [Workflow]。
+2. **识别单一意图**: 如果直接指向特定原子功能（如改颜色、换数据、调整单个组件），选择对应的 [Agent]。
 3. **环境适应**: 根据看板是否已有节点、是否有选中项来微调决策。
 
-请直接输出 JSON:
+请根据方案库中的 ID、描述、意图以及关联的关键词（Hints/Tags）进行逻辑判断。
+直接输出 JSON:
 {
   "thought": "你的核心决策逻辑简述",
   "workflow": "选中的 Workflow ID (若无可不填)",
@@ -45,12 +46,12 @@ ${historyStr}
       const { text } = await generateText({
         model: this.getDefaultModel(),
         system: systemPrompt,
-        prompt: `User Input: "${input}"\nResponse JSON:`
+        prompt: `用户输入: "${input}"\n请综合判断并返回 JSON:`
       });
 
       const parsed = extractJSON(text);
       if (parsed && (parsed.workflow || parsed.agent)) {
-        console.log(`[Router] ${parsed.thought}`);
+        console.log(`[Router] AI-matched: ${parsed.thought}`);
         return this.createWorkflow(parsed.workflow, parsed.agent);
       }
     } catch (e) {
@@ -81,12 +82,17 @@ ${historyStr}
   private getAvailableOptionsString(): string {
     const workflows = WorkflowRegistry.getAllIds().map(id => {
       const w = WorkflowRegistry.get(id);
-      return `- [Workflow] ${id}: ${w?.description || w?.name || id}`;
+      const keywords = w?.matchRule?.keywords ? ` (Keywords: ${w.matchRule.keywords.join(', ')})` : '';
+      return `- [Workflow] ${id}: ${w?.description || w?.name || id}${keywords}`;
     });
 
     const agents = getAgentInfo()
       .filter(a => a.role !== 'orchestrator')
-      .map(a => `- [Agent] ${a.role}: ${a.displayName} - ${a.description}`);
+      .map(a => {
+        const keywords = [...(a.hints || []), ...(a.tags || [])];
+        const kwStr = keywords.length > 0 ? ` (Hints: ${keywords.join(', ')})` : '';
+        return `- [Agent] ${a.role}: ${a.displayName} - ${a.description}${kwStr}`;
+      });
 
     return [...workflows, ...agents].join('\n');
   }

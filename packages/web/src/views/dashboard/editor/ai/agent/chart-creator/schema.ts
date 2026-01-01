@@ -39,13 +39,16 @@ const chartCreatorSchema: IAgentSchema = {
 关注点：视觉美感、清晰的图例、合理的布局。
 数据处理原则：
 1. 如果输入配置中已有业务数据（dataset 或 series.data），请务必保留原始数据，不要修改它。
-2. 如果输入配置中没有数据，则必须生成一段符合图表类型和业务场景的 Mock 数据。
+2. 如果输入配置中没有数据，则必须生成一段符合图表类型 and 业务场景的 Mock 数据。
 
 请只返回包含 'options' 字段的合法 JSON。
 参考模板:
 ${getChartTemplate(chartType)}
 
-重要：不要设置 'color' 或 'backgroundColor'，除非用户明确要求。请依赖 ECharts 主题 (Theme) 来控制颜色。`,
+【严格禁令】
+1. 严禁设置 'backgroundColor'。图表背景必须保持透明以适配大屏。
+2. 不要设置 'color'，除非用户在输入中明确要求了特定颜色。
+请必须依赖全局的 ECharts 主题 (Theme) 来自动处理配色逻辑。`,
 
     // 场景2: 创建新图表
     create: (targetContext?: string) => `你是一位图表设计师 (Chart Creator)。请生成 ECharts 配置项。
@@ -53,7 +56,10 @@ ${getChartTemplate(chartType)}
 请只返回合法的 JSON:
 ${getChartTemplate('APACHE_ECHARTS_BAR_SIMPLE')}
 
-重要：不要设置 'color' 或 'backgroundColor'，除非用户明确要求。请依赖 ECharts 主题 (Theme) 来控制颜色。
+【严格禁令】
+1. 严禁设置 'backgroundColor'。图表背景必须保持透明以适配大屏。
+2. 不要设置 'color'，除非用户在输入中明确要求了特定颜色。
+请必须依赖全局的 ECharts 主题 (Theme) 来自动处理配色逻辑。
 ${targetContext || ''}`
   },
 
