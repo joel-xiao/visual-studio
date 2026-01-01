@@ -11,7 +11,7 @@ initAIContextExplicit();
 
 const inputAreaWrapperRef = ref<HTMLElement | null>(null);
 
-const { messages, sendMessage, inputValue, pendingAttachments, loading, inputAreaHeight, handleContinueWorkflow } = useChat({
+const { messages, sendMessage, inputValue, pendingAttachments, loading, inputAreaHeight, handleContinueWorkflow, markActionHandled } = useChat({
   inputAreaWrapperRef
 });
 
@@ -51,6 +51,7 @@ const chatContainerRef = ref<HTMLElement | null>(null);
       :messages="messages"
       :input-area-height="inputAreaHeight"
       :on-continue-workflow="handleContinueWorkflow"
+      :on-mark-action-handled="markActionHandled"
     />
 
     <div ref="inputAreaWrapperRef" class="input-area-wrapper">

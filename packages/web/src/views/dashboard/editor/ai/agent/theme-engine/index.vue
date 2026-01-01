@@ -56,7 +56,8 @@ const handleSelect = (name: string) => {
 <style scoped lang="scss">
 .theme-selector {
   padding: 12px;
-  
+  width: 100%;
+
   .search-box {
     margin-bottom: 12px;
     :deep(.c-input) { width: 100%; }
@@ -64,42 +65,45 @@ const handleSelect = (name: string) => {
 
   .theme-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-    gap: 8px;
-    max-height: 200px;
+    width: 100%;
+    grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+    gap: 10px;
+    max-height: 240px;
     overflow-y: auto;
 
     .theme-item {
       cursor: pointer;
-      padding: 6px;
-      border-radius: 6px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      min-width: 0;
+      padding: 8px;
+      border-radius: var(--border-radius-8);
+      background: var(--theme-color-tran-6);
+      border: 1px solid var(--theme-color-tran-8);
       transition: all 0.2s;
 
       &:hover {
-        background: rgba(255, 255, 255, 0.08);
-        border-color: #409eff;
+        background: var(--theme-color-tran-10);
+        border-color: var(--db-color-button-primary-bg);
       }
 
       .color-strips {
         display: flex;
-        height: 12px;
-        border-radius: 3px;
+        height: 14px;
+        border-radius: var(--border-radius-6);
         overflow: hidden;
-        margin-bottom: 4px;
+        margin-bottom: 6px;
         .strip { flex: 1; }
       }
 
       .name {
-        font-size: 10px;
+        font-size: 11px;
         text-align: center;
         color: var(--theme-color-text-secondary);
         text-transform: capitalize;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
     }
   }
 }
 </style>
-
-

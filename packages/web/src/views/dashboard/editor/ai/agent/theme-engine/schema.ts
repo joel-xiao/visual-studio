@@ -26,6 +26,11 @@ const themeEngineSchema: IAgentSchema = {
     routingPrompt: (() => '') as (agentList: string, context: any) => string
   },
 
+  uiHints: {
+    fullWidth: true,
+    applyStrategy: 'auto'
+  },
+
   // 可用主题列表
   config: {
     availableThemes: [

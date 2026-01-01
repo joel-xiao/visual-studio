@@ -6,6 +6,7 @@
         :key="msg.id"
         :message="msg"
         :on-continue-workflow="onContinueWorkflow"
+        :on-mark-action-handled="onMarkActionHandled"
       />
     </transition-group>
   </div>
@@ -20,6 +21,7 @@ interface Props {
   messages: IChatMessage[];
   inputAreaHeight?: number;
   onContinueWorkflow?: (data: any) => void;
+  onMarkActionHandled?: (messageId: string, key: string) => void;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -98,4 +100,3 @@ onMounted(() => {
   }
 }
 </style>
-

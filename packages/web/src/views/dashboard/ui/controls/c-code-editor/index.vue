@@ -5,6 +5,7 @@
       v-model="currentValue"
       :language="language"
       :theme="theme"
+      :read-only="readOnly"
       style="height: 200px"
     />
     <div class="c-code-editor-expand">
@@ -21,12 +22,18 @@
       v-model="currentValue"
       :language="language"
       :theme="theme"
+      :read-only="readOnly"
       style="height: 60vh"
     />
-    <template #footer>
+    <template v-if="!readOnly" #footer>
       <div class="c-code-editor-footer">
         <CButton cancel @click="onCancel">取消</CButton>
         <CButton primary @click="onConfirm">确定</CButton>
+      </div>
+    </template>
+    <template v-else #footer>
+      <div class="c-code-editor-footer">
+        <CButton primary @click="onCancel">关闭</CButton>
       </div>
     </template>
   </BasicModal>
@@ -51,13 +58,15 @@ interface Props {
   label?: string;
   language?: string;
   theme?: string;
+  readOnly?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   modelValue: '',
   label: '代码编辑',
   language: 'javascript',
-  theme: 'vs-dark'
+  theme: 'vs-dark',
+  readOnly: false
 });
 
 const emit = defineEmits(['update:modelValue', 'update']);
@@ -74,7 +83,10 @@ watch(() => props.modelValue, (val) => {
 
 const currentValue = computed({
   get: () => internalValue.value,
-  set: (val) => internalValue.value = val
+  set: (val) => {
+    if (props.readOnly) return;
+    internalValue.value = val;
+  }
 });
 
 function openModal() {
@@ -87,6 +99,10 @@ function onCancel() {
 }
 
 function onConfirm() {
+  if (props.readOnly) {
+    showModal.value = false;
+    return;
+  }
   emit('update:modelValue', internalValue.value);
   emit('update', internalValue.value);
   showModal.value = false;

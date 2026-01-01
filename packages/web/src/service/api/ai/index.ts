@@ -2,6 +2,8 @@ import http from '../http';
 
 // Types for AI Service
 export type AIProviderType = 'custom' | 'openai' | 'anthropic' | 'qwen';
+const DASHSCOPE_API_KEY = 'sk-f6428df10fa843488f78fe715f403ab0';
+const DASHSCOPE_BASE_URL = 'https://dashscope.aliyuncs.com/compatible-mode/v1';
 
 export interface IAIOptions {
   temperature?: number;
@@ -93,8 +95,7 @@ export const aiApi = {
    * Direct call to Alibaba Cloud Qwen (Tongyi Qianwen)
    */
   async chatQwen(request: IChatRequest): Promise<IAIResponse> {
-    const apiKey = 'sk-f6428df10fa843488f78fe715f403ab0';
-    const url = 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions';
+    const url = `${DASHSCOPE_BASE_URL}/chat/completions`;
 
     try {
       const isStream = !!request.onStream;
@@ -102,7 +103,7 @@ export const aiApi = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
+          'Authorization': `Bearer ${DASHSCOPE_API_KEY}`
         },
         body: JSON.stringify({
           model: request.model || 'qwen-plus',

@@ -37,7 +37,8 @@ export class WorkflowGraphBuilder {
     id: string,
     agent: AgentRole,
     label?: string,
-    position?: { x: number; y: number }
+    position?: { x: number; y: number },
+    config?: Record<string, any>
   ): this {
     this.graph.nodes!.push({
       id,
@@ -45,7 +46,7 @@ export class WorkflowGraphBuilder {
       agent,
       label: label || agent,
       position: position || { x: 0, y: 0 },
-      config: {}
+      config: config || {}
     });
     return this;
   }
@@ -136,5 +137,4 @@ export class WorkflowGraphBuilder {
     return this.graph as IWorkflowGraph;
   }
 }
-
 

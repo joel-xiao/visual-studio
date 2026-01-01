@@ -27,6 +27,7 @@ export interface IChatMessage extends IAIMessage {
   isError?: boolean;
   data?: any; // For holding chart options, layout config, or other structured data
   agent?: AgentRole; // The agent who generated this message
+  actionStatus?: Record<string, boolean>;
 }
 
 export interface IAgent {
@@ -42,7 +43,15 @@ export interface IWorkflowControl {
   currentStep: number;
   totalSteps: number;
   hasNext: boolean;
+  currentNodeId?: string;
   nextNodeId?: string;
+  nextAgent?: AgentRole;
+  workflowId?: string;
+  secondaryAction?: {
+    label: string;
+    kind: 'skip';
+    targetNodeId?: string;
+  };
 }
 
 export interface IAgentResponse {

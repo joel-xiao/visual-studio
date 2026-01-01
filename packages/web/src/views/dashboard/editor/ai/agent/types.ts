@@ -24,6 +24,7 @@ export interface IAgentSchema {
     fullWidth?: boolean;
     primaryActionText?: string;
     secondaryActionText?: string;
+    applyStrategy?: 'manual' | 'auto';
   };
   prompts: Record<string, (...args: any[]) => string>;
   messages: Record<string, string | ((...args: any[]) => string)>;

@@ -1,6 +1,6 @@
 import type { IAgentResponse } from '../../types';
 import type { IAgentSchema } from '../../agent/types';
-import { generateText, type CoreMessage, type UserContent } from 'ai';
+import { generateText, streamText, type CoreMessage, type UserContent } from 'ai';
 import { useAIConfig } from '../../hooks/core/use-ai-config';
 import { extractJSON } from '../json-utils';
 import { getSchemaMessage } from './schema-helpers';
@@ -18,7 +18,7 @@ export function useBaseAgent(schema: IAgentSchema) {
     extractResponse?: (json: any) => Partial<IAgentResponse>,
     attachments?: { url: string; kind?: string }[]
   ): Promise<IAgentResponse> => {
-    onStream?.({ content: getSchemaMessage(schema, 'processing'), type: 'text' });
+    onStream?.({ content: getSchemaMessage(schema, 'processing') });
 
     const usableAttachments = (attachments || []).filter(a => (a.kind || 'image') === 'image' && !!a.url);
     const finalUserPrompt = usableAttachments.length
@@ -38,7 +38,16 @@ export function useBaseAgent(schema: IAgentSchema) {
     ];
 
     const model = usableAttachments.length ? (visionModel || defaultModel) : defaultModel;
-    let rawText = (await generateText({ model, messages })).text;
+    let rawText = '';
+    if (onStream) {
+      const result = await streamText({ model, messages });
+      for await (const delta of result.textStream) {
+        rawText += delta;
+        onStream({ content: rawText });
+      }
+    } else {
+      rawText = (await generateText({ model, messages })).text;
+    }
 
     let json = extractJSON(rawText);
     if (!json) {

@@ -29,8 +29,8 @@ const chartCreatorSchema: IAgentSchema = {
 
   uiHints: {
     fullWidth: true,
-    primaryActionText: '应用到画布',
-    secondaryActionText: '更新选中图表'
+    primaryActionText: '应用',
+    secondaryActionText: '更新'
   },
 
   prompts: {
@@ -53,6 +53,10 @@ ${getChartTemplate(chartType)}
     // 场景2: 创建新图表
     create: (targetContext?: string) => `你是一位图表设计师 (Chart Creator)。请生成 ECharts 配置项。
 
+数据处理原则：
+1. 必须生成一段符合图表类型与业务场景的 Mock 数据（dataset 或 series.data 均可）。
+2. 如果用户明确给了具体数据或业务口径，请以用户输入为准。
+
 请只返回合法的 JSON:
 ${getChartTemplate('APACHE_ECHARTS_BAR_SIMPLE')}
 
@@ -70,6 +74,14 @@ ${targetContext || ''}`
     beautified: (nodeName: string) => `已优化图表: ${nodeName}`,
     completed: '已完成图表美化',
     created: '已生成图表'
+  },
+
+  config: {
+    defaults: {
+      component: 'APACHE_ECHARTS_BAR_SIMPLE',
+      createName: '新图表',
+      createPosition: { x: 500, y: 300 }
+    }
   }
 };
 

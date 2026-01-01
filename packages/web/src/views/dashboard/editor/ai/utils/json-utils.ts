@@ -123,3 +123,37 @@ export function safeStringifyJSON(obj: any, indent: number = 2): string {
     return '{}';
   }
 }
+
+export function isLikelyCodeOutput(text: string): boolean {
+  const trimmed = (text || '').trimStart();
+  if (!trimmed) return false;
+  return trimmed.startsWith('{') || trimmed.startsWith('[') || trimmed.startsWith('```') || trimmed.startsWith('<template');
+}
+
+export function inferCodeLanguage(text: string): string {
+  const trimmed = (text || '').trimStart();
+  if (!trimmed) return 'json';
+  if (trimmed.startsWith('{') || trimmed.startsWith('[')) return 'json';
+  if (trimmed.startsWith('<template')) return 'vue';
+
+  if (trimmed.startsWith('```')) {
+    const firstLine = trimmed.split('\n')[0] || '';
+    const lang = firstLine.replace('```', '').trim();
+    return lang || 'json';
+  }
+  return 'json';
+}
+
+export function stripMarkdownCodeFences(text: string): string {
+  const raw = text || '';
+  const trimmed = raw.trim();
+  if (!trimmed.startsWith('```')) return raw;
+  const lines = raw.split('\n');
+  if (lines.length === 1) return raw.replace(/^```/, '');
+
+  const firstLine = lines[0] || '';
+  const lastLine = lines[lines.length - 1] || '';
+  const start = firstLine.trimStart().startsWith('```') ? 1 : 0;
+  const end = lastLine.trim().startsWith('```') ? lines.length - 1 : lines.length;
+  return lines.slice(start, end).join('\n');
+}

@@ -163,10 +163,25 @@ export class StepWorkflowEngine {
     return nextNodes;
   }
 
+  private shouldStopOnAgent(
+    node: IWorkflowNode,
+    response: IAgentResponse,
+    options?: {
+      shouldStopOnAgent?: (node: IWorkflowNode, response: IAgentResponse) => boolean;
+    }
+  ) {
+    if (!options?.shouldStopOnAgent) return true;
+    return options.shouldStopOnAgent(node, response);
+  }
+
   async executeStep(
     input: string,
     context: any = {},
-    onStream?: (nodeId: string, partial: Partial<IAgentResponse>) => void
+    onStream?: (nodeId: string, partial: Partial<IAgentResponse>) => void,
+    options?: {
+      shouldStopOnAgent?: (node: IWorkflowNode, response: IAgentResponse) => boolean;
+      onNodeComplete?: (nodeId: string, node: IWorkflowNode, response: IAgentResponse) => void;
+    }
   ): Promise<{ response: IAgentResponse | null; hasNext: boolean; nextNodeId?: string }> {
     if (!this.executionContext) {
       this.executionContext = {
@@ -204,8 +219,12 @@ export class StepWorkflowEngine {
 
       const response = await this.executeNode(currentNode, { ...context, input }, wrappedOnStream);
 
+      if (response && currentNode.type === 'agent') {
+        options?.onNodeComplete?.(currentNodeId, currentNode, response);
+      }
+
       const nextNodes = this.getNextNodes(currentNodeId, context);
-      
+
       if (currentNode.type === 'parallel') {
         this.currentNodeQueue.push(...nextNodes.map(n => n.id));
       } else {
@@ -218,9 +237,11 @@ export class StepWorkflowEngine {
 
       // 如果是agent节点且有响应，返回结果
       if (currentNode.type === 'agent' && response) {
-        const hasNext = this.currentNodeQueue.length > 0 && !nextNodes.some(n => n.type === 'end');
-        const nextNodeId = this.currentNodeQueue[0];
-        return { response, hasNext, nextNodeId };
+        if (this.shouldStopOnAgent(currentNode, response, options)) {
+          const hasNext = this.currentNodeQueue.length > 0 && !nextNodes.some(n => n.type === 'end');
+          const nextNodeId = this.currentNodeQueue[0];
+          return { response, hasNext, nextNodeId };
+        }
       }
 
       // 如果是end节点，结束工作流
@@ -240,9 +261,13 @@ export class StepWorkflowEngine {
   async continueExecution(
     input: string,
     context: any = {},
-    onStream?: (nodeId: string, partial: Partial<IAgentResponse>) => void
+    onStream?: (nodeId: string, partial: Partial<IAgentResponse>) => void,
+    options?: {
+      shouldStopOnAgent?: (node: IWorkflowNode, response: IAgentResponse) => boolean;
+      onNodeComplete?: (nodeId: string, node: IWorkflowNode, response: IAgentResponse) => void;
+    }
   ): Promise<{ response: IAgentResponse | null; hasNext: boolean; nextNodeId?: string }> {
-    return this.executeStep(input, context, onStream);
+    return this.executeStep(input, context, onStream, options);
   }
 
   hasNextStep(): boolean {
@@ -257,6 +282,36 @@ export class StepWorkflowEngine {
   getNextNode(): IWorkflowNode | null {
     if (this.currentNodeQueue.length === 0) return null;
     return this.getNode(this.currentNodeQueue[0]);
+  }
+
+  skipToNode(targetNodeId?: string): void {
+    if (!this.executionContext) return;
+    if (!targetNodeId) {
+      this.currentNodeQueue = [];
+      this.executionContext.status = 'completed';
+      return;
+    }
+
+    const targetIndex = this.currentNodeQueue.indexOf(targetNodeId);
+    if (targetIndex === -1) {
+      if (this.getNode(targetNodeId)) {
+        this.currentNodeQueue = [targetNodeId];
+      } else {
+        this.currentNodeQueue = [];
+        this.executionContext.status = 'completed';
+      }
+      return;
+    }
+
+    const skipped = this.currentNodeQueue.slice(0, targetIndex);
+    this.currentNodeQueue = this.currentNodeQueue.slice(targetIndex);
+
+    const timestamp = Date.now();
+    for (const nodeId of skipped) {
+      if (this.executionContext.visitedNodes.has(nodeId)) continue;
+      this.executionContext.visitedNodes.add(nodeId);
+      this.executionContext.history.push({ nodeId, timestamp });
+    }
   }
 
   getExecutionContext(): IWorkflowExecutionContext | null {

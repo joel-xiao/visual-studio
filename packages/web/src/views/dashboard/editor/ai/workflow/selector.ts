@@ -12,6 +12,17 @@ export class WorkflowSelector {
     return config.defaultModel;
   }
 
+  private findDeepMessage(error: unknown): string {
+    const visited = new Set<unknown>();
+    let current: any = error;
+    while (current && typeof current === 'object' && !visited.has(current)) {
+      visited.add(current);
+      if (typeof current.message === 'string' && current.message) return current.message;
+      current = current.cause;
+    }
+    return typeof (error as any)?.message === 'string' ? (error as any).message : String(error);
+  }
+
   async selectWorkflow(input: string, context: unknown): Promise<IWorkflowGraph | null> {
     const contextObj = context && typeof context === 'object' ? context as Record<string, unknown> : {};
 
@@ -56,6 +67,8 @@ ${historyStr}
       }
     } catch (e) {
       console.error('[WorkflowSelector] AI router critical error:', e);
+      const msg = this.findDeepMessage(e);
+      throw new Error(msg || 'AI 路由失败');
     }
 
     return null;

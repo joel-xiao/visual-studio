@@ -9,6 +9,7 @@ export type { IPromptSuggestion } from './chat/use-chat-context';
 export { useOrchestrator } from './orchestrator/use-orchestrator';
 export type { IHistoryItem } from './orchestrator/use-orchestrator';
 export { useWorkflow } from './orchestrator/use-workflow';
+export { useAgentResponseCardWorkflow } from './ui/use-agent-response-card';
 
 export {
   registerAgents,

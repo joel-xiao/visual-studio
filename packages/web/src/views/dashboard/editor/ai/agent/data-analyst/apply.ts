@@ -6,8 +6,13 @@ import { updateChartOptionsBatch } from '../../utils/agent/apply-helpers';
  * 负责将 AI 分析产生的数据应用到现有图表组件中
  */
 export function apply(context: IAIContext, data: any) {
-    // 分析结果通常通过批量图表选项更新来体现
-    if (data.chartOptions) {
-        updateChartOptionsBatch(context, data.chartOptions);
+    const chartOptions =
+        data?.chartOptions ||
+        data?.chartDataMap ||
+        data?.data?.chartOptions ||
+        data?.data?.chartDataMap;
+
+    if (chartOptions) {
+        updateChartOptionsBatch(context, chartOptions);
     }
 }

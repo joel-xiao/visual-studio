@@ -3,11 +3,15 @@ import { createOpenAI } from '@ai-sdk/openai';
 /**
  * Creates a configured OpenAI provider instance specifically for Alibaba Cloud DashScope (Qwen).
  */
-export const createDashScope = (config: { apiKey: string; baseURL?: string }) => {
+export const createDashScope = (config: { apiKey: string; baseURL: string }) => {
   const baseProvider = createOpenAI({
     apiKey: config.apiKey,
-    baseURL: config.baseURL || 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+    baseURL: config.baseURL,
     fetch: async (url, options) => {
+      if (!config.apiKey) {
+        throw new Error('未配置 DashScope API Key');
+      }
+
       if (options && options.body && typeof options.body === 'string') {
         try {
           const body = JSON.parse(options.body);
@@ -31,7 +35,12 @@ export const createDashScope = (config: { apiKey: string; baseURL?: string }) =>
         const response = await fetch(url, options);
 
         if (!response.ok) {
-          const errorText = await response.text();
+          let errorText = '';
+          try {
+            errorText = await response.clone().text();
+          } catch (_) {
+            errorText = '';
+          }
           console.error('[DashScope] API Error:', response.status, response.statusText, errorText);
         }
 
@@ -45,4 +54,3 @@ export const createDashScope = (config: { apiKey: string; baseURL?: string }) =>
 
   return baseProvider;
 };
-

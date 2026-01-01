@@ -27,6 +27,10 @@ const dataAnalystSchema: IAgentSchema = {
     routingPrompt: (() => '') as (agentList: string, context: any) => string
   },
 
+  uiHints: {
+    applyStrategy: 'auto'
+  },
+
   prompts: {
     generate: (layoutContext: string) => `你是一位专业的数据分析师 (Data Analyst)。你的任务是为大屏中的图表生成高质量、符合业务逻辑的模拟数据。
 

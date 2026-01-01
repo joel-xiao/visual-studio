@@ -15,39 +15,70 @@
       </div>
 
       <div class="message-bubble">
-        <!-- 基础文本 -->
-        <div v-if="message.type === 'text'" class="text-content markdown-body" v-html="message.content"></div>
+        <template v-if="message.type === 'agent-thought'">
+          <div v-if="isStreamingCode" class="streaming-code">
+            <div class="streaming-header">
+              <div class="streaming-title">
+                <span class="thinking-dots" aria-hidden="true"><span></span><span></span><span></span></span>
+                <span class="streaming-text">正在输出中</span>
+              </div>
+            </div>
+            <CCodeEditor
+              :model-value="streamingCode"
+              label="输出预览"
+              :language="streamingLanguage"
+              :read-only="true"
+            />
+          </div>
+          <div v-else class="thought-content">
+            <span class="thinking-dots" aria-hidden="true"><span></span><span></span><span></span></span>
+            <span class="thought-text">{{ message.content }}</span>
+          </div>
+        </template>
 
-        <!-- 思考状态 -->
-        <div v-else-if="message.type === 'agent-thought'" class="thought-content">
-          <CIcon icon="mdi:loading" class="spin" />
-          <span>{{ message.content }}</span>
-        </div>
-
-        <!-- 专业 Agent 响应卡片 -->
+        <!-- 专业 Agent 响应卡片（无专用组件时使用只读 JSON 预览兜底） -->
         <AgentResponseCard
-          v-else-if="agentComponent"
+          v-else-if="message.agent && message.data"
           :role="message.agent"
           :title="message.data?.title || message.data?.name"
-          :badge="message.type"
-          :has-secondary-action="!!agentSchema?.uiHints?.secondaryActionText && hasSelection"
-          :secondary-action-text="agentSchema?.uiHints?.secondaryActionText"
+          :has-secondary-action="showSecondaryAction"
+          :secondary-action-text="secondaryActionText"
           :primary-action-text="getPrimaryActionText()"
           :workflow-control="workflowControl"
+          :enable-workflow-actions="!shouldHideWorkflowControls"
+          :hide-primary-action="shouldHideWorkflowControls"
+          :hide-secondary-action="shouldHideWorkflowControls"
+          :handled="shouldHideWorkflowControls"
           @apply="handleApply"
-          @secondary="handleApply($event, 'update')"
+          @secondary="handleSecondary"
+          @apply-only="handleApplyOnly"
         >
-          <div v-if="message.content" class="card-intro">{{ message.content }}</div>
           <component
             :is="agentComponent"
+            v-if="agentComponent"
             :data="message.data"
             @apply="handleApply"
           />
+          <CCodeEditor
+            v-else
+            :model-value="fallbackCode"
+            label="JSON 预览"
+            language="json"
+            :read-only="true"
+          />
         </AgentResponseCard>
+
+        <!-- 基础文本 -->
+        <div v-else-if="message.type === 'text'" class="text-content markdown-body" v-html="message.content"></div>
 
         <!-- 代码/JSON 预览 (兜底) -->
         <div v-else-if="message.data" class="code-content">
-          <pre><code>{{ JSON.stringify(message.data, null, 2) }}</code></pre>
+          <CCodeEditor
+            :model-value="fallbackCode"
+            label="JSON 预览"
+            language="json"
+            :read-only="true"
+          />
         </div>
 
         <div v-if="imageAttachments.length" class="attachments">
@@ -68,12 +99,16 @@ import { computed, unref } from 'vue';
 import type { IChatMessage } from '../types';
 import CIcon from '../../../ui/controls/c-icon/index.vue';
 import AgentResponseCard from './AgentResponseCard.vue';
+import CCodeEditor from '../../../ui/controls/c-code-editor/index.vue';
 import { useAIContext } from '../hooks/core/use-ai-context';
 import { applyAgentData, getAgentSchema, getAgentComponent } from '../agent/registry';
+import { safeStringifyJSON } from '../utils/json-utils';
+import { getStreamingCodePresentation } from '../utils';
 
 const props = defineProps<{
   message: IChatMessage;
   onContinueWorkflow?: (data: any) => void;
+  onMarkActionHandled?: (messageId: string, key: string) => void;
 }>();
 
 const aiContext = useAIContext();
@@ -86,17 +121,82 @@ const hasSelection = computed(() => {
 
 const workflowControl = computed(() => (props.message as any).workflowControl);
 const isMultiStepWorkflow = computed(() => !!workflowControl.value?.isMultiStep);
+const hasNextStep = computed(() => !!(workflowControl.value?.isMultiStep && workflowControl.value?.hasNext));
 const imageAttachments = computed(() => (props.message.attachments || []).filter(a => a.kind === 'image' && !!a.url));
+const fallbackCode = computed(() => safeStringifyJSON(props.message.data, 2));
+const actionStatus = computed(() => props.message.actionStatus || {});
+const streaming = computed(() => getStreamingCodePresentation(props.message));
+const isStreamingCode = computed(() => streaming.value.isStreamingCode);
+const streamingLanguage = computed(() => streaming.value.language);
+const streamingCode = computed(() => streaming.value.code);
+const workflowHandledKey = computed(() => {
+  if (!isMultiStepWorkflow.value || !hasNextStep.value) return '';
+  const control = workflowControl.value;
+  const workflowId = control?.workflowId || 'workflow';
+  const nodeId = control?.currentNodeId || props.message.id;
+  return `workflow:${workflowId}:${nodeId}:handled`;
+});
+const workflowHandled = computed(() => !!(workflowHandledKey.value && actionStatus.value[workflowHandledKey.value]));
+const shouldHideWorkflowControls = computed(() => isMultiStepWorkflow.value && hasNextStep.value && workflowHandled.value);
 
-const handleApply = (data?: any, mode: 'create' | 'update' = 'create') => {
+const showSecondaryAction = computed(() => {
+  if (isMultiStepWorkflow.value) return !!workflowControl.value?.secondaryAction;
+  return !!agentSchema.value?.uiHints?.secondaryActionText && hasSelection.value;
+});
+
+const secondaryActionText = computed(() =>
+  isMultiStepWorkflow.value
+    ? (workflowControl.value?.secondaryAction?.label || '')
+    : agentSchema.value?.uiHints?.secondaryActionText
+);
+
+const resolveApplyMode = (mode?: 'create' | 'update') => {
+  if (mode) return mode;
+  return hasSelection.value ? 'update' : 'create';
+};
+
+const handleApply = (data?: any, mode?: 'create' | 'update') => {
+  if (!props.message.agent) return;
+  const payload = data || props.message.data;
+  const applyMode = resolveApplyMode(mode);
+
+  if (isMultiStepWorkflow.value && hasNextStep.value && props.onContinueWorkflow) {
+    if (workflowHandled.value) return;
+    if (workflowHandledKey.value) {
+      props.onMarkActionHandled?.(props.message.id, workflowHandledKey.value);
+    }
+    props.onContinueWorkflow({ ...payload, applyMode });
+    return;
+  }
+
+  applyAgentData(props.message.agent, aiContext, { ...payload, applyMode });
+};
+
+const handleSecondary = (data?: any) => {
   if (!props.message.agent) return;
   const payload = data || props.message.data;
 
   if (isMultiStepWorkflow.value && props.onContinueWorkflow) {
-    props.onContinueWorkflow({ ...payload, applyMode: mode });
-  } else {
-    applyAgentData(props.message.agent, aiContext, { ...payload, applyMode: mode });
+    const action = workflowControl.value?.secondaryAction;
+    if (!action) return;
+    if (hasNextStep.value) {
+      if (workflowHandled.value) return;
+      if (workflowHandledKey.value) {
+        props.onMarkActionHandled?.(props.message.id, workflowHandledKey.value);
+      }
+    }
+    props.onContinueWorkflow({ ...payload, applyMode: resolveApplyMode(), workflowAction: action });
+    return;
   }
+
+  applyAgentData(props.message.agent, aiContext, { ...payload, applyMode: 'update' });
+};
+
+const handleApplyOnly = (data?: any, mode?: 'create' | 'update') => {
+  if (!props.message.agent) return;
+  const payload = data || props.message.data;
+  const applyMode = resolveApplyMode(mode);
+  applyAgentData(props.message.agent, aiContext, { ...payload, applyMode });
 };
 
 const getPrimaryActionText = () => {
@@ -106,9 +206,9 @@ const getPrimaryActionText = () => {
 
   const control = workflowControl.value;
   if (control?.hasNext) {
-    return `应用并继续 (${control.currentStep}/${control.totalSteps})`;
+    return `继续 (${control.currentStep}/${control.totalSteps})`;
   }
-  return '应用并完成';
+  return '应用';
 };
 </script>
 
@@ -117,6 +217,7 @@ const getPrimaryActionText = () => {
 .message-wrapper {
   display: flex;
   gap: 9px;
+  align-items: flex-start;
   max-width: 90%;
   animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 
@@ -160,6 +261,7 @@ const getPrimaryActionText = () => {
   &.assistant {
     align-self: flex-start;
     max-width: 100%;
+    width: 100%;
 
     .message-body {
       align-items: flex-start;
@@ -229,6 +331,7 @@ const getPrimaryActionText = () => {
         border-radius: 50%;
         padding: 2px;
         background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
+        mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
         -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
         -webkit-mask-composite: xor;
         mask-composite: exclude;
@@ -314,13 +417,73 @@ const getPrimaryActionText = () => {
         align-items: center;
         gap: 10px;
         color: var(--theme-color-text-secondary);
-        font-style: italic;
+        font-style: normal;
+        padding: 8px 10px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.06);
 
-        :deep(.c-icon) {
-          animation: spin 1s linear infinite;
+        .thought-text {
+          flex: 1;
+          min-width: 0;
+        }
+
+        .thought-text::after {
+          content: '▍';
+          margin-left: 3px;
           color: var(--db-color-button-primary-bg);
+          opacity: 0.8;
+          animation: cursorBlink 1s steps(2, end) infinite;
         }
       }
+
+      .streaming-code {
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      .streaming-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 10px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        color: var(--theme-color-text-secondary);
+        font-size: 12px;
+      }
+
+      .streaming-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+      }
+
+      .streaming-text {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .thinking-dots {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .thinking-dots > span {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--db-color-button-primary-bg);
+        opacity: 0.35;
+        animation: dotPulse 1.2s infinite ease-in-out;
+      }
+
+      .thinking-dots > span:nth-child(2) { animation-delay: 0.15s; }
+      .thinking-dots > span:nth-child(3) { animation-delay: 0.3s; }
 
       .code-content {
          background: linear-gradient(135deg,
@@ -392,6 +555,16 @@ const getPrimaryActionText = () => {
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+@keyframes dotPulse {
+  0%, 100% { transform: translateY(0); opacity: 0.35; }
+  50% { transform: translateY(-2px); opacity: 0.9; }
+}
+
+@keyframes cursorBlink {
+  0%, 49% { opacity: 0; }
+  50%, 100% { opacity: 0.85; }
 }
 
 @keyframes slideIn {

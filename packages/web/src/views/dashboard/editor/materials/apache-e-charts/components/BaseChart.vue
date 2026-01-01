@@ -1,5 +1,5 @@
 <template>
-  <v-chart class="chart" :option="option" autoresize />
+  <v-chart class="chart" :option="option" :theme="theme" autoresize />
 </template>
 
 <script setup lang="ts">
@@ -56,6 +56,8 @@ const props = defineProps<{
 }>();
 
 const { option } = useChartOptions(props, props.defaultOption);
+const chartThemesContext = useChartThemesContext();
+const theme = computed(() => chartThemesContext.getCurrentTheme().value);
 </script>
 
 <style scoped>

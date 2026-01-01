@@ -5,7 +5,7 @@ import VChart from 'vue-echarts';
 import { use } from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
 import {
-  BarChart, LineChart, PieChart, RadarChart, ScatterChart, 
+  BarChart, LineChart, PieChart, RadarChart, ScatterChart,
   CandlestickChart, MapChart, EffectScatterChart
 } from 'echarts/charts';
 import {
@@ -33,12 +33,16 @@ const theme = computed(() => props.data.theme || aiContext.chartThemesContext.ge
 
 const chartOption = computed(() => {
   const options = props.data?.options;
-  return typeof options === 'string' ? safeParseJSON(options, {}) : (options || {});
+  const base = typeof options === 'string' ? safeParseJSON(options, {}) : (options || {});
+  if (!base || typeof base !== 'object' || Array.isArray(base)) {
+    return { backgroundColor: 'transparent' };
+  }
+  return { ...(base as Record<string, any>), backgroundColor: 'transparent' };
 });
 </script>
 
 <template>
-  <div class="chart-preview-box">
+  <div class="chart-preview">
     <v-chart
       class="chart"
       :option="chartOption"
@@ -49,17 +53,16 @@ const chartOption = computed(() => {
 </template>
 
 <style scoped lang="scss">
-.chart-preview-box {
-  height: 240px;
+.chart-preview {
   width: 100%;
-  padding: 12px;
-  background: rgba(0, 0, 0, 0.1);
-  
-  .chart {
-    width: 100%;
-    height: 100%;
-  }
+  height: 260px;
+  padding: 10px;
+  background: transparent;
+  border: none;
+}
+
+.chart {
+  width: 100%;
+  height: 100%;
 }
 </style>
-
-

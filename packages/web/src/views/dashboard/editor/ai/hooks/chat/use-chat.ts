@@ -1,7 +1,7 @@
 import { ref, nextTick, onMounted, onUnmounted, type Ref } from 'vue';
-import type { IChatMessage, IChatImageAttachment, AgentRole, IAgentResponse } from '../../types';
-import { useOrchestrator } from '../orchestrator/use-orchestrator';
+import type { IChatMessage, IChatImageAttachment } from '../../types';
 import { useStepOrchestrator } from '../orchestrator/use-step-orchestrator';
+import { useChatMessages } from './use-chat-messages';
 
 const WELCOME_MESSAGE: IChatMessage = {
   id: 'welcome',
@@ -16,9 +16,8 @@ export function useChat(options: { inputAreaWrapperRef?: Ref<HTMLElement | null>
   const inputValue = ref('');
   const pendingAttachments = ref<IChatImageAttachment[]>([]);
   const loading = ref(false);
-  const messages = ref<IChatMessage[]>([WELCOME_MESSAGE]);
+  const { messages, addOrUpdateMessage, removeMessage } = useChatMessages([WELCOME_MESSAGE]);
   const inputAreaHeight = ref(130);
-  const orchestrator = useOrchestrator();
   const stepOrchestrator = useStepOrchestrator();
 
   let resizeObserver: ResizeObserver | null = null;
@@ -33,17 +32,6 @@ export function useChat(options: { inputAreaWrapperRef?: Ref<HTMLElement | null>
     }
   });
   onUnmounted(() => resizeObserver?.disconnect());
-
-  const addOrUpdateMessage = (role: 'user' | 'assistant', partial: Partial<IChatMessage> & { id?: string }) => {
-    const { id, ...data } = partial;
-    if (id) {
-      const msg = messages.value.find(m => m.id === id);
-      if (msg) return Object.assign(msg, data);
-    }
-    const newId = id || Date.now().toString() + Math.random().toString(36).slice(2, 9);
-    messages.value.push({ id: newId, role, content: '', ...data } as IChatMessage);
-    return messages.value[messages.value.length - 1];
-  };
 
   const sendMessage = async () => {
     const content = inputValue.value.trim();
@@ -96,10 +84,7 @@ export function useChat(options: { inputAreaWrapperRef?: Ref<HTMLElement | null>
       if (response) {
         addOrUpdateMessage('assistant', { id: assistantMsg.id, ...response });
       } else {
-        const msgIndex = messages.value.findIndex(m => m.id === assistantMsg.id);
-        if (msgIndex !== -1) {
-          messages.value.splice(msgIndex, 1);
-        }
+        removeMessage(assistantMsg.id);
       }
     } catch (e: any) {
       addOrUpdateMessage('assistant', {
@@ -112,5 +97,11 @@ export function useChat(options: { inputAreaWrapperRef?: Ref<HTMLElement | null>
     }
   };
 
-  return { messages, inputValue, pendingAttachments, loading, inputAreaHeight, sendMessage, handleContinueWorkflow };
+  const markActionHandled = (messageId: string, key: string) => {
+    const msg = messages.value.find(m => m.id === messageId);
+    const nextStatus = { ...(msg?.actionStatus || {}), [key]: true };
+    addOrUpdateMessage('assistant', { id: messageId, actionStatus: nextStatus });
+  };
+
+  return { messages, inputValue, pendingAttachments, loading, inputAreaHeight, sendMessage, handleContinueWorkflow, markActionHandled };
 }

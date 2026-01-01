@@ -11,7 +11,18 @@ export function createChartGenerationWorkflow(): IWorkflowGraph {
             priority: 11
         })
         .addStartNode('start', '开始', { x: 100, y: 100 })
-        .addAgentNode('chart', 'chart-creator', '图表制作', { x: 100, y: 200 })
+        .addAgentNode('chart', 'chart-creator', '图表制作', { x: 100, y: 200 }, {
+          uiHints: {
+            inlineActions: [
+              { kind: 'applyOnly', label: '应用' }
+            ],
+            secondaryAction: {
+              label: '跳过数据',
+              kind: 'skip',
+              targetNodeId: 'end'
+            }
+          }
+        })
         .addAgentNode('data', 'data-analyst', '填充数据', { x: 100, y: 300 })
         .addEndNode('end', '结束', { x: 100, y: 400 })
         .addEdge('start', 'chart')
