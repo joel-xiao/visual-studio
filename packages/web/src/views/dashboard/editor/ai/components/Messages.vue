@@ -34,9 +34,9 @@ const scrollToBottom = async () => {
   }
 };
 
-watch(() => props.messages.length, () => {
+watch(() => props.messages, () => {
   scrollToBottom();
-}, { immediate: true });
+}, { deep: true, immediate: true });
 </script>
 
 <style scoped lang="scss">

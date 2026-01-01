@@ -363,5 +363,43 @@ export class WorkflowEngine {
       this.executionContext.status = 'cancelled';
     }
   }
+
+  /**
+   * 获取最终聚合的 IAgentResponse
+   */
+  getFinalResponse(success: boolean, error?: Error): IAgentResponse {
+    if (!this.executionContext) {
+      return {
+        content: success ? '工作流执行完成' : `出错啦: ${error?.message || '未知错误'}`,
+        type: 'text',
+        isError: !success
+      };
+    }
+
+    let lastAgentResponse: IAgentResponse | null = null;
+    let finalAgentRole: AgentRole | undefined;
+
+    // 从后往前找最后一个有响应内容的 Agent
+    for (let i = this.executionContext.history.length - 1; i >= 0; i--) {
+      const item = this.executionContext.history[i];
+      if (item.response) {
+        if (!lastAgentResponse) lastAgentResponse = item.response;
+        const node = this.getNode(item.nodeId);
+        if (node?.agent && !finalAgentRole) {
+          finalAgentRole = node.agent;
+        }
+        if (lastAgentResponse && finalAgentRole) break;
+      }
+    }
+
+    return {
+      content: lastAgentResponse?.content || (success ? '任务已完成' : `执行失败: ${error?.message}`),
+      type: lastAgentResponse?.type || 'text',
+      data: this.executionContext.data, // 使用累积的全局数据
+      agent: finalAgentRole,
+      actions: lastAgentResponse?.actions,
+      isError: !success
+    };
+  }
 }
 

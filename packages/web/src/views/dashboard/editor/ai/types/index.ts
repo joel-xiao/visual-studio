@@ -31,5 +31,6 @@ export interface IAgentResponse {
   actions?: ISceneAction[];
   isError?: boolean; // Allow error flag
   requireInteraction?: boolean; // Override schema.isInteractive at runtime
+  agent?: AgentRole; // The agent who generated this response
 }
 
