@@ -5,7 +5,7 @@
 - Monorepo：pnpm workspace
 - Web：Vue 3 + TypeScript + Vite（packages/web）
 - Desktop：Tauri（packages/tauri）与 Electron（packages/electron）
-- 重点模块：大屏编辑器与其 AI 编排（packages/web/src/views/dashboard/editor）
+- 重点模块：大屏编辑器与其 AI 编排（packages/visual-craft-core/src/views/editor）
 
 # Global Constraints (Must Follow)
 1. **Search First**：写代码前先检索仓库内相似实现，优先复用现有模式与工具。
@@ -38,7 +38,7 @@
 - Web 启动入口：[main.ts](packages/web/src/main.ts)
 - 路由入口：[router/index.ts](packages/web/src/router/index.ts)
 - 编辑器路由：/dashboard/editor -> [my-editor.vue](packages/web/src/views/dashboard/main/my-editor.vue)
-- 编辑器根布局：[editor/index.vue](packages/web/src/views/dashboard/editor/index.vue)
+- 编辑器根布局：[editor/index.vue](packages/visual-craft-core/src/views/editor/index.vue)
 - Vite alias：[vite.config.ts](packages/web/vite.config.ts)
 - TS paths：[tsconfig.json](packages/web/tsconfig.json)
 
@@ -55,7 +55,7 @@
 - 约束：指令名使用 kebab-case（例如 drag-resize）。
 
 ## 插件（packages/web/src/plugins）
-- Monaco worker 映射：[monaco-editor.ts](packages/web/src/plugins/monaco-editor.ts)
+- Monaco worker 映射：[monaco-editor.ts](packages/visual-craft-core/src/plugins/monaco-editor.ts)
 - Naive UI 注册：[native-ui.ts](packages/web/src/plugins/native-ui.ts)
 - Naive UI i18n：[native-i18n.ts](packages/web/src/plugins/native-i18n.ts)
 
@@ -63,32 +63,32 @@
 - HTTP 包装：[api/http.ts](packages/web/src/service/api/http.ts)
 - 约束：业务侧优先 import @api/*，避免混用多套入口。
 
-# Dashboard Editor Architecture（packages/web/src/views/dashboard/editor）
+# Dashboard Editor Architecture（packages/visual-craft-core/src/views/editor）
 
 ## Layout & Panels
-- 核心布局：[editor/index.vue](packages/web/src/views/dashboard/editor/index.vue)
+- 核心布局：[editor/index.vue](packages/visual-craft-core/src/views/editor/index.vue)
 - 层级：Canvas + NavPanel + LeftPanel + (RightPanel | AIPanel)
 - activeTab：由 NavPanel emit('change', tabId) 驱动；RightPanel/AIPanel 使用 v-show 控制可见性。
 - 面板实现：
-  - [nav-panel.vue](packages/web/src/views/dashboard/editor/panels/nav-panel.vue)
-  - [left-panel.vue](packages/web/src/views/dashboard/editor/panels/left-panel.vue)
-  - [right-panel.vue](packages/web/src/views/dashboard/editor/panels/right-panel.vue)
-  - [ai-panel.vue](packages/web/src/views/dashboard/editor/panels/ai-panel.vue)
-- 面板类型：[panels.d.ts](packages/web/src/views/dashboard/editor/types/panels.d.ts)
+  - [nav-panel.vue](packages/visual-craft-core/src/views/editor/panels/nav-panel.vue)
+  - [left-panel.vue](packages/visual-craft-core/src/views/editor/panels/left-panel.vue)
+  - [right-panel.vue](packages/visual-craft-core/src/views/editor/panels/right-panel.vue)
+  - [ai-panel.vue](packages/visual-craft-core/src/views/editor/panels/ai-panel.vue)
+- 面板类型：[panels.d.ts](packages/visual-craft-core/src/views/editor/types/panels.d.ts)
 
 ## Context Hooks Pattern（必须保持一致）
 - 统一使用“单例 Context + create/remove/use 三件套”：
   - createXContext：创建并 install（只创建一次）
   - useXContext：返回同一个实例（必要时触发 create）
   - removeXContext：uninstall + 清空引用
-- 生命周期管理：任何 Context 的 install/uninstall 必须由 [editor/index.vue](packages/web/src/views/dashboard/editor/index.vue) 统一管理（onUnmounted 清理）。
+- 生命周期管理：任何 Context 的 install/uninstall 必须由 [editor/index.vue](packages/visual-craft-core/src/views/editor/index.vue) 统一管理（onUnmounted 清理）。
 - 参考：
-  - [node-context](packages/web/src/views/dashboard/editor/hooks/node-context/index.ts)
-  - [bind-keys-context](packages/web/src/views/dashboard/editor/hooks/bind-keys-context/index.ts)
-  - [canvas hook](packages/web/src/views/dashboard/editor/hooks/canvas/index.ts)
-  - [overlay-context](packages/web/src/views/dashboard/editor/hooks/overlay-context/index.ts)
-  - [ruler-context](packages/web/src/views/dashboard/editor/hooks/ruler-context/index.ts)
-  - [component-context](packages/web/src/views/dashboard/editor/hooks/component-context/index.ts)
+  - [node-context](packages/visual-craft-core/src/views/editor/hooks/node-context/index.ts)
+  - [bind-keys-context](packages/visual-craft-core/src/views/editor/hooks/bind-keys-context/index.ts)
+  - [canvas hook](packages/visual-craft-core/src/views/editor/hooks/canvas/index.ts)
+  - [overlay-context](packages/visual-craft-core/src/views/editor/hooks/overlay-context/index.ts)
+  - [ruler-context](packages/visual-craft-core/src/views/editor/hooks/ruler-context/index.ts)
+  - [component-context](packages/visual-craft-core/src/views/editor/hooks/component-context/index.ts)
 
 ## Node Update Invariants（避免状态不同步）
 - Node 布局有两份来源：node 顶层字段（x/y/width/height/rotate/radius）与 props.layout.*。
@@ -98,20 +98,20 @@
 - 禁止：直接 mutate currentNode.value.props 或 data.nodes[*] 绕过同步逻辑。
 
 ## Canvas Interaction
-- 入口：[canvas/index.vue](packages/web/src/views/dashboard/editor/canvas/index.vue)
+- 入口：[canvas/index.vue](packages/visual-craft-core/src/views/editor/canvas/index.vue)
 - Overlay/Scale/Ruler 协作：
-  - 平移：[overlay-context](packages/web/src/views/dashboard/editor/hooks/overlay-context/index.ts)
-  - 缩放：[canvas hook](packages/web/src/views/dashboard/editor/hooks/canvas/index.ts)
-  - Space 拖拽开关：[bind-keys-context](packages/web/src/views/dashboard/editor/hooks/bind-keys-context/index.ts)
+  - 平移：[overlay-context](packages/visual-craft-core/src/views/editor/hooks/overlay-context/index.ts)
+  - 缩放：[canvas hook](packages/visual-craft-core/src/views/editor/hooks/canvas/index.ts)
+  - Space 拖拽开关：[bind-keys-context](packages/visual-craft-core/src/views/editor/hooks/bind-keys-context/index.ts)
 - 拖拽投放（物料 -> 画布）：
-  - dataTransfer 读取入口：[drag-context](packages/web/src/views/dashboard/editor/hooks/drag-context/index.ts)
+  - dataTransfer 读取入口：[drag-context](packages/visual-craft-core/src/views/editor/hooks/drag-context/index.ts)
   - 坐标换算：先以 canvasRootEl.getBoundingClientRect() 扣 rect，再除以 getScale()
 
 ## Schema & Props Panel
-- 基础控件 schema（ISchemaExport）：packages/web/src/views/dashboard/editor/schema/**（类型见 [schema.d.ts](packages/web/src/views/dashboard/editor/types/schema.d.ts)）
-- 组件 schema（IComponentSchemaExport）：canvas/schema/*.ts 与 materials/*/*/schema/*.ts（类型见 [materials.d.ts](packages/web/src/views/dashboard/editor/types/materials.d.ts)）
-- 渲染链路：[right-panel.vue](packages/web/src/views/dashboard/editor/panels/right-panel.vue) -> [schema-renderer](packages/web/src/views/dashboard/editor/schema-renderer/index.vue)
-- 控件映射：[props-ctrl.vue](packages/web/src/views/dashboard/editor/schema-renderer/props-ctrl.vue)（ctrl 必须等于控件组件 export default 的 name）
+- 基础控件 schema（ISchemaExport）：packages/visual-craft-core/src/views/editor/schema/**（类型见 [schema.d.ts](packages/visual-craft-core/src/views/editor/types/schema.d.ts)）
+- 组件 schema（IComponentSchemaExport）：canvas/schema/*.ts 与 materials/*/*/schema/*.ts（类型见 [materials.d.ts](packages/visual-craft-core/src/views/editor/types/materials.d.ts)）
+- 渲染链路：[right-panel.vue](packages/visual-craft-core/src/views/editor/panels/right-panel.vue) -> [schema-renderer](packages/visual-craft-core/src/views/editor/schema-renderer/index.vue)
+- 控件映射：[props-ctrl.vue](packages/visual-craft-core/src/views/editor/schema-renderer/props-ctrl.vue)（ctrl 必须等于控件组件 export default 的 name）
 
 规则：
 - 基础 schema item 必须有 key；type/default 必须匹配；ctrl 必须存在且可被 PropsCtrl 解析。
@@ -123,30 +123,30 @@
 - Props 面板无 “IS NO …”；写回路径正确；数值/布尔类型不漂移；layout 同步正确。
 
 ## Materials（自动发现，不维护手工列表）
-- 扫描与注册逻辑：[component-context](packages/web/src/views/dashboard/editor/hooks/component-context/index.ts)
+- 扫描与注册逻辑：[component-context](packages/visual-craft-core/src/views/editor/hooks/component-context/index.ts)
 - 新增物料组件最小必需：
   - materials/<library>/<component>/use.ts
   - materials/<library>/<component>/index.vue
   - materials/<library>/<component>/schema/default.ts（type 唯一）
 
 ## Dashboard UI（通用控件）
-- 基础组件：packages/web/src/views/dashboard/ui/base
-- 业务控件：packages/web/src/views/dashboard/ui/controls
+- 基础组件：packages/visual-craft-core/src/views/ui/base
+- 业务控件：packages/visual-craft-core/src/views/ui/controls
 - PropsCtrl 动态加载约束：
   - ctrl 字符串必须与控件组件 export default 的 name 完全一致
-  - 入口：[props-ctrl.vue](packages/web/src/views/dashboard/editor/schema-renderer/props-ctrl.vue)
+  - 入口：[props-ctrl.vue](packages/visual-craft-core/src/views/editor/schema-renderer/props-ctrl.vue)
 
-# AI System（packages/web/src/views/dashboard/editor/ai）
+# AI System（packages/visual-craft-core/src/views/editor/ai）
 
 ## Entry Points
-- 多步调度：[use-step-orchestrator](packages/web/src/views/dashboard/editor/ai/hooks/orchestrator/use-step-orchestrator.ts)
-- 自动引擎：[engine.ts](packages/web/src/views/dashboard/editor/ai/workflow/core/engine.ts)
-- 步骤引擎：[step-engine.ts](packages/web/src/views/dashboard/editor/ai/workflow/core/step-engine.ts)
-- 路由选择：[selector.ts](packages/web/src/views/dashboard/editor/ai/workflow/selector.ts)
-- Agent 自动发现：[registry.ts](packages/web/src/views/dashboard/editor/ai/agent/registry.ts)
+- 多步调度：[use-step-orchestrator](packages/visual-craft-core/src/views/editor/ai/hooks/orchestrator/use-step-orchestrator.ts)
+- 自动引擎：[engine.ts](packages/visual-craft-core/src/views/editor/ai/workflow/core/engine.ts)
+- 步骤引擎：[step-engine.ts](packages/visual-craft-core/src/views/editor/ai/workflow/core/step-engine.ts)
+- 路由选择：[selector.ts](packages/visual-craft-core/src/views/editor/ai/workflow/selector.ts)
+- Agent 自动发现：[registry.ts](packages/visual-craft-core/src/views/editor/ai/agent/registry.ts)
 
 ## Add an Agent（按现有模式扩展）
-- 目录：packages/web/src/views/dashboard/editor/ai/agent/<role>/
+- 目录：packages/visual-craft-core/src/views/editor/ai/agent/<role>/
 - 文件：
   - schema.ts（prompts / uiHints / routing）
   - use.ts（process，调用 useBaseAgent）
@@ -157,16 +157,16 @@
 - 策略来源：
   - workflow node config：node.config.uiHints.applyStrategy / node.config.applyStrategy
   - 或 agent schema：schema.uiHints.applyStrategy
-- 参考：[policy.ts](packages/web/src/views/dashboard/editor/ai/hooks/orchestrator/step-orchestrator/policy.ts)
+- 参考：[policy.ts](packages/visual-craft-core/src/views/editor/ai/hooks/orchestrator/step-orchestrator/policy.ts)
 
 ## Vision Input & JSON Output
-- 图片通过 attachments 传递：[base-agent.ts](packages/web/src/views/dashboard/editor/ai/utils/agent/base-agent.ts)
+- 图片通过 attachments 传递：[base-agent.ts](packages/visual-craft-core/src/views/editor/ai/utils/agent/base-agent.ts)
 - 约束：对所有 agent，只输出一个合法 JSON 对象（不要 Markdown/解释性文字）。
 
 ## ECharts Options Update
 - 统一使用 apply helpers：
   - updateChartOptions / updateChartOptionsBatch
-  - [apply-helpers.ts](packages/web/src/views/dashboard/editor/ai/utils/agent/apply-helpers.ts)
+  - [apply-helpers.ts](packages/visual-craft-core/src/views/editor/ai/utils/agent/apply-helpers.ts)
 
 # Minimal Templates（User Only Needs To Fill Placeholders）
 
@@ -195,7 +195,7 @@ schema 文件位置：{canvas/schema/default.ts 或 materials/<library>/<compone
 
 ## T4: 新增属性面板控件（dashboard/ui）
 用户最小输入：
-控件组件路径：{packages/web/src/views/dashboard/ui/controls/...}
+控件组件路径：{packages/visual-craft-core/src/views/ui/controls/...}
 控件 name：{export default name}
 schema.ctrl：{必须等于控件 name}
 值类型：{string/number/boolean/object}
