@@ -1,0 +1,55 @@
+/**
+* @description: CSS Initialize
+* @author: Joel
+*/
+
+:where(#visual-craft-core),
+:where(#visual-craft-core) :where(*) {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  appearance: none;
+}
+
+:where(#visual-craft-core) {
+  text-size-adjust: 100%;
+  font-family: Inter, 'Apple System', 'SF Pro SC', 'SF Pro Display', 'Helvetica Neue', Arial,
+    'PingFang SC', 'Hiragino Sans GB', STHeiti, 'Microsoft YaHei', 'Microsoft JhengHei',
+    'Source Han Sans SC', 'Noto Sans CJK SC', 'Source Han Sans CN', sans-serif;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #333;
+  -webkit-tap-highlight-color: transparent;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizelegibility;
+}
+
+:where(#visual-craft-core) :where(div:focus) {
+  outline: none;
+}
+
+:where(#visual-craft-core) :where(button, input) {
+  overflow: visible;
+  line-height: normal;
+}
+
+:where(#visual-craft-core) :where(button, input, li, ol, optgroup, select, textarea, ul) {
+  padding: 0;
+  margin: 0;
+  font-family: inherit;
+  font-size: 100%;
+  list-style: none;
+  border: 0;
+  outline: none;
+}
+
+:where(#visual-craft-core) :where(table) {
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+
+:where(#visual-craft-core) :where(table tr td) {
+  word-break: break-all;
+  word-wrap: break-word;
+}

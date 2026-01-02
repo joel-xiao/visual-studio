@@ -1,21 +1,20 @@
 <script setup lang="ts">
-import MainLayout from './components/main-layout.vue';
-import ItemCard from './components/item-card.vue';
-import { ref, reactive, markRaw, onMounted } from 'vue';
+import { CoreProjectsLayout as CoreProjects } from 'visual-craft-core';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useDashboardStore } from '@/store/dashboard';
-import visual from '@api/visual/visual';
-import type { IVisualProjectsResponse } from '@api/visual/types';
 const router = useRouter();
-
-const layoutRef = ref<InstanceType<typeof MainLayout>>();
 
 onMounted(() => {
   initLayout();
 });
 
+const folderTree = ref<ITreeItemData[]>([]);
+const folderMenus = ref<ITreeItemMenu[]>([]);
+const buttons = ref<IDbLayoutNewProjectData[]>([]);
+
 function initLayout() {
-  layoutRef.value?.setFolderTree([
+  folderTree.value = [
     { name: '全部应用', id: 'all', sum: 0, handle: false },
     { name: '未分组', id: 'no-group', sum: 0, handle: false },
     {
@@ -28,9 +27,9 @@ function initLayout() {
         { name: '其他', id: '1123', sum: 0 }
       ]
     }
-  ]);
+  ];
 
-  layoutRef.value?.setFolderMenus([
+  folderMenus.value = [
     {
       name: '更多',
       id: 'more',
@@ -42,14 +41,12 @@ function initLayout() {
       ]
     },
     { name: '添加组', id: 'add', icon: 'icon-jiahao', disabled: true }
-  ]);
+  ];
 
-  layoutRef.value?.setButtons([
+  buttons.value = [
     { name: '可视化', id: 'new', icon: '' },
     { name: '导入', id: 'import', icon: '' }
-    // { name: 'PC端', id: 'web', icon: 'new-project-web.png' },
-    // { name: '移动端', id: 'mobile', icon: 'new-project-mobile.png' }
-  ]);
+  ];
 }
 
 const { saveCrumbs } = useDashboardStore();
@@ -62,15 +59,13 @@ const projects = ref<IDbLayoutProject[]>([]);
 </script>
 
 <template>
-  <MainLayout ref="layoutRef" @button-click="onButtonClick">
-    <div class="content">
-      <ItemCard
-        v-for="(item, idx) in projects"
-        :key="item.id + '_' + idx"
-        :data="item"
-      />
-    </div>
-  </MainLayout>
+  <CoreProjects
+    :folder-tree="folderTree"
+    :folder-menus="folderMenus"
+    :buttons="buttons"
+    :projects="projects"
+    @button-click="onButtonClick"
+  />
 </template>
 
 <style lang="scss"></style>

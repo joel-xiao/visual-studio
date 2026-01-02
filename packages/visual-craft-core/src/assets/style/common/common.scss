@@ -1,0 +1,74 @@
+/**
+* @description: CSS Common
+* @author: Joel
+*/
+
+#visual-craft-core {
+  .left {
+    float: left;
+  }
+
+  .right {
+    float: right;
+  }
+
+  .clearfix {
+    &::after {
+      display: block;
+      width: 0;
+      height: 0;
+      clear: both;
+      zoom: 1;
+      content: '';
+    }
+  }
+
+  .ellipsis {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .pointer {
+    cursor: pointer;
+  }
+
+  .not-select {
+    user-select: none;
+  }
+
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.16);
+  }
+
+  ::-webkit-scrollbar-corner {
+    background: #f6f6f6;
+  }
+
+  .transition {
+    transition-timing-function: ease-out;
+    transition-duration: 0.1s;
+    transition-property: background-color, border-color, color, fill, stroke, opacity, left, right,
+      top, bottom, -webkit-box-shadow, -webkit-transform;
+    transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow,
+      transform, left, right, top, bottom;
+    transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow,
+      transform, left, right, top, bottom, -webkit-box-shadow, -webkit-transform;
+  }
+}

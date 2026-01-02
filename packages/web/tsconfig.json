@@ -22,13 +22,22 @@
       "@api/*": ["./src/service/api/*"],
       "@p/*": ["./src/plugins/*"],
       "@d/*": ["./src/directives/*"],
-      "@hooks/*": ["./src/hooks/*"]
+      "@hooks/*": ["./src/hooks/*"],
+      "visual-craft-core": ["../visual-craft-core/src/index.ts"]
     },
     "allowSyntheticDefaultImports": true,
     "lib": ["ESNext", "DOM"],
     "skipLibCheck": true,
     "types": ["vite/client", "@types/node"],
   },
-  "include": ["./src/**/*.ts", "./src/**/*.d.ts", "./src/**/*.tsx", "./src/**/*.vue", "./src/vite.env.d.ts"],
+  "include": [
+    "./src/**/*.ts",
+    "./src/**/*.d.ts",
+    "./src/**/*.tsx",
+    "./src/**/*.vue",
+    "./src/vite.env.d.ts",
+    "../visual-craft-core/src/**/*.d.ts",
+    "../visual-craft-core/src/vite.env.d.ts"
+  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

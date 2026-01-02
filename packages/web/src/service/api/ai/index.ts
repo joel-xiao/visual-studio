@@ -1,9 +1,4 @@
-import http from '../http';
-
-// Types for AI Service
 export type AIProviderType = 'custom' | 'openai' | 'anthropic' | 'qwen';
-const DASHSCOPE_API_KEY = 'sk-f6428df10fa843488f78fe715f403ab0';
-const DASHSCOPE_BASE_URL = 'https://dashscope.aliyuncs.com/compatible-mode/v1';
 
 export interface IAIOptions {
   temperature?: number;
@@ -37,145 +32,109 @@ export interface IChatRequest {
   onStream?: (content: string) => void;
 }
 
-/**
- * AI API Service
- * Responsible for dispatching requests to different AI vendors/models
- */
-export const aiApi = {
-  /**
-   * Generic chat completion interface
-   */
-  chat(request: IChatRequest): Promise<IAIResponse> {
-    let url = '/ai/chat';
+const DEFAULT_BASE_URL = 'https://dashscope.aliyuncs.com/compatible-mode/v1';
 
-    // Dispatch to specific endpoints based on provider
-    switch (request.provider) {
-      case 'qwen':
-        return this.chatQwen(request);
-      case 'openai':
-        url = '/ai/openai/chat';
-        break;
-      case 'anthropic':
-        url = '/ai/anthropic/chat';
-        break;
-      case 'custom':
-      default:
-        url = '/ai/chat';
-        break;
-    }
+export type WebAIClientConfig = {
+  apiKey?: string;
+  baseURL?: string;
+  model?: string;
+};
 
-    return http.post<IAIResponse>(url, request).then(res => {
-      if (res.code === 200 && res.data) {
-        return {
-          ...res.data,
-          // Default type to text if missing
-          type: res.data.type || 'text',
-          // Default actions to empty if missing
-          actions: res.data.actions || []
-        };
-      }
-      throw new Error(res.msg || 'AI Request failed');
-    });
-  },
+let runtimeConfig: Required<WebAIClientConfig> = {
+  apiKey: '',
+  baseURL: DEFAULT_BASE_URL,
+  model: 'qwen-plus'
+};
 
-  /**
-   * Specific method for direct OpenAI calls (if client-side key is used - optional)
-   */
-  async chatOpenAI(messages: IAIMessage[], model = 'gpt-3.5-turbo'): Promise<IAIResponse> {
-    // This is a placeholder for direct client-side calls if ever needed
-    // Usually better to go through backend proxy (aiApi.chat) to hide keys
-    return this.chat({
-      provider: 'openai',
-      model,
-      messages
-    });
-  },
+export function initWebAIClient(config: WebAIClientConfig) {
+  runtimeConfig = {
+    ...runtimeConfig,
+    ...config,
+    apiKey: config.apiKey === undefined ? runtimeConfig.apiKey : config.apiKey,
+    baseURL: config.baseURL === undefined ? runtimeConfig.baseURL : config.baseURL,
+    model: config.model === undefined ? runtimeConfig.model : config.model
+  };
+}
 
-  /**
-   * Direct call to Alibaba Cloud Qwen (Tongyi Qianwen)
-   */
-  async chatQwen(request: IChatRequest): Promise<IAIResponse> {
-    const url = `${DASHSCOPE_BASE_URL}/chat/completions`;
+function getRuntimeConfig() {
+  return runtimeConfig;
+}
 
-    try {
-      const isStream = !!request.onStream;
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${DASHSCOPE_API_KEY}`
-        },
-        body: JSON.stringify({
-          model: request.model || 'qwen-plus',
-          messages: request.messages,
-          stream: isStream,
-          ...request.options
-        })
-      });
+async function chatOpenAICompatible(request: IChatRequest): Promise<IAIResponse> {
+  const { baseURL, apiKey, model } = getRuntimeConfig();
+  const url = `${baseURL}/chat/completions`;
+  const isStream = !!request.onStream;
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Qwen API error: ${response.status}`);
-      }
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (apiKey) headers.Authorization = `Bearer ${apiKey}`;
 
-      if (isStream) {
-        const reader = response.body?.getReader();
-        const decoder = new TextDecoder('utf-8');
-        let fullContent = '';
-        let buffer = '';
+  const response = await fetch(url, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      model: request.model || model,
+      messages: request.messages,
+      stream: isStream,
+      ...request.options
+    })
+  });
 
-        if (reader) {
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            const chunk = decoder.decode(value, { stream: true });
-            buffer += chunk;
-            const lines = buffer.split('\n');
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({} as any));
+    throw new Error(errorData.message || `AI API error: ${response.status}`);
+  }
 
-            // Keep the last potentially incomplete line in the buffer
-            buffer = lines.pop() || '';
+  if (isStream) {
+    const reader = response.body?.getReader();
+    const decoder = new TextDecoder('utf-8');
+    let fullContent = '';
+    let buffer = '';
 
-            for (const line of lines) {
-              const trimmedLine = line.trim();
-              if (trimmedLine.startsWith('data: ')) {
-                const jsonStr = trimmedLine.slice(6);
-                if (jsonStr === '[DONE]') continue;
-                try {
-                  const json = JSON.parse(jsonStr);
-                  const content = json.choices[0]?.delta?.content || '';
-                  if (content) {
-                    fullContent += content;
-                    request.onStream?.(content);
-                  }
-                } catch (e) {
-                  console.warn('Error parsing stream chunk', e);
-                }
-              }
+    if (reader) {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value, { stream: true });
+        buffer += chunk;
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+          const trimmedLine = line.trim();
+          if (!trimmedLine.startsWith('data: ')) continue;
+          const jsonStr = trimmedLine.slice(6);
+          if (jsonStr === '[DONE]') continue;
+          try {
+            const json = JSON.parse(jsonStr);
+            const content = json.choices?.[0]?.delta?.content || '';
+            if (content) {
+              fullContent += content;
+              request.onStream?.(content);
             }
+          } catch (_) {
+            continue;
           }
         }
-        return {
-          role: 'assistant',
-          content: fullContent,
-          type: 'text',
-          actions: []
-        };
-      } else {
-        const data = await response.json();
-        if (data.choices && data.choices.length > 0) {
-          return {
-            role: 'assistant',
-            content: data.choices[0].message.content,
-            type: 'text', // We will parse this later in the scene
-            actions: []
-          };
-        } else {
-          throw new Error('No response from Qwen');
-        }
       }
-    } catch (e) {
-      console.error('Qwen API Call Failed:', e);
-      throw new Error((e as Error).message || 'Qwen API Request failed');
     }
+
+    return { role: 'assistant', content: fullContent, type: 'text', actions: [] };
+  }
+
+  const data = await response.json().catch(() => ({} as any));
+  if (data.choices && data.choices.length > 0) {
+    return {
+      role: 'assistant',
+      content: data.choices[0].message.content,
+      type: 'text',
+      actions: []
+    };
+  }
+  throw new Error('No response from AI');
+}
+
+export const aiApi = {
+  chat(request: IChatRequest): Promise<IAIResponse> {
+    return chatOpenAICompatible(request);
   }
 };

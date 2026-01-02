@@ -9,6 +9,8 @@ export default tseslint.config(
     ignores: [
       '**/node_modules/**',
       '**/packages/web/src/assets/style/font/**',
+      '**/packages/visual-craft-core/src/assets/style/font/**',
+      'packages/visual-craft-core/dist/**',
       'packages/web/dist/**',
       'packages/electron/dist/**',
       'packages/electron/release/**',
@@ -170,4 +172,3 @@ export default tseslint.config(
     }
   }
 );
-

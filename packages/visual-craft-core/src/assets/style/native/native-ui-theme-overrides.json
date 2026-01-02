@@ -1,0 +1,54 @@
+{
+  "Card": {
+    "color": "rgba(0, 0, 0, 0)"
+  },
+  "Button": {
+    "paddingSmall": "0 14px",
+
+    "heightSmall": "30px",
+    "heightMedium": "32px",
+
+    "borderRadiusSmall": "var(--border-radius-6)",
+    "borderRadiusMedium": "var(--border-radius-8)",
+
+    "fontSizeSmall": "var(--font-size-xs)",
+    "fontSizeMedium": "var(--font-size-sm)",
+
+    "colorTertiary": "var(--theme-color-tran-12)",
+    "colorTertiaryHover": "var(--theme-color-tran-10)",
+    "colorTertiaryPressed": "var(--theme-color-tran-12)",
+
+    "colorPrimary": "var(--theme-color-button-normal-bg)",
+    "colorHoverPrimary": "var(--theme-color-button-normal-bg-hover)",
+    "colorPressedPrimary": "var(--theme-color-button-normal-bg-pressing)",
+    "colorFocusPrimary": "var(--theme-color-button-normal-bg)",
+    "textColorPrimary": "var(--theme-color-white)",
+    "textColorHoverPrimary": "var(--theme-color-white)",
+    "textColorPressedPrimary": "var(--theme-color-white)",
+    "textColorFocusPrimary": "var(--theme-color-white)",
+    "borderPrimary": "var(--theme-color-button-normal-bg)",
+    "borderHoverPrimary": "var(--theme-color-button-normal-bg-hover)",
+    "borderPressedPrimary": "var(--theme-color-button-normal-bg-pressing)",
+    "borderFocusPrimary": "var(--theme-color-button-normal-bg)"
+  },
+  "Input": {
+    "textColor": "var(--theme-color-text-bold)",
+    "fontSizeSmall": "var(--font-size-xs)",
+    "fontSizeMedium": "var(--font-size-sm)",
+    "caretColor": "var(--theme-color-text-bold)",
+    "color": "var(--theme-color-gray-100)",
+    "colorFocus": "var(--theme-color-gray-100)",
+    "border": "var(--theme-color-gray-100)",
+    "borderHover": "var(--theme-color-gray-100)",
+    "borderFocus": "var(--theme-color-gray-100)",
+    "boxShadowFocus": "none"
+  },
+  "Breadcrumb": {
+    "fontWeightActive": "400",
+    "fontSize": "13px",
+    "itemTextColor": "var(--theme-color-tran-50)",
+    "itemTextColorHover": "var(--theme-color-tran-85)",
+    "itemTextColorPressed": "var(--theme-color-tran-50)",
+    "itemTextColorActive": "var(--theme-color-tran-85)"
+  }
+}

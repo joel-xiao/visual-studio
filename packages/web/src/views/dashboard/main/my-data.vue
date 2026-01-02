@@ -1,20 +1,18 @@
 <script setup lang="ts">
-import MainLayout from './components/main-layout.vue';
-import { ref, reactive, markRaw, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { CoreDataLayout as CoreData } from 'visual-craft-core';
+import { ref, onMounted } from 'vue';
 import { useDashboardStore } from '@/store/dashboard';
-import visual from '@api/visual/visual';
-import type { IVisualProjectsResponse } from '@api/visual/types';
-const router = useRouter();
-
-const layoutRef = ref();
 
 onMounted(() => {
   initLayout();
 });
 
+const folderTree = ref<ITreeItemData[]>([]);
+const folderMenus = ref<ITreeItemMenu[]>([]);
+const buttons = ref<IDbLayoutNewProjectData[]>([]);
+
 function initLayout() {
-  layoutRef.value.setFolderTree([
+  folderTree.value = [
     { name: '全部数据', id: 'all', sum: 0, handle: false },
     { name: '未分组', id: 'no-group', sum: 0, handle: false },
     {
@@ -51,9 +49,9 @@ function initLayout() {
         }
       ]
     }
-  ]);
+  ];
 
-  layoutRef.value.setFolderMenus([
+  folderMenus.value = [
     {
       name: '更多',
       id: 'more',
@@ -65,24 +63,28 @@ function initLayout() {
       ]
     },
     { name: '添加组', id: 'add', icon: 'icon-jiahao', disabled: true }
-  ]);
+  ];
 
-  layoutRef.value.setButtons([
+  buttons.value = [
     { name: 'POST', id: 'post', icon: '' },
     { name: 'GET', id: 'get', icon: '' },
     { name: '导入', id: 'import', icon: '' }
-  ]);
+  ];
 }
 
 const { saveCrumbs } = useDashboardStore();
-function onNewProject(opt: DbLayoutCreateProject) {
-  // saveCrumbs(opt.folder?.cascades);
-  // router.push('/dashboard/editor');
+function onButtonClick(opt: DbLayoutCreateProject) {
+  saveCrumbs(opt.folder?.cascades);
 }
 </script>
 
 <template>
-  <MainLayout ref="layoutRef" @create-project="onNewProject" />
+  <CoreData
+    :folder-tree="folderTree"
+    :folder-menus="folderMenus"
+    :buttons="buttons"
+    @button-click="onButtonClick"
+  />
 </template>
 
 <style lang="scss">

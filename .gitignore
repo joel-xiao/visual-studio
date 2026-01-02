@@ -7,6 +7,7 @@ node_modules/
 
 # Build outputs
 packages/web/dist/
+packages/visual-craft-core/dist/
 packages/electron/dist/
 packages/electron/release/
 packages/tauri/target/

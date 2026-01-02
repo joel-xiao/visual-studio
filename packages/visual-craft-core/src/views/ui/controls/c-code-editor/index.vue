@@ -1,0 +1,134 @@
+<template>
+<div class="c-code-editor">
+  <div class="c-code-editor-content">
+    <BasicCodeEditor
+      v-model="currentValue"
+      :language="language"
+      :theme="theme"
+      :read-only="readOnly"
+      style="height: 200px"
+    />
+    <div class="c-code-editor-expand">
+      <BasicIcon icon="icon-spread-out" hover @click="openModal" />
+    </div>
+  </div>
+
+  <BasicModal
+    v-model="showModal"
+    :title="label"
+    width="80vw"
+  >
+    <BasicCodeEditor
+      v-model="currentValue"
+      :language="language"
+      :theme="theme"
+      :read-only="readOnly"
+      style="height: 60vh"
+    />
+    <template v-if="!readOnly" #footer>
+      <div class="c-code-editor-footer">
+        <CButton cancel @click="onCancel">取消</CButton>
+        <CButton primary @click="onConfirm">确定</CButton>
+      </div>
+    </template>
+    <template v-else #footer>
+      <div class="c-code-editor-footer">
+        <CButton primary @click="onCancel">关闭</CButton>
+      </div>
+    </template>
+  </BasicModal>
+</div>
+</template>
+
+<script lang="ts">
+export default {
+  name: 'C_CODE_EDITOR',
+  inheritAttrs: false
+};
+</script>
+<script setup lang="ts">
+import { ref, computed, watch } from 'vue';
+import BasicModal from '../../base/basic-modal.vue';
+import BasicCodeEditor from '../../base/basic-code-editor.vue';
+import BasicIcon from '../../base/basic-icon.vue';
+import CButton from '../c-button/index.vue';
+
+export interface Props {
+  modelValue?: string;
+  label?: string;
+  language?: string;
+  theme?: string;
+  readOnly?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  modelValue: '',
+  label: '代码编辑',
+  language: 'javascript',
+  theme: 'vs-dark',
+  readOnly: false
+});
+
+const emit = defineEmits(['update:modelValue', 'update']);
+
+const showModal = ref(false);
+const internalValue = ref('');
+
+// Sync internal value when modal opens or prop changes
+watch(() => props.modelValue, (val) => {
+  if (!showModal.value) {
+    internalValue.value = val;
+  }
+}, { immediate: true });
+
+const currentValue = computed({
+  get: () => internalValue.value,
+  set: (val) => {
+    if (props.readOnly) return;
+    internalValue.value = val;
+  }
+});
+
+function openModal() {
+  showModal.value = true;
+}
+
+function onCancel() {
+  showModal.value = false;
+  internalValue.value = props.modelValue; // Reset
+}
+
+function onConfirm() {
+  if (props.readOnly) {
+    showModal.value = false;
+    return;
+  }
+  emit('update:modelValue', internalValue.value);
+  emit('update', internalValue.value);
+  showModal.value = false;
+}
+</script>
+
+<style lang="scss" scoped>
+.c-code-editor {
+  width: 100%;
+}
+
+.c-code-editor-content {
+  position: relative;
+  border: 1px solid var(--theme-color-real-gray-600);
+  border-radius: var(--border-radius-4);
+  overflow: hidden;
+}
+
+.c-code-editor-expand {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+.c-code-editor-footer {
+  display: flex;
+  gap: 8px;
+}
+</style>

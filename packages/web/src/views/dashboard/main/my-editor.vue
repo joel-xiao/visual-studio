@@ -1,27 +1,44 @@
 <template>
-  <Editor />
+  <Editor :data="editorData" />
 </template>
 
 <script setup lang="ts">
-import Editor from '../editor/index.vue';
-import { ref, reactive } from 'vue';
+import { ref } from 'vue';
+import { Editor } from 'visual-craft-core';
 
-// const data = reactive<IEditorData>({
-//   folder: '',
-//   id: '',
-//   type: '',
-//   name: '',
-//   nodes: [
-//     {
-//       id: 'root',
-//       name: '根容器',
-//       width: 1920,
-//       height: 1080,
-//       x: 0,
-//       y: 0
-//     }
-//   ]
-// });
+const editorData = ref<IEditorData>({
+  folder: '',
+  id: '',
+  type: '',
+  name: '',
+  nodes: [
+    {
+      parentId: '',
+      id: 'root',
+      component: 'CANVAS_ROOT',
+      schema: 'CANVAS_ROOT',
+      name: '根容器',
+      width: 1000,
+      height: 600,
+      radius: [0, 0, 0, 0],
+      type: '',
+      x: 0,
+      y: 0,
+      z: 0,
+      select: true,
+      lock: false,
+      props: {
+        layout: {
+          width: 1000,
+          height: 600
+        },
+        fill: {
+          color: 'hsla(0, 0%, 13% , 1)'
+        }
+      }
+    }
+  ]
+});
 </script>
 
 <style lang="scss"></style>

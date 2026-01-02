@@ -1,0 +1,19 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "declarationMap": false,
+    "emitDeclarationOnly": true,
+    "outDir": "./dist/types"
+  },
+  "include": [
+    "./src/index.ts",
+    "./src/components/**/*",
+    "./src/directives/**/*",
+    "./src/hooks/**/*",
+    "./src/assets/utils/**/*",
+    "./src/views/editor/**/*",
+    "./src/views/ui/**/*"
+  ]
+}

@@ -1,0 +1,121 @@
+<script lang="ts" setup>
+import { computed, reactive } from 'vue';
+import { Icon } from '@iconify/vue';
+
+interface Props {
+  src?: string;
+  button?: boolean;
+  block?: boolean;
+  size?: CSize;
+  fontSize?: string | number;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  src: '',
+  button: false,
+  block: false,
+  size: '',
+  fontSize: ''
+});
+
+const Style = reactive({
+  fontSize: props.fontSize
+});
+
+const isImage = computed(() => {
+  const src = props.src || '';
+  if (!src) return false;
+  if (src.startsWith('http://')) return true;
+  if (src.startsWith('https://')) return true;
+  if (src.startsWith('data:')) return true;
+  if (src.startsWith('blob:')) return true;
+  if (src.startsWith('/')) return true;
+  return src.includes('.');
+});
+
+const isIconify = computed(() => {
+  if (isImage.value) return false;
+  return props.src?.includes(':');
+});
+
+const isIcon = computed(() => {
+  if (isImage.value) return false;
+  return !!props.src;
+});
+</script>
+
+<template>
+  <span class="c-icon-font" v-bind="$attrs" :style="Style" :class="[button ? 'button' : '', block ? 'block' : '', size, !isIcon ? 'img' : '']">
+    <Icon v-if="isIconify" class="icon-font" :icon="src" />
+    <i v-else-if="isIcon" class="icon-font" :class="src"></i>
+    <img v-else class="icon-img" :src="src" />
+  </span>
+</template>
+
+<style lang="scss">
+.c-icon-font {
+  display: inline-block;
+  overflow: hidden;
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+
+  .icon-font {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  .icon-img {
+    max-width: 100%;
+    width: calc(100% - 2px);
+    max-height: 100%;
+  }
+
+  &.block {
+    width: 20px;
+    height: 20px;
+    margin: 2px;
+  }
+
+  &.img {
+    margin: 0px 8px;
+  }
+
+  &.button {
+    width: 20px;
+    height: 20px;
+    margin: 2px;
+    color: var(--theme-color-tran-85);
+    transition: all 0.15s;
+
+    &:hover {
+      background-color: var(--theme-color-tran-6);
+    }
+
+    &.active {
+      color: var(--theme-color-tran-85);
+      background: var(--theme-color-tran-12);
+    }
+
+    &[circle] {
+      border-radius: 50%;
+    }
+  }
+
+  &.small {
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+  }
+
+  &.medium {
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+  }
+}
+</style>
