@@ -1,4 +1,4 @@
-import type { AgentRole } from '../../types';
+import type { AgentContext } from '../../types';
 import type { IAgentSchema } from '../types';
 import { getDataTemplate } from './template';
 import { createRoutingPrompt } from '../../utils/agent/routing';
@@ -9,7 +9,7 @@ import { createRoutingPrompt } from '../../utils/agent/routing';
  */
 const dataAnalystSchema: IAgentSchema = {
   id: 'data-analyst',
-  role: 'data-analyst' as AgentRole,
+  role: 'data-analyst',
   name: 'Data Analyst',
   displayName: '数据分析师',
   description: 'Responsible for data analysis and mock data generation.',
@@ -24,7 +24,7 @@ const dataAnalystSchema: IAgentSchema = {
       withSelection: '如果用户要求为选中的图表生成或修改数据，请路由给 data-analyst',
       withoutSelection: '如果用户要求生成数据或进行数据分析，路由给 data-analyst'
     },
-    routingPrompt: (() => '') as (agentList: string, context: any) => string
+    routingPrompt: (_agentList: string, _context: AgentContext) => ''
   },
 
   uiHints: {

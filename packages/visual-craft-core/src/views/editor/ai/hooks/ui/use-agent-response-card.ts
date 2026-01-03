@@ -2,6 +2,7 @@ import { computed, type ComputedRef } from 'vue';
 import type { IWorkflowControl } from '../../types';
 import type { IWorkflowEdge, IWorkflowGraph, IWorkflowNode } from '../../workflow/core/types';
 import { WorkflowRegistry } from '../../workflow/registry';
+import { asRecord, pickString } from '../../utils/json-utils';
 
 export function useAgentResponseCardWorkflow(
   workflowControl: ComputedRef<IWorkflowControl | undefined>,
@@ -23,15 +24,17 @@ export function useAgentResponseCardWorkflow(
     if (!graph || !nodeId) return [];
 
     const node = graph.nodes.find(n => n.id === nodeId);
-    const raw = (node?.config as any)?.uiHints?.inlineActions ?? (node?.config as any)?.inlineActions;
+    const config = asRecord(node?.config);
+    const uiHints = asRecord(config?.uiHints);
+    const raw = uiHints?.inlineActions ?? config?.inlineActions;
     if (!Array.isArray(raw)) return [];
 
     const normalized: Array<{ kind: 'applyOnly'; label: string; title?: string }> = [];
     for (const a of raw) {
-      if (!a || typeof a !== 'object') continue;
-      const kind = (a as any).kind === 'applyOnly' ? (a as any).kind : undefined;
-      const label = typeof (a as any).label === 'string' ? (a as any).label : '';
-      const title = typeof (a as any).title === 'string' ? (a as any).title : undefined;
+      const aObj = asRecord(a);
+      const kind = pickString(aObj, 'kind') === 'applyOnly' ? 'applyOnly' : undefined;
+      const label = pickString(aObj, 'label') || '';
+      const title = pickString(aObj, 'title');
       if (!kind || !label) continue;
       normalized.push({ kind, label, title });
     }
@@ -85,7 +88,8 @@ export function useAgentResponseCardWorkflow(
     const edges: Array<{ key: string; source: string; target: string; condition?: string }> = [];
 
     while (queue.length) {
-      const id = queue.shift()!;
+      const id = queue.shift();
+      if (!id) break;
       if (visited.has(id)) continue;
       visited.add(id);
 

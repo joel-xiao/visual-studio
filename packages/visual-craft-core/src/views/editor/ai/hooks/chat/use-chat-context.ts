@@ -5,6 +5,8 @@ import { getPresetSuggestions } from '../../agent/suggestion-generator/presets';
 import { useSuggestionGenerator } from '../../agent/suggestion-generator/use';
 import { useAIContext } from '../core/use-ai-context';
 import { useAISuggestionsConfig } from '../../config';
+import { asRecord, pickString } from '../../utils/json-utils';
+import type { AgentContext } from '../../types';
 
 export { type IPromptSuggestion };
 export { useAISuggestionsConfig };
@@ -14,7 +16,7 @@ export function useChatContext() {
   const aiContext = useAIContext();
   const suggestionAgent = useSuggestionGenerator();
   const aiSuggestionsConfig = useAISuggestionsConfig();
-  
+
   const selectedNodes = computed(() => unref(nodeContext.getSelectedNodes()));
   const suggestions = ref<IPromptSuggestion[]>([]);
 
@@ -44,7 +46,7 @@ export function useChatContext() {
   const loadSuggestions = async () => {
     const nodes = [...unref(nodeContext.getNodes())];
     const selected = [...unref(nodeContext.getSelectedNodes())];
-    
+
     const nodeCount = nodes.filter(n => n.id !== 'root').length;
     const hasSelection = selected.length > 0 && selected[0].id !== 'root';
     const selectionType = hasSelection ? selected[0].component || selected[0].schema : '';
@@ -72,19 +74,24 @@ export function useChatContext() {
           availableComponents: aiContext.componentContext.getAvailableComponents()
         };
 
-        const aiResponse = await suggestionAgent.process('生成建议', context);
-        
-        if (aiResponse.data?.suggestions && Array.isArray(aiResponse.data.suggestions)) {
+        const aiResponse = await suggestionAgent.process('生成建议', context as unknown as AgentContext);
+
+        const dataObj = asRecord(aiResponse.data) ?? {};
+        const suggestionsRaw = dataObj.suggestions;
+        if (Array.isArray(suggestionsRaw)) {
           const maxAISuggestions = aiSuggestionsConfig.getMaxAISuggestions();
-          const aiSuggestions = aiResponse.data.suggestions
+          const aiSuggestions = suggestionsRaw
             .slice(0, maxAISuggestions)
-            .map((s: any) => ({
-              label: s.label,
-              value: s.value,
-              icon: s.icon || 'mdi:lightbulb-outline',
-              agent: s.agent || 'orchestrator',
-              color: s.color || 'blue'
-            }));
+            .map((s: unknown) => {
+              const obj = asRecord(s) ?? {};
+              return {
+                label: pickString(obj, 'label') || '',
+                value: pickString(obj, 'value') || '',
+                icon: pickString(obj, 'icon') || 'mdi:lightbulb-outline',
+                agent: pickString(obj, 'agent') || 'orchestrator',
+                color: pickString(obj, 'color') || 'blue'
+              } satisfies IPromptSuggestion;
+            });
 
           // 追加AI建议到前面
           suggestions.value = [...aiSuggestions, ...limitedPresetSuggestions];
@@ -122,4 +129,3 @@ export function useChatContext() {
     aiSuggestionsEnabled: aiSuggestionsConfig.enabled
   };
 }
-

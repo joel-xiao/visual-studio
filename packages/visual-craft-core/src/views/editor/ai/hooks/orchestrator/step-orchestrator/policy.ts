@@ -1,12 +1,15 @@
 import type { AgentRole } from '../../../types';
 import { getAgentSchema } from '../../../agent/registry';
+import { asRecord, pickString } from '../../../utils/json-utils';
 
 export const resolveApplyStrategy = (
   agent?: AgentRole,
-  nodeConfig?: Record<string, any>,
-  context?: { nodes?: any }
+  nodeConfig?: Record<string, unknown>,
+  context?: { nodes?: readonly unknown[] }
 ): 'manual' | 'auto' => {
-  const fromNode = nodeConfig?.uiHints?.applyStrategy ?? nodeConfig?.applyStrategy;
+  const configObj = asRecord(nodeConfig) ?? {};
+  const uiHints = asRecord(configObj.uiHints) ?? {};
+  const fromNode = uiHints.applyStrategy ?? configObj.applyStrategy;
   const resolvedFromNode = fromNode === 'auto' || fromNode === 'manual' ? fromNode : undefined;
   if (!agent) return 'manual';
   const schema = getAgentSchema(agent);
@@ -14,21 +17,27 @@ export const resolveApplyStrategy = (
   const resolvedFromSchema = fromSchema === 'auto' || fromSchema === 'manual' ? fromSchema : undefined;
   const base = resolvedFromNode ?? resolvedFromSchema ?? 'manual';
 
-  const nodes = Array.isArray((context as any)?.nodes) ? (context as any).nodes : [];
-  const hasCanvasComponents = nodes.some((n: any) => n && typeof n === 'object' && n.id && n.id !== 'root');
+  const nodes = Array.isArray(context?.nodes) ? context.nodes : [];
+  const hasCanvasComponents = nodes.some((n: unknown) => {
+    const id = pickString(asRecord(n), 'id');
+    return !!id && id !== 'root';
+  });
 
   if (hasCanvasComponents && base === 'auto') return 'manual';
   return base;
 };
 
-export const resolveSecondaryAction = (nodeConfig?: Record<string, any>) => {
-  const action = nodeConfig?.uiHints?.secondaryAction ?? nodeConfig?.secondaryAction;
-  if (!action || typeof action !== 'object') return undefined;
-  if (action.kind !== 'skip') return undefined;
-  if (typeof action.label !== 'string' || !action.label) return undefined;
+export const resolveSecondaryAction = (nodeConfig?: Record<string, unknown>) => {
+  const configObj = asRecord(nodeConfig) ?? {};
+  const uiHints = asRecord(configObj.uiHints) ?? {};
+  const action = asRecord(uiHints.secondaryAction ?? configObj.secondaryAction);
+  if (!action) return undefined;
+  if (pickString(action, 'kind') !== 'skip') return undefined;
+  const label = pickString(action, 'label');
+  if (!label) return undefined;
   return {
-    label: action.label,
+    label,
     kind: 'skip' as const,
-    targetNodeId: typeof action.targetNodeId === 'string' ? action.targetNodeId : undefined
+    targetNodeId: pickString(action, 'targetNodeId')
   };
 };

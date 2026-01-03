@@ -55,10 +55,11 @@ export function useChat(options: { inputAreaWrapperRef?: Ref<HTMLElement | null>
         onStream: (partial) => addOrUpdateMessage('assistant', { id: assistantMsg.id, ...partial })
       });
       addOrUpdateMessage('assistant', { id: assistantMsg.id, ...response });
-    } catch (e: any) {
+    } catch (e) {
+      const message = e instanceof Error ? e.message : String(e);
       addOrUpdateMessage('assistant', {
         id: assistantMsg.id,
-        content: `出错啦: ${e.message}`,
+        content: `出错啦: ${message}`,
         isError: true
       });
     } finally {
@@ -66,7 +67,7 @@ export function useChat(options: { inputAreaWrapperRef?: Ref<HTMLElement | null>
     }
   };
 
-  const handleContinueWorkflow = async (data: any) => {
+  const handleContinueWorkflow = async (data: unknown) => {
     if (loading.value) return;
 
     loading.value = true;
@@ -86,10 +87,11 @@ export function useChat(options: { inputAreaWrapperRef?: Ref<HTMLElement | null>
       } else {
         removeMessage(assistantMsg.id);
       }
-    } catch (e: any) {
+    } catch (e) {
+      const message = e instanceof Error ? e.message : String(e);
       addOrUpdateMessage('assistant', {
         id: assistantMsg.id,
-        content: `继续执行出错: ${e.message}`,
+        content: `继续执行出错: ${message}`,
         isError: true
       });
     } finally {

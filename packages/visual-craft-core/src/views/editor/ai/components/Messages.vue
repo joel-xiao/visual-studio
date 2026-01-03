@@ -20,7 +20,7 @@ import Message from './Message.vue';
 interface Props {
   messages: IChatMessage[];
   inputAreaHeight?: number;
-  onContinueWorkflow?: (data: any) => void;
+  onContinueWorkflow?: (data: unknown) => void;
   onMarkActionHandled?: (messageId: string, key: string) => void;
 }
 

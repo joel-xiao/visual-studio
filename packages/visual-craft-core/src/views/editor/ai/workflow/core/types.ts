@@ -13,8 +13,8 @@ export interface IWorkflowNode {
   type: WorkflowNodeType;
   label: string;
   agent?: AgentRole;
-  condition?: (context: any) => boolean;
-  config?: Record<string, any>;
+  condition?: (context: Record<string, unknown>) => boolean;
+  config?: Record<string, unknown>;
   position?: { x: number; y: number };
 }
 
@@ -58,7 +58,7 @@ export interface IWorkflowExecutionContext {
   workflowId: string;
   currentNodeId: string;
   status: WorkflowExecutionStatus;
-  data: Record<string, any>; // 累积的数据
+  data: Record<string, unknown>; // 累积的数据
   history: Array<{
     nodeId: string;
     timestamp: number;
@@ -74,8 +74,7 @@ export interface IWorkflowExecutionContext {
 export interface IWorkflowExecutionResult {
   success: boolean;
   status: WorkflowExecutionStatus;
-  finalData: Record<string, any>;
+  finalData: Record<string, unknown>;
   executionPath: string[]; // 执行的节点路径
   error?: Error;
 }
-

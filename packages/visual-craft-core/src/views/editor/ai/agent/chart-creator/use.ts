@@ -1,56 +1,90 @@
 import type { IAgent, IAgentResponse } from '../../types';
 import chartCreatorSchema from './schema';
 import { useBaseAgent } from '../../utils/agent/base-agent';
+import { asRecord, pickString } from '../../utils/json-utils';
+import type { JsonValue } from '../../../../../@types/utils';
 
 export function useChartCreator(): IAgent {
   const schema = chartCreatorSchema;
   const { processWithAI } = useBaseAgent(schema);
 
-  const process = async (input: string, context?: any, onStream?: any): Promise<IAgentResponse> => {
-    const selected = Array.isArray(context?.selectedNodes) ? context.selectedNodes[0] : undefined;
-    const selectedIsChart = !!selected && typeof selected === 'object' && (selected as any)?.component?.includes('ECHARTS');
+  const process = async (
+    input: string,
+    context?: unknown,
+    onStream?: (partial: Partial<IAgentResponse>) => void
+  ): Promise<IAgentResponse> => {
+    const ctx = asRecord(context) ?? {};
+    const selected = Array.isArray(ctx.selectedNodes) ? ctx.selectedNodes[0] : undefined;
+    const selectedIsChart = !!pickString(selected, 'component')?.includes('ECHARTS');
 
     const workflowChartNodesSource =
-      context?.workflowData?.nodes ||
-      context?.previousAgentData?.nodes ||
-      context?.nodes ||
+      asRecord(ctx.workflowData)?.nodes ||
+      asRecord(ctx.previousAgentData)?.nodes ||
+      ctx.nodes ||
       [];
     const chartNodes = Array.isArray(workflowChartNodesSource)
-      ? workflowChartNodesSource.filter((n: any) => n?.component?.includes('ECHARTS'))
+      ? workflowChartNodesSource.filter((n: unknown) => !!pickString(n, 'component')?.includes('ECHARTS'))
       : [];
 
     const shouldBatchBeautify =
       !selectedIsChart &&
       chartNodes.length > 0 &&
-      (typeof context?.workflowNodeId === 'string' ||
+      (pickString(ctx, 'workflowNodeId') ||
         /全部|所有|批量/.test(String(input || '')));
 
     // 场景1: 批量美化 (工作流后续步骤)
     if (shouldBatchBeautify) {
-      const chartOptions: Record<string, any> = {};
+      const chartOptions: Record<string, Record<string, JsonValue>> = {};
       for (const node of chartNodes) {
-        const res = await processWithAI(schema.prompts.beautify(node.component), `优化图表: ${node.name}`, onStream, undefined, context?.attachments);
-        const payload = res.data && typeof res.data === 'object' ? res.data as Record<string, any> : {};
-        const options = payload.options && typeof payload.options === 'object' ? payload.options : payload;
-        if (options && typeof options === 'object') chartOptions[node.id] = options;
+        const nodeObj = asRecord(node) ?? {};
+        const nodeId = pickString(nodeObj, 'id');
+        const component = pickString(nodeObj, 'component') || '';
+        const name = pickString(nodeObj, 'name') || '';
+
+        const attachments = Array.isArray(ctx.attachments)
+          ? ctx.attachments
+              .map(a => asRecord(a) ?? {})
+              .filter(a => typeof a.url === 'string')
+              .map(a => ({ url: String(a.url), kind: typeof a.kind === 'string' ? a.kind : null }))
+          : undefined;
+
+        const res = await processWithAI(
+          schema.prompts.beautify(component),
+          `优化图表: ${name}`,
+          onStream,
+          undefined,
+          attachments
+        );
+
+        const payload = asRecord(res.data) ?? {};
+        const optionsObj = asRecord(payload.options) ?? payload;
+        if (nodeId && optionsObj) chartOptions[nodeId] = optionsObj;
       }
       return { content: '图表已美化', type: 'text', data: { chartOptions } };
     }
 
     // 场景2: 单图表创建/更新
     const target = selectedIsChart ? selected : undefined;
-    const targetCtx = target ? `Target: ${target.name} (${target.id})` : 'New Chart';
+    const targetObj = asRecord(target);
+    const targetName = pickString(targetObj, 'name');
+    const targetId = pickString(targetObj, 'id');
+    const targetCtx = targetName && targetId ? `Target: ${targetName} (${targetId})` : 'New Chart';
 
     return processWithAI(schema.prompts.create(targetCtx), input, onStream, (json) => {
-      const root = json && typeof json === 'object' ? json as Record<string, any> : {};
-      const dataObj = root.data && typeof root.data === 'object' ? root.data as Record<string, any> : root;
+      const root = asRecord(json) ?? {};
+      const dataObj = asRecord(root.data) ?? root;
       const normalized = dataObj.options ? dataObj : { options: dataObj };
 
       return {
         type: 'chart',
         data: normalized
       };
-    }, context?.attachments);
+    }, Array.isArray(ctx.attachments)
+      ? ctx.attachments
+          .map(a => asRecord(a) ?? {})
+          .filter(a => typeof a.url === 'string')
+          .map(a => ({ url: String(a.url), kind: typeof a.kind === 'string' ? a.kind : null }))
+      : undefined);
   };
 
   return { role: schema.role, name: schema.name, description: schema.description, process };

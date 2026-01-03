@@ -1,6 +1,7 @@
-import { ref, nextTick } from 'vue';
-import type { IAgentResponse, IChatImageAttachment } from '../../types';
+import { ref, shallowRef, nextTick } from 'vue';
+import type { AgentContext, IAgentResponse, IChatImageAttachment } from '../../types';
 import { StepWorkflowEngine } from '../../workflow/core/step-engine';
+import type { IWorkflowGraph, IWorkflowNode } from '../../workflow/core/types';
 import { WorkflowSelector } from '../../workflow/selector';
 import { applyAgentData } from '../../agent/registry';
 import { useAIContext } from '../core/use-ai-context';
@@ -8,40 +9,46 @@ import { buildChatContext } from './step-orchestrator/context';
 import { resolveApplyStrategy, resolveSecondaryAction } from './step-orchestrator/policy';
 import { createInitialExecutionState } from './step-orchestrator/state';
 import type { IHistoryItem, IStepExecutionState } from './step-orchestrator/types';
+import { asRecord, isFunction, pickString } from '../../utils/json-utils';
+import type { JsonValue } from '../../../../../@types/utils';
 
 export function useStepOrchestrator() {
   const aiContext = useAIContext();
   const history = ref<IHistoryItem[]>([]);
   const selector = new WorkflowSelector();
-  const executionState = ref<IStepExecutionState>(createInitialExecutionState());
+  const executionState = shallowRef<IStepExecutionState>(createInitialExecutionState());
 
   const waitForPaint = () =>
     new Promise<void>((resolve) => {
-      if (typeof requestAnimationFrame === 'function') {
-        requestAnimationFrame(() => resolve());
+      const raf = (globalThis as unknown as { requestAnimationFrame?: (cb: () => void) => number }).requestAnimationFrame;
+      if (isFunction(raf)) {
+        raf(() => resolve());
         return;
       }
       setTimeout(() => resolve(), 0);
     });
 
-  const hasCanvasComponents = (context: any) => {
-    const nodes = Array.isArray(context?.nodes) ? context.nodes : [];
-    return nodes.some((n: any) => n && typeof n === 'object' && n.id && n.id !== 'root');
+  const hasCanvasComponents = (context: Record<string, unknown>) => {
+    const nodes = Array.isArray(context.nodes) ? context.nodes : [];
+    return nodes.some((n: unknown) => {
+      const id = pickString(asRecord(n), 'id');
+      return !!id && id !== 'root';
+    });
   };
 
   const createWorkflowEngineHandlers = (params: {
-    workflow: any;
-    context: any;
+    workflow: IWorkflowGraph;
+    context: Record<string, unknown>;
     onStream?: (partial: Partial<IAgentResponse>) => void;
   }) => {
     const { workflow, context, onStream } = params;
     return {
       onStream: (nodeId: string, partial: Partial<IAgentResponse>) => {
-        const node = workflow.nodes.find((n: any) => n.id === nodeId);
+        const node = workflow.nodes.find(n => n.id === nodeId);
         onStream?.({ ...partial, agent: node?.agent });
       },
-      onNodeComplete: async (nodeId: string, nodeRes: any) => {
-        const node = workflow.nodes.find((n: any) => n.id === nodeId);
+      onNodeComplete: async (nodeId: string, nodeRes: IAgentResponse) => {
+        const node = workflow.nodes.find(n => n.id === nodeId);
         if (nodeRes.data && node?.agent && resolveApplyStrategy(node.agent, node.config, context) === 'auto') {
           applyAgentData(node.agent, aiContext, nodeRes.data);
           await nextTick();
@@ -51,10 +58,10 @@ export function useStepOrchestrator() {
     };
   };
 
-  const createStepEngineOptions = (completedAgentsRef: { value: number }, context: any) => {
+  const createStepEngineOptions = (completedAgentsRef: { value: number }, context: Record<string, unknown>) => {
     return {
-      shouldStopOnAgent: (node: any) => resolveApplyStrategy(node.agent, node.config, context) !== 'auto',
-      onNodeComplete: async (_nodeId: string, node: any, nodeRes: any) => {
+      shouldStopOnAgent: (node: IWorkflowNode) => resolveApplyStrategy(node.agent, node.config, context) !== 'auto',
+      onNodeComplete: async (_nodeId: string, node: IWorkflowNode, nodeRes: IAgentResponse) => {
         completedAgentsRef.value++;
         if (node.agent && resolveApplyStrategy(node.agent, node.config, context) === 'auto' && nodeRes.data) {
           applyAgentData(node.agent, aiContext, nodeRes.data);
@@ -88,7 +95,7 @@ export function useStepOrchestrator() {
         const { WorkflowEngine } = await import('../../workflow/core/engine');
         const engine = new WorkflowEngine(workflow);
         const handlers = createWorkflowEngineHandlers({ workflow, context, onStream });
-        const result = await engine.execute(input, context, handlers.onStream, handlers.onNodeComplete);
+        const result = await engine.execute(input, context as unknown as AgentContext, handlers.onStream, handlers.onNodeComplete);
         const finalResponse = engine.getFinalResponse(result.success, result.error);
         history.value.push({ role: 'assistant', content: finalResponse.content });
         return finalResponse;
@@ -104,7 +111,7 @@ export function useStepOrchestrator() {
         const { WorkflowEngine } = await import('../../workflow/core/engine');
         const engine = new WorkflowEngine(workflow);
         const handlers = createWorkflowEngineHandlers({ workflow, context, onStream });
-        const result = await engine.execute(input, context, handlers.onStream, handlers.onNodeComplete);
+        const result = await engine.execute(input, context as unknown as AgentContext, handlers.onStream, handlers.onNodeComplete);
 
         const response: IAgentResponse = {
           content: result.success ? '工作流已自动执行完成' : `执行失败: ${result.error?.message || '未知错误'}`,
@@ -135,26 +142,25 @@ export function useStepOrchestrator() {
       if (stepResult.response) {
         const currentNode = engine.getCurrentNode();
         const agent = stepResult.response.agent ?? (currentNode?.type === 'agent' ? currentNode.agent : undefined);
-        const responseWithAgent: IAgentResponse = { ...stepResult.response, agent };
+        const responseWithAgent: IAgentResponse = stepResult.response;
+        responseWithAgent.agent = agent;
 
         executionState.value.lastResponse = responseWithAgent;
         executionState.value.isWaitingForConfirmation = stepResult.hasNext;
 
-        const enhancedResponse: IAgentResponse = {
-          ...responseWithAgent,
-          workflowControl: {
-            isMultiStep: true,
-            currentStep: executionState.value.currentStep,
-            totalSteps: executionState.value.totalSteps,
-            hasNext: stepResult.hasNext,
-            currentNodeId: currentNode?.id,
-            nextNodeId: stepResult.nextNodeId,
-            nextAgent: stepResult.nextNodeId
-              ? workflow.nodes.find(n => n.id === stepResult.nextNodeId)?.agent
-              : undefined,
-            workflowId: workflow.id,
-            secondaryAction: resolveSecondaryAction(currentNode?.config)
-          }
+        const enhancedResponse: IAgentResponse = responseWithAgent;
+        enhancedResponse.workflowControl = {
+          isMultiStep: true,
+          currentStep: executionState.value.currentStep,
+          totalSteps: executionState.value.totalSteps,
+          hasNext: stepResult.hasNext,
+          currentNodeId: currentNode?.id,
+          nextNodeId: stepResult.nextNodeId,
+          nextAgent: stepResult.nextNodeId
+            ? workflow.nodes.find(n => n.id === stepResult.nextNodeId)?.agent
+            : undefined,
+          workflowId: workflow.id,
+          secondaryAction: resolveSecondaryAction(currentNode?.config)
         };
 
         history.value.push({ role: 'assistant', content: enhancedResponse.content });
@@ -181,9 +187,10 @@ export function useStepOrchestrator() {
 
       throw new Error('工作流执行失败');
 
-    } catch (e: any) {
+    } catch (e) {
       console.error('[StepOrchestrator] Task failed:', e);
-      return { content: e.message || '执行出错', type: 'text', isError: true };
+      const message = e instanceof Error ? e.message : String(e);
+      return { content: message || '执行出错', type: 'text', isError: true };
     }
   };
 
@@ -197,12 +204,14 @@ export function useStepOrchestrator() {
     }
 
     try {
-      const payloadObj = data && typeof data === 'object' ? data as Record<string, any> : {};
-      const workflowAction = payloadObj.workflowAction && typeof payloadObj.workflowAction === 'object'
-        ? payloadObj.workflowAction as Record<string, any>
-        : undefined;
-      const applyPayload = { ...payloadObj };
-      delete (applyPayload as any).workflowAction;
+      const payloadObj = asRecord(data) ?? {};
+      const workflowActionValue = payloadObj.workflowAction;
+      const workflowAction = asRecord(workflowActionValue);
+      const applyPayload: Record<string, JsonValue> = {};
+      for (const [key, value] of Object.entries(payloadObj)) {
+        if (key === 'workflowAction') continue;
+        applyPayload[key] = value;
+      }
 
       if (state.lastResponse.agent && Object.keys(applyPayload).length > 0) {
         applyAgentData(state.lastResponse.agent, aiContext, applyPayload);
@@ -210,8 +219,8 @@ export function useStepOrchestrator() {
         await waitForPaint();
       }
 
-      if (workflowAction?.kind === 'skip') {
-        const targetNodeId = typeof workflowAction.targetNodeId === 'string' ? workflowAction.targetNodeId : undefined;
+      if (pickString(workflowAction, 'kind') === 'skip') {
+        const targetNodeId = pickString(workflowAction, 'targetNodeId');
         state.engine.skipToNode(targetNodeId);
       }
 
@@ -225,32 +234,31 @@ export function useStepOrchestrator() {
       const completedAgents = { value: 0 };
       const stepResult = await state.engine.continueExecution(state.lastInput || '', context, (_nodeId: string, partial: Partial<IAgentResponse>) => {
         const currentNode = state.engine?.getCurrentNode();
-        onStream?.({ ...partial, agent: currentNode?.type === 'agent' ? currentNode.agent : currentNode?.agent });
+        onStream?.({ ...partial, agent: currentNode?.agent });
       }, createStepEngineOptions(completedAgents, context));
 
       if (stepResult.response) {
         const currentNode = state.engine.getCurrentNode();
         const agent = stepResult.response.agent ?? (currentNode?.type === 'agent' ? currentNode.agent : undefined);
-        const responseWithAgent: IAgentResponse = { ...stepResult.response, agent };
+        const responseWithAgent: IAgentResponse = stepResult.response;
+        responseWithAgent.agent = agent;
 
         state.currentStep += completedAgents.value;
         state.lastResponse = responseWithAgent;
         state.isWaitingForConfirmation = stepResult.hasNext;
 
         const nextNode = state.engine.getNextNode();
-        const enhancedResponse: IAgentResponse = {
-          ...responseWithAgent,
-          workflowControl: {
-            isMultiStep: true,
-            currentStep: state.currentStep,
-            totalSteps: state.totalSteps,
-            hasNext: stepResult.hasNext,
-            currentNodeId: currentNode?.id,
-            nextNodeId: stepResult.nextNodeId,
-            nextAgent: nextNode?.type === 'agent' ? nextNode.agent : undefined,
-            workflowId: state.workflowId,
-            secondaryAction: resolveSecondaryAction(currentNode?.config)
-          }
+        const enhancedResponse: IAgentResponse = responseWithAgent;
+        enhancedResponse.workflowControl = {
+          isMultiStep: true,
+          currentStep: state.currentStep,
+          totalSteps: state.totalSteps,
+          hasNext: stepResult.hasNext,
+          currentNodeId: currentNode?.id,
+          nextNodeId: stepResult.nextNodeId,
+          nextAgent: nextNode?.type === 'agent' ? nextNode.agent : undefined,
+          workflowId: state.workflowId,
+          secondaryAction: resolveSecondaryAction(currentNode?.config)
         };
 
         history.value.push({ role: 'assistant', content: enhancedResponse.content });
@@ -260,8 +268,8 @@ export function useStepOrchestrator() {
       if (!stepResult.hasNext) {
         state.currentStep += completedAgents.value;
         const final = state.engine.getFinalResponse(true);
-        const actionLabel = workflowAction?.kind === 'skip' && typeof workflowAction.label === 'string'
-          ? workflowAction.label
+        const actionLabel = pickString(workflowAction, 'kind') === 'skip'
+          ? (pickString(workflowAction, 'label') || '')
           : '';
         const completedResponse: IAgentResponse = {
           content: actionLabel ? `已应用并${actionLabel}` : (final.content || '工作流已完成'),
@@ -285,9 +293,10 @@ export function useStepOrchestrator() {
       state.isWaitingForConfirmation = false;
       return null;
 
-    } catch (e: any) {
+    } catch (e) {
       console.error('[StepOrchestrator] Continue failed:', e);
-      return { content: e.message || '继续执行出错', type: 'text', isError: true };
+      const message = e instanceof Error ? e.message : String(e);
+      return { content: message || '继续执行出错', type: 'text', isError: true };
     }
   };
 

@@ -12,7 +12,7 @@ import {
   TitleComponent, TooltipComponent, LegendComponent, GridComponent,
   DatasetComponent, TransformComponent, DataZoomComponent, VisualMapComponent
 } from 'echarts/components';
-import { safeParseJSON } from '../../utils/json-utils';
+import { asRecord, isString, pickString, safeParseJSON } from '../../utils/json-utils';
 
 use([
   CanvasRenderer, BarChart, LineChart, PieChart, RadarChart, ScatterChart,
@@ -40,51 +40,50 @@ type ChartItem = {
 };
 
 const normalizeOptions = (val: unknown) => {
-  const base = typeof val === 'string' ? safeParseJSON(val, {}) : (val || {});
-  if (!base || typeof base !== 'object' || Array.isArray(base)) return { backgroundColor: 'transparent' };
-  return { ...(base as Record<string, unknown>), backgroundColor: 'transparent' };
+  const base = isString(val) ? safeParseJSON(val, {}) : val;
+  const obj = asRecord(base) ?? {};
+  return { ...obj, backgroundColor: 'transparent' };
 };
 
 const chartItems = computed<ChartItem[]>(() => {
-  const d = (props.data || {}) as unknown as Record<string, unknown>;
+  const d = asRecord(props.data) ?? {};
   const charts = d.charts;
   const chartOptions = d.chartOptions;
 
   if (Array.isArray(charts)) {
     return charts
       .map((c: unknown, idx: number): ChartItem => {
-        const cObj = c && typeof c === 'object' ? (c as Record<string, unknown>) : {};
-        const id = cObj['id'];
-        const title = cObj['title'];
-        const name = cObj['name'];
-        const optionsProp = cObj['options'];
-        const dataProp = cObj['data'];
-        const themeProp = cObj['theme'];
+        const cObj = asRecord(c) ?? {};
+        const id = cObj.id;
+        const title = pickString(cObj, 'title');
+        const name = pickString(cObj, 'name');
+        const optionsProp = cObj.options;
+        const dataProp = cObj.data;
+        const themeProp = pickString(cObj, 'theme');
 
-        const key = String((typeof id === 'string' || typeof id === 'number') ? id : idx);
-        const label = typeof title === 'string'
-          ? title
-          : (typeof name === 'string' ? name : `图表 ${idx + 1}`);
+        const key = String(id ?? idx);
+        const label = title || name || `图表 ${idx + 1}`;
         const options = optionsProp ?? dataProp ?? c;
-        const theme = typeof themeProp === 'string' ? themeProp : undefined;
+        const theme = themeProp;
 
         return { key, label, options, theme };
       })
       .filter((it: ChartItem) => !!it.key);
   }
 
-  if (chartOptions && typeof chartOptions === 'object' && !Array.isArray(chartOptions)) {
-    const entries = Object.entries(chartOptions as Record<string, unknown>);
+  const chartOptionsObj = asRecord(chartOptions);
+  if (chartOptionsObj) {
+    const entries = Object.entries(chartOptionsObj);
     return entries.map(([key, options], idx): ChartItem => ({
       key,
       label: `图表 ${idx + 1}`,
       options,
-      theme: typeof d.theme === 'string' ? d.theme : undefined
+      theme: pickString(d, 'theme')
     }));
   }
 
   const options = d.options ?? d.data ?? d;
-  return [{ key: 'single', label: '图表', options, theme: typeof d.theme === 'string' ? d.theme : undefined }];
+  return [{ key: 'single', label: '图表', options, theme: pickString(d, 'theme') }];
 });
 
 const activeKey = ref<string>('');

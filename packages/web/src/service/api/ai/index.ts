@@ -1,3 +1,6 @@
+import { createOpenAI } from '@ai-sdk/openai';
+import { generateText, streamText } from 'ai';
+
 export type AIProviderType = 'custom' | 'openai' | 'anthropic' | 'qwen';
 
 export interface IAIOptions {
@@ -61,76 +64,56 @@ function getRuntimeConfig() {
 }
 
 async function chatOpenAICompatible(request: IChatRequest): Promise<IAIResponse> {
-  const { baseURL, apiKey, model } = getRuntimeConfig();
-  const url = `${baseURL}/chat/completions`;
-  const isStream = !!request.onStream;
-
-  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-  if (apiKey) headers.Authorization = `Bearer ${apiKey}`;
-
-  const response = await fetch(url, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify({
-      model: request.model || model,
-      messages: request.messages,
-      stream: isStream,
-      ...request.options
-    })
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({} as any));
-    throw new Error(errorData.message || `AI API error: ${response.status}`);
+  if (request.provider === 'anthropic') {
+    throw new Error('Provider "anthropic" is not supported in web client yet.');
   }
 
-  if (isStream) {
-    const reader = response.body?.getReader();
-    const decoder = new TextDecoder('utf-8');
+  const { baseURL, apiKey, model } = getRuntimeConfig();
+  const provider = createOpenAI({
+    apiKey,
+    baseURL,
+    name: request.provider === 'qwen' ? 'qwen' : request.provider === 'custom' ? 'custom' : 'openai'
+  });
+
+  const options = request.options;
+  const callSettings = {
+    temperature: typeof options?.temperature === 'number' ? options.temperature : undefined,
+    maxOutputTokens:
+      typeof options?.maxTokens === 'number'
+        ? options.maxTokens
+        : typeof (options as { maxOutputTokens?: unknown } | undefined)?.maxOutputTokens === 'number'
+          ? (options as { maxOutputTokens?: number }).maxOutputTokens
+          : undefined
+  };
+
+  const messages = request.messages.map(m => ({ role: m.role, content: m.content }));
+  const chatModel = provider.chat(request.model || model);
+
+  if (request.onStream) {
+    const result = streamText({
+      model: chatModel,
+      messages,
+      ...callSettings
+    });
+
     let fullContent = '';
-    let buffer = '';
-
-    if (reader) {
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        const chunk = decoder.decode(value, { stream: true });
-        buffer += chunk;
-        const lines = buffer.split('\n');
-        buffer = lines.pop() || '';
-
-        for (const line of lines) {
-          const trimmedLine = line.trim();
-          if (!trimmedLine.startsWith('data: ')) continue;
-          const jsonStr = trimmedLine.slice(6);
-          if (jsonStr === '[DONE]') continue;
-          try {
-            const json = JSON.parse(jsonStr);
-            const content = json.choices?.[0]?.delta?.content || '';
-            if (content) {
-              fullContent += content;
-              request.onStream?.(content);
-            }
-          } catch (_) {
-            continue;
-          }
-        }
+    for await (const delta of result.textStream) {
+      if (delta) {
+        fullContent += delta;
+        request.onStream(delta);
       }
     }
 
     return { role: 'assistant', content: fullContent, type: 'text', actions: [] };
   }
 
-  const data = await response.json().catch(() => ({} as any));
-  if (data.choices && data.choices.length > 0) {
-    return {
-      role: 'assistant',
-      content: data.choices[0].message.content,
-      type: 'text',
-      actions: []
-    };
-  }
-  throw new Error('No response from AI');
+  const result = await generateText({
+    model: chatModel,
+    messages,
+    ...callSettings
+  });
+
+  return { role: 'assistant', content: result.text, type: 'text', actions: [] };
 }
 
 export const aiApi = {

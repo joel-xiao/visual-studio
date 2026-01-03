@@ -1,6 +1,8 @@
 import type { AgentRole } from '../../types';
 import type { IAgentSchema } from '../types';
 import { createRoutingPrompt } from '../../utils/agent/routing';
+import type { AgentContext } from '../../types';
+import type { JsonValue } from '../../../../../@types/utils';
 
 /**
  * Theme Engine Agent Schema
@@ -23,7 +25,7 @@ const themeEngineSchema: IAgentSchema = {
       withSelection: '全局主题切换，不用于单个图表颜色修改',
       withoutSelection: '如果用户要求全局主题切换，路由给 theme-engine'
     },
-    routingPrompt: (() => '') as (agentList: string, context: any) => string
+    routingPrompt: (_agentList: string, _context: AgentContext) => ''
   },
 
   uiHints: {
@@ -60,7 +62,8 @@ const themeEngineSchema: IAgentSchema = {
 
   prompts: {
     select: () => {
-      const themes = themeEngineSchema.config?.availableThemes || [];
+      const raw = themeEngineSchema.config?.availableThemes;
+      const themes = Array.isArray(raw) ? raw.filter((v): v is string => typeof v === 'string') : [];
       return `你是一位主题配色专家 (Theme Engine)。请为大屏选择一个合适的主题。
 可用主题列表: ${themes.join(', ')}。
 
@@ -74,7 +77,7 @@ const themeEngineSchema: IAgentSchema = {
   messages: {
     processing: '正在匹配主题...',
     completed: '已应用主题',
-    fallback: (theme: string) => `已切换到 ${theme} 主题（离线模式）`
+    fallback: (theme: JsonValue) => `已切换到 ${String(theme || '')} 主题（离线模式）`
   }
 };
 

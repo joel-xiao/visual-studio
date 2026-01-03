@@ -1,5 +1,6 @@
 import type { IWorkflowGraph } from './core/types';
 import type { AgentRole } from '../types';
+import { isFunction } from '../utils/json-utils';
 
 export class WorkflowRegistry {
   private static workflows = new Map<string, () => IWorkflowGraph>();
@@ -20,7 +21,7 @@ export class WorkflowRegistry {
       const workflowId = match[1];
       const moduleExports = module as Record<string, unknown>;
       const createFnName = Object.keys(moduleExports).find(
-        key => key.startsWith('create') && key.endsWith('Workflow') && typeof moduleExports[key] === 'function'
+        key => key.startsWith('create') && key.endsWith('Workflow') && isFunction(moduleExports[key])
       );
 
       if (createFnName) {

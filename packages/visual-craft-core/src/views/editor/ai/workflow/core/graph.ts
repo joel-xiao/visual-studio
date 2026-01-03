@@ -1,4 +1,4 @@
-import type { IWorkflowGraph, IWorkflowNode, IWorkflowEdge, IWorkflowMatchRule } from './types';
+import type { IWorkflowGraph, IWorkflowMatchRule } from './types';
 import type { AgentRole } from '../../types';
 
 export class WorkflowGraphBuilder {
@@ -23,7 +23,8 @@ export class WorkflowGraphBuilder {
   }
 
   addStartNode(id: string = 'start', label: string = '开始', position?: { x: number; y: number }): this {
-    this.graph.nodes!.push({
+    const nodes = this.graph.nodes ?? (this.graph.nodes = []);
+    nodes.push({
       id,
       type: 'start',
       label,
@@ -38,9 +39,10 @@ export class WorkflowGraphBuilder {
     agent: AgentRole,
     label?: string,
     position?: { x: number; y: number },
-    config?: Record<string, any>
+    config?: Record<string, unknown>
   ): this {
-    this.graph.nodes!.push({
+    const nodes = this.graph.nodes ?? (this.graph.nodes = []);
+    nodes.push({
       id,
       type: 'agent',
       agent,
@@ -53,11 +55,12 @@ export class WorkflowGraphBuilder {
 
   addConditionNode(
     id: string,
-    condition: (context: any) => boolean,
+    condition: (context: Record<string, unknown>) => boolean,
     label: string = '条件判断',
     position?: { x: number; y: number }
   ): this {
-    this.graph.nodes!.push({
+    const nodes = this.graph.nodes ?? (this.graph.nodes = []);
+    nodes.push({
       id,
       type: 'condition',
       label,
@@ -72,7 +75,8 @@ export class WorkflowGraphBuilder {
     label: string = '并行执行',
     position?: { x: number; y: number }
   ): this {
-    this.graph.nodes!.push({
+    const nodes = this.graph.nodes ?? (this.graph.nodes = []);
+    nodes.push({
       id,
       type: 'parallel',
       label,
@@ -86,7 +90,8 @@ export class WorkflowGraphBuilder {
     label: string = '合并',
     position?: { x: number; y: number }
   ): this {
-    this.graph.nodes!.push({
+    const nodes = this.graph.nodes ?? (this.graph.nodes = []);
+    nodes.push({
       id,
       type: 'merge',
       label,
@@ -96,7 +101,8 @@ export class WorkflowGraphBuilder {
   }
 
   addEndNode(id: string = 'end', label: string = '结束', position?: { x: number; y: number }): this {
-    this.graph.nodes!.push({
+    const nodes = this.graph.nodes ?? (this.graph.nodes = []);
+    nodes.push({
       id,
       type: 'end',
       label,
@@ -112,7 +118,8 @@ export class WorkflowGraphBuilder {
     weight?: number
   ): this {
     const edgeId = `${source}->${target}`;
-    this.graph.edges!.push({
+    const edges = this.graph.edges ?? (this.graph.edges = []);
+    edges.push({
       id: edgeId,
       source,
       target,
@@ -137,4 +144,3 @@ export class WorkflowGraphBuilder {
     return this.graph as IWorkflowGraph;
   }
 }
-

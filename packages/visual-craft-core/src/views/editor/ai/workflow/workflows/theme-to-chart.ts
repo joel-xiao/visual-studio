@@ -1,5 +1,6 @@
 import { WorkflowGraphBuilder } from '../core/graph';
 import type { IWorkflowGraph } from '../core/types';
+import { asRecord, isString } from '../../utils/json-utils';
 
 export function createThemeToChartWorkflow(): IWorkflowGraph {
   return new WorkflowGraphBuilder()
@@ -13,8 +14,11 @@ export function createThemeToChartWorkflow(): IWorkflowGraph {
     .addStartNode('start', '开始', { x: 100, y: 100 })
     .addAgentNode('theme', 'theme-engine', '切换主题', { x: 100, y: 200 })
     .addConditionNode('hasCharts', (context) => {
-      const nodes = context?.nodes || [];
-      return nodes.some((n: any) => n.component?.includes('APACHE_ECHARTS'));
+      const nodes = Array.isArray(context.nodes) ? context.nodes : [];
+      return nodes.some((n: unknown) => {
+        const comp = (asRecord(n) ?? {}).component;
+        return isString(comp) && comp.includes('APACHE_ECHARTS');
+      });
     }, '是否有图表', { x: 100, y: 300 })
     .addAgentNode('chart', 'chart-creator', '优化图表', { x: 100, y: 400 })
     .addEndNode('end', '结束', { x: 100, y: 500 })

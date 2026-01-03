@@ -1,9 +1,14 @@
 import type { AgentRole } from '../../types';
 import type { IAgentSchema } from '../types';
+import type { IWorkflowGraph } from '../../workflow/core/types';
+import type { AgentContext } from '../../types';
 
 // 动态获取所有 agent schemas
-const agentSchemaModules = import.meta.glob<{ default: any }>('../*/schema.ts', { eager: true });
-const workflowModules = import.meta.glob<{ [key: string]: any }>('../../workflow/workflows/*.ts', { eager: true });
+const agentSchemaModules = import.meta.glob<{ default: IAgentSchema }>('../*/schema.ts', { eager: true });
+const workflowModules = import.meta.glob<Record<string, (...args: string[]) => IWorkflowGraph>>(
+  '../../workflow/workflows/*.ts',
+  { eager: true }
+);
 
 // 获取可用 Agents 信息
 function getAvailableAgentsInfo(): string {
@@ -35,7 +40,7 @@ function getAvailableWorkflowsInfo(): string {
       try {
         const workflow = module[createFnName]();
         workflows.push(`- ${workflow.id}: ${workflow.name} - ${workflow.description}`);
-      } catch (e) {
+      } catch {
         workflows.push(`- ${workflowName}: 工作流`);
       }
     }
@@ -58,7 +63,7 @@ const suggestionGeneratorSchema: IAgentSchema = {
     tags: [],
     intent: '根据当前画布状态生成上下文相关的建议',
     priorityRules: {},
-    routingPrompt: () => ''
+    routingPrompt: (_agentList: string, _context: AgentContext) => ''
   },
 
   uiHints: {

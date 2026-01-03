@@ -1,4 +1,5 @@
 import type { AgentRole } from '../../types';
+import type { JsonValue } from '../../../../../@types/utils';
 import type { IAgentSchema } from '../types';
 import { getChartTemplate } from './template';
 import { createRoutingPrompt } from '../../utils/agent/routing';
@@ -81,8 +82,8 @@ ${targetContext || ''}`
   // 流式输出消息
   messages: {
     processing: '正在生成图表配置...',
-    beautifying: (nodeName: string) => `正在美化图表: ${nodeName}...`,
-    beautified: (nodeName: string) => `已优化图表: ${nodeName}`,
+    beautifying: (nodeName: JsonValue) => `正在美化图表: ${String(nodeName ?? '')}...`,
+    beautified: (nodeName: JsonValue) => `已优化图表: ${String(nodeName ?? '')}`,
     completed: '已完成图表美化',
     created: '已生成图表'
   },

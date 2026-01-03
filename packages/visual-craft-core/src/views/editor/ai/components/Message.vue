@@ -40,7 +40,7 @@
         <AgentResponseCard
           v-else-if="message.agent && message.data"
           :role="message.agent"
-          :title="message.data?.title || message.data?.name"
+          :title="messageTitle"
           :has-secondary-action="showSecondaryAction"
           :secondary-action-text="secondaryActionText"
           :primary-action-text="getPrimaryActionText()"
@@ -69,7 +69,9 @@
         </AgentResponseCard>
 
         <!-- 基础文本 -->
-        <div v-else-if="message.type === 'text'" class="text-content markdown-body" v-html="message.content"></div>
+        <div v-else-if="message.type === 'text'" class="text-content markdown-body">
+          <TextMessageContent :content="message.content" />
+        </div>
 
         <!-- 代码/JSON 预览 (兜底) -->
         <div v-else-if="message.data" class="code-content">
@@ -95,21 +97,89 @@
 </template>
 
 <script setup lang="ts">
-import { computed, unref } from 'vue';
+import { computed, unref, h, defineComponent } from 'vue';
 import type { IChatMessage } from '../types';
+import type { JsonValue } from '../../../../@types/utils';
 import CIcon from '../../../ui/controls/c-icon/index.vue';
 import AgentResponseCard from './AgentResponseCard.vue';
 import CCodeEditor from '../../../ui/controls/c-code-editor/index.vue';
 import { useAIContext } from '../hooks/core/use-ai-context';
 import { applyAgentData, getAgentSchema, getAgentComponent } from '../agent/registry';
-import { safeStringifyJSON } from '../utils/json-utils';
+import { asRecord, safeStringifyJSON } from '../utils/json-utils';
 import { getStreamingCodePresentation } from '../utils';
+
+const messageTitle = computed(() => {
+  const obj = asRecord(props.message.data);
+  if (!obj) return '';
+  const title = typeof obj.title === 'string' ? obj.title : undefined;
+  const name = typeof obj.name === 'string' ? obj.name : undefined;
+  return title || name || '';
+});
 
 const props = defineProps<{
   message: IChatMessage;
-  onContinueWorkflow?: (data: any) => void;
+  onContinueWorkflow?: (data: unknown) => void;
   onMarkActionHandled?: (messageId: string, key: string) => void;
 }>();
+
+const TextMessageContent = defineComponent({
+  props: {
+    content: {
+      type: String,
+      required: true
+    }
+  },
+  setup(p) {
+    const renderInline = (text: string) => {
+      const parts: Array<string | ReturnType<typeof h>> = [];
+      const re = /(\*\*[^*]+\*\*|`[^`]+`)/g;
+      let lastIndex = 0;
+      for (;;) {
+        const match = re.exec(text);
+        if (!match) break;
+        const idx = match.index;
+        if (idx > lastIndex) parts.push(text.slice(lastIndex, idx));
+        const token = match[0];
+        if (token.startsWith('**')) {
+          parts.push(h('strong', token.slice(2, -2)));
+        } else {
+          parts.push(h('code', token.slice(1, -1)));
+        }
+        lastIndex = idx + token.length;
+      }
+      if (lastIndex < text.length) parts.push(text.slice(lastIndex));
+      return parts;
+    };
+
+    return () => {
+      const lines = p.content.split('\n');
+      const children: Array<string | ReturnType<typeof h>> = [];
+
+      let i = 0;
+      while (i < lines.length) {
+        const line = lines[i] ?? '';
+        const isBullet = line.trimStart().startsWith('- ');
+        if (isBullet) {
+          const items: Array<ReturnType<typeof h>> = [];
+          while (i < lines.length && (lines[i] ?? '').trimStart().startsWith('- ')) {
+            const raw = (lines[i] ?? '').trimStart().slice(2);
+            items.push(h('li', renderInline(raw)));
+            i++;
+          }
+          children.push(h('ul', items));
+          if (i < lines.length) children.push(h('br'));
+          continue;
+        }
+
+        children.push(...renderInline(line));
+        if (i < lines.length - 1) children.push(h('br'));
+        i++;
+      }
+
+      return h('span', children);
+    };
+  }
+});
 
 const aiContext = useAIContext();
 const agentSchema = computed(() => props.message.agent ? getAgentSchema(props.message.agent) : null);
@@ -119,11 +189,11 @@ const hasSelection = computed(() => {
   return Array.isArray(selected) ? selected.length > 0 : !!selected;
 });
 
-const workflowControl = computed(() => (props.message as any).workflowControl);
+const workflowControl = computed(() => props.message.workflowControl);
 const isMultiStepWorkflow = computed(() => !!workflowControl.value?.isMultiStep);
 const hasNextStep = computed(() => !!(workflowControl.value?.isMultiStep && workflowControl.value?.hasNext));
 const imageAttachments = computed(() => (props.message.attachments || []).filter(a => a.kind === 'image' && !!a.url));
-const fallbackCode = computed(() => safeStringifyJSON(props.message.data, 2));
+const fallbackCode = computed(() => safeStringifyJSON((props.message.data ?? {}) as JsonValue, 2));
 const actionStatus = computed(() => props.message.actionStatus || {});
 const streaming = computed(() => getStreamingCodePresentation(props.message));
 const isStreamingCode = computed(() => streaming.value.isStreamingCode);
@@ -155,46 +225,52 @@ const resolveApplyMode = (mode?: 'create' | 'update') => {
   return hasSelection.value ? 'update' : 'create';
 };
 
-const handleApply = (data?: any, mode?: 'create' | 'update') => {
+const handleApply = (data?: unknown, mode?: 'create' | 'update') => {
   if (!props.message.agent) return;
-  const payload = data || props.message.data;
   const applyMode = resolveApplyMode(mode);
+  const payload: Record<string, JsonValue> = asRecord(data) ?? asRecord(props.message.data) ?? {};
+  const nextPayload: Record<string, JsonValue> = { ...payload, applyMode };
 
   if (isMultiStepWorkflow.value && hasNextStep.value && props.onContinueWorkflow) {
     if (workflowHandled.value) return;
     if (workflowHandledKey.value) {
       props.onMarkActionHandled?.(props.message.id, workflowHandledKey.value);
     }
-    props.onContinueWorkflow({ ...payload, applyMode });
+    props.onContinueWorkflow(nextPayload);
     return;
   }
 
-  applyAgentData(props.message.agent, aiContext, { ...payload, applyMode });
+  applyAgentData(props.message.agent, aiContext, nextPayload);
 };
 
-const handleSecondary = (data?: any) => {
+const handleSecondary = (data?: unknown) => {
   if (!props.message.agent) return;
-  const payload = data || props.message.data;
+  const payload: Record<string, JsonValue> = asRecord(data) ?? asRecord(props.message.data) ?? {};
 
   if (isMultiStepWorkflow.value && props.onContinueWorkflow) {
     const action = workflowControl.value?.secondaryAction;
     if (!action) return;
+    const workflowAction: Record<string, JsonValue> = {
+      kind: action.kind,
+      label: action.label,
+      ...(action.targetNodeId ? { targetNodeId: action.targetNodeId } : {})
+    };
     if (hasNextStep.value) {
       if (workflowHandled.value) return;
       if (workflowHandledKey.value) {
         props.onMarkActionHandled?.(props.message.id, workflowHandledKey.value);
       }
     }
-    props.onContinueWorkflow({ ...payload, applyMode: resolveApplyMode(), workflowAction: action });
+    props.onContinueWorkflow({ ...payload, applyMode: resolveApplyMode(), workflowAction });
     return;
   }
 
   applyAgentData(props.message.agent, aiContext, { ...payload, applyMode: 'update' });
 };
 
-const handleApplyOnly = (data?: any, mode?: 'create' | 'update') => {
+const handleApplyOnly = (data?: unknown, mode?: 'create' | 'update') => {
   if (!props.message.agent) return;
-  const payload = data || props.message.data;
+  const payload: Record<string, JsonValue> = asRecord(data) ?? asRecord(props.message.data) ?? {};
   const applyMode = resolveApplyMode(mode);
   applyAgentData(props.message.agent, aiContext, { ...payload, applyMode });
 };

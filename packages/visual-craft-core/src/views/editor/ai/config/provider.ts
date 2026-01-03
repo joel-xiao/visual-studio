@@ -1,4 +1,5 @@
 import { createOpenAI } from '@ai-sdk/openai';
+import { asRecord, isString, pickString } from '../utils/json-utils';
 
 /**
  * Creates a configured OpenAI provider instance specifically for Alibaba Cloud DashScope (Qwen).
@@ -12,16 +13,16 @@ export const createDashScope = (config: { apiKey: string; baseURL: string }) => 
         throw new Error('未配置 DashScope API Key');
       }
 
-      if (options && options.body && typeof options.body === 'string') {
+      if (options && options.body && isString(options.body)) {
         try {
           const body = JSON.parse(options.body);
 
           // Fix the role: DashScope rejects 'developer' role
           if (body.messages && Array.isArray(body.messages)) {
-            body.messages.forEach((msg: any) => {
-              if (msg.role === 'developer') {
-                msg.role = 'system';
-              }
+            body.messages.forEach((msg: unknown) => {
+              const obj = asRecord(msg);
+              if (!obj) return;
+              if (pickString(obj, 'role') === 'developer') obj.role = 'system';
             });
           }
 

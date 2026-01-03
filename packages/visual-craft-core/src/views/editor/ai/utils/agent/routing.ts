@@ -1,8 +1,10 @@
 import type { IAgentSchema } from '../../agent/types';
+import type { AgentContext } from '../../types';
 
-export function createRoutingPrompt(schema: IAgentSchema): (agentList: string, context: any) => string {
-  return (agentList: string, context: any) => {
-    const selectedNodes = context?.selectedNodes || [];
+export function createRoutingPrompt(schema: IAgentSchema): (agentList: string, context: AgentContext) => string {
+  return (agentList: string, context: AgentContext) => {
+    void agentList;
+    const selectedNodes = Array.isArray(context.selectedNodes) ? context.selectedNodes : [];
     const { displayName, role, description, routing } = schema;
     let prompt = `**${displayName}** (${role}): ${description}\n\n`;
 
@@ -15,4 +17,3 @@ export function createRoutingPrompt(schema: IAgentSchema): (agentList: string, c
     return prompt;
   };
 }
-

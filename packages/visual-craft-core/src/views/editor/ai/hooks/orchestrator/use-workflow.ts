@@ -1,7 +1,7 @@
 import { ref, computed } from 'vue';
 import type { IWorkflowGraph, IWorkflowExecutionResult } from '../../workflow/core/types';
 import { WorkflowEngine } from '../../workflow/core/engine';
-import type { IAgentResponse } from '../../types';
+import type { AgentContext, IAgentResponse } from '../../types';
 
 /**
  * 工作流 Hook
@@ -22,7 +22,7 @@ export function useWorkflow(graph: IWorkflowGraph) {
    */
   const execute = async (
     input: string,
-    context: any = {},
+    context: AgentContext = {},
     onStream?: (nodeId: string, partial: Partial<IAgentResponse>) => void
   ): Promise<IWorkflowExecutionResult> => {
     if (!engine.value) {

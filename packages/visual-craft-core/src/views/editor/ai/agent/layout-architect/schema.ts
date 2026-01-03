@@ -2,6 +2,7 @@ import type { AgentRole } from '../../types';
 import type { IAgentSchema } from '../types';
 import { getLayoutTemplate } from './template';
 import { createRoutingPrompt } from '../../utils/agent/routing';
+import type { AgentContext } from '../../types';
 
 /**
  * Layout Architect Agent Schema
@@ -24,7 +25,7 @@ const layoutArchitectSchema: IAgentSchema = {
       withSelection: '如果用户要求移动位置/调整大小，请路由给 layout-architect',
       withoutSelection: '如果用户要求生成新大屏/图表，路由给 layout-architect'
     },
-    routingPrompt: (() => '') as (agentList: string, context: any) => string
+    routingPrompt: (_agentList: string, _context: AgentContext) => ''
   },
 
   uiHints: {

@@ -2,11 +2,12 @@ import type {
   IWorkflowGraph,
   IWorkflowNode,
   IWorkflowEdge,
-  IWorkflowExecutionContext,
-  IWorkflowExecutionResult
+  IWorkflowExecutionContext
 } from './types';
-import type { IAgent, AgentRole, IAgentResponse } from '../../types';
+import type { IAgent, AgentRole, IAgentResponse, AgentContext } from '../../types';
 import { registerAgents } from '../../agent/registry';
+import { asRecord } from '../../utils/json-utils';
+import type { JsonValue } from '../../../../../@types/utils';
 
 export class StepWorkflowEngine {
   private agents: Record<AgentRole, IAgent>;
@@ -17,6 +18,11 @@ export class StepWorkflowEngine {
   constructor(graph: IWorkflowGraph) {
     this.graph = graph;
     this.agents = registerAgents();
+  }
+
+  private requireExecutionContext(): IWorkflowExecutionContext {
+    if (!this.executionContext) throw new Error('Workflow execution context not initialized');
+    return this.executionContext;
   }
 
   private getOutgoingEdges(nodeId: string): IWorkflowEdge[] {
@@ -31,7 +37,7 @@ export class StepWorkflowEngine {
     const incomingEdges = this.getIncomingEdges(nodeId);
     if (incomingEdges.length === 0) return true;
 
-    const visitedNodes = this.executionContext!.visitedNodes;
+    const visitedNodes = this.requireExecutionContext().visitedNodes;
     return incomingEdges.every(edge => visitedNodes.has(edge.source));
   }
 
@@ -41,7 +47,7 @@ export class StepWorkflowEngine {
 
   private async executeAgentNode(
     node: IWorkflowNode,
-    context: any,
+    context: Record<string, unknown> & { input?: string },
     onStream?: (partial: Partial<IAgentResponse>) => void
   ): Promise<IAgentResponse> {
     if (!node.agent) throw new Error(`Agent node ${node.id} must have an agent role`);
@@ -49,14 +55,32 @@ export class StepWorkflowEngine {
     const agent = this.agents[node.agent];
     if (!agent) throw new Error(`Agent ${node.agent} not found`);
 
-    const workflowContext = {
-      ...context,
+    const exec = this.requireExecutionContext();
+    const historySafe: JsonValue = exec.history.map(h => {
+      const item: Record<string, JsonValue> = {
+        nodeId: h.nodeId,
+        timestamp: h.timestamp
+      };
+      if (h.response) {
+        const resp: Record<string, JsonValue> = {
+          content: h.response.content,
+          type: h.response.type
+        };
+        if (h.response.data !== undefined) resp.data = h.response.data;
+        item.response = resp;
+      }
+      if (h.error) item.error = h.error.message || String(h.error);
+      return item;
+    });
+
+    const workflowContext: AgentContext = {
+      ...(context as unknown as AgentContext),
       workflowNodeId: node.id,
-      workflowData: this.executionContext!.data,
-      history: this.executionContext!.history
+      workflowData: exec.data as unknown as JsonValue,
+      history: historySafe
     };
 
-    const lastAgentItem = [...this.executionContext!.history]
+    const lastAgentItem = [...exec.history]
       .reverse()
       .find(h => {
         const prevNode = h.nodeId ? this.getNode(h.nodeId) : null;
@@ -67,20 +91,22 @@ export class StepWorkflowEngine {
       workflowContext.previousAgentData = lastAgentItem.response.data;
     }
 
-    return await agent.process(context.input || '', workflowContext, onStream);
+    const input = typeof context.input === 'string' ? context.input : '';
+    return await agent.process(input, workflowContext, onStream);
   }
 
-  private executeConditionNode(node: IWorkflowNode, context: any): boolean {
+  private executeConditionNode(node: IWorkflowNode, context: Record<string, unknown>): boolean {
     if (!node.condition) throw new Error(`Condition node ${node.id} must have a condition function`);
     return node.condition(context);
   }
 
   private async executeNode(
     node: IWorkflowNode,
-    context: any,
+    context: Record<string, unknown> & { input?: string },
     onStream?: (partial: Partial<IAgentResponse>) => void
   ): Promise<IAgentResponse | null> {
     const timestamp = Date.now();
+    const exec = this.requireExecutionContext();
 
     try {
       let response: IAgentResponse | null = null;
@@ -91,17 +117,12 @@ export class StepWorkflowEngine {
 
         case 'agent':
           response = await this.executeAgentNode(node, context, onStream);
-          if (response?.data) {
-            this.executionContext!.data = {
-              ...this.executionContext!.data,
-              ...response.data
-            };
-          }
+          if (response?.data) exec.data = { ...exec.data, ...(asRecord(response.data) ?? {}) };
           break;
 
         case 'condition': {
           const conditionResult = this.executeConditionNode(node, context);
-          this.executionContext!.data[`${node.id}_result`] = conditionResult;
+          exec.data[`${node.id}_result`] = conditionResult;
           break;
         }
 
@@ -111,17 +132,17 @@ export class StepWorkflowEngine {
           break;
       }
 
-      this.executionContext!.history.push({
+      exec.history.push({
         nodeId: node.id,
         timestamp,
         response: response || undefined
       });
 
-      this.executionContext!.visitedNodes.add(node.id);
+      exec.visitedNodes.add(node.id);
 
       return response;
     } catch (error) {
-      this.executionContext!.history.push({
+      exec.history.push({
         nodeId: node.id,
         timestamp,
         error: error as Error
@@ -130,15 +151,16 @@ export class StepWorkflowEngine {
     }
   }
 
-  private getNextNodes(currentNodeId: string, context: any): IWorkflowNode[] {
+  private getNextNodes(currentNodeId: string): IWorkflowNode[] {
     const currentNode = this.getNode(currentNodeId);
     if (!currentNode) return [];
 
     const outgoingEdges = this.getOutgoingEdges(currentNodeId);
     const nextNodes: IWorkflowNode[] = [];
+    const exec = this.requireExecutionContext();
 
     if (currentNode.type === 'condition') {
-      const conditionResult = this.executionContext!.data[`${currentNodeId}_result`];
+      const conditionResult = exec.data[`${currentNodeId}_result`];
       for (const edge of outgoingEdges) {
         if (edge.condition === String(conditionResult)) {
           const nextNode = this.getNode(edge.target);
@@ -149,7 +171,7 @@ export class StepWorkflowEngine {
       if (currentNode.type === 'merge') {
         const incomingEdges = this.getIncomingEdges(currentNodeId);
         const allCompleted = incomingEdges.every(edge =>
-          this.executionContext!.visitedNodes.has(edge.source)
+          exec.visitedNodes.has(edge.source)
         );
         if (!allCompleted) return [];
       }
@@ -176,7 +198,7 @@ export class StepWorkflowEngine {
 
   async executeStep(
     input: string,
-    context: any = {},
+    context: Record<string, unknown> = {},
     onStream?: (nodeId: string, partial: Partial<IAgentResponse>) => void,
     options?: {
       shouldStopOnAgent?: (node: IWorkflowNode, response: IAgentResponse) => boolean;
@@ -197,7 +219,8 @@ export class StepWorkflowEngine {
 
     // 循环执行直到找到一个agent节点或工作流结束
     while (this.currentNodeQueue.length > 0) {
-      const currentNodeId = this.currentNodeQueue.shift()!;
+      const currentNodeId = this.currentNodeQueue.shift();
+      if (!currentNodeId) break;
       const currentNode = this.getNode(currentNodeId);
 
       if (!currentNode) throw new Error(`Node ${currentNodeId} not found`);
@@ -207,11 +230,12 @@ export class StepWorkflowEngine {
         continue;
       }
 
-      if (this.executionContext.visitedNodes.has(currentNodeId) && currentNode.type !== 'merge') {
+      const exec = this.requireExecutionContext();
+      if (exec.visitedNodes.has(currentNodeId) && currentNode.type !== 'merge') {
         continue;
       }
 
-      this.executionContext.currentNodeId = currentNodeId;
+      exec.currentNodeId = currentNodeId;
 
       const wrappedOnStream = onStream
         ? (partial: Partial<IAgentResponse>) => onStream(currentNodeId, partial)
@@ -223,13 +247,13 @@ export class StepWorkflowEngine {
         await options?.onNodeComplete?.(currentNodeId, currentNode, response);
       }
 
-      const nextNodes = this.getNextNodes(currentNodeId, context);
+      const nextNodes = this.getNextNodes(currentNodeId);
 
       if (currentNode.type === 'parallel') {
         this.currentNodeQueue.push(...nextNodes.map(n => n.id));
       } else {
         for (const nextNode of nextNodes) {
-          if (!this.executionContext.visitedNodes.has(nextNode.id)) {
+          if (!exec.visitedNodes.has(nextNode.id)) {
             this.currentNodeQueue.push(nextNode.id);
           }
         }
@@ -246,7 +270,7 @@ export class StepWorkflowEngine {
 
       // 如果是end节点，结束工作流
       if (currentNode.type === 'end') {
-        this.executionContext.status = 'completed';
+        exec.status = 'completed';
         return { response: null, hasNext: false };
       }
 
@@ -254,13 +278,13 @@ export class StepWorkflowEngine {
     }
 
     // 队列为空，工作流完成
-    this.executionContext.status = 'completed';
+    this.requireExecutionContext().status = 'completed';
     return { response: null, hasNext: false };
   }
 
   async continueExecution(
     input: string,
-    context: any = {},
+    context: Record<string, unknown> = {},
     onStream?: (nodeId: string, partial: Partial<IAgentResponse>) => void,
     options?: {
       shouldStopOnAgent?: (node: IWorkflowNode, response: IAgentResponse) => boolean;
@@ -351,7 +375,7 @@ export class StepWorkflowEngine {
     return {
       content: lastAgentResponse?.content || (success ? '任务已完成' : `执行失败: ${error?.message}`),
       type: lastAgentResponse?.type || 'text',
-      data: this.executionContext.data,
+      data: this.executionContext.data as unknown as JsonValue,
       agent: finalAgentRole,
       actions: lastAgentResponse?.actions,
       isError: !success

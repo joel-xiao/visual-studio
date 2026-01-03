@@ -1,10 +1,29 @@
 <template>
-  <Editor :data="editorData" />
+  <Editor :data="editorData" :ai-config="aiConfig" />
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
 import { Editor } from 'visual-craft-core';
+
+const aiConfig = {
+  runtime: {
+    mode: 'builtin' as const,
+    builtin: {
+      apiKey: 'sk-f6428df10fa843488f78fe715f403ab0',
+      baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+      model: 'qwen-max',
+      visionModel: 'qwen-vl-max'
+    }
+  },
+  suggestions: {
+    suggestions: {
+      enabled: true,
+      maxAISuggestions: 3,
+      maxPresetSuggestions: 6
+    }
+  }
+};
 
 const editorData = ref<IEditorData>({
   folder: '',

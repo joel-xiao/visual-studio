@@ -1,23 +1,49 @@
-import type { IAgent, IAgentResponse } from '../../types';
+import type { IAgent, IAgentResponse, AgentContext } from '../../types';
 import layoutArchitectSchema from './schema';
 import { useBaseAgent } from '../../utils/agent/base-agent';
+import { asRecord, pickString } from '../../utils/json-utils';
 
 export function useLayoutArchitect(): IAgent {
   const schema = layoutArchitectSchema;
   const { processWithAI } = useBaseAgent(schema);
 
-  const process = async (input: string, context?: any, onStream?: any): Promise<IAgentResponse> => {
-    const historyStr = context?.history?.map((h: any) => {
-      const count = Array.isArray(h.attachments) ? h.attachments.length : 0;
-      return `${h.role}: ${h.content}${count ? ` [图片${count}]` : ''}`;
-    }).join('\n') || '';
-    const componentList = context?.availableComponents?.map((c: any) => `- ${c.name} (type: ${c.type})`).join('\n') || '';
+  const process = async (
+    input: string,
+    context?: AgentContext,
+    onStream?: (partial: Partial<IAgentResponse>) => void
+  ): Promise<IAgentResponse> => {
+    const ctx = asRecord(context) ?? {};
+    const history = Array.isArray(ctx.history) ? ctx.history : [];
+
+    const historyStr = history
+      .map(h => {
+        const obj = asRecord(h) ?? {};
+        const role = pickString(obj, 'role') || 'assistant';
+        const content = pickString(obj, 'content') || '';
+        const attachments = Array.isArray(obj.attachments) ? obj.attachments : [];
+        const count = attachments.length;
+        return `${role}: ${content}${count ? ` [图片${count}]` : ''}`;
+      })
+      .join('\n');
+
+    const availableComponents = Array.isArray(ctx.availableComponents) ? ctx.availableComponents : [];
+    const componentList = availableComponents
+      .map(c => {
+        const obj = asRecord(c) ?? {};
+        const name = pickString(obj, 'name') || '';
+        const type = pickString(obj, 'type') || '';
+        return `- ${name} (type: ${type})`;
+      })
+      .filter(Boolean)
+      .join('\n');
 
     return processWithAI(schema.prompts.generate(componentList, historyStr), input, onStream, (json) => {
-      if (!json.data?.nodes) throw new Error('返回布局数据格式错误');
-      return { data: json.data };
-    }, context?.attachments);
+      const obj = asRecord(json) ?? {};
+      const data = asRecord(obj.data);
+      if (!data?.nodes) throw new Error('返回布局数据格式错误');
+      return { data: obj.data };
+    }, ctx.attachments);
   };
 
-  return { role: schema.role as any, name: schema.name, description: schema.description, process };
+  return { role: schema.role, name: schema.name, description: schema.description, process };
 }

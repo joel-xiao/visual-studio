@@ -1,5 +1,5 @@
 import { generateTextCompat } from '../hooks/core/use-ai-config';
-import { extractJSON } from '../utils/json-utils';
+import { asRecord, extractJSON, pickString } from '../utils/json-utils';
 import type { IWorkflowGraph } from './core/types';
 import type { AgentRole } from '../types';
 import { getAgentInfo } from '../agent/registry';
@@ -8,17 +8,19 @@ import { WorkflowRegistry } from './registry';
 export class WorkflowSelector {
   private findDeepMessage(error: unknown): string {
     const visited = new Set<unknown>();
-    let current: any = error;
-    while (current && typeof current === 'object' && !visited.has(current)) {
+    let current: unknown = error;
+    while (current && !visited.has(current)) {
       visited.add(current);
-      if (typeof current.message === 'string' && current.message) return current.message;
-      current = current.cause;
+      const currObj = asRecord(current);
+      const msg = pickString(currObj, 'message');
+      if (msg) return msg;
+      current = currObj?.cause;
     }
-    return typeof (error as any)?.message === 'string' ? (error as any).message : String(error);
+    return pickString(asRecord(error), 'message') || String(error);
   }
 
   async selectWorkflow(input: string, context: unknown): Promise<IWorkflowGraph | null> {
-    const contextObj = context && typeof context === 'object' ? context as Record<string, unknown> : {};
+    const contextObj = asRecord(context) ?? {};
 
     try {
       const historyStr = this.getHistoryString(contextObj);
@@ -54,9 +56,13 @@ ${historyStr}
       });
 
       const parsed = extractJSON(text);
-      if (parsed && (parsed.workflow || parsed.agent)) {
-        console.log(`[Router] AI-matched: ${parsed.thought}`);
-        return this.createWorkflow(parsed.workflow, parsed.agent);
+      const obj = asRecord(parsed);
+      const workflow = pickString(obj, 'workflow') || '';
+      const agent = pickString(obj, 'agent');
+      if (obj && (workflow || agent)) {
+        const thought = pickString(obj, 'thought') || '';
+        console.log(`[Router] AI-matched: ${thought}`);
+        return this.createWorkflow(workflow, agent);
       }
     } catch (e) {
       console.error('[WorkflowSelector] AI router critical error:', e);
@@ -67,25 +73,31 @@ ${historyStr}
     return null;
   }
 
-  private getHistoryString(context: any): string {
+  private getHistoryString(context: Record<string, unknown>): string {
     const history = Array.isArray(context.history) ? context.history : [];
     if (history.length === 0) return '';
     return '\n最近对话:\n' + history.slice(-3)
-      .map((h: any) => {
-        const count = Array.isArray(h.attachments) ? h.attachments.length : 0;
+      .map((h: unknown) => {
+        const hObj = asRecord(h) ?? {};
+        const attachments = Array.isArray(hObj.attachments) ? hObj.attachments : [];
+        const count = attachments.length;
         const tag = count ? ` [图片${count}]` : '';
-        return `- ${h.role === 'user' ? '用户' : '助手'}: ${h.content}${tag}`;
+        const role = pickString(hObj, 'role') === 'user' ? '用户' : '助手';
+        const content = pickString(hObj, 'content') || '';
+        return `- ${role}: ${content}${tag}`;
       })
       .join('\n');
   }
 
-  private getStateString(context: any): string {
+  private getStateString(context: Record<string, unknown>): string {
     const nodes = Array.isArray(context.nodes) ? context.nodes : [];
-    const selected = (Array.isArray(context.selectedNodes) ? context.selectedNodes : [])[0] as any;
+    const selected = (Array.isArray(context.selectedNodes) ? context.selectedNodes : [])[0];
+    const selectedObj = asRecord(selected) ?? {};
+    const selectedName = pickString(selectedObj, 'name') || pickString(selectedObj, 'type') || '';
 
     return [
       `- 看板节点数: ${nodes.length}`,
-      `- 当前选中: ${selected ? `${selected.name || selected.type}` : '无'}`
+      `- 当前选中: ${selected ? selectedName : '无'}`
     ].join('\n');
   }
 

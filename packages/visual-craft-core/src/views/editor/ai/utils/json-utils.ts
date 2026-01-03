@@ -3,12 +3,58 @@
  * 统一所有 JSON 相关的处理逻辑
  */
 
+import type { JsonValue } from '../../../../@types/utils';
+
+type JsonRecord = Record<string, JsonValue>;
+
+export function isString(value: unknown): value is string {
+  return typeof value === 'string';
+}
+
+export function isFunction(value: unknown): value is (...args: unknown[]) => unknown {
+  return typeof value === 'function';
+}
+
+export function asRecord(value: unknown): JsonRecord | undefined {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return undefined;
+  return value as JsonRecord;
+}
+
+export function pickRecord(value: unknown, key: string): JsonRecord | undefined {
+  const obj = asRecord(value);
+  return asRecord(obj?.[key]);
+}
+
+export function pickString(value: unknown, key: string): string | undefined {
+  const obj = asRecord(value);
+  const v = obj?.[key];
+  return typeof v === 'string' ? v : undefined;
+}
+
+export function pickNumber(value: unknown, key: string): number | undefined {
+  const obj = asRecord(value);
+  const v = obj?.[key];
+  return typeof v === 'number' && Number.isFinite(v) ? v : undefined;
+}
+
+export function pickBoolean(value: unknown, key: string): boolean | undefined {
+  const obj = asRecord(value);
+  const v = obj?.[key];
+  return typeof v === 'boolean' ? v : undefined;
+}
+
+export function pickArray(value: unknown, key: string): JsonValue[] | undefined {
+  const obj = asRecord(value);
+  const v = obj?.[key];
+  return Array.isArray(v) ? (v as JsonValue[]) : undefined;
+}
+
 /**
  * 从文本中安全地提取 JSON 对象
  * @param text 包含 JSON 的文本
  * @returns 解析后的 JSON 对象，如果解析失败则返回 null
  */
-export function extractJSON(text: string): any | null {
+export function extractJSON(text: string): JsonValue | null {
   if (!text) return null;
 
   // 方法1: 尝试查找 markdown 代码块中的 JSON
@@ -17,9 +63,9 @@ export function extractJSON(text: string): any | null {
     try {
       const cleaned = codeBlockMatch[1].trim();
       if (cleaned) {
-        return JSON.parse(cleaned);
+        return JSON.parse(cleaned) as JsonValue;
       }
-    } catch (e) {
+    } catch (_e) {
       // 继续尝试其他方法
     }
   }
@@ -65,8 +111,8 @@ export function extractJSON(text: string): any | null {
         if (braceCount === 0 && startIndex !== -1) {
           try {
             const jsonStr = text.substring(startIndex, i + 1);
-            return JSON.parse(jsonStr);
-          } catch (e) {
+            return JSON.parse(jsonStr) as JsonValue;
+          } catch (_e) {
             // 继续尝试其他方法
           }
         }
@@ -78,8 +124,8 @@ export function extractJSON(text: string): any | null {
   const simpleMatch = text.match(/\{[\s\S]*\}/);
   if (simpleMatch) {
     try {
-      return JSON.parse(simpleMatch[0]);
-    } catch (e) {
+      return JSON.parse(simpleMatch[0]) as JsonValue;
+    } catch (_e) {
       // 最后的后备方案也失败了
     }
   }
@@ -90,7 +136,7 @@ export function extractJSON(text: string): any | null {
 /**
  * 从文本中提取 JSON，如果失败则抛出错误
  */
-export function extractJSONOrThrow(text: string, errorMessage: string = 'Failed to extract JSON'): any {
+export function extractJSONOrThrow(text: string, errorMessage: string = 'Failed to extract JSON'): JsonValue {
   const result = extractJSON(text);
   if (!result) {
     throw new Error(errorMessage);
@@ -101,12 +147,11 @@ export function extractJSONOrThrow(text: string, errorMessage: string = 'Failed 
 /**
  * 安全解析 JSON 字符串
  */
-export function safeParseJSON(str: string | undefined | null, fallback: any = {}): any {
+export function safeParseJSON<T extends JsonValue = JsonValue>(str: string | undefined | null, fallback: T = {} as T): T {
   if (typeof str !== 'string' || !str) return fallback;
   try {
-    return JSON.parse(str);
-  } catch (e) {
-    console.warn('[JSON Utils] Failed to parse JSON:', e);
+    return JSON.parse(str) as T;
+  } catch (_e) {
     return fallback;
   }
 }
@@ -114,12 +159,11 @@ export function safeParseJSON(str: string | undefined | null, fallback: any = {}
 /**
  * 安全序列化 JSON
  */
-export function safeStringifyJSON(obj: any, indent: number = 2): string {
+export function safeStringifyJSON(obj: JsonValue | string, indent: number = 2): string {
   if (typeof obj === 'string') return obj;
   try {
     return JSON.stringify(obj, null, indent);
-  } catch (e) {
-    console.warn('[JSON Utils] Failed to stringify JSON:', e);
+  } catch (_e) {
     return '{}';
   }
 }

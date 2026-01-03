@@ -1,21 +1,16 @@
 import { createOpenAI } from '@ai-sdk/openai';
-import { generateText, streamText, type CoreMessage, type UserContent } from 'ai';
-import {
-  getAIRuntimeConfig,
-  getAIRuntimeVersion,
-  type AIRuntimeConfig,
-  type AIBuiltinOpenAIConfig,
-  type AIExternalAdapter,
-  type AIExternalChatRequest,
-  type AIExternalChatResult,
-  type AIRuntimeMode
-} from '../../config';
+import { generateText, streamText } from 'ai';
+import { getAIRuntimeConfig, getAIRuntimeVersion } from '../../config';
+
+type OpenAIClient = ReturnType<typeof createOpenAI>;
+type OpenAIChatModel = ReturnType<OpenAIClient['chat']>;
+type StreamTextMessages = NonNullable<Parameters<typeof streamText>[0]['messages']>;
 
 let cached:
   | {
-      defaultModel: any;
-      visionModel: any;
-      openai: any;
+      defaultModel: OpenAIChatModel;
+      visionModel: OpenAIChatModel;
+      openai: OpenAIClient;
     }
   | null = null;
 
@@ -61,11 +56,14 @@ export async function generateTextCompat(args: { system: string; prompt: string;
   const { defaultModel } = useAIConfig();
   if (args.onStream) {
     let acc = '';
-    const messages: CoreMessage[] = [
-      { role: 'system', content: args.system },
-      { role: 'user', content: args.prompt as UserContent }
+    const messages = [
+      { role: 'system' as const, content: args.system },
+      { role: 'user' as const, content: args.prompt }
     ];
-    const result = await streamText({ model: defaultModel, messages });
+    const result = await streamText({
+      model: defaultModel,
+      messages: messages as unknown as StreamTextMessages
+    });
     for await (const delta of result.textStream) {
       acc += delta;
       args.onStream(delta);
