@@ -1,10 +1,12 @@
 <template>
-  <Editor :data="editorData" :ai-config="aiConfig" />
+  <div class="app">
+    <Editor :data="editorData" :ai-config="aiConfig" />
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { Editor } from 'visual-craft-core';
+import { reactive } from 'vue';
+import { Editor } from '../src/index';
 
 const aiConfig = {
   runtime: {
@@ -25,11 +27,11 @@ const aiConfig = {
   }
 };
 
-const editorData = ref<IEditorData>({
+const editorData = reactive<IEditorData>({
   folder: '',
   id: '',
   type: '',
-  name: '',
+  name: 'core-dev',
   nodes: [
     {
       parentId: '',
@@ -60,4 +62,17 @@ const editorData = ref<IEditorData>({
 });
 </script>
 
-<style lang="scss"></style>
+<style>
+html,
+body,
+#app {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+}
+
+.app {
+  height: 100%;
+  width: 100%;
+}
+</style>

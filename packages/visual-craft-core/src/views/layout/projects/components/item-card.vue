@@ -12,14 +12,9 @@
 </template>
 <script lang="ts" setup>
 import { computed } from 'vue';
+import { getManageIcon } from 'virtual:visual-craft-core-public-assets';
 
-const manageIconUrlMap = import.meta.glob<string>('/public/image/manage/*', {
-  eager: true,
-  import: 'default',
-  query: '?inline'
-}) as Record<string, string>;
-
-const defaultNoPhotoIcon = manageIconUrlMap['/public/image/manage/no-photo.svg'] || '';
+const defaultNoPhotoIcon = getManageIcon('no-photo.svg');
 
 type IDbItemCard = {
   icon: string;

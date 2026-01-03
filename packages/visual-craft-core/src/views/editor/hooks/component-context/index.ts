@@ -1,15 +1,10 @@
 import { readonly, createVNode, type Component as VueComponent } from 'vue';
 import { cloneDeep } from 'lodash';
 import { createComponent } from '../../../../hooks/vue-hooks';
+import { getEditorIcon } from 'virtual:visual-craft-core-public-assets';
 
 type ComponentRegistry = Record<string, VueComponent>;
 type ComponentSchemaRegistry = Record<string, IComponentSchemaExport>;
-
-const editorIconUrlMap = import.meta.glob<string>('/public/image/editor/**/*', {
-  eager: true,
-  import: 'default',
-  query: '?inline'
-}) as Record<string, string>;
 
 export class CreateComponentContext {
   MaterialUses: Record<string, { [key: string]: IUseMaterialComponent }>;
@@ -123,7 +118,7 @@ export class CreateComponentContext {
       return icon;
     }
 
-    return editorIconUrlMap[`/public/image/editor/${icon}`] || '';
+    return getEditorIcon(icon);
   }
 
   #getComponentSchemas(component_path: string): PanelComponentData[] {

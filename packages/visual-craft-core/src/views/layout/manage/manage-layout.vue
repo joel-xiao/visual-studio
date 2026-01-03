@@ -4,14 +4,9 @@ import NavTree from '@/components/nav-tree/index.vue';
 import Icon from '@/components/icon/index.vue';
 import { computed, ref } from 'vue';
 import { getUuid } from '@/assets/utils/index';
+import { getManageIcon } from 'virtual:visual-craft-core-public-assets';
 
-const manageIconUrlMap = import.meta.glob<string>('/public/image/manage/*', {
-  eager: true,
-  import: 'default',
-  query: '?inline'
-}) as Record<string, string>;
-
-const defaultFolderIcon = manageIconUrlMap['/public/image/manage/folder.svg'] || '';
+const defaultFolderIcon = getManageIcon('folder.svg');
 
 type IDbLayoutNewProjectData = {
   name: string;

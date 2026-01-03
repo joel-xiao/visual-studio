@@ -5,7 +5,7 @@
   "scripts": {
     "dev:web": "pnpm -F @visual-craft/web dev",
     "wait:web": "wait-on --interval 1000 --timeout 60000 tcp:1420",
-    "build:web": "pnpm -F @visual-craft/web build",
+    "build:web": "pnpm -F visual-craft-core build && pnpm -F @visual-craft/web build",
     "dev:tauri": "concurrently \"pnpm dev:web\" \"pnpm wait:web && pnpm -F @visual-craft/tauri dev\"",
     "build:tauri": "pnpm -F @visual-craft/web build:client && pnpm -F @visual-craft/tauri build",
     "dev:electron": "concurrently \"pnpm dev:web\" \"pnpm wait:web && pnpm -F @visual-craft/electron dev\"",

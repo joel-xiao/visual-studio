@@ -20,6 +20,14 @@
     "skipLibCheck": true,
     "types": ["vite/client", "@types/node"],
   },
-  "include": ["./src/**/*.ts", "./src/**/*.d.ts", "./src/**/*.tsx", "./src/**/*.vue", "./src/vite.env.d.ts"],
+  "include": [
+    "./src/**/*.ts",
+    "./src/**/*.d.ts",
+    "./src/**/*.tsx",
+    "./src/**/*.vue",
+    "./src/vite.env.d.ts",
+    "./dev/**/*.ts",
+    "./dev/**/*.vue"
+  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
