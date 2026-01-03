@@ -8,7 +8,7 @@ import { Editor } from 'visual-craft-core';
 
 const aiConfig = {
   runtime: {
-    mode: 'builtin' as const,
+    mode: 'builtin',
     builtin: {
       apiKey: '',
       baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',

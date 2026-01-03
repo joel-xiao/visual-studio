@@ -10,7 +10,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, readonly, markRaw, withDefaults } from 'vue';
+import { computed, reactive } from 'vue';
+import { dragResizeDirective } from '../../../../directives/drag-resize';
+
+const vDragResize = dragResizeDirective;
 
 interface Props {
   data: IDragDataset;

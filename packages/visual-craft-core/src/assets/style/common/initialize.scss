@@ -34,6 +34,19 @@
   line-height: normal;
 }
 
+:where(#visual-craft-core)
+  :where(
+    button:not(:disabled),
+    a[href],
+    summary,
+    [role='button'],
+    input[type='button']:not(:disabled),
+    input[type='submit']:not(:disabled),
+    input[type='reset']:not(:disabled)
+  ):hover {
+  cursor: pointer;
+}
+
 :where(#visual-craft-core) :where(button, input, li, ol, optgroup, select, textarea, ul) {
   padding: 0;
   margin: 0;

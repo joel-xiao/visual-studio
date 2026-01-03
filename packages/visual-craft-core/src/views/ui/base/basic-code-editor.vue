@@ -12,6 +12,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import CodeEditor from '@/components/code-editor/index.vue';
 
 interface Props {
   modelValue?: string;

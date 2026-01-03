@@ -58,8 +58,14 @@ export type AIRuntimeConfig = {
   external: AIExternalAdapter | null;
 };
 
+export type AIInitRuntimeConfig = {
+  mode?: AIRuntimeMode | string;
+  external?: AIExternalAdapter | null;
+  builtin?: Partial<AIBuiltinOpenAIConfig>;
+};
+
 export type AIInitConfig = {
-  runtime?: Partial<Omit<AIRuntimeConfig, 'builtin'>> & { builtin?: Partial<AIBuiltinOpenAIConfig> };
+  runtime?: AIInitRuntimeConfig;
   suggestions?: Partial<AIConfig>;
 };
 
@@ -78,12 +84,19 @@ let runtimeConfig: AIRuntimeConfig = {
 
 let runtimeVersion = 0;
 
-export function initAIRuntime(
-  config: Partial<Omit<AIRuntimeConfig, 'builtin'>> & { builtin?: Partial<AIBuiltinOpenAIConfig> }
-) {
+export function initAIRuntime(config: AIInitRuntimeConfig) {
+  let mode: AIRuntimeMode = runtimeConfig.mode;
+  if (config.mode !== undefined) {
+    if (config.mode === 'builtin' || config.mode === 'external') {
+      mode = config.mode;
+    } else {
+      throw new Error(`[AI] invalid runtime mode: ${String(config.mode)}`);
+    }
+  }
+
   runtimeConfig = {
     ...runtimeConfig,
-    ...config,
+    mode,
     builtin: { ...runtimeConfig.builtin, ...(config.builtin || {}) },
     external: config.external === undefined ? runtimeConfig.external : config.external
   };

@@ -8,9 +8,9 @@ import { Editor } from '../src/index';
 
 const aiConfig = {
   runtime: {
-    mode: 'builtin' as const,
+    mode: 'builtin',
     builtin: {
-      apiKey: '',
+      apiKey: 'sk-f6428df10fa843488f78fe715f403ab0',
       baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
       model: 'qwen-max',
       visionModel: 'qwen-vl-max'
@@ -64,6 +64,7 @@ const editorData = reactive<IEditorData>({
 html,
 body,
 #app {
+  padding: 0px;
   height: 100%;
   width: 100%;
   margin: 0;

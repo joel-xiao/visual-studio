@@ -4,6 +4,8 @@
 */
 
 :where(#visual-craft-core, #visual-craft-core-project) {
+  user-select: none;
+
   // Color
   --db-color-main: var(--color-gray-800);
   --db-color-bg-dark: #080808;

@@ -79,6 +79,9 @@ export default defineConfig(({ command }) => {
       },
       vue()
     ],
+    optimizeDeps: {
+      exclude: ['virtual:visual-craft-core-public-assets']
+    },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, 'src')

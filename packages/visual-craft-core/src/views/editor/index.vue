@@ -4,7 +4,7 @@
     <NavPanel @change="handleTabChange" />
     <!-- <ToolbarPanel /> -->
     <LeftPanel />
-    <RightPanel v-show="activeTab === 'design'" />
+    <RightPanel />
     <AIPanel v-show="activeTab === 'ai'" />
   </div>
 </template>
@@ -21,18 +21,15 @@ import { ref, reactive, onMounted, onUnmounted, computed, watch } from 'vue';
 
 import { initEditorConfig, getLayoutConfig, type EditorConfigMap } from './config';
 import { initAIConfig, type AIInitConfig } from './ai/config';
-import { initServerDBRuntime, type ServerDBRuntime } from '../../server';
 
 const props = defineProps<{
   data: IEditorData;
   editorConfig?: Partial<EditorConfigMap>;
   aiConfig?: AIInitConfig;
-  serverDBRuntime?: Partial<ServerDBRuntime>;
 }>();
 
 if (props.editorConfig) initEditorConfig(props.editorConfig);
 if (props.aiConfig) initAIConfig(props.aiConfig);
-if (props.serverDBRuntime) initServerDBRuntime(props.serverDBRuntime);
 
 const activeTab = ref('design');
 const handleTabChange = (tabId: string) => {
