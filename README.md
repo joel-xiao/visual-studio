@@ -18,6 +18,7 @@ English | [中文](./README.zh-CN.md)
 ```
 visual-studio/
 ├── packages/
+│   ├── visual-craft-core/ # Core UI/editor library (Vue 3 + Vite)
 │   ├── web/          # Web application (Vue 3 + Vite)
 │   ├── electron/     # Electron desktop application
 │   └── tauri/        # Tauri desktop application (Rust)
@@ -52,6 +53,9 @@ pnpm install
 # Web development
 pnpm dev:web
 
+# Core development (library dev server)
+pnpm -F visual-craft-core dev
+
 # Electron development
 pnpm dev:electron
 
@@ -68,6 +72,7 @@ pnpm build:tauri
 ```
 
 **Build Output Directories:**
+- **visual-craft-core**: `packages/visual-craft-core/dist/` (and `packages/visual-craft-core/dist/visual-craft-core.css`)
 - **Web mode** (`--mode web`): `packages/web/dist/` (base: `/`)
 - **Client mode** (`--mode client`): `packages/web/dist/` (base: `./`)
 - **Electron**: 
@@ -80,6 +85,13 @@ pnpm build:tauri
   - Frontend: `packages/web/dist`
 
 ## 📦 Package Description
+
+### `visual-craft-core`
+
+- Core UI/editor library
+- Vue 3 + TypeScript + Vite
+- `pnpm -F visual-craft-core dev` - dev server (default port: 1430)
+- Built artifact: `packages/visual-craft-core/dist/`
 
 ### `@visual-craft/web`
 

@@ -18,6 +18,7 @@
 ```
 visual-studio/
 ├── packages/
+│   ├── visual-craft-core/ # 核心 UI/编辑器库（Vue 3 + Vite）
 │   ├── web/          # Web 应用（Vue 3 + Vite）
 │   ├── electron/     # Electron 桌面应用
 │   └── tauri/        # Tauri 桌面应用（Rust）
@@ -53,6 +54,9 @@ pnpm install
 # Web 开发
 pnpm dev:web
 
+# Core 开发（库的 dev server）
+pnpm -F visual-craft-core dev
+
 # Electron 开发
 pnpm dev:electron
 
@@ -69,6 +73,7 @@ pnpm build:tauri
 ```
 
 **构建输出目录：**
+- **visual-craft-core**: `packages/visual-craft-core/dist/`（包含 `visual-craft-core.css`）
 - **Web 模式** (`--mode web`): `packages/web/dist/` (base: `/`)
 - **客户端模式** (`--mode client`): `packages/web/dist/` (base: `./`)
 - **Electron**: 
@@ -81,6 +86,13 @@ pnpm build:tauri
   - 前端：`packages/web/dist`
 
 ## 📦 包说明
+
+### `visual-craft-core`
+
+- 核心 UI/编辑器库
+- Vue 3 + TypeScript + Vite
+- `pnpm -F visual-craft-core dev` - 开发服务（默认端口：1430）
+- 构建产物：`packages/visual-craft-core/dist/`
 
 ### `@visual-craft/web`
 
@@ -160,4 +172,3 @@ Vue 3.5 + Vite 7 + TypeScript 5.9 + Node.js 22 + Electron 39 / Tauri 2.9 + pnpm 
 ## 🔗 相关链接
 
 - [Web Demo](https://visual-studio-one.vercel.app/)
-

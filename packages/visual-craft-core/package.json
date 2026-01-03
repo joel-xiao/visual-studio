@@ -1,6 +1,6 @@
 {
   "name": "visual-craft-core",
-  "version": "0.0.1",
+  "version": "0.0.1-test.0",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -14,8 +14,13 @@
     "./style.css": "./dist/visual-craft-core.css"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "README.zh-CN.md"
   ],
+  "publishConfig": {
+    "tag": "test"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build && vue-tsc -p tsconfig.build.json --declaration --emitDeclarationOnly --outDir dist/types"
