@@ -16,8 +16,6 @@ export type CanvasApi = {
   getScale: () => number;
 };
 
-const CANVAS_SCALE_VAR = '--vc-canvas-scale';
-
 class Canvas {
   #scale = 1;
   #maxScale = 256;
@@ -73,7 +71,8 @@ class Canvas {
 
     // Reset scale
     this.#scale = 1;
-    this.#option.canvasEl.style.setProperty(CANVAS_SCALE_VAR, `${this.#scale}`);
+    this.#option.canvasEl.style.transformOrigin = `0px 0px`;
+    this.#option.canvasEl.style.scale = `${this.#scale}`;
 
     this.#canvasUpdates.forEach(callback => callback({ scale: this.#scale }));
   }
@@ -103,7 +102,8 @@ class Canvas {
     const ratio_scale = ratio - 1;
 
     if (this.#option?.canvasEl) {
-      this.#option.canvasEl.style.setProperty(CANVAS_SCALE_VAR, `${this.#scale}`);
+      this.#option.canvasEl.style.transformOrigin = `0px 0px`;
+      this.#option.canvasEl.style.scale = `${this.#scale}`;
     }
 
     if (this.#option?.canvasEl && this.#option?.parentEl) {

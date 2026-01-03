@@ -26,9 +26,6 @@ export type OverlayApi = {
   overlaySetPos: (pos: Pos) => void;
 };
 
-const OVERLAY_TRANSLATE_X_VAR = '--vc-overlay-translate-x';
-const OVERLAY_TRANSLATE_Y_VAR = '--vc-overlay-translate-y';
-
 class Overlay {
   // eslint-disable-next-line no-unused-private-class-members
   #disabled = true;
@@ -205,10 +202,9 @@ class Overlay {
     );
 
     if (this.#option) {
-      const translateX = this.#pos.x + this.#scaleOffset.x;
-      const translateY = this.#pos.y + this.#scaleOffset.y;
-      this.#option.canvasEl.style.setProperty(OVERLAY_TRANSLATE_X_VAR, `${translateX}px`);
-      this.#option.canvasEl.style.setProperty(OVERLAY_TRANSLATE_Y_VAR, `${translateY}px`);
+      this.#option.canvasEl.style.translate = `${this.#pos.x + this.#scaleOffset.x}px ${
+        this.#pos.y + this.#scaleOffset.y
+      }px`;
     }
     // if (!this.#disabled && this.#option?.parentEl) {
     // }

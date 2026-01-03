@@ -1,7 +1,5 @@
 <template>
-  <div class="app">
-    <Editor :data="editorData" :ai-config="aiConfig" />
-  </div>
+<Editor :data="editorData" :ai-config="aiConfig" />
 </template>
 
 <script setup lang="ts">
@@ -69,10 +67,5 @@ body,
   height: 100%;
   width: 100%;
   margin: 0;
-}
-
-.app {
-  height: 100%;
-  width: 100%;
 }
 </style>
