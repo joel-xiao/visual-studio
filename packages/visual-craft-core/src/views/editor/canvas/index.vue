@@ -122,6 +122,9 @@ const onDrop = function (event: DragEvent): void {
     .editor-canvas-root {
       position: absolute;
       background-color: var(--db-editor-color-root-bg);
+      transform-origin: 0px 0px;
+      transform: translate(var(--vc-overlay-translate-x, 0px), var(--vc-overlay-translate-y, 0px))
+        scale(var(--vc-canvas-scale, 1));
     }
 
     .editor-canvas-root-mask {
