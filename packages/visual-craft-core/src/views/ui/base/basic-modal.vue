@@ -1,5 +1,5 @@
 <template>
-<teleport to="body">
+<teleport :to="teleportTo">
   <transition name="fade">
     <div v-if="modelValue" class="basic-modal-mask" @click="onMaskClick">
       <div class="basic-modal-wrapper" :style="{ width: width }" @click.stop>
@@ -22,6 +22,8 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted, ref } from 'vue';
+
 interface Props {
   modelValue: boolean;
   title?: string;
@@ -37,6 +39,15 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits(['update:modelValue', 'close']);
+
+const teleportTo = ref<string | HTMLElement>('body');
+
+onMounted(() => {
+  const target =
+    document.querySelector<HTMLElement>('#visual-craft-core') ||
+    document.querySelector<HTMLElement>('#visual-craft-core-project');
+  if (target) teleportTo.value = target;
+});
 
 function onClose() {
   emit('update:modelValue', false);
