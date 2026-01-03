@@ -10,6 +10,8 @@
     "build:tauri": "pnpm -F @visual-craft/web build:client && pnpm -F @visual-craft/tauri build",
     "dev:electron": "concurrently \"pnpm dev:web\" \"pnpm wait:web && pnpm -F @visual-craft/electron dev\"",
     "build:electron": "pnpm -F @visual-craft/web build:client && pnpm -F @visual-craft/electron build",
+    "publish:core:test": "tsx scripts/publish-visual-craft-core.ts --tag=test --bump=prerelease --preid=test",
+    "publish:core:latest": "tsx scripts/publish-visual-craft-core.ts --tag=latest --bump=patch",
     "log": "NODE_OPTIONS='--loader tsx/esm' conventional-changelog -p custom-config -i CHANGELOG.md -s -r 0 -n ./config/changelog-option.ts",
     "lint": "eslint . --fix",
     "lint:check": "eslint .",
