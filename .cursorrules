@@ -19,7 +19,6 @@
 9. **Agent Output**：需要结构化输出时，只输出单个可 JSON.parse 的对象（便于 extractJSON）。
 10. **Self-Check**：仅当用户明确说“Self-Check / 执行自检 / 运行命令”时，才执行以下命令；否则只给出建议命令，不主动执行。
    - pnpm lint:check
-   - pnpm build:web
 
 # Workflow
 1. **Search**：定位入口、相邻实现与可复用工具。
@@ -46,17 +45,17 @@
 - 入口：[client/index.ts](packages/web/src/client/index.ts)
 - 约束：Web/Client 差异逻辑下沉到 client 层；业务层只调用 isClient/invokeClient。
 
-## 全局组件（packages/web/src/components）
-- 入口：[components/index.ts](packages/web/src/components/index.ts)
+## 全局组件（packages/visual-craft-core/src/components）
+- 入口：[components/index.ts](packages/visual-craft-core/src/components/index.ts)
 - 约束：新增全局组件必须提供 components/<name>/use.ts 并导出 install(app)。
 
-## 全局指令（packages/web/src/directives）
-- 入口：[directives/index.ts](packages/web/src/directives/index.ts)
+## 全局指令（packages/visual-craft-core/src/directives）
+- 入口：[directives/index.ts](packages/visual-craft-core/src/directives/index.ts)
 - 约束：指令名使用 kebab-case（例如 drag-resize）。
 
-## 插件（packages/web/src/plugins）
+## 插件（packages/visual-craft-core/src/plugins）
 - Monaco worker 映射：[monaco-editor.ts](packages/visual-craft-core/src/plugins/monaco-editor.ts)
-- Naive UI 注册：[native-ui.ts](packages/web/src/plugins/native-ui.ts)
+- Naive UI 注册：[native-ui.ts](packages/visual-craft-core/src/plugins/native-ui.ts)
 - Naive UI i18n：[native-i18n.ts](packages/web/src/plugins/native-i18n.ts)
 
 ## Service（packages/web/src/service）

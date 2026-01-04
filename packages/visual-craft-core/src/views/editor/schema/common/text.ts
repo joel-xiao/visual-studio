@@ -65,6 +65,24 @@ const schema: ISchemaExport = {
         ctrl: 'C_INPUT',
         size: 'middle'
       }
+    ],
+    [
+      {
+        key: 'textAlign',
+        type: String,
+        default: 'left',
+        ctrl: 'C_GROUP_SELECT',
+        options: options.TextAlignOptions
+      },
+    ],
+    [
+      {
+        key: 'styles',
+        type: Array,
+        default: [],
+        ctrl: 'C_GROUP_CHECK',
+        options: options.TextStyleOptions
+      }
     ]
   ]
 };

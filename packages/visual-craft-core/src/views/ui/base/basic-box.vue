@@ -106,6 +106,21 @@ defineExpose({ focus, blur, getRect });
     cursor: pointer;
   }
 
+  &.group-item-box {
+    justify-content: center;
+    background: var(--db-color-button-group-item-background);
+
+    &:hover {
+      background: var(--db-color-button-group-item-bg-hover);
+    }
+
+    &.active {
+      box-shadow: 0 0 0 1px var(--db-color-button-group-item-active) inset;
+      background: var(--db-color-button-group-item-active);
+      color: var(--db-color-button-group-item-active-text);
+    }
+  }
+
   &.status-button-box {
     height: 30px;
     width: 30px;

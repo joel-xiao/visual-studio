@@ -1,7 +1,7 @@
 <template>
 <BasicBox ref="box" class="c-color-picker" type="input">
   <BasicColorPicker v-bind="$attrs" v-model="modelValue" @click="onFocus" @focus="onFocus" @blur="onBlur" />
-  <BasicInput v-if="type === 'color-input'" v-bind="$attrs" v-model="modelValue" type="text" @focus="onFocus" @blur="onBlur" @update="onUpdate" />
+  <BasicInput v-if="type === 'color-input'" v-bind="$attrs" v-model="modelValue" type="text" @focus="onFocus" @blur="onBlur" />
 </BasicBox>
 </template>
 
@@ -38,6 +38,7 @@ const modelValue = computed({
   },
   set(value) {
     emit('update:modelValue', value);
+    emit('update', value);
   }
 });
 
@@ -51,10 +52,6 @@ const onFocus = function () {
 
 const onBlur = function () {
   box.value?.blur();
-};
-
-const onUpdate = function (value: string | number) {
-  emit('update', value);
 };
 </script>
 

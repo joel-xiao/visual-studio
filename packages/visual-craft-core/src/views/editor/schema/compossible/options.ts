@@ -36,8 +36,34 @@ const BlendModeOptions = [
   { label: '明度', value: 'luminosity' }
 ];
 
+const TextAlignOptions = [
+  { value: 'left', icon: 'mdi:format-align-left', tooltip: '左对齐' },
+  { value: 'center', icon: 'mdi:format-align-center', tooltip: '居中对齐' },
+  { value: 'right', icon: 'mdi:format-align-right', tooltip: '右对齐' },
+  { value: 'justify', icon: 'mdi:format-align-justify', tooltip: '两端对齐' }
+];
+
+const TextStyleOptions = [
+  { value: 'bold', icon: 'mdi:format-bold', tooltip: '加粗' },
+  { value: 'italic', icon: 'mdi:format-italic', tooltip: '斜体' },
+  { value: 'underline', icon: 'mdi:format-underline', tooltip: '下划线' },
+  { value: 'line-through', icon: 'mdi:format-strikethrough', tooltip: '删除线' }
+];
+
+const CodeLanguageOptions = [
+  { label: 'JavaScript', value: 'javascript' },
+  { label: 'TypeScript', value: 'typescript' },
+  { label: 'JSON', value: 'json' },
+  { label: 'HTML', value: 'html' },
+  { label: 'CSS', value: 'css' },
+  { label: 'Markdown', value: 'markdown' }
+];
+
 export default {
   FontFamilyOptions,
   FontSizeOptions,
-  BlendModeOptions
+  BlendModeOptions,
+  TextAlignOptions,
+  TextStyleOptions,
+  CodeLanguageOptions
 };

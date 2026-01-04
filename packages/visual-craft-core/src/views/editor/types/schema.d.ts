@@ -5,7 +5,12 @@ interface IDefaultSchemaKeyData {
   ctrl: string;
   ctrl_type?: string;
   size?: 'default' | 'small' | 'middle' | 'large' | 'mini';
-  options?: { label: string | number; value: string | number }[];
+  options?: {
+    label?: string | number;
+    value: string | number;
+    icon?: string;
+    tooltip?: string;
+  }[];
   click?: (props: ComponentProp) => void;
   change?: (props: ComponentProp) => void;
 }
