@@ -1,5 +1,5 @@
 import { readonly, createVNode, type Component as VueComponent } from 'vue';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, get, set } from 'lodash';
 import { createComponent } from '../../../../hooks/vue-hooks';
 import { getEditorIcon } from 'virtual:visual-craft-core-public-assets';
 
@@ -347,12 +347,12 @@ export class CreateComponentContext {
                     }
 
                     if (is_component_schema_default_object) {
-                      const value = (component_schema_default as Record<string, unknown>)[item.key] ?? item.default;
-                      (prop as Record<string, unknown>)[item.key] = value;
+                      const value = get(component_schema_default, item.key) ?? item.default;
+                      set(prop, item.key, value);
                     } else if (is_component_schema_default) {
-                      (prop as Record<string, unknown>)[item.key] = component_schema_default || item.default;
+                      set(prop, item.key, component_schema_default || item.default);
                     } else {
-                      (prop as Record<string, unknown>)[item.key] = item.default;
+                      set(prop, item.key, item.default);
                     }
                   }
                 }

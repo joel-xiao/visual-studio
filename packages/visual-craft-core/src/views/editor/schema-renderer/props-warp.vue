@@ -3,12 +3,14 @@
   <PropsItem v-for="(schemaRow, idx) in Schema" :key="idx" :grid-template-columns="getGridTemplateColumns(idx)">
     <template v-for="(prop, ctrl_idx) in schemaRow" :key="ctrl_idx">
       <PropsCtrl
-        :model-value="modelValue[prop.key || '']"
+        :model-value="getValue(prop.key || '')"
         :data-type="prop.type"
         :ctrl="prop.ctrl"
         :icon="prop.icon"
         :ctrl-type="prop.ctrl_type || ''"
         :options="prop?.options"
+        :suffix="(prop as any)?.suffix"
+        :keys="(prop as any)?.keys"
         @update="onUpdate(prop.key || '', $event)"
         @click="onClick(prop)"
       />
@@ -27,6 +29,7 @@ import PropsLayout from './props-layout.vue';
 import PropsItem from './props-item.vue';
 import PropsCtrl from './props-ctrl.vue';
 import { computed } from 'vue';
+import { get } from 'lodash';
 
 export interface Props {
   modelValue: ComponentProp;
@@ -57,6 +60,10 @@ const getGridTemplateColumns = computed(() => {
     return Array.isArray(Schema.value[idx]) ? Schema.value[idx].map(prop => prop?.size || 'default') : [];
   };
 });
+
+const getValue = (key: string) => {
+  return get(props.modelValue, key);
+};
 
 const onUpdate = function (key: string, value: string | number | boolean | undefined | number[]) {
   emit('update', [key, value]);

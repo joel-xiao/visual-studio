@@ -1,10 +1,11 @@
 interface IDefaultSchemaKeyData {
   key?: string;
   label?: string;
-  icon?: string;
+  icon?: string | string[];
   ctrl: string;
   ctrl_type?: string;
   size?: 'default' | 'small' | 'middle' | 'large' | 'mini';
+  suffix?: string;
   options?: {
     label?: string | number;
     value: string | number;
@@ -58,13 +59,21 @@ interface ISchemaFunctionData extends IDefaultSchemaKeyData {
   default: () => void;
 }
 
+interface ISchemaSelectInputData extends IDefaultSchemaKeyData {
+  type: ObjectConstructor;
+  ctrl: 'C_SELECT_INPUT';
+  keys: [string, string];
+  default: Record<string, string | number>;
+}
+
 declare type SchemaKeyType =
   | ISchemaKeyNumberData
   | ISchemaKeyStringData
   | ISchemaKeyBooleanData
   | ISchemaArrayData
   | ISchemaBlendData
-  | ISchemaBlendsData;
+  | ISchemaBlendsData
+  | ISchemaSelectInputData;
 
 declare type SchemaKeyTypes = { [key: string]: SchemaKeyType } | SchemaKeyType[][];
 

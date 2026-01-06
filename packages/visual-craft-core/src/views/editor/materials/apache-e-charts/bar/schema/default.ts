@@ -20,10 +20,10 @@ const schema: IComponentSchemaExport = {
       schema: 'COMMON_LAYER',
       default: {
         blends: [{
-        mix: 'normal',
-        opacity: 1,
-        visible: true
-      }]
+          mix: 'normal',
+          opacity: 1,
+          visible: true
+        }]
       }
     },
     {
@@ -66,8 +66,26 @@ const schema: IComponentSchemaExport = {
       name: '图例',
       icon: '',
       category: 'LEGEND',
-
-      schemas: []
+      schemas: [
+        {
+          type: 'schema',
+          schema: 'ECHARTS_LEGEND',
+          label: '图例设置',
+          key: 'legend',
+          default: {
+            textStyle: {
+              fontFamily: 'SimSun',
+              fontSize: 12,
+              color: '#fff',
+              styles: []
+            },
+            position: 'top-center',
+            icon: 'circle',
+            itemWidth: 14,
+            itemGap: 10
+          }
+        }
+      ]
     }
   ]
 };

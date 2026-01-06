@@ -3,7 +3,7 @@
   <template v-if="layout === 'inline'">
     <div class="editor-schema-renderer-props-ctrl-label">{{ label }}</div>
   </template>
-  <component :is="getComponent(ctrl)" v-if="isComponent(ctrl)" :type="ctrlType" v-bind="$attrs" />
+  <component :is="getComponent(ctrl)" v-if="isComponent(ctrl)" :type="ctrlType" v-bind="$attrs" :suffix="suffix" :keys="keys" />
   <div v-else>IS NO {{ ctrl }}</div>
 </div>
 </template>
@@ -22,6 +22,8 @@ export interface Props {
   ctrlType: string;
   layout?: string;
   label?: string;
+  suffix?: string;
+  keys?: [string, string];
 }
 
 const props = withDefaults(defineProps<Props>(), {

@@ -20,7 +20,7 @@ const schema: ISchemaExport = {
     ],
     [
       {
-        key: 'fontFamily',
+        key: 'textStyle.fontFamily',
         type: String,
         default: 'SimSun',
         icon: 'mdi:format-font',
@@ -30,7 +30,7 @@ const schema: ISchemaExport = {
     ],
     [
       {
-        key: 'fontSize',
+        key: 'textStyle.fontSize',
         type: Number,
         default: 12,
         icon: 'mdi:format-size',
@@ -40,7 +40,7 @@ const schema: ISchemaExport = {
         options: options.FontSizeOptions
       },
       {
-        key: 'color',
+        key: 'textStyle.color',
         type: String,
         default: '#fff',
         icon: '',
@@ -50,7 +50,7 @@ const schema: ISchemaExport = {
     ],
     [
       {
-        key: 'lineHeight',
+        key: 'textStyle.lineHeight',
         type: String,
         default: '',
         icon: 'mdi:format-line-spacing',
@@ -58,7 +58,7 @@ const schema: ISchemaExport = {
         size: 'middle'
       },
       {
-        key: 'letterSpacing',
+        key: 'textStyle.letterSpacing',
         type: String,
         default: '',
         icon: 'mdi:format-letter-spacing',
@@ -68,7 +68,7 @@ const schema: ISchemaExport = {
     ],
     [
       {
-        key: 'textAlign',
+        key: 'textStyle.textAlign',
         type: String,
         default: 'left',
         ctrl: 'C_GROUP_SELECT',
@@ -77,7 +77,7 @@ const schema: ISchemaExport = {
     ],
     [
       {
-        key: 'styles',
+        key: 'textStyle.styles',
         type: Array,
         default: [],
         ctrl: 'C_GROUP_CHECK',

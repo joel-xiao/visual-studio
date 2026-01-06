@@ -1,7 +1,10 @@
 <template>
 <BasicBox ref="box" type="input">
   <BasicIcon :lock="lock" :icon="icon" :style="iconStyle" @mousedown="onMouseDown" />
-  <BasicInput :disabled="lock" v-bind="$attrs" :model-value="modelValue" type="text" @focus="onFocus" @blur="onBlur" @update="onUpdate" />
+  <div class="c-input-content">
+    <BasicInput :disabled="lock" v-bind="$attrs" :model-value="modelValue" type="text" @focus="onFocus" @blur="onBlur" @update="onUpdate" />
+    <span v-if="suffix" class="c-input-suffix">{{ suffix }}</span>
+  </div>
 </BasicBox>
 </template>
 
@@ -23,12 +26,14 @@ export interface IProps {
   icon?: string;
   focus?: boolean;
   modelValue?: string | number;
+  suffix?: string;
 }
 const props = withDefaults(defineProps<IProps>(), {
   lock: false,
   icon: '',
   focus: true,
-  modelValue: ''
+  modelValue: '',
+  suffix: ''
 });
 
 const emit = defineEmits(['update']);
@@ -85,4 +90,27 @@ const onUpdate = function (value: string | number) {
 };
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+#visual-craft-core {
+  .c-input-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding-right: 8px;
+    min-width: 0;
+
+    .basic-input {
+      flex: 1;
+      min-width: 20px;
+    }
+
+    .c-input-suffix {
+      font-size: 11px;
+      color: var(--theme-color-text-secondary);
+      margin-left: 2px;
+      opacity: 0.8;
+      user-select: none;
+    }
+  }
+}
+</style>
