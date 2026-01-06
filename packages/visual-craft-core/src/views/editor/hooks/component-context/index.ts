@@ -42,10 +42,18 @@ export class CreateComponentContext {
 
   #install() {
     Object.values(
-      import.meta.glob<ISchemaExport>(['./../../schema/**/*.ts', '!./../../schema/**/*.d.ts'], {
-        eager: true,
-        import: 'default'
-      })
+      import.meta.glob<ISchemaExport>(
+        [
+          '../../schema/**/*.ts',
+          '!../../schema/**/*.d.ts',
+          '!../../schema/options/**',
+          '!../../schema/compossible/**'
+        ],
+        {
+          eager: true,
+          import: 'default'
+        }
+      )
     ).forEach(schema => {
       if (schema?.name) {
         this.#schemas[schema.name] = schema;
@@ -335,7 +343,7 @@ export class CreateComponentContext {
               for (const row_array of schema_data) {
                 if (Array.isArray(row_array)) {
                   for (const item of row_array) {
-                    if (!item.key) {
+                    if (item.key === undefined || item.key === null) {
                       console.warn(
                         'Schema 2',
                         'Schema Key of Editor is null',
@@ -346,13 +354,21 @@ export class CreateComponentContext {
                       continue;
                     }
 
+                    let value;
                     if (is_component_schema_default_object) {
-                      const value = get(component_schema_default, item.key) ?? item.default;
-                      set(prop, item.key, value);
+                      value = (item.key ? get(component_schema_default, item.key) : undefined) ?? item.default;
                     } else if (is_component_schema_default) {
-                      set(prop, item.key, component_schema_default || item.default);
+                      value = component_schema_default || item.default;
                     } else {
-                      set(prop, item.key, item.default);
+                      value = item.default;
+                    }
+
+                    if (item.key === '') {
+                      if (value && typeof value === 'object' && !Array.isArray(value)) {
+                        Object.assign(prop, value);
+                      }
+                    } else {
+                      set(prop, item.key, value);
                     }
                   }
                 }

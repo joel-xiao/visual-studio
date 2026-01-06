@@ -40,6 +40,7 @@ export default {
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import { get, set, cloneDeep } from 'lodash';
 import BasicBox from '../../base/basic-box.vue';
 import BasicInput from '../../base/basic-input.vue';
 import BasicSelect from '../../base/basic-select.vue';
@@ -69,18 +70,20 @@ const selectKey = computed(() => props.keys[0]);
 const inputKey = computed(() => props.keys[1]);
 
 const selectModel = computed({
-  get: () => props.modelValue?.[selectKey.value] ?? '',
+  get: () => get(props.modelValue, selectKey.value) ?? '',
   set: (val) => {
-    const newValue = { ...props.modelValue, [selectKey.value]: val };
+    const newValue = cloneDeep(props.modelValue || {});
+    set(newValue, selectKey.value, val);
     emit('update', newValue);
     emit('update:modelValue', newValue);
   }
 });
 
 const inputModel = computed({
-  get: () => props.modelValue?.[inputKey.value] ?? '',
+  get: () => get(props.modelValue, inputKey.value) ?? '',
   set: (val) => {
-    const newValue = { ...props.modelValue, [inputKey.value]: val };
+    const newValue = cloneDeep(props.modelValue || {});
+    set(newValue, inputKey.value, val);
     emit('update', newValue);
     emit('update:modelValue', newValue);
   }

@@ -63,9 +63,10 @@ const onUpdate = function (
   schema: SchemaKeyTypes,
   [prop_key, prop_value]: [key: string, value: number | string | boolean | undefined | number[]]
 ) {
+  const path = prop_key ? `${key}.${prop_key}` : key;
   updateNodeProp(
     currentNode.value.id,
-    `${key}.${prop_key}`,
+    path,
     formatterComponentProp(schema, {
       key: prop_key,
       value: prop_value

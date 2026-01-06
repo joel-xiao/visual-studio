@@ -1,4 +1,4 @@
-import options from '../compossible/options';
+import options from '../options';
 
 const SCHEMA_NAME = 'COMMON_LAYER';
 const SCHEMA_LABEL = '图层';

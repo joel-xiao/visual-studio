@@ -62,7 +62,7 @@ const getGridTemplateColumns = computed(() => {
 });
 
 const getValue = (key: string) => {
-  return get(props.modelValue, key);
+  return key ? get(props.modelValue, key) : props.modelValue;
 };
 
 const onUpdate = function (key: string, value: string | number | boolean | undefined | number[]) {

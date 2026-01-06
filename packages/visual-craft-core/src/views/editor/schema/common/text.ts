@@ -1,4 +1,4 @@
-import options from '../compossible/options';
+import options from '../options';
 
 const SCHEMA_NAME = 'COMMON_TEXT';
 const SCHEMA_LABEL = '文字';
@@ -13,7 +13,7 @@ const schema: ISchemaExport = {
       {
         key: 'value',
         type: String,
-        default: '这是文本',
+        default: '请输入文本内容',
         icon: 'mdi:format-text',
         ctrl: 'C_INPUT'
       }
@@ -22,7 +22,7 @@ const schema: ISchemaExport = {
       {
         key: 'textStyle.fontFamily',
         type: String,
-        default: 'SimSun',
+        default: 'Microsoft YaHei',
         icon: 'mdi:format-font',
         ctrl: 'C_SELECT',
         options: options.FontFamilyOptions
@@ -32,7 +32,7 @@ const schema: ISchemaExport = {
       {
         key: 'textStyle.fontSize',
         type: Number,
-        default: 12,
+        default: 14,
         icon: 'mdi:format-size',
         ctrl: 'C_SELECT',
         ctrl_type: 'input-select',

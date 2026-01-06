@@ -11,7 +11,7 @@ const schema: ISchemaExport = {
       {
         key: 'color',
         type: String,
-        default: '',
+        default: '#ffffff',
         icon: 'C',
         ctrl: 'C_COLOR_PICKER',
         ctrl_type: 'color-input',

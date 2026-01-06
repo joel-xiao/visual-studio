@@ -1,4 +1,4 @@
-import options from '../compossible/options';
+import options from '../options';
 
 const SCHEMA_NAME = 'ECHARTS_LEGEND';
 const SCHEMA_KEY = 'legend';
@@ -13,7 +13,7 @@ const schema: ISchemaExport = {
                 label: '文本样式',
                 key: 'textStyle.fontFamily',
                 type: String,
-                default: 'SimSun',
+                default: 'Microsoft YaHei',
                 ctrl: 'C_SELECT',
                 options: options.FontFamilyOptions
             }
