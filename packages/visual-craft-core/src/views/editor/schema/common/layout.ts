@@ -100,6 +100,15 @@ const schema: ISchemaExport = {
         ],
         ctrl: 'INPUT_GROUP'
       }
+    ],
+    [
+      {
+        key: 'padding',
+        type: Array,
+        default: [0, 0, 0, 0],
+        size: 'large',
+        ctrl: 'C_EDGE'
+      }
     ]
   ]
 };
