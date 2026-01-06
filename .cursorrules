@@ -5,6 +5,7 @@
 - Monorepo：pnpm workspace
 - Web：Vue 3 + TypeScript + Vite（packages/web）
 - Desktop：Tauri（packages/tauri）与 Electron（packages/electron）
+-Icon： iconify/vue(https://icon-sets.iconify.design/)
 - 重点模块：大屏编辑器与其 AI 编排（packages/visual-craft-core/src/views/editor）
 
 # Global Constraints (Must Follow)
