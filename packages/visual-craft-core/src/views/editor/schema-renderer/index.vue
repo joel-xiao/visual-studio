@@ -90,8 +90,10 @@ function onSelectTab(data: CategorySchemaType) {
 <style lang="scss">
 .editor-schema-renderer {
   width: 100%;
+  height: calc(100% - var(--db-editor-tab-bar-height));
   position: relative;
   overflow-x: hidden;
+  overflow-y: auto;
 
   .editor-schema-renderer-wrapper {
     // padding: 0 6px 90px 12px;
