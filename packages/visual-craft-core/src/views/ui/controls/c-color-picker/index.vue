@@ -1,6 +1,6 @@
 <template>
 <BasicBox ref="box" class="c-color-picker" type="input">
-  <BasicColorPicker v-bind="$attrs" v-model="modelValue" @click="onFocus" @focus="onFocus" @blur="onBlur" />
+  <BasicColorPicker v-bind="$attrs" v-model="modelValue" @click="onFocus" @focus="onFocus" @blur="onBlur" @update:show="onUpdateShow" />
   <BasicInput v-if="type === 'color-input'" v-bind="$attrs" v-model="modelValue" type="text" @focus="onFocus" @blur="onBlur" />
 </BasicBox>
 </template>
@@ -52,6 +52,14 @@ const onFocus = function () {
 
 const onBlur = function () {
   box.value?.blur();
+};
+
+const onUpdateShow = (show: boolean) => {
+  if (!show) {
+    onBlur();
+  } else {
+    onFocus();
+  }
 };
 </script>
 
