@@ -14,7 +14,7 @@
         @click.stop="onItemClick(item)"
       >
         <div class="basic-select-item-icon">
-          <i v-if="modelValue === item.value" class="icon-font icon-shouqi2"></i>
+          <BasicIcon v-if="modelValue === item.value" icon="mdi:check" />
         </div>
         <span>{{ item.label }}</span>
       </div>
@@ -26,6 +26,7 @@
 
 <script setup lang="ts">
 import { ref, nextTick, computed } from 'vue';
+import BasicIcon from './basic-icon.vue';
 
 interface Item {
   label: string;
@@ -216,6 +217,14 @@ defineExpose({ open, close });
       &:hover,
       &.active {
         background-color: var(--db-color-select-item-bg-hover);
+
+        .basic-icon {
+          color: #fff !important;
+        }
+
+        span {
+          color: #fff;
+        }
       }
 
       .basic-select-item-icon {
@@ -225,9 +234,8 @@ defineExpose({ open, close });
         align-items: center;
         justify-content: center;
 
-        .icon-shouqi2 {
-            transform: rotate(90deg);
-            font-size: 12px;
+        .basic-icon {
+          color: var(--theme-color-blue-700);
         }
       }
 
