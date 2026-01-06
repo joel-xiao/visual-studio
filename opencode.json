@@ -1,0 +1,33 @@
+{
+  "command": {
+    "t1": {
+      "template": "模板：T1 新增基础控件 schema（editor/schema）\n请你按 .cursorrules 规范输出一个可执行的改造计划。\n\n把下面模板填完（或直接粘贴你已填好的内容）后继续：\n\n```text\n模板：T1 新增基础控件 schema（editor/schema）\nschema name：\n分组 key：\n面板 label：\n控件矩阵（二维数组）：\n是否有 click/change 联动：\n```\n\n用户补充：$ARGUMENTS",
+      "description": "T1 新增基础控件 schema（editor/schema）",
+      "agent": "plan"
+    },
+    "t2": {
+      "template": "模板：T2 新增组件 schema（IComponentSchemaExport）\n请你按 .cursorrules 规范输出一个可执行的改造计划。\n\n把下面模板填完（或直接粘贴你已填好的内容）后继续：\n\n```text\n模板：T2 新增组件 schema（IComponentSchemaExport）\n组件 type：\nschema 文件位置：\n需要组合的基础 schema：\n每个分组的 key/label/default 覆盖：\n是否需要 categorySchemas：\n```\n\n用户补充：$ARGUMENTS",
+      "description": "T2 新增组件 schema（IComponentSchemaExport）",
+      "agent": "plan"
+    },
+    "t3": {
+      "template": "模板：T3 新增物料组件（materials）\n请你按 .cursorrules 规范输出一个可执行的改造计划。\n\n把下面模板填完（或直接粘贴你已填好的内容）后继续：\n\n```text\n模板：T3 新增物料组件（materials）\n组件标识(type)：\n组件目录：\n需要的属性项：\n默认值：\n```\n\n用户补充：$ARGUMENTS",
+      "description": "T3 新增物料组件（materials）",
+      "agent": "plan"
+    },
+    "t4": {
+      "template": "模板：T4 新增属性面板控件（dashboard/ui）\n请你按 .cursorrules 规范输出一个可执行的改造计划。\n\n把下面模板填完（或直接粘贴你已填好的内容）后继续：\n\n```text\n模板：T4 新增属性面板控件（dashboard/ui）\n控件组件路径：\n控件 name：\nschema.ctrl：\n值类型：\n```\n\n用户补充：$ARGUMENTS",
+      "description": "T4 新增属性面板控件（dashboard/ui）",
+      "agent": "plan"
+    },
+    "t5": {
+      "template": "模板：T5 新增 Agent（ai/agent）\n请你按 .cursorrules 规范输出一个可执行的改造计划。\n\n把下面模板填完（或直接粘贴你已填好的内容）后继续：\n\n```text\n模板：T5 新增 Agent（ai/agent）\nrole 目录名：\n输入数据结构：\n是否需要 apply：\n是否需要 UI：\n```\n\n用户补充：$ARGUMENTS",
+      "description": "T5 新增 Agent（ai/agent）",
+      "agent": "plan"
+    }
+  },
+  "instructions": [
+    ".cursorrules"
+  ],
+  "$schema": "https://opencode.ai/config.json"
+}
