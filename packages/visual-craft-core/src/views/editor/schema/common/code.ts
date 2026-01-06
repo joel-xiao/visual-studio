@@ -9,7 +9,7 @@ const schema: ISchemaExport = {
   schema: [
     [
       {
-        key: 'options',
+        key: 'value',
         type: String,
         default: '',
         ctrl: 'C_CODE_EDITOR',

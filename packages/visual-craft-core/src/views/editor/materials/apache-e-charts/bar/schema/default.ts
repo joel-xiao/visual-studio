@@ -26,13 +26,6 @@ const schema: IComponentSchemaExport = {
         }]
       }
     },
-    {
-      type: 'schema',
-      schema: 'COMMON_CODE_EDITOR',
-      default: {
-        value: ''
-      }
-    }
   ],
 
   categorySchemas: [
@@ -83,6 +76,20 @@ const schema: IComponentSchemaExport = {
             icon: 'circle',
             itemWidth: 14,
             itemGap: 10
+          }
+        }
+      ]
+    },
+    {
+      name: '自定义',
+      icon: '',
+      category: 'CODE',
+      schemas: [
+        {
+          type: 'schema',
+          schema: 'COMMON_CODE_EDITOR',
+          default: {
+            options: ''
           }
         }
       ]
