@@ -6,7 +6,7 @@
   >
     <div class="switch-track">
       <div class="switch-thumb">
-        <div class="switch-light" v-if="modelValue"></div>
+        <div v-if="modelValue" class="switch-light"></div>
       </div>
     </div>
   </div>
@@ -39,7 +39,7 @@ const toggle = () => {
   --switch-height: 12px;
   --switch-bg: var(--theme-color-gray-300);
   --switch-active-bg: var(--theme-color-blue-700);
-  
+
   display: inline-flex;
   cursor: pointer;
   user-select: none;

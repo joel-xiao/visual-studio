@@ -17,14 +17,14 @@ import { computed } from 'vue';
 import BasicBox from '../../base/basic-box.vue';
 import BasicIcon from '../../base/basic-icon.vue';
 
-interface Option {
+export interface Option {
   label?: string;
   value: string | number;
   icon?: string;
   tooltip?: string;
 }
 
-interface Props {
+export interface Props {
   modelValue?: string | number;
   options?: Option[];
 }

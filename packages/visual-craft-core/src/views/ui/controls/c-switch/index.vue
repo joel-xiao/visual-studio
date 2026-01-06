@@ -18,7 +18,7 @@ export default {
 <script setup lang="ts">
 import BasicSwitch from '../../base/basic-switch.vue';
 
-interface Props {
+export interface Props {
   modelValue?: boolean;
 }
 
