@@ -1,5 +1,11 @@
 <template>
-<PropsLayout :key-value="'props-warp-' + keyValue" :label="propsType.label">
+<PropsLayout
+  :key-value="'props-warp-' + keyValue"
+  :label="propsType.label"
+  :has-switch="propsType.show_switch"
+  :switch-value="!!getValue('show')"
+  @update:switch-value="onUpdate('show', $event)"
+>
   <PropsItem v-for="(schemaRow, idx) in Schema" :key="idx" :grid-template-columns="getGridTemplateColumns(idx)">
     <template v-for="(prop, ctrl_idx) in schemaRow" :key="ctrl_idx">
       <PropsCtrl

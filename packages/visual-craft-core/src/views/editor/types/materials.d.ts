@@ -8,6 +8,7 @@ declare interface IComponentProps {
 
 declare interface ISchemaPropTypes extends ISchemaExportDefault {
   schema: SchemaKeyTypes;
+  show_switch?: boolean;
 }
 
 declare type SchemaPropsTypes = ISchemaPropTypes[];
@@ -32,6 +33,7 @@ declare type ComponentSchemaExportSchemas = {
   key?: string;
   schema: string;
   default: ComponentProp;
+  show_switch?: boolean;
 }[];
 
 declare interface IComponentSchemaExport {

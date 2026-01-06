@@ -268,6 +268,7 @@ export class CreateComponentContext {
             name: schema.name,
             label: component_schema.label || schema.label,
             key: component_schema.key || schema.key,
+            show_switch: component_schema.show_switch ?? schema.show_switch,
             schema: (schema as Record<string, unknown>)[component_schema.type] as SchemaKeyTypes
           });
         }

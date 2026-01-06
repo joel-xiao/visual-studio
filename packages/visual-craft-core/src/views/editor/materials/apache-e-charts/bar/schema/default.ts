@@ -36,6 +36,7 @@ const schema: IComponentSchemaExport = {
 
       schemas: [
         {
+          show_switch: true,
           type: 'schema',
           schema: 'COMMON_TEXT',
           label: '标题',
@@ -45,6 +46,7 @@ const schema: IComponentSchemaExport = {
           }
         },
         {
+          show_switch: true,
           type: 'schema',
           schema: 'COMMON_TEXT',
           label: '副标题',
@@ -61,6 +63,7 @@ const schema: IComponentSchemaExport = {
       category: 'LEGEND',
       schemas: [
         {
+          show_switch: true,
           type: 'schema',
           schema: 'ECHARTS_LEGEND',
           label: '图例设置',

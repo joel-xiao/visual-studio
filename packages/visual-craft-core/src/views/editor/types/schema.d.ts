@@ -81,6 +81,7 @@ declare interface ISchemaExportDefault {
   name: string;
   label: string;
   key: string;
+  show_switch?: boolean;
 }
 
 declare interface ISchemaExport extends ISchemaExportDefault {
