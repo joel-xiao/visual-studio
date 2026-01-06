@@ -14,7 +14,7 @@ const schema: ISchemaExport = {
         key: 'value',
         type: String,
         default: '这是文本',
-        icon: 'icon-text',
+        icon: 'mdi:format-text',
         ctrl: 'C_INPUT'
       }
     ],
@@ -23,7 +23,7 @@ const schema: ISchemaExport = {
         key: 'fontFamily',
         type: String,
         default: 'SimSun',
-        icon: 'icon-font-family',
+        icon: 'mdi:format-font',
         ctrl: 'C_SELECT',
         options: options.FontFamilyOptions
       }
@@ -33,7 +33,7 @@ const schema: ISchemaExport = {
         key: 'fontSize',
         type: Number,
         default: 12,
-        icon: 'icon-text-size',
+        icon: 'mdi:format-size',
         ctrl: 'C_SELECT',
         ctrl_type: 'input-select',
         size: 'large',
@@ -53,7 +53,7 @@ const schema: ISchemaExport = {
         key: 'lineHeight',
         type: String,
         default: '',
-        icon: 'icon-line-height',
+        icon: 'mdi:format-line-spacing',
         ctrl: 'C_INPUT',
         size: 'middle'
       },
@@ -61,7 +61,7 @@ const schema: ISchemaExport = {
         key: 'letterSpacing',
         type: String,
         default: '',
-        icon: 'icon-letter-spacing',
+        icon: 'mdi:format-letter-spacing',
         ctrl: 'C_INPUT',
         size: 'middle'
       }

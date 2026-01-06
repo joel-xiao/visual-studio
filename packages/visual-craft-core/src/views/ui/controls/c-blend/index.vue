@@ -23,7 +23,7 @@
         />
 
       <!-- Eye Icon -->
-       <BasicIcon hover :icon="visibleModel ? 'icon-eye' : 'icon-eye-close'" :lock="lock" @click="toggleVisible" />
+       <BasicIcon hover :icon="visibleModel ? 'mdi:eye-outline' : 'mdi:eye-off-outline'" :lock="lock" @click="toggleVisible" />
     </BasicBox>
   </div>
 </template>
@@ -65,7 +65,7 @@ const props = withDefaults(defineProps<IProps>(), {
     opacity: '100%',
     visible: true
   }),
-  icon: 'icon-opacity',
+  icon: 'mdi:opacity',
   options: () => [],
   lock: false
 });

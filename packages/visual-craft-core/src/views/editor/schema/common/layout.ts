@@ -45,7 +45,7 @@ const schema: ISchemaExport = {
         key: 'size_proportion_lock',
         type: Boolean,
         default: false,
-        icon: 'icon-locking-ratio',
+        icon: 'mdi:aspect-ratio',
         ctrl: 'C_BUTTON',
         ctrl_type: 'status-button',
         size: 'mini'
@@ -56,7 +56,7 @@ const schema: ISchemaExport = {
         key: 'rotate',
         type: Number,
         default: 0,
-        icon: 'icon-rotate',
+        icon: 'mdi:rotate-right',
         ctrl: 'C_INPUT',
         size: 'middle'
       },
@@ -64,7 +64,7 @@ const schema: ISchemaExport = {
         key: 'reverse-y',
         type: Boolean,
         default: false,
-        icon: 'icon-reverse-y',
+        icon: 'mdi:flip-vertical',
         ctrl: 'C_BUTTON',
         size: 'small',
         click: props => {
@@ -77,7 +77,7 @@ const schema: ISchemaExport = {
         key: 'reverse-x',
         type: Boolean,
         default: false,
-        icon: 'icon-reverse-x',
+        icon: 'mdi:flip-horizontal',
         ctrl: 'C_BUTTON',
         size: 'small',
         click: props => {
@@ -93,10 +93,10 @@ const schema: ISchemaExport = {
         type: Array,
         default: [0, 0, 0, 0],
         icon: [
-          'icon-top-left-radius',
-          'icon-top-right-radius',
-          'icon-bottom-left-radius',
-          'icon-bottom-right-radius'
+          'tabler:radius-top-left',
+          'tabler:radius-top-right',
+          'tabler:radius-bottom-left',
+          'tabler:radius-bottom-right'
         ],
         ctrl: 'INPUT_GROUP'
       }

@@ -28,7 +28,7 @@ const schema: ISchemaExport = {
         key: 'size_proportion_lock',
         type: Boolean,
         default: false,
-        icon: 'icon-locking-ratio',
+        icon: 'mdi:aspect-ratio',
         ctrl: 'C_BUTTON',
         ctrl_type: 'status-button',
         size: 'mini'
