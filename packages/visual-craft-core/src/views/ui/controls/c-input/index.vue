@@ -105,11 +105,14 @@ const onUpdate = function (value: string | number) {
     }
 
     .c-input-suffix {
-      font-size: 11px;
+      font-size: 14px;
       color: var(--theme-color-text-secondary);
       margin-left: 2px;
+      flex-shrink: 0;
       opacity: 0.8;
-      user-select: none;
+      display: flex;
+      align-items: center;
+      line-height: 1;
     }
   }
 }
