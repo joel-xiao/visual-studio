@@ -3,7 +3,7 @@ const SCHEMA_KEY = 'layout';
 
 const schema: ISchemaExport = {
   name: SCHEMA_NAME,
-  label: '', // SCHEMA_LABEL,
+  label: '',
   key: SCHEMA_KEY,
   schema: [
     [
@@ -65,6 +65,7 @@ const schema: ISchemaExport = {
         type: Boolean,
         default: false,
         icon: 'mdi:flip-vertical',
+        hint: '垂直翻转',
         ctrl: 'C_BUTTON',
         size: 'small',
         click: props => {
@@ -78,6 +79,7 @@ const schema: ISchemaExport = {
         type: Boolean,
         default: false,
         icon: 'mdi:flip-horizontal',
+        hint: '水平翻转',
         ctrl: 'C_BUTTON',
         size: 'small',
         click: props => {
@@ -90,6 +92,7 @@ const schema: ISchemaExport = {
     [
       {
         key: 'radius',
+        label: '圆角',
         type: Array,
         default: [0, 0, 0, 0],
         icon: [
@@ -104,6 +107,7 @@ const schema: ISchemaExport = {
     [
       {
         key: 'padding',
+        label: '内边距',
         type: Array,
         default: [0, 0, 0, 0],
         size: 'large',

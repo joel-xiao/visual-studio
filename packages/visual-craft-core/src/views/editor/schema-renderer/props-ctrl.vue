@@ -1,10 +1,14 @@
 <template>
-<div class="editor-schema-renderer-props-ctrl">
-  <template v-if="layout === 'inline'">
-    <div class="editor-schema-renderer-props-ctrl-label">{{ label }}</div>
-  </template>
-  <component :is="getComponent(ctrl)" v-if="isComponent(ctrl)" :type="ctrlType" v-bind="$attrs" :suffix="suffix" :keys="keys" />
-  <div v-else>IS NO {{ ctrl }}</div>
+<div class="editor-schema-renderer-props-ctrl" :class="{ 'is-inline': layout === 'inline' }">
+  <div v-if="label" class="editor-schema-renderer-props-ctrl-label">
+    {{ label }}
+  </div>
+  <div class="editor-schema-renderer-props-ctrl-control">
+    <template v-if="isComponent(ctrl)">
+      <component :is="getComponent(ctrl)" :type="ctrlType" v-bind="$attrs" />
+    </template>
+    <div v-else>IS NO {{ ctrl }}</div>
+  </div>
 </div>
 </template>
 
@@ -22,8 +26,6 @@ export interface Props {
   ctrlType: string;
   layout?: string;
   label?: string;
-  suffix?: string;
-  keys?: [string, string];
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -60,6 +62,34 @@ const getComponent = (schema_name: string) => {
 };
 </script>
 <style lang="scss">
-.editor-schema-renderer .schema-ctrl {
+.editor-schema-renderer .editor-schema-renderer-props-ctrl {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  .editor-schema-renderer-props-ctrl-label {
+    flex: 0 0 auto;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--theme-color-text-secondary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .editor-schema-renderer-props-ctrl-control {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &.is-inline {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    .editor-schema-renderer-props-ctrl-label {
+      width: 72px;
+    }
+  }
 }
 </style>

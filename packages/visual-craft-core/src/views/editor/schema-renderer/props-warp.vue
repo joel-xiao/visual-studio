@@ -13,6 +13,9 @@
         :data-type="prop.type"
         :ctrl="prop.ctrl"
         :icon="prop.icon"
+        layout="vertical"
+        :label="prop.label"
+        :hint="getHint(prop)"
         :ctrl-type="prop.ctrl_type || ''"
         :options="prop?.options"
         :suffix="(prop as any)?.suffix"
@@ -69,6 +72,12 @@ const getGridTemplateColumns = computed(() => {
 
 const getValue = (key: string) => {
   return key ? get(props.modelValue, key) : props.modelValue;
+};
+
+const getHint = (prop: SchemaKeyType) => {
+  const hint = (prop as any)?.hint as string | undefined;
+  if (!hint) return undefined;
+  return hint;
 };
 
 const onUpdate = function (key: string, value: string | number | boolean | undefined | number[]) {

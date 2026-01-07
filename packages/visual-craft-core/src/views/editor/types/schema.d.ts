@@ -6,11 +6,11 @@ interface IDefaultSchemaKeyData {
   ctrl_type?: string;
   size?: 'default' | 'small' | 'middle' | 'large' | 'mini';
   suffix?: string;
+  hint?: string;
   options?: {
     label?: string | number;
     value: string | number;
     icon?: string;
-    tooltip?: string;
   }[];
   click?: (props: ComponentProp) => void;
   change?: (props: ComponentProp) => void;

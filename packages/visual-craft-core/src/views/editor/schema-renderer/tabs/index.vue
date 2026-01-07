@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref, watch } from 'vue';
 import BasicIcon from '../../../ui/base/basic-icon.vue';
 
 type Props = {
@@ -46,7 +46,7 @@ watch(
       >
         <!-- The discrete active indicator -->
         <div class="active-indicator"></div>
-        
+
         <BasicIcon v-if="nav.icon" :icon="nav.icon" class="tab-icon" />
         <span class="tab-name">{{ nav.name }}</span>
       </div>
@@ -120,9 +120,9 @@ watch(
       &.active {
         color: var(--color-accent);
         background: var(--theme-color-tran-6);
-        
+
         .tab-icon { opacity: 1; }
-        
+
         .active-indicator {
           background-color: var(--color-accent);
         }

@@ -25,17 +25,17 @@ export const FontSizeOptions = [
 ];
 
 export const TextAlignOptions = [
-    { value: 'left', icon: 'mdi:format-align-left', tooltip: '左对齐' },
-    { value: 'center', icon: 'mdi:format-align-center', tooltip: '居中对齐' },
-    { value: 'right', icon: 'mdi:format-align-right', tooltip: '右对齐' },
-    { value: 'justify', icon: 'mdi:format-align-justify', tooltip: '两端对齐' }
+    { value: 'left', icon: 'mdi:format-align-left', hint: '左对齐' },
+    { value: 'center', icon: 'mdi:format-align-center', hint: '居中对齐' },
+    { value: 'right', icon: 'mdi:format-align-right', hint: '右对齐' },
+    { value: 'justify', icon: 'mdi:format-align-justify', hint: '两端对齐' }
 ];
 
 export const TextStyleOptions = [
-    { value: 'bold', icon: 'mdi:format-bold', tooltip: '加粗' },
-    { value: 'italic', icon: 'mdi:format-italic', tooltip: '斜体' },
-    { value: 'underline', icon: 'mdi:format-underline', tooltip: '下划线' },
-    { value: 'line-through', icon: 'mdi:format-strikethrough', tooltip: '删除线' }
+    { value: 'bold', icon: 'mdi:format-bold', hint: '加粗' },
+    { value: 'italic', icon: 'mdi:format-italic', hint: '斜体' },
+    { value: 'underline', icon: 'mdi:format-underline', hint: '下划线' },
+    { value: 'line-through', icon: 'mdi:format-strikethrough', hint: '删除线' }
 ];
 
 export default {

@@ -3,26 +3,29 @@
     ref="propsLayout"
     :key="keyValue"
     class="schema-props-layout-pro"
-    :class="{ 
+    :class="{
       'is-inactive': hasSwitch && !switchValue,
-      'is-collapsed': !isShown 
+      'is-collapsed': !isShown,
     }"
   >
     <!-- Header: Click to toggle manual expansion (if active) -->
-    <div 
-      v-if="showLabel" 
-      class="layout-header" 
-      :class="{ 'can-expand': hasSwitch && switchValue !== false }"
+    <div
+      v-if="showLabel"
+      class="layout-header"
+      :class="{
+        'can-expand': hasSwitch && switchValue !== false,
+        'is-has-switch': hasSwitch,
+         }"
       @click="toggleExpand"
     >
       <div class="header-main">
         <!-- Blue bar: Only show when there is NO switch -->
         <div v-if="!hasSwitch" class="status-indicator"></div>
-        
+
         <!-- Expander: Only show when there IS a switch -->
-        <BasicExpander 
+        <BasicExpander
           v-if="hasSwitch"
-          :model-value="isShown" 
+          :model-value="isShown"
           :disabled="hasSwitch && !switchValue"
           class="layout-trigger"
         />
@@ -38,7 +41,7 @@
         />
       </div>
     </div>
-    
+
     <!-- Body: Visual expansion with smooth CSS transitions -->
     <transition name="expand">
       <div v-if="isShown" class="layout-body">
@@ -106,7 +109,7 @@ onMounted(() => {
 <style lang="scss">
 .editor-schema-renderer .schema-props-layout-pro {
   --accent-color: var(--theme-color-blue-700);
-  
+
   margin: 12px 0;
   background: transparent;
   transition: all 0.3s ease;
@@ -116,10 +119,13 @@ onMounted(() => {
     align-items: center;
     justify-content: space-between;
     padding: 0 4px 10px 4px;
-    border-bottom: 1px solid var(--theme-color-gray-100);
-    margin-bottom: 14px;
     cursor: default;
     user-select: none;
+
+    &.is-has-switch {
+      border-bottom: 1px solid var(--theme-color-gray-100);
+      margin-bottom: 14px;
+    }
 
     &.can-expand {
       cursor: pointer;

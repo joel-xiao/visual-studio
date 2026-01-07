@@ -1,14 +1,13 @@
 <template>
 <div class="c-group-check">
-  <basic-box
+<basic-box
       v-for="item in options"
       :key="item.value"
       type="group-item"
-      :tooltip="item.tooltip"
       :model-value="isChecked(item.value)"
       @click="toggle(item.value)"
     >
-    <basic-icon :icon="item.icon" :tooltip="item.tooltip" />
+    <basic-icon :icon="item.icon" :hint="item.hint" />
   </basic-box>
 </div>
 </template>
@@ -22,7 +21,7 @@ export interface Option {
   label?: string;
   value: string | number;
   icon?: string;
-  tooltip?: string;
+  hint?: string;
 }
 
 export interface Props {
