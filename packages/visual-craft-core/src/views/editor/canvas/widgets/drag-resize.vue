@@ -22,7 +22,10 @@ const props = withDefaults(defineProps<Props>(), {
   data: () => ({ y2: 0, x2: 0, x: 0, y: 0 })
 });
 
-const emit = defineEmits(['resizing']);
+const emit = defineEmits<{
+  (e: 'resizing', val: IDragDataset): void;
+  (e: 'drag-start', val: IDragDataset): void;
+}>();
 
 const dragData = reactive<IDragResizeBinding>({
   pos: props.data,
@@ -31,6 +34,12 @@ const dragData = reactive<IDragResizeBinding>({
   scale: 1,
   onUp: (dragDataset: IDragDataset) => {
     emit('resizing', dragDataset);
+  },
+  onMove: (dragDataset: IDragDataset) => {
+    emit('resizing', dragDataset);
+  },
+  onDown: (dragDataset: IDragDataset) => {
+    emit('drag-start', dragDataset);
   }
 });
 

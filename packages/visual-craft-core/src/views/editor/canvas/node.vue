@@ -6,7 +6,7 @@
 
 <script setup lang="ts">
 import DragResize from './widgets/drag-resize.vue';
-import { ref, reactive, markRaw, readonly, withDefaults, watch, onMounted } from 'vue';
+import { ref, reactive, markRaw, readonly, watch, onMounted, unref } from 'vue';
 import { useNodeContext } from './../hooks/node-context';
 import { getNodeStyle } from './../hooks/node-context/style';
 import { useComponentContext } from './../hooks/component-context';
@@ -19,7 +19,8 @@ const props = withDefaults(defineProps<Props>(), {
   id: ''
 });
 
-const { getNode, updateNode, onSelectNode, addNodeInstance } = useNodeContext();
+const { getNode, updateNode, onSelectNode, addNodeInstance, getSelectedNodes, moveNodes } = useNodeContext();
+const selectedNodes = getSelectedNodes();
 const node = getNode(props.id);
 const nodeStyle = getNodeStyle(node);
 
@@ -58,17 +59,33 @@ onMounted(() => {
 
 addNodeInstance(node.id, { setActive, updatePos });
 
-const onDown = function (): void {
-  onSelectNode(node.id);
+const onDown = function (e: MouseEvent): void {
+  onSelectNode(node.id, e.shiftKey);
 };
 
 const onResizing = function (dragDataset: IDragDataset): void {
-  updateNode(node.id, {
-    x: dragDataset.x,
-    y: dragDataset.y,
-    width: dragDataset.x2 - dragDataset.x,
-    height: dragDataset.y2 - dragDataset.y
-  });
+  const dx = dragDataset.x - node.x;
+  const dy = dragDataset.y - node.y;
+  const dw = (dragDataset.x2 - dragDataset.x) - node.width;
+  const dh = (dragDataset.y2 - dragDataset.y) - node.height;
+
+  if (dw === 0 && dh === 0) {
+    // Dragging
+    const selectedIds = (unref(selectedNodes) as INode[]).map((n: INode) => n.id);
+    if (selectedIds.includes(node.id)) {
+      moveNodes(selectedIds, dx, dy);
+    } else {
+      updateNode(node.id, { x: dragDataset.x, y: dragDataset.y });
+    }
+  } else {
+    // Resizing
+    updateNode(node.id, {
+      x: dragDataset.x,
+      y: dragDataset.y,
+      width: dragDataset.x2 - dragDataset.x,
+      height: dragDataset.y2 - dragDataset.y
+    });
+  }
 };
 
 const { createNodeComponentApp } = useComponentContext();

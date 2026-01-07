@@ -28,6 +28,8 @@ class CreateNodeContext {
     this.update = this.update.bind(this);
     this.onAddNode = this.onAddNode.bind(this);
     this.onSelectNode = this.onSelectNode.bind(this);
+    this.onSelectNodes = this.onSelectNodes.bind(this);
+    this.moveNodes = this.moveNodes.bind(this);
     this.addNodeInstance = this.addNodeInstance.bind(this);
     this.removeNodeInstance = this.removeNodeInstance.bind(this);
     this.deleteNodeComponent = this.deleteNodeComponent.bind(this);
@@ -170,6 +172,18 @@ class CreateNodeContext {
     }
   }
 
+  moveNodes(ids: string[], dx: number, dy: number): void {
+    ids.forEach(id => {
+      const node = this.#data?.nodes.find(n => n.id === id);
+      if (node) {
+        this.updateNode(id, {
+          x: (node.x || 0) + dx,
+          y: (node.y || 0) + dy
+        });
+      }
+    });
+  }
+
   /**
    * @parma {
    *  syncNode: boolean
@@ -302,22 +316,29 @@ class CreateNodeContext {
     }
   }
 
-  onSelectNode(id: string): void {
-    this.#data?.nodes.forEach(node => {
-      if (id === node.id) {
+  onSelectNode(id: string, isAppend = false): void {
+    this.onSelectNodes([id], isAppend);
+  }
+
+  onSelectNodes(ids: string[], isAppend = false): void {
+    if (!this.#data) return;
+    const selectedIds = new Set<string>();
+
+    this.#data.nodes.forEach(node => {
+      if (ids.includes(node.id)) {
         node.select = true;
-      } else {
+      } else if (!isAppend) {
         node.select = false;
       }
-      this.#nodeInstances?.[node.id]?.setActive?.(node.select);
+
+      const isSelected = !!node.select;
+      this.#nodeInstances?.[node.id]?.setActive?.(isSelected);
+      if (isSelected) selectedIds.add(node.id);
     });
 
     this.#nodesTreeSource.forEach(treeNode => {
-      if (id === treeNode?.data?.id) {
-        treeNode.select = true;
-      } else {
-        treeNode.select = false;
-      }
+      const id = (treeNode.data?.id as string) || '';
+      treeNode.select = selectedIds.has(id);
     });
   }
 

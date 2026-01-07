@@ -12,6 +12,7 @@
     <template v-for="item in nodes" :key="item.id">
       <CanvasNode :id="item.id" />
     </template>
+    <MarqueeSelect />
   </div>
 </div>
 </template>
@@ -19,6 +20,7 @@
 <script setup lang="ts">
 import GridLine from './widgets/grid-line.vue';
 import CanvasNode from './node.vue';
+import MarqueeSelect from './widgets/marquee-select.vue';
 import { ref, nextTick, onMounted, onBeforeUnmount } from 'vue';
 import { useDrag } from './../hooks/drag-context';
 import { useNodeContext } from './../hooks/node-context';
@@ -28,27 +30,36 @@ import { useBindKeysContext } from './../hooks/bind-keys-context';
 import { useRuler } from './../hooks/ruler-context';
 import { useOverlay } from './../hooks/overlay-context';
 import { removeCanvas, useCanvas } from '../hooks/canvas';
+import { useMarqueeSelect } from '../hooks/node-context/marquee-select';
 
 // interface Props {}
 // const props = withDefaults(defineProps<Props>(), {});
 
-const { getRootRef, getNodes, onSelectNode, onAddNode } = useNodeContext();
+const middleEl = ref<HTMLElement>();
+const canvasRootEl = ref<HTMLElement>();
+
+const { getRootRef, getNodes, onSelectNode, onAddNode, onSelectNodes } = useNodeContext();
+const { getScale } = useCanvas();
+const { onMouseDown: onMarqueeMouseDown } = useMarqueeSelect(canvasRootEl, {
+  getNodes,
+  onSelect: onSelectNodes,
+  getScale
+});
 const nodes = getNodes();
 const root = getRootRef();
 const rootStyle = getRootStyle(root);
 
-const onDown = function (): void {
+const onDown = function (e: MouseEvent): void {
   onSelectNode(root.value.id);
+  onMarqueeMouseDown(e);
 };
 
-const middleEl = ref<HTMLElement>();
-const canvasRootEl = ref<HTMLElement>();
 
 // Use Overlay Hook
 const { addOverlayMoveUpdated, overlayUpdatePos, addOverlay, setOverlayDisabled } = useOverlay();
 
 // Use Canvas Mixin
-const { addScaleEvent, getScale } = useCanvas();
+const { addScaleEvent } = useCanvas();
 
 onMounted(() => {
   nextTick(() => {

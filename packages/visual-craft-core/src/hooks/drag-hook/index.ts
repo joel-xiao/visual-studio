@@ -11,6 +11,8 @@ export class Drag {
   #moved: boolean;
   #scale = 1;
   callbackUp?: ((dragDataset: IDragDataset) => void) | null;
+  callbackMove?: ((dragDataset: IDragDataset) => void) | null;
+  callbackDown?: ((dragDataset: IDragDataset) => void) | null;
   stickEl?: HTMLElement;
   sticks: string[];
   stickEls: HTMLElement[] = [];
@@ -18,6 +20,7 @@ export class Drag {
   defaultPos: IDragDataset;
   startPos: { x: number; y: number };
   pos: IDragDataset;
+  #startInteractionPos: IDragDataset = { x: 0, y: 0, x2: 0, y2: 0 };
   cursorPos?: IDragCursorPos | null;
   binding: IDragBinding;
   constructor() {
@@ -25,6 +28,7 @@ export class Drag {
     this.currentStick = '';
     this.defaultPos = { x: 0, y: 0, x2: 0, y2: 0 };
     this.pos = { ...this.defaultPos };
+    this.#startInteractionPos = { ...this.defaultPos };
     this.startPos = { x: 0, y: 0 };
 
     this.binding = {
@@ -68,6 +72,8 @@ export class Drag {
     this.disabled = !!this.binding.disabled;
     this.active = !!this.binding.active;
     this.callbackUp = this.binding.onUp;
+    this.callbackMove = this.binding.onMove;
+    this.callbackDown = this.binding.onDown;
 
     if (!this.cursorPos) {
       this.el.addEventListener('mousedown', this.bodyDown, true);
@@ -119,6 +125,8 @@ export class Drag {
     }
 
     this.callbackUp = null;
+    this.callbackMove = null;
+    this.callbackDown = null;
   }
 
   setDisabled(disabled: boolean): void {
@@ -134,6 +142,7 @@ export class Drag {
 
   setPos(pos: IDragDataset): void {
     if (!this.resize) return;
+    if (this.currentStick !== '') return;
     this.pos = { ...pos };
     this.defaultPos = { ...this.pos };
     this.updateStyle(this.defaultPos);
@@ -159,6 +168,7 @@ export class Drag {
     this.currentStick = 'body';
     this.startPos.x = event.x;
     this.startPos.y = event.y;
+    this.#startInteractionPos = { ...this.defaultPos };
     this.onDown();
   }
 
@@ -168,6 +178,7 @@ export class Drag {
     this.currentStick = 'body';
     this.startPos.x = pos.x;
     this.startPos.y = pos.y;
+    this.#startInteractionPos = { ...this.defaultPos };
     this.onDown();
   }
 
@@ -177,12 +188,14 @@ export class Drag {
     this.currentStick = (<HTMLElement>event.target).getAttribute('stick') || '';
     this.startPos.x = event.x;
     this.startPos.y = event.y;
+    this.#startInteractionPos = { ...this.defaultPos };
     this.onDown();
   }
 
   onUp(event: MouseEvent): void {
     this.#setMoved(false);
     this.prevent(event);
+    this.currentStick = '';
     this.defaultPos = { ...this.pos };
     this.updateStyle(this.defaultPos);
 
@@ -200,6 +213,7 @@ export class Drag {
   }
 
   onDown(): void {
+    this.callbackDown?.(this.pos);
     document.documentElement.addEventListener('mousemove', this.onMove, false);
     document.documentElement.addEventListener('mouseup', this.onUp, false);
     document.documentElement.addEventListener('mouseleave', this.onUp, false);
@@ -218,38 +232,39 @@ export class Drag {
     this.prevent(event);
 
     const stick: string = this.currentStick;
-    const defaultPos: IDragDataset = this.defaultPos;
+    const startPos: IDragDataset = this.#startInteractionPos;
 
     const diff_x: number = (event.x - this.startPos.x) / this.#scale;
     const diff_y: number = (event.y - this.startPos.y) / this.#scale;
     if (stick === 'body') {
-      this.pos.x = defaultPos.x + diff_x;
-      this.pos.y = defaultPos.y + diff_y;
-      this.pos.x2 = defaultPos.x2 + diff_x;
-      this.pos.y2 = defaultPos.y2 + diff_y;
+      this.pos.x = startPos.x + diff_x;
+      this.pos.y = startPos.y + diff_y;
+      this.pos.x2 = startPos.x2 + diff_x;
+      this.pos.y2 = startPos.y2 + diff_y;
     } else if (stick === 'tl') {
-      this.pos.x = defaultPos.x + diff_x;
-      this.pos.y = defaultPos.y + diff_y;
+      this.pos.x = startPos.x + diff_x;
+      this.pos.y = startPos.y + diff_y;
     } else if (stick === 'tr') {
-      this.pos.x2 = defaultPos.x2 + diff_x;
-      this.pos.y = defaultPos.y + diff_y;
+      this.pos.x2 = startPos.x2 + diff_x;
+      this.pos.y = startPos.y + diff_y;
     } else if (stick === 'br') {
-      this.pos.x2 = defaultPos.x2 + diff_x;
-      this.pos.y2 = defaultPos.y2 + diff_y;
+      this.pos.x2 = startPos.x2 + diff_x;
+      this.pos.y2 = startPos.y2 + diff_y;
     } else if (stick === 'bl') {
-      this.pos.x = defaultPos.x + diff_x;
-      this.pos.y2 = defaultPos.y2 + diff_y;
+      this.pos.x = startPos.x + diff_x;
+      this.pos.y2 = startPos.y2 + diff_y;
     } else if (stick === 'tm') {
-      this.pos.y = defaultPos.y + diff_y;
+      this.pos.y = startPos.y + diff_y;
     } else if (stick === 'rm') {
-      this.pos.x2 = defaultPos.x2 + diff_x;
+      this.pos.x2 = startPos.x2 + diff_x;
     } else if (stick === 'bm') {
-      this.pos.y2 = defaultPos.y2 + diff_y;
+      this.pos.y2 = startPos.y2 + diff_y;
     } else if (stick === 'lm') {
-      this.pos.x = defaultPos.x + diff_x;
+      this.pos.x = startPos.x + diff_x;
     }
 
     this.updateStyle(this.pos);
+    this.callbackMove?.(this.pos);
   }
 
   prevent(event: MouseEvent): void {
@@ -273,9 +288,8 @@ export class Drag {
     }
 
     if (this.el) {
-      this.el.style.transform = `translate(${pos.x + diff_rotate_x}px, ${
-        pos.y + diff_rotate_y
-      }px) ${rotate}`;
+      this.el.style.transform = `translate(${pos.x + diff_rotate_x}px, ${pos.y + diff_rotate_y
+        }px) ${rotate}`;
       this.el.style.width = Math.abs(pos.x2 - pos.x) + 'px';
       this.el.style.height = Math.abs(pos.y2 - pos.y) + 'px';
     }
@@ -324,50 +338,3 @@ export class Drag {
     }
   }
 }
-/*
-例子
-createDrag<T>(
-  panelElement.value,
-  defineAsyncComponent(() => import('./component-item-drag.vue')),
-  item,
-  event
-);
-*/
-// export const createDrag = function <T>(
-//   parentEl: HTMLElement | undefined,
-//   comp: Component,
-//   prop: T,
-//   event: MouseEvent | void
-// ): void {
-//   if (!parentEl) {
-//     console.error('parentEl not defined for createDrag function');
-//     return;
-//   }
-
-//   let pos: IDragDataset | undefined = undefined;
-//   let currentTarget: HTMLElement | void;
-//   if (event) {
-//     currentTarget = event.currentTarget as HTMLElement;
-//     const rect: DOMRect = currentTarget.getBoundingClientRect();
-//     pos = { x: rect.x, y: rect.y, x2: rect.x + rect.width, y2: rect.y + rect.height };
-//   }
-
-//   let app: App | null = createComponent<T>('createDrag', parentEl, comp, {
-//     ...prop,
-//     element: currentTarget?.cloneNode(true) as HTMLElement
-//   });
-//   const el: HTMLElement = app._container;
-
-//   let drag: Drag | null = new Drag();
-//   drag?.install(el, {
-//     pos: pos,
-//     cursorPos: event ? { x: event.x, y: event.y } : null,
-//     onUp: function () {
-//       app?.unmount();
-//       app = null;
-//       drag?.uninstall();
-//       drag = null;
-//     }
-//   });
-// };
-

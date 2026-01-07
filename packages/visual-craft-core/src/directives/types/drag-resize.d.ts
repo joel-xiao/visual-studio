@@ -3,4 +3,6 @@ declare interface IDragResizeBinding extends IDragBinding {
   disabled: boolean;
   active: boolean;
   onUp?: (pos: IDragDataset) => void;
+  onMove?: (pos: IDragDataset) => void;
+  onDown?: (pos: IDragDataset) => void;
 }
