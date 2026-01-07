@@ -1,5 +1,5 @@
 <template>
-<BasicBox class="c-button" v-bind="$attrs" :type="type || 'button'" @update="onUpdate">
+<BasicBox class="c-button" v-bind="$attrs" :type="type || 'button'" v-hint="hint" @update="onUpdate">
   <BasicIcon v-if="resolvedIcon" :icon="resolvedIcon" :spin="resolvedIcon === 'mdi:loading'" />
   <div class="c-button-text" :class="buttonTextClass">
     <slot ></slot>
@@ -8,9 +8,14 @@
 </template>
 
 <script lang="ts">
+import { hintDirective } from '@/directives/hint';
+
 export default {
   name: 'C_BUTTON',
-  inheritAttrs: false
+  inheritAttrs: false,
+  directives: {
+    hint: hintDirective
+  }
 };
 </script>
 
@@ -23,12 +28,14 @@ export interface Props {
   icon?: string;
   loading?: boolean;
   dataType?: BooleanConstructor;
+  hint?: string;
 }
 const props = withDefaults(defineProps<Props>(), {
   type: 'button',
   icon: '',
   loading: false,
   dataType: Boolean,
+  hint: ''
 });
 
 const resolvedIcon = computed(() => {
