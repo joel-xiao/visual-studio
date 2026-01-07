@@ -68,7 +68,7 @@ const layerMenus = reactive<PanelLayerItemMenu[]>([
 ]);
 
 const onLayerSelect = function (item: PanelLayerItemData) {
-  onSelectNode(item?.data?.id as string);
+  onSelectNode(item.id);
 };
 
 const onLayerCommand = function (cmd: PanelLayerItemMenu, item: PanelLayerItemData) {

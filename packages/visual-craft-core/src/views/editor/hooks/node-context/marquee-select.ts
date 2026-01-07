@@ -1,4 +1,4 @@
-import { ref, reactive, type Ref, unref, readonly } from 'vue';
+import { ref, reactive, type DeepReadonly, type Ref, unref, readonly } from 'vue';
 
 export interface MarqueeRect {
     x: number;
@@ -8,7 +8,7 @@ export interface MarqueeRect {
 }
 
 interface MarqueeOptions {
-    getNodes: () => any;
+    getNodes: () => Readonly<Ref<readonly DeepReadonly<INode>[]>>;
     onSelect?: (ids: string[], isAppend: boolean) => void;
     getScale: () => number;
 }
@@ -35,7 +35,6 @@ export const useMarqueeSelect = (
 
     const getNodesInArea = (selectionRect: MarqueeRect): string[] => {
         const nodes = unref(getNodes());
-        if (!nodes || !Array.isArray(nodes)) return [];
 
         const { x, y, width, height } = selectionRect;
         const minX = x;
@@ -63,7 +62,7 @@ export const useMarqueeSelect = (
             }
         });
 
-        return ids;
+        return ids?.length ? ids : ['root'];
     };
 
     const onMouseDown = (e: MouseEvent) => {

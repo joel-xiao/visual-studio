@@ -25,13 +25,13 @@ declare type PanelLayerItemData = {
   schema?: string;
   id: string;
   sum?: number;
-  children?: PanelLayerItemData[];
+  children?: readonly PanelLayerItemData[];
   AFold?: boolean;
   select?: boolean;
   handle?: boolean;
   parentId?: string | undefined | null;
-  cascades?: PanelLayerItemData[];
-  data?: { [key: string]: string | undefined | null | boolean | number };
+  cascades?: readonly PanelLayerItemData[];
+  data?: INode;
 };
 
 declare type PanelLayerItemMenu = {

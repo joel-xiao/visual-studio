@@ -71,8 +71,8 @@ const onResizing = function (dragDataset: IDragDataset): void {
 
   if (dw === 0 && dh === 0) {
     // Dragging
-    const selectedIds = (unref(selectedNodes) as INode[]).map((n: INode) => n.id);
-    if (selectedIds.includes(node.id)) {
+    if (node.select) {
+      const selectedIds = (unref(selectedNodes) as INode[]).map((n: INode) => n.id);
       moveNodes(selectedIds, dx, dy);
     } else {
       updateNode(node.id, { x: dragDataset.x, y: dragDataset.y });

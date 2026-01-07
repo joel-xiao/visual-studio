@@ -18,4 +18,6 @@ declare interface IDragBinding {
   active?: boolean;
   scale?: number;
   onUp?: (dragDataset: IDragDataset) => void;
+  onMove?: (dragDataset: IDragDataset) => void;
+  onDown?: (dragDataset: IDragDataset) => void;
 }

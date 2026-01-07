@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import LayerItem from './layer-item.vue';
-import { ref, reactive, computed, onUnmounted } from 'vue';
+import { reactive, computed } from 'vue';
 import ICClickMenu from '@/components/click-menu/index.vue';
 
 interface Props {
-  data?: PanelLayerItemData[];
-  itemMenus?: PanelLayerItemMenu[];
+  data?: readonly PanelLayerItemData[];
+  itemMenus?: readonly PanelLayerItemMenu[];
   itemIcon?: string;
 }
 const props = withDefaults(defineProps<Props>(), {
@@ -17,31 +17,22 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits(['select', 'command']);
 
 const findLayer = function (
-  folders: PanelLayerItemData[],
-  cascades?: PanelLayerItemData[]
+  folders: readonly PanelLayerItemData[],
+  cascades?: readonly PanelLayerItemData[]
 ): PanelLayerItemData[] {
-  folders.forEach(folder => {
-    folder.cascades = [folder];
-    if (cascades) folder.cascades.unshift(...cascades);
-    if (folder.children) {
-      findLayer(folder.children, folder.cascades);
-    } else {
-      folder.children = [];
-    }
+  const list = [...folders] as PanelLayerItemData[];
+  list.forEach(folder => {
+    folder.cascades = cascades ? [...cascades, folder] : [folder];
+    const children = folder.children || [];
+    folder.children = findLayer(children, folder.cascades);
   });
-  return folders;
+  return list;
 };
 const tree = computed<PanelLayerItemData[]>(() => {
-  return findLayer(props.data);
+  return findLayer(props.data || []);
 });
 
-const oldSelect = ref<PanelLayerItemData>();
 const onNavSelect = function (item: PanelLayerItemData): void {
-  if (oldSelect.value) {
-    oldSelect.value.select = false;
-  }
-  oldSelect.value = item;
-  item.select = true;
   emit('select', item);
 };
 

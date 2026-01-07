@@ -5,9 +5,9 @@ import Icon from '@/components/icon/index.vue';
 
 interface Props {
   recursion?: number;
-  data?: PanelLayerItemData[];
+  data?: readonly PanelLayerItemData[];
   itemIcon?: string;
-  itemMenus: PanelLayerItemMenu[];
+  itemMenus: readonly PanelLayerItemMenu[];
 }
 
 const props = withDefaults(defineProps<Props>(), {

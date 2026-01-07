@@ -1,19 +1,22 @@
-import { watch, computed, readonly, reactive, ref, ComputedRef, type App, type Ref } from 'vue';
+import { watch, computed, readonly, reactive, ref, shallowReadonly, ComputedRef, type App, type Ref } from 'vue';
 import { getUuid } from '../../../../assets/utils/index';
 
 class CreateNodeContext {
   #data?: IEditorData;
-  #nodes: ComputedRef<INode[]> | [] = [];
-  #selectedNodes: ComputedRef<INode[]> | [] = [];
+  #nodes: ComputedRef<INode[]> = computed(() => []);
+  #selectedNodes: ComputedRef<INode[]> = computed(() => []);
   #currentNode: Ref<INode> = ref({} as INode);
   #nodesTreeSource: TreeNode[] = reactive([]);
-  #nodesTree: ComputedRef<TreeNode[]> | [] = [];
-  #nodeInstances?: {
-    [nodeId: string]: INodeInstance;
-  } = {};
-  #nodeComponentInstances?: {
-    [nodeId: string]: App | undefined;
-  } = {};
+  #nodesTree: Ref<TreeNode[]> = ref<TreeNode[]>([]);
+  #nodeInstances?: Record<string, INodeInstance> = {};
+  #nodeComponentInstances?: Record<string, App | undefined> = {};
+  #nodeMap = reactive(new Map<string, INode>());
+  #treeNodeMap = reactive(new Map<string, TreeNode>());
+  #rootNode: ComputedRef<INode> = computed(() => {
+    const node = this.#nodeMap.get('root');
+    return node ? node : ({} as INode);
+  });
+
   constructor() {
     this.getNodeTree = this.getNodeTree.bind(this);
     this.getNodes = this.getNodes.bind(this);
@@ -37,65 +40,83 @@ class CreateNodeContext {
     this.uninstall = this.uninstall.bind(this);
   }
 
-  getNodeTree(): ComputedRef<TreeNode[]> | [] {
-    return this.#nodesTree;
+  getNodeTree() {
+    return shallowReadonly(this.#nodesTree);
+  }
+
+  #refreshNodeTree(): void {
+    const rootNode = this.#treeNodeMap.get('root');
+    if (!rootNode) {
+      this.#nodesTree.value = [];
+      return;
+    }
+
+    const childrenMap = new Map<string, TreeNode[]>();
+    this.#nodesTreeSource.forEach(node => {
+      if (!node.parentId) return;
+      const list = childrenMap.get(node.parentId);
+      if (list) {
+        list.push(node);
+      } else {
+        childrenMap.set(node.parentId, [node]);
+      }
+    });
+
+    this.#nodesTreeSource.forEach(node => {
+      node.children = childrenMap.get(node.id) || [];
+    });
+
+    this.#nodesTree.value = [rootNode];
   }
 
   #createNodeTree(): void {
     // Clear existing array without breaking reference
     this.#nodesTreeSource.splice(0, this.#nodesTreeSource.length);
+    this.#treeNodeMap.clear();
 
     this.#data?.nodes.forEach(node => {
       this.#addTreeNode(node);
     });
 
     // Set initial state for root node if needed
-    const rootNode = this.#nodesTreeSource.find(node => node.id === 'root');
+    const rootNode = this.#treeNodeMap.get('root');
     if (rootNode) {
       rootNode.AFold = true;
     }
 
-    if (Array.isArray(this.#nodesTree)) {
-      this.#nodesTree = computed<TreeNode[]>(() => {
-        const rootNode = this.#nodesTreeSource.find(node => node.id === 'root');
-        if (!rootNode) return [];
-        const nodesTree = [rootNode];
-        this.#formatTreeNode(this.#nodesTreeSource, nodesTree);
-        return nodesTree;
-      });
-    }
+    this.#refreshNodeTree();
+
+    return;
   }
 
-  #formatTreeNode(nodes: TreeNode[], nodesTree: TreeNode[]): void {
-    nodesTree.forEach((node: TreeNode): void => {
-      node.children = nodes.filter(n => n.parentId === node.id);
-      this.#formatTreeNode(nodes, node.children);
+  #syncNodeMap() {
+    this.#nodeMap.clear();
+    this.#data?.nodes.forEach(node => {
+      this.#nodeMap.set(node.id, node);
     });
   }
 
   #addTreeNode(node: INode) {
-    this.#nodesTreeSource.push({
+    const treeNode: TreeNode = reactive({
       parentId: node.parentId,
       id: node.id,
-      name: node.name,
+      get name() {
+        return node.name;
+      },
       schema: node.schema,
-      select: node.select,
-      data: {
-        name: node.name,
-        id: node.id,
-        parentId: node.parentId,
-        type: node.type,
-        z: node.z
-      }
-    });
+      get select() {
+        return node.select;
+      },
+      data: node
+    }) as TreeNode;
+    this.#nodesTreeSource.push(treeNode);
+    this.#treeNodeMap.set(node.id, treeNode);
   }
 
   #createNodes() {
-    this.#nodes = this.#data
-      ? computed<INode[]>(() =>
-        this.#data ? this.#data.nodes.filter(node => node.id !== 'root') : []
-      )
-      : [];
+    this.#nodes = computed<INode[]>(() =>
+      this.#data ? this.#data.nodes.filter(node => node.id !== 'root') : []
+    );
   }
 
   getNodes() {
@@ -129,19 +150,16 @@ class CreateNodeContext {
   }
 
   getRootRef() {
-    return readonly(computed(() => {
-      const node = this.#data?.nodes.find(node => node.id === 'root');
-      return node ? node : ({} as INode);
-    }));
+    return this.#rootNode;
   }
 
   getRoot() {
-    const node = this.#data?.nodes.find(node => node.id === 'root');
+    const node = this.#nodeMap.get('root');
     return readonly(node ? node : ({} as INode));
   }
 
   getNode(id: string) {
-    const node = this.#data?.nodes.find(node => node.id === id);
+    const node = this.#nodeMap.get(id);
     return readonly(node ? node : ({} as INode));
   }
 
@@ -151,7 +169,7 @@ class CreateNodeContext {
    * }
    * **/
   updateNode(id: string, delta: INodeDelta, syncLayout = true): void {
-    const node = this.#data?.nodes.find(node => node.id === id);
+    const node = this.#nodeMap.get(id);
     if (node && delta) {
       Object.assign(node, delta);
 
@@ -174,7 +192,7 @@ class CreateNodeContext {
 
   moveNodes(ids: string[], dx: number, dy: number): void {
     ids.forEach(id => {
-      const node = this.#data?.nodes.find(n => n.id === id);
+      const node = this.#nodeMap.get(id);
       if (node) {
         this.updateNode(id, {
           x: (node.x || 0) + dx,
@@ -195,15 +213,15 @@ class CreateNodeContext {
     value: ComponentPropValue,
     syncNode = true
   ): void {
-    const node = this.#data?.nodes.find(node => node.id === id);
+    const node = this.#nodeMap.get(id);
     if (!node || !key) return;
 
     const keyArr = key.split('.');
-    let current: Record<string, unknown> = node.props as unknown as Record<string, unknown>;
+    let current: Record<string, ComponentPropValue | ComponentProp> = node.props;
 
     if (!current) {
       node.props = {} as IComponentProps;
-      current = node.props as unknown as Record<string, unknown>;
+      current = node.props;
     }
 
     for (let i = 0; i < keyArr.length - 1; i++) {
@@ -211,7 +229,7 @@ class CreateNodeContext {
       if (!current[k] || typeof current[k] !== 'object') {
         current[k] = {};
       }
-      current = current[k] as Record<string, unknown>;
+      current = current[k] as Record<string, ComponentPropValue | ComponentProp>;
     }
     const lastKey = keyArr[keyArr.length - 1];
     current[lastKey] = value;
@@ -228,7 +246,7 @@ class CreateNodeContext {
           nodeUpdates[field] = Number(value);
           break;
         case 'radius':
-          (nodeUpdates as Record<string, unknown>).radius = value;
+          (nodeUpdates as Record<string, ComponentPropValue>).radius = value;
           break;
       }
       if (Object.keys(nodeUpdates).length > 0) {
@@ -270,12 +288,13 @@ class CreateNodeContext {
       });
     }
 
+    this.#syncNodeMap();
     this.#createNodeTree();
     this.onSelectNode('root');
     this.#initSelectedNode();
   }
 
-  #onAddNode(addNode: IAddNode, parentId: string, pos: INodePointerPos) {
+  #onAddNode(addNode: IAddNode, parentId: string, pos: INodePointerPos, refreshTree = true) {
     if (addNode instanceof Object) {
       const node: INode = {
         parentId: parentId,
@@ -296,21 +315,28 @@ class CreateNodeContext {
       };
 
       this.#data?.nodes.push(node);
+      const addedNode =
+        this.#data && this.#data.nodes.length > 0
+          ? this.#data.nodes[this.#data.nodes.length - 1]
+          : node;
 
-      node.x = pos.x - node.width / 2;
-      node.y = pos.y - node.height / 2;
-      this.updateNode(node.id, node);
-      this.#addTreeNode(node);
-      console.log(this.#data)
-      return node;
+      this.#nodeMap.set(addedNode.id, addedNode);
+
+      addedNode.x = pos.x - addedNode.width / 2;
+      addedNode.y = pos.y - addedNode.height / 2;
+      this.updateNode(addedNode.id, addedNode);
+      this.#addTreeNode(addedNode);
+      if (refreshTree) this.#refreshNodeTree();
+      return addedNode;
     }
   }
 
   onAddNode(nodes: IAddNode[] | IAddNode, parentId: string, pos: INodePointerPos) {
     if (Array.isArray(nodes)) {
       nodes.forEach((node: IAddNode) => {
-        this.#onAddNode(node, parentId, pos);
+        this.#onAddNode(node, parentId, pos, false);
       });
+      this.#refreshNodeTree();
     } else if (nodes instanceof Object) {
       return this.#onAddNode(nodes, parentId, pos);
     }
@@ -322,10 +348,11 @@ class CreateNodeContext {
 
   onSelectNodes(ids: string[], isAppend = false): void {
     if (!this.#data) return;
-    const selectedIds = new Set<string>();
+    const idSet = new Set(ids);
 
     this.#data.nodes.forEach(node => {
-      if (ids.includes(node.id)) {
+      const isTarget = idSet.has(node.id);
+      if (isTarget) {
         node.select = true;
       } else if (!isAppend) {
         node.select = false;
@@ -333,12 +360,6 @@ class CreateNodeContext {
 
       const isSelected = !!node.select;
       this.#nodeInstances?.[node.id]?.setActive?.(isSelected);
-      if (isSelected) selectedIds.add(node.id);
-    });
-
-    this.#nodesTreeSource.forEach(treeNode => {
-      const id = (treeNode.data?.id as string) || '';
-      treeNode.select = selectedIds.has(id);
     });
   }
 
@@ -369,6 +390,7 @@ class CreateNodeContext {
 
   install(data: IEditorData): void {
     this.#data = data;
+    this.#syncNodeMap();
     this.#createNodes();
     this.#createSelectedNodes();
     this.#createNodeTree();
@@ -377,10 +399,13 @@ class CreateNodeContext {
   }
 
   uninstall(): void {
-    this.#nodes = [];
-    this.#selectedNodes = [];
-    this.#nodesTreeSource = [];
-    this.#nodesTree = [];
+    this.#data = undefined;
+    this.#nodes = computed(() => []);
+    this.#selectedNodes = computed(() => []);
+    this.#nodesTreeSource.splice(0, this.#nodesTreeSource.length);
+    this.#nodesTree.value = [];
+    this.#nodeMap.clear();
+    this.#treeNodeMap.clear();
     this.#nodeInstances = undefined;
     this.#nodeComponentInstances = undefined;
   }
