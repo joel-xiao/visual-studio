@@ -4,6 +4,7 @@ import { invokeClient, setupNative } from '@/client';
 import '@a/style/index.scss';
 import '@a/style/font/iconfont.css';
 import 'visual-craft-core/style.css';
+import { directives as coreDirectives } from 'visual-craft-core';
 import App from './App.vue';
 // import '@/registerServiceWorker'
 import router, { setupRouter } from '@/router/index';
@@ -12,7 +13,7 @@ import native from './plugins/native-ui';
 import components from './components/index';
 import directives from './directives/index';
 
-const app = createApp(App).use(components).use(directives).use(native);
+const app = createApp(App).use(components).use(directives).use(coreDirectives).use(native);
 // router
 setupRouter(app);
 // store
