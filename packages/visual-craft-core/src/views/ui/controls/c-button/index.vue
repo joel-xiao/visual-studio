@@ -1,5 +1,5 @@
 <template>
-<BasicBox class="c-button" v-bind="$attrs" :type="type || 'button'" v-hint="hint" @update="onUpdate">
+<BasicBox v-hint="hint" class="c-button" v-bind="$attrs" :type="type || 'button'" @update="onUpdate">
   <BasicIcon v-if="resolvedIcon" :icon="resolvedIcon" :spin="resolvedIcon === 'mdi:loading'" />
   <div class="c-button-text" :class="buttonTextClass">
     <slot ></slot>
@@ -12,10 +12,10 @@ import { hintDirective } from '@/directives/hint';
 
 export default {
   name: 'C_BUTTON',
-  inheritAttrs: false,
   directives: {
     hint: hintDirective
-  }
+  },
+  inheritAttrs: false
 };
 </script>
 

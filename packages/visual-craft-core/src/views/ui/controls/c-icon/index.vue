@@ -1,5 +1,5 @@
 <template>
-  <BasicBox class="c-icon" v-bind="$attrs" :type="type" v-hint="hint">
+  <BasicBox v-hint="hint" class="c-icon" v-bind="$attrs" :type="type">
     <BasicIcon :icon="icon" :lock="lock" :hover="hover" :size="size" :spin="spin" />
   </BasicBox>
 </template>
@@ -9,10 +9,10 @@ import { hintDirective } from '@/directives/hint';
 
 export default {
   name: 'C_ICON',
-  inheritAttrs: false,
   directives: {
     hint: hintDirective
-  }
+  },
+  inheritAttrs: false
 };
 </script>
 

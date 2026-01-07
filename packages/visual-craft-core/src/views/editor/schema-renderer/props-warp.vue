@@ -15,11 +15,11 @@
         :icon="prop.icon"
         layout="vertical"
         :label="prop.label"
-        :hint="getHint(prop)"
+        :hint="prop.hint"
         :ctrl-type="prop.ctrl_type || ''"
         :options="prop?.options"
-        :suffix="(prop as any)?.suffix"
-        :keys="(prop as any)?.keys"
+        :suffix="prop.suffix"
+        :keys="getKeys(prop)"
         @update="onUpdate(prop.key || '', $event)"
         @click="onClick(prop)"
       />
@@ -74,10 +74,9 @@ const getValue = (key: string) => {
   return key ? get(props.modelValue, key) : props.modelValue;
 };
 
-const getHint = (prop: SchemaKeyType) => {
-  const hint = (prop as any)?.hint as string | undefined;
-  if (!hint) return undefined;
-  return hint;
+const getKeys = (prop: SchemaKeyType) => {
+  if ('keys' in prop) return prop.keys;
+  return undefined;
 };
 
 const onUpdate = function (key: string, value: string | number | boolean | undefined | number[]) {
