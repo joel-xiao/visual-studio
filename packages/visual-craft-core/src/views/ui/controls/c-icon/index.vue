@@ -1,13 +1,18 @@
 <template>
-  <BasicBox class="c-icon" v-bind="$attrs" :type="type">
+  <BasicBox class="c-icon" v-bind="$attrs" :type="type" v-hint="hint">
     <BasicIcon :icon="icon" :lock="lock" :hover="hover" :size="size" :spin="spin" />
   </BasicBox>
 </template>
 
 <script lang="ts">
+import { hintDirective } from '@/directives/hint';
+
 export default {
   name: 'C_ICON',
-  inheritAttrs: false
+  inheritAttrs: false,
+  directives: {
+    hint: hintDirective
+  }
 };
 </script>
 
@@ -22,6 +27,7 @@ export interface Props {
   hover?: boolean;
   size?: 'small' | 'medium' | 'large';
   spin?: boolean;
+  hint?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -30,7 +36,8 @@ const props = withDefaults(defineProps<Props>(), {
   lock: false,
   hover: false,
   size: 'medium',
-  spin: false
+  spin: false,
+  hint: ''
 });
 </script>
 

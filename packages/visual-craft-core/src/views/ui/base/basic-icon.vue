@@ -1,3 +1,13 @@
+<script lang="ts">
+import { hintDirective } from '@/directives/hint';
+
+export default {
+  directives: {
+    hint: hintDirective
+  }
+};
+</script>
+
 <script setup lang="ts">
 import { computed } from 'vue';
 import { Icon } from '@iconify/vue';
@@ -8,13 +18,15 @@ interface IProps {
   hover?: boolean;
   size?: 'small' | 'medium' | 'large';
   spin?: boolean;
+  hint?: string;
 }
 const props = withDefaults(defineProps<IProps>(), {
   lock: false,
   icon: '',
   hover: false,
   size: 'medium',
-  spin: false
+  spin: false,
+  hint: ''
 });
 
 const iconClass = computed(() => ({
@@ -23,6 +35,8 @@ const iconClass = computed(() => ({
   spinning: props.spin || props.icon === 'mdi:loading',
   [props.size]: true
 }));
+
+const hintContent = computed(() => (props.hint || '').trim());
 
 const isIconify = computed(() => {
   return props.icon?.includes(':');
@@ -38,7 +52,7 @@ const isIconText = computed(() => {
 </script>
 
 <template>
-<div class="basic-icon" :class="iconClass">
+<div class="basic-icon" :class="iconClass" v-hint="hintContent">
   <Icon v-if="isIconify" :icon="icon" />
   <span v-else-if="isIconText" class="basic-icon-text">{{ icon }}</span>
   <i v-else-if="isIcon" class="icon-font" :class="icon"></i>
