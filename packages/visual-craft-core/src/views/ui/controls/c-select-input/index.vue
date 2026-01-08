@@ -143,6 +143,12 @@ function onBlur() {
     &.select-part {
       flex: 1.5;
       cursor: pointer;
+      border-radius: 6px;
+      transition: background 0.2s;
+
+      &:hover {
+        background: var(--db-color-button-bg-hover);
+      }
     }
 
     .part-icon {
