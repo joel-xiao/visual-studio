@@ -10,7 +10,6 @@ const schema: ISchemaExport = {
     schema: [
         [
             {
-                label: '文本样式',
                 key: 'textStyle.fontFamily',
                 type: String,
                 default: 'Microsoft YaHei',
