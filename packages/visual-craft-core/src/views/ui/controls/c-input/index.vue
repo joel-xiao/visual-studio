@@ -9,14 +9,14 @@
 </template>
 
 <script lang="ts">
-import { hintDirective } from '@/directives/hint';
+import { hintDirective } from '../../../../directives/hint';
 
 export default {
   name: 'C_INPUT',
-  inheritAttrs: false,
   directives: {
     hint: hintDirective
-  }
+  },
+  inheritAttrs: false
 };
 </script>
 

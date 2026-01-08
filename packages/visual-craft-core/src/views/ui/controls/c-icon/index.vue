@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts">
-import { hintDirective } from '@/directives/hint';
+import { hintDirective } from '../../../../directives/hint';
 
 export default {
   name: 'C_ICON',

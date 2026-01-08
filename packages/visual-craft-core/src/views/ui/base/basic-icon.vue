@@ -1,5 +1,5 @@
 <script lang="ts">
-import { hintDirective } from '@/directives/hint';
+import { hintDirective } from '../../../directives/hint';
 
 export default {
   directives: {
@@ -12,7 +12,7 @@ export default {
 import { computed } from 'vue';
 import { Icon } from '@iconify/vue';
 
-interface IProps {
+export interface IProps {
   lock?: boolean;
   icon?: string;
   hover?: boolean;

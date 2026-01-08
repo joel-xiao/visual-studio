@@ -11,7 +11,7 @@
 
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
-import { dragResizeDirective } from '@/directives/drag-resize';
+import { dragResizeDirective } from '../../../../directives/drag-resize';
 
 const vDragResize = dragResizeDirective;
 
