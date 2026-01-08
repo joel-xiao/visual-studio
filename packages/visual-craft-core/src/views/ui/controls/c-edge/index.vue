@@ -8,6 +8,7 @@
       @mouseleave="onMouseLeave"
       @mousedown="onMouseDown(0, $event)"
     >
+      <div class="drag-handle-bar"></div>
       <BasicInput
         type="text"
         :model-value="modelValue[0]"
@@ -24,6 +25,7 @@
       @mouseleave="onMouseLeave"
       @mousedown="onMouseDown(1, $event)"
     >
+      <div class="drag-handle-bar vertical"></div>
       <BasicInput
         type="text"
         :model-value="modelValue[1]"
@@ -40,6 +42,7 @@
       @mouseleave="onMouseLeave"
       @mousedown="onMouseDown(2, $event)"
     >
+      <div class="drag-handle-bar"></div>
       <BasicInput
         type="text"
         :model-value="modelValue[2]"
@@ -56,6 +59,7 @@
       @mouseleave="onMouseLeave"
       @mousedown="onMouseDown(3, $event)"
     >
+      <div class="drag-handle-bar vertical"></div>
       <BasicInput
         type="text"
         :model-value="modelValue[3]"
@@ -192,38 +196,105 @@ const onMouseDown = (index: number, e: MouseEvent) => {
     z-index: 2;
     transition: all 0.2s;
     border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: ew-resize;
+
+    &:hover {
+      .drag-handle-bar {
+        background: var(--theme-color-primary);
+        opacity: 0.8;
+      }
+    }
 
     &.focused {
       background: var(--db-color-input-background);
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       z-index: 10;
+      cursor: default;
+
+      .drag-handle-bar {
+        opacity: 0;
+      }
+    }
+
+    .drag-handle-bar {
+      position: absolute;
+      background: var(--theme-color-text-secondary);
+      opacity: 0.3;
+      border-radius: 1px;
+      transition: all 0.2s;
+      pointer-events: none;
+
+      &.vertical {
+        width: 2px;
+        height: 12px;
+        left: 2px;
+      }
+
+      &:not(.vertical) {
+        width: 12px;
+        height: 2px;
+        bottom: 2px;
+      }
     }
 
     .basic-input {
       text-align: center;
       font-size: 12px;
       color: var(--theme-color-text-primary);
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      pointer-events: none; /* Let parent handle events initially */
+    }
+
+    &.focused .basic-input {
+      pointer-events: auto;
     }
 
     &.top {
       top: 0px;
       left: 50%;
       transform: translateX(-50%);
+
+      .drag-handle-bar {
+        bottom: 1px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
     }
     &.bottom {
       bottom: 0px;
       left: 50%;
       transform: translateX(-50%);
+
+      .drag-handle-bar {
+        top: 1px;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: auto;
+      }
     }
     &.left {
       left: 2px;
       top: 50%;
       transform: translateY(-50%);
+
+      .drag-handle-bar.vertical {
+        right: 1px;
+        left: auto;
+      }
     }
     &.right {
       right: 2px;
       top: 50%;
       transform: translateY(-50%);
+
+      .drag-handle-bar.vertical {
+        left: 1px;
+      }
     }
   }
 
