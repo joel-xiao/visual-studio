@@ -1,9 +1,10 @@
 <template>
 <div class="c-position">
   <div class="c-position-grid">
-    <div 
-      v-for="item in positions" 
+    <div
+      v-for="item in positions"
       :key="item.value"
+      v-hint="item.hint"
       class="c-position-item"
       :class="{ active: modelValue === item.value }"
       @click="onUpdate(item.value)"
@@ -15,8 +16,13 @@
 </template>
 
 <script lang="ts">
+import { hintDirective } from '@/directives/hint';
+
 export default {
   name: 'C_POSITION',
+  directives: {
+    hint: hintDirective
+  },
   inheritAttrs: false
 };
 </script>
@@ -35,18 +41,18 @@ const props = withDefaults(defineProps<IProps>(), {
 const emit = defineEmits(['update', 'update:modelValue']);
 
 const positions = [
-  { value: 'top-left' },
-  { value: 'top-center' },
-  { value: 'top-right' },
-  { value: 'bottom-left' },
-  { value: 'bottom-center' },
-  { value: 'bottom-right' },
-  { value: 'left-top' },
-  { value: 'left-middle' },
-  { value: 'left-bottom' },
-  { value: 'right-top' },
-  { value: 'right-middle' },
-  { value: 'right-bottom' }
+  { value: 'top-left', hint: '顶部左侧' },
+  { value: 'top-center', hint: '顶部居中' },
+  { value: 'top-right', hint: '顶部右侧' },
+  { value: 'bottom-left', hint: '底部左侧' },
+  { value: 'bottom-center', hint: '底部居中' },
+  { value: 'bottom-right', hint: '底部右侧' },
+  { value: 'left-top', hint: '左侧顶部' },
+  { value: 'left-middle', hint: '左侧居中' },
+  { value: 'left-bottom', hint: '左侧底部' },
+  { value: 'right-top', hint: '右侧顶部' },
+  { value: 'right-middle', hint: '右侧居中' },
+  { value: 'right-bottom', hint: '右侧底部' }
 ];
 
 const onUpdate = (value: string) => {
@@ -83,7 +89,7 @@ const onUpdate = (value: string) => {
     &.active {
       background: var(--db-color-button-focus-border);
       border-color: var(--db-color-button-focus-border);
-      
+
       .c-position-icon {
         background: #fff;
       }

@@ -3,11 +3,12 @@
 <basic-box
       v-for="item in options"
       :key="item.value"
+      v-hint="item.hint || ''"
       type="group-item"
       :model-value="isChecked(item.value)"
       @click="toggle(item.value)"
     >
-    <basic-icon :icon="item.icon" :hint="item.hint" />
+    <basic-icon :icon="item.icon"/>
   </basic-box>
 </div>
 </template>
@@ -56,8 +57,13 @@ const toggle = (value: string | number) => {
 </script>
 
 <script lang="ts">
+import { hintDirective } from '@/directives/hint';
+
 export default {
-  name: 'C_GROUP_CHECK'
+  name: 'C_GROUP_CHECK',
+  directives: {
+    hint: hintDirective
+  }
 };
 </script>
 

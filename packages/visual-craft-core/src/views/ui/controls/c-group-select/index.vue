@@ -3,11 +3,12 @@
 <basic-box
       v-for="item in options"
       :key="item.value"
+      v-hint="item.hint || ''"
       type="group-item"
       :model-value="item.value === modelValue"
       @click="select(item.value)"
     >
-    <basic-icon :icon="item.icon" :hint="item.hint" />
+    <basic-icon :icon="item.icon" />
   </basic-box>
 </div>
 </template>
@@ -46,8 +47,13 @@ const select = (value: string | number) => {
 </script>
 
 <script lang="ts">
+import { hintDirective } from '@/directives/hint';
+
 export default {
-  name: 'C_GROUP_SELECT'
+  name: 'C_GROUP_SELECT',
+  directives: {
+    hint: hintDirective
+  }
 };
 </script>
 
