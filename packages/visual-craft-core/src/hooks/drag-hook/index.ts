@@ -7,6 +7,7 @@ export class Drag {
   resize: boolean;
   disabled: boolean;
   active: boolean;
+  selection: boolean;
   // eslint-disable-next-line no-unused-private-class-members
   #moved: boolean;
   #scale = 1;
@@ -43,6 +44,7 @@ export class Drag {
     this.resize = !!this.binding.resize;
     this.disabled = !!this.binding.disabled;
     this.active = !!this.binding.disabled;
+    this.selection = false;
     this.#moved = false;
 
     this.bodyDown = this.bodyDown.bind(this);
@@ -100,6 +102,7 @@ export class Drag {
 
     this.setDisabled(this.disabled);
     this.setActive(this.active);
+    this.setSelection(this.selection);
     this.setPos(this.defaultPos);
     this.updateSticks();
   }
@@ -140,8 +143,13 @@ export class Drag {
     this.active = active;
   }
 
+  setSelection(selection: boolean): void {
+    this.el?.classList[selection ? 'add' : 'remove']('v-drag-selection');
+    this.selection = selection;
+  }
+
   setPos(pos: IDragDataset): void {
-    if (!this.resize) return;
+    if (!this.resize && !this.selection) return;
     if (this.currentStick !== '') return;
     this.pos = { ...pos };
     this.defaultPos = { ...this.pos };

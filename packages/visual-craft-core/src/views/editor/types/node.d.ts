@@ -61,5 +61,6 @@ declare type TreeNode = PanelLayerItemData;
 
 declare interface INodeInstance {
   setActive: (val: boolean) => void;
+  setSelection: (val: boolean) => void;
   updatePos: () => void;
 }
