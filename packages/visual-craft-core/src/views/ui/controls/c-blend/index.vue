@@ -148,6 +148,14 @@ function toggleVisible() {
     align-items: center;
     margin-right: 8px;
     width: 65%;
+    height: 100%;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover {
+      background: var(--db-color-button-bg-hover);
+    }
   }
 
   .c-blend-input {
