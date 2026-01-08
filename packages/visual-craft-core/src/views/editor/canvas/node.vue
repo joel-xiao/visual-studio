@@ -1,5 +1,5 @@
 <template>
-<DragResize ref="resize" :data="dragDataset" @resizing="onResizing" @mousedown.stop.prevent="onDown">
+<DragResize ref="resize" :resize="true" :data="dragDataset" @resizing="onResizing" @mousedown.stop.prevent="onDown">
   <div ref="vm" class="middle-node" :style="nodeStyle"></div>
 </DragResize>
 </template>
@@ -19,7 +19,7 @@ const props = withDefaults(defineProps<Props>(), {
   id: ''
 });
 
-const { getNode, updateNode, onSelectNode, addNodeInstance, getSelectedNodes, moveNodes } = useNodeContext();
+const { getNode, updateNode, onSelectNode, addNodeInstance, getSelectedNodes, moveNodes, setNodesSelection } = useNodeContext();
 const selectedNodes = getSelectedNodes();
 const node = getNode(props.id);
 const nodeStyle = getNodeStyle(node);
@@ -40,6 +40,9 @@ const resize = ref<null | InstanceType<typeof DragResize>>(null);
 const setActive = function (val: boolean | undefined) {
   resize?.value?.setActive(val);
 };
+const setSelection = function (val: boolean | undefined) {
+  resize?.value?.setSelection(val);
+};
 const updatePos = function () {
   resize?.value?.setPos({
     x: node.x || 0,
@@ -57,7 +60,7 @@ onMounted(() => {
   setScale();
 });
 
-addNodeInstance(node.id, { setActive, updatePos });
+addNodeInstance(node.id, { setActive, setSelection, updatePos });
 
 const onDown = function (e: MouseEvent): void {
   onSelectNode(node.id, e.shiftKey);

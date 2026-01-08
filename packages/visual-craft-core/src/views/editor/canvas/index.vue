@@ -13,6 +13,7 @@
       <CanvasNode :id="item.id" />
     </template>
     <MarqueeSelect />
+    <SelectionBox />
   </div>
 </div>
 </template>
@@ -21,6 +22,7 @@
 import GridLine from './widgets/grid-line.vue';
 import CanvasNode from './node.vue';
 import MarqueeSelect from './widgets/marquee-select.vue';
+import SelectionBox from './widgets/selection-box.vue';
 import { ref, nextTick, onMounted, onBeforeUnmount } from 'vue';
 import { useDrag } from './../hooks/drag-context';
 import { useNodeContext } from './../hooks/node-context';

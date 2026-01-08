@@ -35,6 +35,7 @@ class CreateNodeContext {
     this.moveNodes = this.moveNodes.bind(this);
     this.addNodeInstance = this.addNodeInstance.bind(this);
     this.removeNodeInstance = this.removeNodeInstance.bind(this);
+    this.setNodesSelection = this.setNodesSelection.bind(this);
     this.deleteNodeComponent = this.deleteNodeComponent.bind(this);
     this.install = this.install.bind(this);
     this.uninstall = this.uninstall.bind(this);
@@ -357,9 +358,26 @@ class CreateNodeContext {
       } else if (!isAppend) {
         node.select = false;
       }
+    });
 
+    const selectedNodes = this.#data.nodes.filter(n => n.select && n.id !== 'root');
+    const selectedCount = selectedNodes.length;
+
+    this.#data.nodes.forEach(node => {
       const isSelected = !!node.select;
-      this.#nodeInstances?.[node.id]?.setActive?.(isSelected);
+      const isMultiple = selectedCount > 1;
+
+      // Single select: show handles. Multi select: hide individual handles.
+      this.#nodeInstances?.[node.id]?.setActive?.(isSelected && !isMultiple);
+
+      // Multi select: show weak highlight for members.
+      this.#nodeInstances?.[node.id]?.setSelection?.(isSelected && isMultiple);
+    });
+  }
+
+  setNodesSelection(ids: string[], selection: boolean): void {
+    ids.forEach(id => {
+      this.#nodeInstances?.[id]?.setSelection?.(selection);
     });
   }
 

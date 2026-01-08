@@ -31,6 +31,7 @@ const dragData = reactive<IDragResizeBinding>({
   pos: props.data,
   disabled: false,
   active: false,
+  selection: false,
   scale: 1,
   onUp: (dragDataset: IDragDataset) => {
     emit('resizing', dragDataset);
@@ -49,6 +50,10 @@ const setActive = function (val: boolean | undefined): void {
   dragData.active = !!val;
 };
 
+const setSelection = function (val: boolean | undefined): void {
+  dragData.selection = !!val;
+};
+
 const setPos = function (pos: IDragDataset): void {
   dragData.pos = pos;
 };
@@ -57,7 +62,7 @@ const setScale = function (scale: number) {
   dragData.scale = scale;
 };
 
-defineExpose({ setActive, setPos, setScale });
+defineExpose({ setActive, setSelection, setPos, setScale });
 </script>
 
 <style lang="scss">
