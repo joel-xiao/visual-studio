@@ -43,7 +43,7 @@ const schema: ISchemaExport = {
         key: 'textStyle.color',
         type: String,
         default: '#fff',
-        icon: '',
+        icon: 'mdi:format-color-text',
         ctrl: 'C_COLOR_PICKER',
         size: 'mini'
       }
@@ -55,7 +55,8 @@ const schema: ISchemaExport = {
         default: '',
         icon: 'mdi:format-line-spacing',
         ctrl: 'C_INPUT',
-        size: 'middle'
+        size: 'middle',
+        hint: '行高'
       },
       {
         key: 'textStyle.letterSpacing',
@@ -63,7 +64,8 @@ const schema: ISchemaExport = {
         default: '',
         icon: 'mdi:format-letter-spacing',
         ctrl: 'C_INPUT',
-        size: 'middle'
+        size: 'middle',
+        hint: '字间距'
       }
     ],
     [

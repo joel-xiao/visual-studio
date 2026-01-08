@@ -14,6 +14,7 @@ const schema: ISchemaExport = {
                 key: 'textStyle.fontFamily',
                 type: String,
                 default: 'Microsoft YaHei',
+                icon: 'mdi:format-font',
                 ctrl: 'C_SELECT',
                 options: options.FontFamilyOptions
             }
@@ -23,6 +24,7 @@ const schema: ISchemaExport = {
                 key: 'textStyle.fontSize',
                 type: Number,
                 default: 12,
+                icon: 'mdi:format-size',
                 ctrl: 'C_INPUT',
                 size: 'large'
             },
@@ -74,6 +76,7 @@ const schema: ISchemaExport = {
                 key: 'itemGap',
                 type: Number,
                 default: 10,
+                icon: 'mdi:format-letter-spacing',
                 ctrl: 'C_INPUT',
                 suffix: 'px'
             }
