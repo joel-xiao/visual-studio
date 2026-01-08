@@ -6,6 +6,7 @@
       :class="{ focused: focusedIndex === 0 }"
       @mouseenter="onMouseEnter(0)"
       @mouseleave="onMouseLeave"
+      @mousedown="onMouseDown(0, $event)"
     >
       <BasicInput
         type="text"
@@ -21,6 +22,7 @@
       :class="{ focused: focusedIndex === 1 }"
       @mouseenter="onMouseEnter(1)"
       @mouseleave="onMouseLeave"
+      @mousedown="onMouseDown(1, $event)"
     >
       <BasicInput
         type="text"
@@ -36,6 +38,7 @@
       :class="{ focused: focusedIndex === 2 }"
       @mouseenter="onMouseEnter(2)"
       @mouseleave="onMouseLeave"
+      @mousedown="onMouseDown(2, $event)"
     >
       <BasicInput
         type="text"
@@ -51,6 +54,7 @@
       :class="{ focused: focusedIndex === 3 }"
       @mouseenter="onMouseEnter(3)"
       @mouseleave="onMouseLeave"
+      @mousedown="onMouseDown(3, $event)"
     >
       <BasicInput
         type="text"
@@ -118,6 +122,44 @@ const onMouseEnter = (index: number) => {
 const onMouseLeave = () => {
   hoveredIndex.value = -1;
 };
+
+const onMouseDown = (index: number, e: MouseEvent) => {
+  const target = e.currentTarget as HTMLElement;
+  const inputEl = target.querySelector('input');
+
+  e.preventDefault();
+
+  const startX = e.clientX;
+  const startValue = Number(props.modelValue[index]) || 0;
+  let isDragging = false;
+
+  const onMouseMove = (event: MouseEvent) => {
+    const deltaX = event.clientX - startX;
+
+    if (Math.abs(deltaX) > 2) {
+      isDragging = true;
+      document.body.style.cursor = 'ew-resize';
+    }
+
+    if (isDragging) {
+      const newValue = startValue + deltaX;
+      onUpdate(index, newValue);
+    }
+  };
+
+  const onMouseUp = () => {
+    window.removeEventListener('mousemove', onMouseMove);
+    window.removeEventListener('mouseup', onMouseUp);
+    document.body.style.cursor = '';
+
+    if (!isDragging) {
+      inputEl?.focus();
+    }
+  };
+
+  window.addEventListener('mousemove', onMouseMove);
+  window.addEventListener('mouseup', onMouseUp);
+};
 </script>
 
 <style lang="scss">
@@ -164,22 +206,22 @@ const onMouseLeave = () => {
     }
 
     &.top {
-      top: 3px;
+      top: 0px;
       left: 50%;
       transform: translateX(-50%);
     }
     &.bottom {
-      bottom: 3px;
+      bottom: 0px;
       left: 50%;
       transform: translateX(-50%);
     }
     &.left {
-      left: 4px;
+      left: 2px;
       top: 50%;
       transform: translateY(-50%);
     }
     &.right {
-      right: 4px;
+      right: 2px;
       top: 50%;
       transform: translateY(-50%);
     }
