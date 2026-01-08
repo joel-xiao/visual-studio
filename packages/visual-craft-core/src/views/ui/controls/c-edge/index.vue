@@ -153,7 +153,7 @@ const onMouseLeave = () => {
 
     &.focused {
       background: var(--db-color-input-background);
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 0 1px var(--db-color-button-focus-border);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       z-index: 10;
     }
 
