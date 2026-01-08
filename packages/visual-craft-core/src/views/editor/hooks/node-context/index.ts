@@ -350,15 +350,36 @@ class CreateNodeContext {
   onSelectNodes(ids: string[], isAppend = false): void {
     if (!this.#data) return;
     const idSet = new Set(ids);
+    const selectingComponents = ids.some(id => id !== 'root');
 
     this.#data.nodes.forEach(node => {
       const isTarget = idSet.has(node.id);
       if (isTarget) {
-        node.select = true;
+        if (isAppend && node.id !== 'root') {
+          // Toggle selection for components when holding shift
+          node.select = !node.select;
+        } else {
+          node.select = true;
+        }
       } else if (!isAppend) {
         node.select = false;
       }
+
+      // If we are selecting or have selected components, root must be deselected
+      if (node.id === 'root' && (selectingComponents || (isAppend && this.#currentNode.value?.id !== 'root'))) {
+        node.select = false;
+      }
     });
+
+    // Case for when everything is deselected via toggle, select root as fallback
+    const hasSelection = this.#data.nodes.some(n => n.select && n.id !== 'root');
+    if (!hasSelection && !idSet.has('root') && !isAppend) {
+      const rootNode = this.#nodeMap.get('root');
+      if (rootNode) rootNode.select = true;
+    } else if (hasSelection) {
+      const rootNode = this.#nodeMap.get('root');
+      if (rootNode) rootNode.select = false;
+    }
 
     const selectedNodes = this.#data.nodes.filter(n => n.select && n.id !== 'root');
     const selectedCount = selectedNodes.length;
