@@ -72,12 +72,13 @@ const schema: ISchemaExport = {
         ],
         [
             {
-                label: '图例间距',
+                hint: '间距',
                 key: 'itemGap',
                 type: Number,
                 default: 10,
                 icon: 'mdi:format-letter-spacing',
                 ctrl: 'C_INPUT',
+                size: 'wide',
                 suffix: 'px'
             }
         ]

@@ -53,6 +53,7 @@ const schema: ISchemaExport = {
     ],
     [
       {
+        hint: '旋转角度',
         key: 'rotate',
         type: Number,
         default: 0,
