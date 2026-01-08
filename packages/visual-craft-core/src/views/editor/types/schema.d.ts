@@ -4,7 +4,7 @@ interface IDefaultSchemaKeyData {
   icon?: string | string[];
   ctrl: string;
   ctrl_type?: string;
-  size?: 'default' | 'small' | 'middle' | 'large' | 'mini';
+  size?: 'default' | 'small' | 'middle' | 'wide' | 'large' | 'mini';
   suffix?: string;
   hint?: string;
   options?: {

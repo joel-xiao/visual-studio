@@ -25,6 +25,7 @@ const gridTemplateOption: { [key: string]: string } = {
   default: '1fr',
   small: '0.25fr',
   middle: '0.5fr',
+  wide: '0.75fr',
   large: '1fr',
   mini: '30px',
   full: 'calc(100% - 30px)'
