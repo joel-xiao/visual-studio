@@ -349,50 +349,40 @@ class CreateNodeContext {
 
   onSelectNodes(ids: string[], isAppend = false): void {
     if (!this.#data) return;
+
     const idSet = new Set(ids);
-    const selectingComponents = ids.some(id => id !== 'root');
+    const nodes = this.#data.nodes;
 
-    this.#data.nodes.forEach(node => {
+    // 1. Update basic selection state
+    nodes.forEach(node => {
       const isTarget = idSet.has(node.id);
-      if (isTarget) {
-        if (isAppend && node.id !== 'root') {
-          // Toggle selection for components when holding shift
-          node.select = !node.select;
-        } else {
-          node.select = true;
-        }
-      } else if (!isAppend) {
-        node.select = false;
-      }
-
-      // If we are selecting or have selected components, root must be deselected
-      if (node.id === 'root' && (selectingComponents || (isAppend && this.#currentNode.value?.id !== 'root'))) {
-        node.select = false;
+      if (isAppend) {
+        if (isTarget) node.select = !node.select;
+      } else {
+        node.select = isTarget;
       }
     });
 
-    // Case for when everything is deselected via toggle, select root as fallback
-    const hasSelection = this.#data.nodes.some(n => n.select && n.id !== 'root');
-    if (!hasSelection && !idSet.has('root') && !isAppend) {
-      const rootNode = this.#nodeMap.get('root');
-      if (rootNode) rootNode.select = true;
-    } else if (hasSelection) {
-      const rootNode = this.#nodeMap.get('root');
+    // 2. Resolve Page (root) vs. Components conflict
+    const selectedComponents = nodes.filter(n => n.select && n.id !== 'root');
+    const rootNode = this.#nodeMap.get('root');
+
+    if (selectedComponents.length > 0) {
       if (rootNode) rootNode.select = false;
+    } else if (!idSet.has('root')) {
+      // Fallback to Page selection if nothing else is selected
+      if (rootNode) rootNode.select = true;
     }
 
-    const selectedNodes = this.#data.nodes.filter(n => n.select && n.id !== 'root');
-    const selectedCount = selectedNodes.length;
-
-    this.#data.nodes.forEach(node => {
+    // 3. Propagate to UI instances
+    const activeCount = selectedComponents.length;
+    nodes.forEach(node => {
       const isSelected = !!node.select;
-      const isMultiple = selectedCount > 1;
+      const isMultipleMode = activeCount > 1;
 
-      // Single select: show handles. Multi select: hide individual handles.
-      this.#nodeInstances?.[node.id]?.setActive?.(isSelected && !isMultiple);
-
-      // Multi select: show weak highlight for members.
-      this.#nodeInstances?.[node.id]?.setSelection?.(isSelected && isMultiple);
+      // Handles: Only for single component. Selection: Only for members of group selection.
+      this.#nodeInstances?.[node.id]?.setActive?.(isSelected && !isMultipleMode);
+      this.#nodeInstances?.[node.id]?.setSelection?.(isSelected && isMultipleMode);
     });
   }
 
