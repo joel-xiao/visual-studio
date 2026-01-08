@@ -1,7 +1,7 @@
 import { watch, computed, readonly, reactive, ref, shallowReadonly, ComputedRef, type App, type Ref } from 'vue';
 import { getUuid } from '../../../../assets/utils/index';
 
-class CreateNodeContext {
+export class CreateNodeContext {
   #data?: IEditorData;
   #nodes: ComputedRef<INode[]> = computed(() => []);
   #selectedNodes: ComputedRef<INode[]> = computed(() => []);
@@ -164,11 +164,6 @@ class CreateNodeContext {
     return readonly(node ? node : ({} as INode));
   }
 
-  /**
-   * @parma {
-   *  syncLayout: boolean
-   * }
-   * **/
   updateNode(id: string, delta: INodeDelta, syncLayout = true): void {
     const node = this.#nodeMap.get(id);
     if (node && delta) {
@@ -176,7 +171,6 @@ class CreateNodeContext {
 
       this.#nodeInstances?.[node.id]?.updatePos?.();
 
-      // INode binds to  Pros Layout
       if (syncLayout) {
         const layoutUpdates: { key: string; value: ComponentPropValue }[] = [];
         if (delta.x !== undefined) layoutUpdates.push({ key: 'layout.x', value: delta.x });
@@ -203,11 +197,6 @@ class CreateNodeContext {
     });
   }
 
-  /**
-   * @parma {
-   *  syncNode: boolean
-   * }
-   * **/
   updateNodeProp(
     id: string,
     key: string,
@@ -234,7 +223,6 @@ class CreateNodeContext {
     }
     const lastKey = keyArr[keyArr.length - 1];
     current[lastKey] = value;
-    console.log(node);
 
     if (syncNode && key.startsWith('layout.')) {
       const field = key.split('.')[1];
@@ -256,11 +244,6 @@ class CreateNodeContext {
     }
   }
 
-  /**
-   * @parma {
-   *  syncNode: boolean
-   * }
-   * **/
   updateNodeProps(
     id: string,
     opts:
@@ -276,9 +259,6 @@ class CreateNodeContext {
     }
   }
 
-  /**
-   * Update the entire editor data (nodes)
-   */
   update(data: IEditorData): void {
     if (!this.#data || !data || !data.nodes) return;
 
@@ -353,7 +333,6 @@ class CreateNodeContext {
     const idSet = new Set(ids);
     const nodes = this.#data.nodes;
 
-    // 1. Update basic selection state
     nodes.forEach(node => {
       const isTarget = idSet.has(node.id);
       if (isAppend) {
@@ -363,7 +342,6 @@ class CreateNodeContext {
       }
     });
 
-    // 2. Resolve Page (root) vs. Components conflict
     const selectedComponents = nodes.filter(n => n.select && n.id !== 'root');
     const rootNode = this.#nodeMap.get('root');
 
@@ -374,13 +352,11 @@ class CreateNodeContext {
       if (rootNode) rootNode.select = true;
     }
 
-    // 3. Propagate to UI instances
     const activeCount = selectedComponents.length;
     nodes.forEach(node => {
       const isSelected = !!node.select;
       const isMultipleMode = activeCount > 1;
 
-      // Handles: Only for single component. Selection: Only for members of group selection.
       this.#nodeInstances?.[node.id]?.setActive?.(isSelected && !isMultipleMode);
       this.#nodeInstances?.[node.id]?.setSelection?.(isSelected && isMultipleMode);
     });

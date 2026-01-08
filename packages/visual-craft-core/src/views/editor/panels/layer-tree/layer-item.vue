@@ -1,7 +1,9 @@
 <script lang="ts" setup>
 import { ref, reactive } from 'vue';
 import { useComponentContext } from '../../hooks/component-context';
+import { useNodeContext } from '../../hooks/node-context';
 import Icon from '@/components/icon/index.vue';
+import { useNodeMenu } from '../../hooks/context-menu';
 
 interface Props {
   recursion?: number;
@@ -21,6 +23,8 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits(['select', 'command']);
 
 const componentContext = useComponentContext();
+const nodeContext = useNodeContext();
+const { showNodeMenu } = useNodeMenu();
 
 const getItemIcon = (item: PanelLayerItemData): string => {
   if (item.icon) return item.icon;
@@ -51,7 +55,7 @@ const onCommand = function (
 </script>
 <template>
   <div v-for="item in data" :key="item.id" class="layer-item" :class="{ 'layer-item_check': item.select }">
-    <div class="layer-item-nav" :class="{ active: item.select }" :style="layerItemStyle" @click="onSelect(item)">
+    <div class="layer-item-nav" :class="{ active: item.select }" :style="layerItemStyle" @click="onSelect(item)" @contextmenu.stop.prevent="showNodeMenu($event, item.id, nodeContext, componentContext, 1)">
       <div class="layer-item-left">
         <Icon v-if="item?.children?.length" class="arrow" block src="icon-zhankai" :class="{ active: item.AFold }" @click.stop="onArrow(item)" />
         <span v-else class="dot"></span>

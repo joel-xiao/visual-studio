@@ -1,5 +1,5 @@
 <template>
-<DragResize ref="resize" :resize="true" :data="dragDataset" @resizing="onResizing" @mousedown.stop.prevent="onDown">
+<DragResize ref="resize" :data="dragDataset" @resizing="onResizing" @mousedown.stop.prevent="onDown" @contextmenu.stop.prevent="showNodeMenu($event, id, nodeContext, componentContext, getScale())">
   <div ref="vm" class="middle-node" :style="nodeStyle"></div>
 </DragResize>
 </template>
@@ -11,6 +11,7 @@ import { useNodeContext } from './../hooks/node-context';
 import { getNodeStyle } from './../hooks/node-context/style';
 import { useComponentContext } from './../hooks/component-context';
 import { useCanvas } from '../hooks/canvas';
+import { useNodeMenu } from '../hooks/context-menu';
 
 interface Props {
   id: string;
@@ -19,12 +20,15 @@ const props = withDefaults(defineProps<Props>(), {
   id: ''
 });
 
-const { getNode, updateNode, onSelectNode, addNodeInstance, getSelectedNodes, moveNodes, setNodesSelection } = useNodeContext();
+const nodeContext = useNodeContext();
+const componentContext = useComponentContext();
+const { getNode, updateNode, onSelectNode, addNodeInstance, getSelectedNodes, moveNodes, setNodesSelection } = nodeContext;
 const selectedNodes = getSelectedNodes();
 const node = getNode(props.id);
 const nodeStyle = getNodeStyle(node);
 
 const { getScale, addCanvasUpdated } = useCanvas();
+const { showNodeMenu } = useNodeMenu();
 const dragDataset = readonly(
   reactive<IDragDataset>(
     markRaw({

@@ -10,6 +10,16 @@
   --db-color-main: var(--color-gray-800);
   --db-color-bg-dark: #080808;
 
+  // Popup / Menu Theme (Context Menu, etc.)
+  --db-menu-bg: rgba(30, 30, 30, 0.85);
+  --db-menu-border: rgba(255, 255, 255, 0.08);
+  --db-menu-blur: blur(20px);
+  --db-menu-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  --db-menu-item-hover: rgba(52, 128, 255, 0.9);
+  --db-menu-text: rgba(255, 255, 255, 0.9);
+  --db-menu-text-secondary: rgba(255, 255, 255, 0.4);
+  --db-menu-divider: rgba(255, 255, 255, 0.06);
+
   // Font color
   color: var(--theme-color-text);
 

@@ -233,10 +233,6 @@ defineExpose({ open, close });
         display: flex;
         align-items: center;
         justify-content: center;
-
-        .basic-icon {
-          color: var(--theme-color-blue-700);
-        }
       }
 
       span {

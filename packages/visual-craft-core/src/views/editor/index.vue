@@ -6,6 +6,7 @@
     <LeftPanel />
     <RightPanel />
     <AIPanel v-show="activeTab === 'ai'" />
+    <ContextMenu />
   </div>
 </template>
 
@@ -16,6 +17,7 @@ import AIPanel from './panels/ai-panel.vue';
 import LeftPanel from './panels/left-panel.vue';
 import RightPanel from './panels/right-panel.vue';
 import Canvas from './canvas/index.vue';
+import ContextMenu from './canvas/context-menu.vue';
 
 import { ref, reactive, onMounted, onUnmounted, computed, watch } from 'vue';
 
