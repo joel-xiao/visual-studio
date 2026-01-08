@@ -8,6 +8,18 @@
   top: 0;
   left: 0;
   box-sizing: border-box;
+  background-color: rgba(0, 0, 0, 0);
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    right: -8px;
+    bottom: -8px;
+    pointer-events: auto;
+    z-index: -1;
+  }
 
   &.active {
     z-index: 999999;
@@ -62,6 +74,15 @@
 
     &>.v-drag-stick {
       position: absolute;
+
+      &::after {
+        content: "";
+        position: absolute;
+        top: -6px;
+        left: -6px;
+        right: -6px;
+        bottom: -6px;
+      }
 
       &.v-drag-stick-tl,
       &.v-drag-stick-br,
