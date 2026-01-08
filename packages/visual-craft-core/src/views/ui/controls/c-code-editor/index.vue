@@ -9,7 +9,7 @@
       style="height: 200px"
     />
     <div class="c-code-editor-expand">
-      <BasicIcon icon="icon-spread-out" hover @click="openModal" />
+      <BasicIcon icon="icon-spread-out" hint="全屏编辑" size="small" hover @click="openModal" />
     </div>
   </div>
 
@@ -125,6 +125,11 @@ function onConfirm() {
   position: absolute;
   top: 8px;
   right: 8px;
+
+  :deep(.basic-icon.large.hover) {
+    width: 28px;
+    height: 28px;
+  }
 }
 
 .c-code-editor-footer {
