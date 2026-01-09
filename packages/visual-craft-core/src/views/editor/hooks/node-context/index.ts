@@ -1,6 +1,15 @@
 import { watch, computed, readonly, reactive, ref, shallowReadonly, ComputedRef, type App, type Ref } from 'vue';
+import RBush from 'rbush';
 import { getUuid } from '../../../../assets/utils/index';
 import { groupSelectedNodesImpl, unGroupImpl } from './group';
+
+interface SpatialItem {
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
+  id: string;
+}
 
 export class CreateNodeContext {
   #data?: IEditorData;
@@ -13,6 +22,7 @@ export class CreateNodeContext {
   #nodeComponentInstances?: Record<string, App | undefined> = {};
   #nodeMap = reactive(new Map<string, INode>());
   #treeNodeMap = reactive(new Map<string, TreeNode>());
+  #spatialIndex = new RBush<SpatialItem>();
   #rootNode: ComputedRef<INode> = computed(() => {
     const node = this.#nodeMap.get('root');
     return node ? node : ({} as INode);
@@ -43,6 +53,7 @@ export class CreateNodeContext {
     this.deleteNodeComponent = this.deleteNodeComponent.bind(this);
     this.install = this.install.bind(this);
     this.uninstall = this.uninstall.bind(this);
+    this.searchNodesInArea = this.searchNodesInArea.bind(this);
   }
 
   getNodeTree() {
@@ -95,6 +106,23 @@ export class CreateNodeContext {
     this.#data?.nodes.forEach(node => {
       this.#nodeMap.set(node.id, node);
     });
+    this.#syncSpatialIndex();
+  }
+
+  #syncSpatialIndex() {
+    this.#spatialIndex.clear();
+    const items: SpatialItem[] = [];
+    this.#data?.nodes.forEach(node => {
+      if (node.id === 'root') return;
+      items.push({
+        minX: node.x,
+        minY: node.y,
+        maxX: node.x + node.width,
+        maxY: node.y + node.height,
+        id: node.id
+      });
+    });
+    this.#spatialIndex.load(items);
   }
 
   #addTreeNode(node: INode) {
@@ -166,9 +194,11 @@ export class CreateNodeContext {
     return readonly(node ? node : ({} as INode));
   }
 
-  updateNode(id: string, delta: INodeDelta, syncLayout = true): void {
+  updateNode(id: string, delta: INodeDelta, syncLayout = true, skipSpatialSync = false): void {
     const node = this.#nodeMap.get(id);
     if (node && delta) {
+      const geometryChanged = delta.x !== undefined || delta.y !== undefined || delta.width !== undefined || delta.height !== undefined;
+
       Object.assign(node, delta);
 
       this.#nodeInstances?.[node.id]?.updatePos?.();
@@ -183,6 +213,10 @@ export class CreateNodeContext {
         if (layoutUpdates.length > 0) {
           this.updateNodeProps(node.id, layoutUpdates, false);
         }
+      }
+
+      if (geometryChanged && !skipSpatialSync) {
+        this.#syncSpatialIndex();
       }
     }
   }
@@ -202,6 +236,7 @@ export class CreateNodeContext {
         this.#treeNodeMap.delete(id);
       }
       this.#refreshNodeTree();
+      this.#syncSpatialIndex();
     }
   }
 
@@ -212,9 +247,10 @@ export class CreateNodeContext {
         this.updateNode(id, {
           x: (node.x || 0) + dx,
           y: (node.y || 0) + dy
-        });
+        }, true, true);
       }
     }
+    this.#syncSpatialIndex();
   }
 
   groupSelectedNodes(): INode | undefined {
@@ -318,7 +354,7 @@ export class CreateNodeContext {
     this.#initSelectedNode();
   }
 
-  #onAddNode(addNode: IAddNode, parentId: string, pos: INodePointerPos, refreshTree = true) {
+  #onAddNode(addNode: IAddNode, parentId: string, pos: INodePointerPos, refreshTree = true, skipSpatialSync = false) {
     if (addNode instanceof Object) {
       const node: INode = {
         parentId: parentId,
@@ -348,7 +384,7 @@ export class CreateNodeContext {
 
       addedNode.x = pos.x - addedNode.width / 2;
       addedNode.y = pos.y - addedNode.height / 2;
-      this.updateNode(addedNode.id, addedNode);
+      this.updateNode(addedNode.id, addedNode, true, skipSpatialSync);
       this.#addTreeNode(addedNode);
       if (refreshTree) this.#refreshNodeTree();
       return addedNode;
@@ -358,9 +394,10 @@ export class CreateNodeContext {
   onAddNode(nodes: IAddNode[] | IAddNode, parentId: string, pos: INodePointerPos) {
     if (Array.isArray(nodes)) {
       for (const node of nodes) {
-        this.#onAddNode(node, parentId, pos, false);
+        this.#onAddNode(node, parentId, pos, false, true);
       }
       this.#refreshNodeTree();
+      this.#syncSpatialIndex();
     } else if (nodes instanceof Object) {
       return this.#onAddNode(nodes, parentId, pos);
     }
@@ -475,8 +512,21 @@ export class CreateNodeContext {
     this.#nodesTree.value = [];
     this.#nodeMap.clear();
     this.#treeNodeMap.clear();
+    this.#spatialIndex.clear();
     this.#nodeInstances = undefined;
     this.#nodeComponentInstances = undefined;
+  }
+
+  searchNodesInArea(rect: { x: number; y: number; width: number; height: number }): INode[] {
+    const items = this.#spatialIndex.search({
+      minX: rect.x,
+      minY: rect.y,
+      maxX: rect.x + rect.width,
+      maxY: rect.y + rect.height
+    });
+    return items
+      .map(item => this.#nodeMap.get(item.id))
+      .filter((n): n is INode => !!n);
   }
 }
 

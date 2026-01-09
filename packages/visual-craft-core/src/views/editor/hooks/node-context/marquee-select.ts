@@ -8,7 +8,7 @@ export interface MarqueeRect {
 }
 
 interface MarqueeOptions {
-    getNodes: () => Readonly<Ref<readonly DeepReadonly<INode>[]>>;
+    searchNodesInArea: (rect: MarqueeRect) => INode[];
     onSelect?: (ids: string[], isAppend: boolean) => void;
     getScale: () => number;
 }
@@ -27,28 +27,14 @@ export const useMarqueeSelect = (
     canvasRootEl: Ref<HTMLElement | undefined>,
     options: MarqueeOptions
 ) => {
-    const { getNodes, onSelect, getScale } = options;
+    const { searchNodesInArea, onSelect, getScale } = options;
 
     let startX = 0;
     let startY = 0;
 
     const getNodesInArea = (selectionRect: MarqueeRect): string[] => {
-        const nodes = unref(getNodes());
-        const { x, y, width, height } = selectionRect;
-        const x2_area = x + width;
-        const y2_area = y + height;
-
-        const allInArea: INode[] = [];
-        for (const node of nodes) {
-            if (node.id === 'root') continue;
-
-            if (node.x < x2_area &&
-                node.x + node.width > x &&
-                node.y < y2_area &&
-                node.y + node.height > y) {
-                allInArea.push(node as unknown as INode);
-            }
-        }
+        const allInArea = searchNodesInArea(selectionRect);
+        if (!allInArea.length) return ['root'];
 
         const areaIdSet = new Set(allInArea.map(n => n.id));
         const ids = allInArea

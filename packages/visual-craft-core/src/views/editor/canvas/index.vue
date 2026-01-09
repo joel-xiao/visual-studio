@@ -42,11 +42,11 @@ import { useNodeMenu } from '../hooks/context-menu';
 const middleEl = ref<HTMLElement>();
 const canvasRootEl = ref<HTMLElement>();
 
-const { getRootRef, getNodes, onSelectNode, onAddNode, onSelectNodes } = useNodeContext();
+const { getRootRef, getNodes, onSelectNode, onAddNode, onSelectNodes, searchNodesInArea } = useNodeContext();
 const { getScale } = useCanvas();
 const { showCanvasMenu } = useNodeMenu();
 const { onMouseDown: onMarqueeMouseDown } = useMarqueeSelect(canvasRootEl, {
-  getNodes,
+  searchNodesInArea,
   onSelect: onSelectNodes,
   getScale
 });
