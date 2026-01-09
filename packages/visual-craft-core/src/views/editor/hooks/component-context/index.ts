@@ -60,14 +60,27 @@ export class CreateComponentContext {
       }
     });
 
-    const rawCanvasSchemas = import.meta.glob<{ default: IComponentSchemaExport }>(
-      './../../canvas/schema/*.ts',
-      { eager: true }
+    const rawCanvasSchemas = import.meta.glob<IComponentSchemaExport>(
+      ['../../canvas/schema/*.ts', '../../canvas/*/schema.ts'],
+      { eager: true, import: 'default' }
     );
-    for (const [, module] of Object.entries(rawCanvasSchemas)) {
-      const schema = module.default;
+    for (const schema of Object.values(rawCanvasSchemas)) {
       if (schema?.type) {
         this.#canvasSchemas[schema.type] = schema;
+      }
+    }
+
+    const rawCanvasComponents = import.meta.glob<VueComponent>(
+      ['../../canvas/*/index.vue'],
+      { eager: true, import: 'default' }
+    );
+    for (const [componentPath, module] of Object.entries(rawCanvasComponents)) {
+      const match = componentPath.match(/\/canvas\/(?:components\/)?([^/]+)\/index\.vue$/);
+      const folder = match?.[1];
+      const type = folder ? folder.toUpperCase() : undefined;
+      if (type) {
+        this.#components[type] = module;
+        this.#componentPathMap[type] = componentPath;
       }
     }
 

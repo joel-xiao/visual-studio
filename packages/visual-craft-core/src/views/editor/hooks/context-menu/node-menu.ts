@@ -70,14 +70,24 @@ export const buildNodeMenuItems = (
         label: '创建编组',
         icon: 'lucide:group',
         shortcuts: [CMD, { label: 'G' }],
-        disabled: !isMultiple
+        disabled: !isMultiple,
+        action: () => {
+            nodeContext.groupSelectedNodes?.();
+        }
     });
 
     menu.push({
         id: 'ungroup',
         label: '取消编组',
         icon: 'lucide:ungroup',
-        shortcuts: [SHIFT, CMD, { label: 'G' }]
+        shortcuts: [SHIFT, CMD, { label: 'G' }],
+        action: () => {
+            const target = selectedNodes.find(n => n.id === nodeId) || selectedNodes[0];
+            const isGroup = target?.schema === 'GROUP';
+            if (isGroup && target?.id) {
+                nodeContext.unGroup?.(target.id);
+            }
+        }
     });
 
     menu.push({ id: 'div-group', label: '', divider: true });

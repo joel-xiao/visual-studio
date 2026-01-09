@@ -1,31 +1,37 @@
 <template>
-<DragResize ref="resize" :data="dragDataset" @resizing="onResizing" @mousedown.stop.prevent="onDown" @contextmenu.stop.prevent="showNodeMenu($event, id, nodeContext, componentContext, getScale())">
-  <div ref="vm" class="middle-node" :style="nodeStyle"></div>
-</DragResize>
+  <DragResize
+    ref="resize"
+    :data="dragDataset"
+    @resizing="onResizing"
+    @mousedown.stop.prevent="onDown"
+    @contextmenu.stop.prevent="showNodeMenu($event, id, nodeContext, componentContext, getScale())"
+  >
+    <div ref="vm" class="middle-node" :style="nodeStyle"></div>
+  </DragResize>
 </template>
 
 <script setup lang="ts">
 import DragResize from './widgets/drag-resize.vue';
-import { ref, reactive, markRaw, readonly, watch, onMounted, unref } from 'vue';
+import { ref, reactive, markRaw, readonly, onMounted, unref } from 'vue';
 import { useNodeContext } from './../hooks/node-context';
 import { getNodeStyle } from './../hooks/node-context/style';
 import { useComponentContext } from './../hooks/component-context';
 import { useCanvas } from '../hooks/canvas';
 import { useNodeMenu } from '../hooks/context-menu';
+import { handleNodeDrag, handleNodeResize } from './../hooks/node-context/group';
 
 interface Props {
   id: string;
 }
-const props = withDefaults(defineProps<Props>(), {
-  id: ''
-});
+const props = withDefaults(defineProps<Props>(), { id: '' });
 
 const nodeContext = useNodeContext();
 const componentContext = useComponentContext();
-const { getNode, updateNode, onSelectNode, addNodeInstance, getSelectedNodes, moveNodes, setNodesSelection } = nodeContext;
+const { getNode, updateNode, onSelectNode, addNodeInstance, getSelectedNodes, moveNodes } = nodeContext;
 const selectedNodes = getSelectedNodes();
 const node = getNode(props.id);
 const nodeStyle = getNodeStyle(node);
+const allNodes = nodeContext.getNodes();
 
 const { getScale, addCanvasUpdated } = useCanvas();
 const { showNodeMenu } = useNodeMenu();
@@ -41,13 +47,9 @@ const dragDataset = readonly(
 );
 const resize = ref<null | InstanceType<typeof DragResize>>(null);
 
-const setActive = function (val: boolean | undefined) {
-  resize?.value?.setActive(val);
-};
-const setSelection = function (val: boolean | undefined) {
-  resize?.value?.setSelection(val);
-};
-const updatePos = function () {
+const setActive = (val: boolean | undefined) => resize?.value?.setActive(val);
+const setSelection = (val: boolean | undefined) => resize?.value?.setSelection(val);
+const updatePos = () => {
   resize?.value?.setPos({
     x: node.x || 0,
     y: node.y || 0,
@@ -56,50 +58,35 @@ const updatePos = function () {
   });
 };
 
+const setScale = () => resize?.value?.setScale(getScale());
 addCanvasUpdated(setScale);
-function setScale() {
-  resize?.value?.setScale(getScale());
-}
+
 onMounted(() => {
   setScale();
+  createNodeComponentApp(node.props as IComponentProps, vm?.value, node.component);
 });
 
 addNodeInstance(node.id, { setActive, setSelection, updatePos });
 
-const onDown = function (e: MouseEvent): void {
-  onSelectNode(node.id, e.shiftKey);
-};
+const onDown = (e: MouseEvent) => onSelectNode(node.id, e.shiftKey);
 
-const onResizing = function (dragDataset: IDragDataset): void {
+const onResizing = (dragDataset: IDragDataset) => {
   const dx = dragDataset.x - node.x;
   const dy = dragDataset.y - node.y;
-  const dw = (dragDataset.x2 - dragDataset.x) - node.width;
-  const dh = (dragDataset.y2 - dragDataset.y) - node.height;
+  const dw = dragDataset.x2 - dragDataset.x - node.width;
+  const dh = dragDataset.y2 - dragDataset.y - node.height;
+
+  if ((node as INode).lock) return;
 
   if (dw === 0 && dh === 0) {
-    // Dragging
-    if (node.select) {
-      const selectedIds = (unref(selectedNodes) as INode[]).map((n: INode) => n.id);
-      moveNodes(selectedIds, dx, dy);
-    } else {
-      updateNode(node.id, { x: dragDataset.x, y: dragDataset.y });
-    }
+    handleNodeDrag(node as INode, dx, dy, unref(allNodes) as INode[], unref(selectedNodes) as INode[], updateNode, moveNodes);
   } else {
-    // Resizing
-    updateNode(node.id, {
-      x: dragDataset.x,
-      y: dragDataset.y,
-      width: dragDataset.x2 - dragDataset.x,
-      height: dragDataset.y2 - dragDataset.y
-    });
+    handleNodeResize(node as INode, dragDataset, unref(allNodes) as INode[], updateNode);
   }
 };
 
 const { createNodeComponentApp } = useComponentContext();
 const vm = ref<HTMLElement>();
-onMounted(() => {
-  createNodeComponentApp(node.props as IComponentProps, vm?.value, node.component);
-});
 </script>
 
 <style lang="scss"></style>

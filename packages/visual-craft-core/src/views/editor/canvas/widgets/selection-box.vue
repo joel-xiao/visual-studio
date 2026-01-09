@@ -6,6 +6,7 @@
       @resizing="onResizing"
       @drag-start="onDragStart"
       @mousedown.stop
+      @contextmenu.stop.prevent="onContextMenu"
     />
   </div>
 </template>
@@ -15,10 +16,15 @@ import { computed, ref, watch, unref, onMounted, nextTick } from 'vue';
 import DragResize from './drag-resize.vue';
 import { useNodeContext } from '../../hooks/node-context';
 import { useCanvas } from '../../hooks/canvas';
+import { useComponentContext } from '../../hooks/component-context';
+import { useNodeMenu } from '../../hooks/context-menu';
 
-const { getSelectedNodes, updateNode, setNodesSelection } = useNodeContext();
+const nodeContext = useNodeContext();
+const { getSelectedNodes, updateNode, setNodesSelection } = nodeContext;
 const selectedNodes = getSelectedNodes();
 const { getScale, addCanvasUpdated } = useCanvas();
+const componentContext = useComponentContext();
+const { showNodeMenu } = useNodeMenu();
 
 const resizeRef = ref<InstanceType<typeof DragResize> | null>(null);
 
@@ -46,7 +52,7 @@ let initialNodesState: NodeInitialState[] = [];
 const calculateBoundingBox = async () => {
   const nodes = unref(selectedNodes);
   if (nodes.length <= 1) return;
-  
+
   let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
   nodes.forEach(node => {
     minX = Math.min(minX, node.x);
@@ -54,9 +60,9 @@ const calculateBoundingBox = async () => {
     maxX = Math.max(maxX, node.x + node.width);
     maxY = Math.max(maxY, node.y + node.height);
   });
-  
+
   boundingBox.value = { x: minX, y: minY, x2: maxX, y2: maxY };
-  
+
   await nextTick();
   resizeRef.value?.setPos(boundingBox.value);
   resizeRef.value?.setActive(true);
@@ -77,23 +83,23 @@ watch(selectedNodes, (newVal) => {
 
 onMounted(async () => {
   await nextTick();
-  const scale = getScale();
-  resizeRef.value?.setScale(scale);
+  setScale();
   if (selectedNodes.value.length > 1) {
     calculateBoundingBox();
   }
 });
 
 // Listen to scale changes
-addCanvasUpdated(({ scale }) => {
-  resizeRef.value?.setScale(scale || getScale());
-});
+function setScale() {
+  resizeRef.value?.setScale(getScale());
+}
+addCanvasUpdated(setScale);
 
 const onDragStart = () => {
   const b = boundingBox.value;
   const bw = b.x2 - b.x;
   const bh = b.y2 - b.y;
-  
+
   initialNodesState = selectedNodes.value.map(node => ({
     id: node.id,
     x: node.x,
@@ -110,7 +116,7 @@ const onDragStart = () => {
 const onResizing = (newBox: IDragDataset) => {
   const nbw = newBox.x2 - newBox.x;
   const nbh = newBox.y2 - newBox.y;
-  
+
   initialNodesState.forEach(state => {
     updateNode(state.id, {
       x: newBox.x + state.leftRatio * nbw,
@@ -119,9 +125,15 @@ const onResizing = (newBox: IDragDataset) => {
       height: state.heightRatio * nbh
     });
   });
-  
+
   // Update local box too
   boundingBox.value = { ...newBox };
+};
+
+const onContextMenu = (e: MouseEvent) => {
+  const ids = selectedNodes.value.map(n => n.id);
+  const nodeId = ids[0] || 'root';
+  showNodeMenu(e, nodeId, nodeContext, componentContext, getScale());
 };
 </script>
 

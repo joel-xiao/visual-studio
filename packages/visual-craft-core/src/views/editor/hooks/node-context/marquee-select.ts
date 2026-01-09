@@ -13,7 +13,6 @@ interface MarqueeOptions {
     getScale: () => number;
 }
 
-// Managed locally in this module
 const isMarqueeSelecting = ref(false);
 const marqueeRect = reactive<MarqueeRect>({ x: 0, y: 0, width: 0, height: 0 });
 
@@ -35,66 +34,28 @@ export const useMarqueeSelect = (
 
     const getNodesInArea = (selectionRect: MarqueeRect): string[] => {
         const nodes = unref(getNodes());
-
         const { x, y, width, height } = selectionRect;
-        const minX = x;
-        const maxX = x + width;
-        const minY = y;
-        const maxY = y + height;
+        const x2_area = x + width;
+        const y2_area = y + height;
 
-        const ids: string[] = [];
-        nodes.forEach((node) => {
-            if (node.id === 'root') return;
+        const allInArea: INode[] = [];
+        for (const node of nodes) {
+            if (node.id === 'root') continue;
 
-            const nodeX = node.x;
-            const nodeY = node.y;
-            const nodeX2 = node.x + node.width;
-            const nodeY2 = node.y + node.height;
-
-            const isInside =
-                nodeX < maxX &&
-                nodeX2 > minX &&
-                nodeY < maxY &&
-                nodeY2 > minY;
-
-            if (isInside) {
-                ids.push(node.id);
+            if (node.x < x2_area &&
+                node.x + node.width > x &&
+                node.y < y2_area &&
+                node.y + node.height > y) {
+                allInArea.push(node as unknown as INode);
             }
-        });
-
-        return ids?.length ? ids : ['root'];
-    };
-
-    const onMouseDown = (e: MouseEvent) => {
-        if (e.button !== 0) return;
-
-        isMarqueeSelecting.value = true;
-        startX = e.clientX;
-        startY = e.clientY;
-        updateRect(e.clientX, e.clientY);
-
-        window.addEventListener('mousemove', onMouseMove);
-        window.addEventListener('mouseup', onMouseUp);
-    };
-
-    const onMouseMove = (e: MouseEvent) => {
-        if (!isMarqueeSelecting.value) return;
-        updateRect(e.clientX, e.clientY);
-    };
-
-    const onMouseUp = (e: MouseEvent) => {
-        if (!isMarqueeSelecting.value) return;
-
-        if (marqueeRect.width > 2 || marqueeRect.height > 2) {
-            const ids = getNodesInArea({ ...marqueeRect });
-            onSelect?.(ids, e.shiftKey);
         }
 
-        isMarqueeSelecting.value = false;
-        Object.assign(marqueeRect, { x: 0, y: 0, width: 0, height: 0 });
+        const areaIdSet = new Set(allInArea.map(n => n.id));
+        const ids = allInArea
+            .filter(node => !node.parentId || node.parentId === 'root' || !areaIdSet.has(node.parentId))
+            .map(node => node.id);
 
-        window.removeEventListener('mousemove', onMouseMove);
-        window.removeEventListener('mouseup', onMouseUp);
+        return ids.length ? ids : ['root'];
     };
 
     const updateRect = (currentX: number, currentY: number) => {
@@ -116,7 +77,36 @@ export const useMarqueeSelect = (
         });
     };
 
-    return {
-        onMouseDown
+    const onMouseMove = (e: MouseEvent) => {
+        if (isMarqueeSelecting.value) updateRect(e.clientX, e.clientY);
     };
+
+    const onMouseUp = (e: MouseEvent) => {
+        if (!isMarqueeSelecting.value) return;
+
+        if (marqueeRect.width > 2 || marqueeRect.height > 2) {
+            const ids = getNodesInArea({ ...marqueeRect });
+            onSelect?.(ids, e.shiftKey);
+        }
+
+        isMarqueeSelecting.value = false;
+        Object.assign(marqueeRect, { x: 0, y: 0, width: 0, height: 0 });
+
+        window.removeEventListener('mousemove', onMouseMove);
+        window.removeEventListener('mouseup', onMouseUp);
+    };
+
+    const onMouseDown = (e: MouseEvent) => {
+        if (e.button !== 0) return;
+
+        isMarqueeSelecting.value = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        updateRect(e.clientX, e.clientY);
+
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mouseup', onMouseUp);
+    };
+
+    return { onMouseDown };
 };

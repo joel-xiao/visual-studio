@@ -1,5 +1,6 @@
 import { watch, computed, readonly, reactive, ref, shallowReadonly, ComputedRef, type App, type Ref } from 'vue';
 import { getUuid } from '../../../../assets/utils/index';
+import { groupSelectedNodesImpl, unGroupImpl } from './group';
 
 export class CreateNodeContext {
   #data?: IEditorData;
@@ -29,10 +30,13 @@ export class CreateNodeContext {
     this.updateNodeProps = this.updateNodeProps.bind(this);
     this.updateNodeProp = this.updateNodeProp.bind(this);
     this.update = this.update.bind(this);
+    this.removeNode = this.removeNode.bind(this);
     this.onAddNode = this.onAddNode.bind(this);
     this.onSelectNode = this.onSelectNode.bind(this);
     this.onSelectNodes = this.onSelectNodes.bind(this);
     this.moveNodes = this.moveNodes.bind(this);
+    this.groupSelectedNodes = this.groupSelectedNodes.bind(this);
+    this.unGroup = this.unGroup.bind(this);
     this.addNodeInstance = this.addNodeInstance.bind(this);
     this.removeNodeInstance = this.removeNodeInstance.bind(this);
     this.setNodesSelection = this.setNodesSelection.bind(this);
@@ -53,25 +57,24 @@ export class CreateNodeContext {
     }
 
     const childrenMap = new Map<string, TreeNode[]>();
-    this.#nodesTreeSource.forEach(node => {
-      if (!node.parentId) return;
+    for (const node of this.#nodesTreeSource) {
+      if (!node.parentId) continue;
       const list = childrenMap.get(node.parentId);
       if (list) {
         list.push(node);
       } else {
         childrenMap.set(node.parentId, [node]);
       }
-    });
+    }
 
-    this.#nodesTreeSource.forEach(node => {
+    for (const node of this.#nodesTreeSource) {
       node.children = childrenMap.get(node.id) || [];
-    });
+    }
 
     this.#nodesTree.value = [rootNode];
   }
 
   #createNodeTree(): void {
-    // Clear existing array without breaking reference
     this.#nodesTreeSource.splice(0, this.#nodesTreeSource.length);
     this.#treeNodeMap.clear();
 
@@ -79,15 +82,12 @@ export class CreateNodeContext {
       this.#addTreeNode(node);
     });
 
-    // Set initial state for root node if needed
     const rootNode = this.#treeNodeMap.get('root');
     if (rootNode) {
       rootNode.AFold = true;
     }
 
     this.#refreshNodeTree();
-
-    return;
   }
 
   #syncNodeMap() {
@@ -99,7 +99,9 @@ export class CreateNodeContext {
 
   #addTreeNode(node: INode) {
     const treeNode: TreeNode = reactive({
-      parentId: node.parentId,
+      get parentId() {
+        return node.parentId;
+      },
       id: node.id,
       get name() {
         return node.name;
@@ -185,8 +187,26 @@ export class CreateNodeContext {
     }
   }
 
+  removeNode(id: string): void {
+    if (!this.#data) return;
+    const idx = this.#data.nodes.findIndex(n => n.id === id);
+    if (idx >= 0) {
+      const node = this.#data.nodes[idx];
+      this.deleteNodeComponent(node);
+      this.#data.nodes.splice(idx, 1);
+      this.#nodeMap.delete(id);
+      const tree = this.#treeNodeMap.get(id);
+      if (tree) {
+        const tIdx = this.#nodesTreeSource.findIndex(t => t.id === id);
+        if (tIdx >= 0) this.#nodesTreeSource.splice(tIdx, 1);
+        this.#treeNodeMap.delete(id);
+      }
+      this.#refreshNodeTree();
+    }
+  }
+
   moveNodes(ids: string[], dx: number, dy: number): void {
-    ids.forEach(id => {
+    for (const id of ids) {
       const node = this.#nodeMap.get(id);
       if (node) {
         this.updateNode(id, {
@@ -194,7 +214,30 @@ export class CreateNodeContext {
           y: (node.y || 0) + dy
         });
       }
-    });
+    }
+  }
+
+  groupSelectedNodes(): INode | undefined {
+    return groupSelectedNodesImpl(
+      this.#data,
+      this.#nodeMap,
+      (node: INode) => this.#addTreeNode(node),
+      () => this.#refreshNodeTree(),
+      (id: string) => this.onSelectNode(id),
+      (id, delta) => this.updateNode(id, delta)
+    );
+  }
+
+  unGroup(groupId: string): void {
+    unGroupImpl(
+      this.#data,
+      this.#nodeMap,
+      (id: string, delta: INodeDelta) => this.updateNode(id, delta),
+      (id: string) => this.removeNode(id),
+      () => this.#refreshNodeTree(),
+      (id: string) => this.onSelectNode(id),
+      groupId
+    );
   }
 
   updateNodeProp(
@@ -314,9 +357,9 @@ export class CreateNodeContext {
 
   onAddNode(nodes: IAddNode[] | IAddNode, parentId: string, pos: INodePointerPos) {
     if (Array.isArray(nodes)) {
-      nodes.forEach((node: IAddNode) => {
+      for (const node of nodes) {
         this.#onAddNode(node, parentId, pos, false);
-      });
+      }
       this.#refreshNodeTree();
     } else if (nodes instanceof Object) {
       return this.#onAddNode(nodes, parentId, pos);
@@ -330,17 +373,29 @@ export class CreateNodeContext {
   onSelectNodes(ids: string[], isAppend = false): void {
     if (!this.#data) return;
 
-    const idSet = new Set(ids);
+    let targetIds = [...ids];
+    if (targetIds.length > 1) {
+      targetIds = targetIds.filter(id => {
+        let parentId = this.#nodeMap.get(id)?.parentId;
+        while (parentId && parentId !== 'root') {
+          if (targetIds.includes(parentId)) return false;
+          parentId = this.#nodeMap.get(parentId)?.parentId;
+        }
+        return true;
+      });
+    }
+
+    const idSet = new Set(targetIds);
     const nodes = this.#data.nodes;
 
-    nodes.forEach(node => {
+    for (const node of nodes) {
       const isTarget = idSet.has(node.id);
       if (isAppend) {
         if (isTarget) node.select = !node.select;
       } else {
         node.select = isTarget;
       }
-    });
+    }
 
     const selectedComponents = nodes.filter(n => n.select && n.id !== 'root');
     const rootNode = this.#nodeMap.get('root');
@@ -348,29 +403,38 @@ export class CreateNodeContext {
     if (selectedComponents.length > 0) {
       if (rootNode) rootNode.select = false;
     } else if (!idSet.has('root')) {
-      // Fallback to Page selection if nothing else is selected
       if (rootNode) rootNode.select = true;
     }
 
     const activeCount = selectedComponents.length;
-    nodes.forEach(node => {
+    for (const node of nodes) {
       const isSelected = !!node.select;
       const isMultipleMode = activeCount > 1;
 
       this.#nodeInstances?.[node.id]?.setActive?.(isSelected && !isMultipleMode);
       this.#nodeInstances?.[node.id]?.setSelection?.(isSelected && isMultipleMode);
-    });
+    }
   }
 
   setNodesSelection(ids: string[], selection: boolean): void {
-    ids.forEach(id => {
+    for (const id of ids) {
       this.#nodeInstances?.[id]?.setSelection?.(selection);
-    });
+    }
   }
 
   addNodeInstance(nodeId: string, addNodeInstance: INodeInstance): void {
     if (this.#nodeInstances) {
       this.#nodeInstances[nodeId] = addNodeInstance;
+
+      const node = this.#nodeMap.get(nodeId);
+      if (node) {
+        const activeCount = this.#selectedNodes.value.filter(n => n.id !== 'root').length;
+        const isSelected = !!node.select;
+        const isMultipleMode = activeCount > 1;
+
+        addNodeInstance.setActive?.(isSelected && !isMultipleMode);
+        addNodeInstance.setSelection?.(isSelected && isMultipleMode);
+      }
     }
   }
 
