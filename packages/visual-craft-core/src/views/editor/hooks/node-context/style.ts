@@ -30,7 +30,8 @@ export function getNodeStyle(nodeOrRef: MaybeRef<StyleNode> | Readonly<Ref<Style
       '--node-width': width,
       '--node-height': height,
       overflow: 'hidden',
-      transform: `rotate(${rotate})`
+      transform: `rotate(${rotate})`,
+      display: node?.hide ? 'none' : 'block'
     };
   });
 }

@@ -54,25 +54,17 @@ const onSelect = function (tab: PanelTab) {
   tab.show = true;
 };
 
-const { getNodeTree, onSelectNode } = useNodeContext();
+const nodeContext = useNodeContext();
+const { getNodeTree, onSelectNode } = nodeContext;
 const layerData = getNodeTree();
 
-const layerMenus = reactive<PanelLayerItemMenu[]>([
-  {
-    name: '更多',
-    id: 'more',
-    icon: 'icon-dian',
-    disabled: true
-  },
-  { name: '添加组', id: 'add', icon: 'icon-jiahao', disabled: true }
-]);
+const layerMenus = reactive<PanelLayerItemMenu[]>([]);
 
 const onLayerSelect = function (item: PanelLayerItemData) {
   onSelectNode(item.id);
 };
 
 const onLayerCommand = function (cmd: PanelLayerItemMenu, item: PanelLayerItemData) {
-  console.log(cmd, item);
 };
 
 const componentTabBars = reactive<PanelTab[]>([{ name: '组件库', id: 'component' }]);
@@ -108,9 +100,6 @@ const componentData = reactive<PanelComponentData[]>(getMaterials());
         border-bottom: 1px solid var(--db-editor-color-canvas);
         padding: 0 12px 0 6px;
         height: var(--db-editor-tab-bar-height);
-
-        .tab_bar-title {
-        }
       }
 
       .editor-resource-library {

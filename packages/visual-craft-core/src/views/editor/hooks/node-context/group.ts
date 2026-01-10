@@ -15,25 +15,32 @@ export class GroupExtension {
     const parents = new Set(selected.map(n => n.parentId || 'root'));
     const parentId = parents.size === 1 ? Array.from(parents)[0] : 'root';
 
-    const minX = Math.min(...selected.map(n => n.x));
-    const minY = Math.min(...selected.map(n => n.y));
-    const maxX = Math.max(...selected.map(n => n.x + n.width));
-    const maxY = Math.max(...selected.map(n => n.y + n.height));
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity, maxZ = 0;
+    for (const n of selected) {
+      if (n.x < minX) minX = n.x;
+      if (n.y < minY) minY = n.y;
+      if (n.x + n.width > maxX) maxX = n.x + n.width;
+      if (n.y + n.height > maxY) maxY = n.y + n.height;
+      if (n.z > maxZ) maxZ = n.z;
+    }
+
+    const width = maxX - minX;
+    const height = maxY - minY;
 
     const group: INode = {
-      parentId: parentId,
+      parentId,
       id: getUuid(),
       name: 'Group',
       schema: 'GROUP',
       component: 'GROUP',
       props: { layout: {} },
-      width: maxX - minX,
-      height: maxY - minY,
+      width,
+      height,
       radius: [0, 0, 0, 0],
       type: 'group',
       x: minX,
       y: minY,
-      z: 0,
+      z: maxZ + 1,
       select: false,
       lock: false
     };
@@ -42,15 +49,18 @@ export class GroupExtension {
     nodeMap.set(group.id, group);
     this.context.addTreeNodeInternal(group);
 
+    const invWidth = 1 / Math.max(width, 1);
+    const invHeight = 1 / Math.max(height, 1);
+
     for (const child of selected) {
       const oldParentId = child.parentId;
       child.parentId = group.id;
 
       const rel = {
-        xRatio: (child.x - group.x) / Math.max(group.width, 1),
-        yRatio: (child.y - group.y) / Math.max(group.height, 1),
-        wRatio: child.width / Math.max(group.width, 1),
-        hRatio: child.height / Math.max(group.height, 1)
+        xRatio: (child.x - minX) * invWidth,
+        yRatio: (child.y - minY) * invHeight,
+        wRatio: child.width * invWidth,
+        hRatio: child.height * invHeight
       };
 
       const layout = (child.props.layout || {}) as Record<string, ComponentPropValue>;
@@ -58,12 +68,12 @@ export class GroupExtension {
       child.props.layout = layout as ComponentProp;
 
       if (oldParentId && oldParentId !== parentId && oldParentId !== 'root') {
-        this.refreshAncestorBounds(oldParentId);
+        this.refreshGroupBounds(oldParentId);
       }
     }
 
     if (parentId !== 'root') {
-      this.refreshAncestorBounds(parentId);
+      this.refreshGroupBounds(parentId);
     }
 
     this.context.onSelectNode(group.id);
@@ -81,23 +91,31 @@ export class GroupExtension {
     if (!group || group.schema !== 'GROUP') return;
 
     const targetParentId = group.parentId || 'root';
-    const children = data.nodes.filter(n => n.parentId === group.id && n.id !== 'root');
+    const children: INode[] = [];
+
+    for (const n of data.nodes) {
+      if (n.parentId === group.id && n.id !== 'root') {
+        children.push(n);
+      }
+    }
+
     const firstChildId = children[0]?.id;
 
     for (const child of children) {
       const rel = (child.props?.layout?.groupRel || {}) as Record<string, number>;
-      const xRatio = Number(rel['xRatio'] || 0);
-      const yRatio = Number(rel['yRatio'] || 0);
-      const wRatio = Number(rel['wRatio'] || 0);
-      const hRatio = Number(rel['hRatio'] || 0);
-
-      const nextX = group.x + xRatio * group.width;
-      const nextY = group.y + yRatio * group.height;
-      const nextW = wRatio * group.width;
-      const nextH = hRatio * group.height;
+      const xRatio = rel['xRatio'] || 0;
+      const yRatio = rel['yRatio'] || 0;
+      const wRatio = rel['wRatio'] || 0;
+      const hRatio = rel['hRatio'] || 0;
 
       child.parentId = targetParentId;
-      this.context.updateNode(child.id, { x: nextX, y: nextY, width: nextW, height: nextH }, true, true);
+      this.context.updateNode(child.id, {
+        x: group.x + xRatio * group.width,
+        y: group.y + yRatio * group.height,
+        width: wRatio * group.width,
+        height: hRatio * group.height
+      }, true, true);
+
       if (child.props?.layout) {
         delete (child.props.layout as Record<string, unknown>)['groupRel'];
       }
@@ -107,74 +125,62 @@ export class GroupExtension {
     this.context.removeNode(group.id);
     this.context.refreshNodeTreeInternal();
     this.context.syncSpatialIndex();
+
     if (firstChildId) {
       this.context.onSelectNode(firstChildId);
     }
   }
 
-  public handleNodeDrag(
-    node: INode,
-    dx: number,
-    dy: number,
-    allNodes: INode[],
-    selectedNodes: INode[]
-  ) {
+  public handleNodeDrag(node: INode, dx: number, dy: number, allNodes: INode[], selectedNodes: INode[]) {
     const moveIdsSet = new Set<string>();
     const nodesToProcess = selectedNodes.length > 0 ? selectedNodes : [node];
 
     for (const n of nodesToProcess) {
       moveIdsSet.add(n.id);
-      const descendants = this.getAllDescendantIds(allNodes, n.id);
-      for (const dId of descendants) moveIdsSet.add(dId);
+      this.collectDescendantIds(allNodes, n.id, moveIdsSet);
     }
 
-    const moveIdsArr = Array.from(moveIdsSet);
-    this.context.moveNodes(moveIdsArr, dx, dy);
+    this.context.moveNodes(Array.from(moveIdsSet), dx, dy);
 
     const affectedParents = new Set<string>();
-    for (const id of moveIdsArr) {
-      const n = allNodes.find(item => item.id === id);
+    for (const id of moveIdsSet) {
+      const n = this.context.getNodeMap().get(id);
       if (n?.parentId && n.parentId !== 'root' && !moveIdsSet.has(n.parentId)) {
         affectedParents.add(n.parentId);
       }
     }
 
-    affectedParents.forEach(pid => this.refreshAncestorBounds(pid, true));
+    for (const pid of affectedParents) {
+      this.refreshGroupBounds(pid, true);
+    }
     this.context.syncSpatialIndex();
   }
 
-  public handleNodeResize(
-    node: INode,
-    newBox: IDragDataset,
-    allNodes: INode[],
-    isRecursive = false
-  ) {
+  public handleNodeResize(node: INode, newBox: IDragDataset, allNodes: INode[], isRecursive = false) {
     const newW = newBox.x2 - newBox.x;
     const newH = newBox.y2 - newBox.y;
-
     const oldX = node.x;
     const oldY = node.y;
     const oldWidth = node.width;
     const oldHeight = node.height;
 
-    this.context.updateNode(node.id, {
-      x: newBox.x,
-      y: newBox.y,
-      width: newW,
-      height: newH
-    }, true, true);
+    this.context.updateNode(node.id, { x: newBox.x, y: newBox.y, width: newW, height: newH }, true, true);
 
     if (node.schema === 'GROUP') {
-      const children = allNodes.filter(n => n.parentId === node.id);
-      for (const child of children) {
+      const invOldW = 1 / Math.max(oldWidth, 1);
+      const invOldH = 1 / Math.max(oldHeight, 1);
+
+      for (const child of allNodes) {
+        if (child.parentId !== node.id) continue;
+
         const rel = (child.props?.layout?.groupRel || {}) as Record<string, number>;
         let { xRatio, yRatio, wRatio, hRatio } = rel;
 
         if ([xRatio, yRatio, wRatio, hRatio].some(v => typeof v !== 'number' || isNaN(v))) {
-          xRatio = (child.x - oldX) / Math.max(oldWidth, 1);
-          yRatio = (child.y - oldY) / Math.max(oldHeight, 1);
-          wRatio = child.width / Math.max(oldWidth, 1);
-          hRatio = child.height / Math.max(oldHeight, 1);
+          xRatio = (child.x - oldX) * invOldW;
+          yRatio = (child.y - oldY) * invOldH;
+          wRatio = child.width * invOldW;
+          hRatio = child.height * invOldH;
         }
 
         const nextX = newBox.x + xRatio * newW;
@@ -188,60 +194,65 @@ export class GroupExtension {
 
     if (!isRecursive) {
       if (node.parentId && node.parentId !== 'root') {
-        this.refreshAncestorBounds(node.parentId);
+        this.refreshGroupBounds(node.parentId);
       }
       this.context.syncSpatialIndex();
     }
   }
 
-  private getAllDescendantIds(allNodes: INode[], parentId: string): string[] {
-    const children = allNodes.filter(n => n.parentId === parentId);
-    let ids = children.map(c => c.id);
-    for (const c of children) {
-      ids = ids.concat(this.getAllDescendantIds(allNodes, c.id));
+  private collectDescendantIds(allNodes: INode[], parentId: string, result: Set<string>): void {
+    for (const n of allNodes) {
+      if (n.parentId === parentId && !result.has(n.id)) {
+        result.add(n.id);
+        this.collectDescendantIds(allNodes, n.id, result);
+      }
     }
-    return ids;
   }
 
-  private refreshAncestorBounds(groupId: string, skipSpatialSync = false) {
-    const allNodes = this.context.getData()?.nodes || [];
+  public refreshGroupBounds(groupId: string, skipSpatialSync = false) {
     if (!groupId || groupId === 'root') return;
 
-    const children = allNodes.filter(n => n.parentId === groupId);
+    const nodeMap = this.context.getNodeMap();
+    const group = nodeMap.get(groupId);
+    if (!group) return;
+
+    const allNodes = this.context.getData()?.nodes || [];
+    const children: INode[] = [];
+
+    for (const n of allNodes) {
+      if (n.parentId === groupId) children.push(n);
+    }
+
     if (children.length === 0) return;
 
-    const minX = Math.min(...children.map(n => n.x));
-    const minY = Math.min(...children.map(n => n.y));
-    const maxX = Math.max(...children.map(n => n.x + n.width));
-    const maxY = Math.max(...children.map(n => n.y + n.height));
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    for (const n of children) {
+      if (n.x < minX) minX = n.x;
+      if (n.y < minY) minY = n.y;
+      if (n.x + n.width > maxX) maxX = n.x + n.width;
+      if (n.y + n.height > maxY) maxY = n.y + n.height;
+    }
 
     const newW = maxX - minX;
     const newH = maxY - minY;
-
-    const group = allNodes.find(n => n.id === groupId);
-    if (!group) return;
-
     const threshold = 0.01;
-    const changed =
-      Math.abs(group.x - minX) > threshold ||
+
+    if (Math.abs(group.x - minX) > threshold ||
       Math.abs(group.y - minY) > threshold ||
       Math.abs(group.width - newW) > threshold ||
-      Math.abs(group.height - newH) > threshold;
+      Math.abs(group.height - newH) > threshold) {
 
-    if (changed) {
-      this.context.updateNode(groupId, {
-        x: minX,
-        y: minY,
-        width: newW,
-        height: newH
-      }, true, skipSpatialSync);
+      this.context.updateNode(groupId, { x: minX, y: minY, width: newW, height: newH }, true, skipSpatialSync);
+
+      const invW = 1 / Math.max(newW, 1);
+      const invH = 1 / Math.max(newH, 1);
 
       for (const child of children) {
         const rel = {
-          xRatio: (child.x - minX) / Math.max(newW, 1),
-          yRatio: (child.y - minY) / Math.max(newH, 1),
-          wRatio: child.width / Math.max(newW, 1),
-          hRatio: child.height / Math.max(newH, 1)
+          xRatio: (child.x - minX) * invW,
+          yRatio: (child.y - minY) * invH,
+          wRatio: child.width * invW,
+          hRatio: child.height * invH
         };
         if (child.props?.layout) {
           (child.props.layout as Record<string, any>)['groupRel'] = rel;
@@ -249,7 +260,7 @@ export class GroupExtension {
       }
 
       if (group.parentId && group.parentId !== 'root') {
-        this.refreshAncestorBounds(group.parentId, skipSpatialSync);
+        this.refreshGroupBounds(group.parentId, skipSpatialSync);
       }
     }
   }

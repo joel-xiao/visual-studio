@@ -54,13 +54,27 @@ export const buildNodeMenuItems = (
         id: 'move-up',
         label: '上移一层',
         icon: 'lucide:arrow-up-to-line',
-        shortcuts: [CMD, { label: ']' }]
+        shortcuts: [CMD, { label: ']' }],
+        action: () => nodeContext.layer.moveLayer('up', nodeId)
     });
     menu.push({
         id: 'move-down',
         label: '下移一层',
         icon: 'lucide:arrow-down-to-line',
-        shortcuts: [CMD, { label: '[' }]
+        shortcuts: [CMD, { label: '[' }],
+        action: () => nodeContext.layer.moveLayer('down', nodeId)
+    });
+    menu.push({
+        id: 'move-top',
+        label: '置于顶层',
+        icon: 'lucide:chevrons-up',
+        action: () => nodeContext.layer.moveLayer('top', nodeId)
+    });
+    menu.push({
+        id: 'move-bottom',
+        label: '置于底层',
+        icon: 'lucide:chevrons-down',
+        action: () => nodeContext.layer.moveLayer('bottom', nodeId)
     });
     menu.push({ id: 'div-arrange', label: '', divider: true });
 
@@ -93,17 +107,20 @@ export const buildNodeMenuItems = (
     menu.push({ id: 'div-group', label: '', divider: true });
 
     // 5. Visibility / Locking
+    const node = nodeContext.getNodeMap().get(nodeId);
     menu.push({
         id: 'visible',
-        label: '显示 / 隐藏图层',
-        icon: 'lucide:eye',
-        shortcuts: [SHIFT, CMD, { label: 'H' }]
+        label: node?.hide ? '显示图层' : '隐藏图层',
+        icon: node?.hide ? 'lucide:eye' : 'lucide:eye-off',
+        shortcuts: [SHIFT, CMD, { label: 'H' }],
+        action: () => nodeContext.layer.setRecursiveProperty(nodeId, 'hide', !node?.hide)
     });
     menu.push({
         id: 'lock',
-        label: '锁定 / 解锁图层',
-        icon: 'lucide:lock',
-        shortcuts: [SHIFT, CMD, { label: 'L' }]
+        label: node?.lock ? '解锁图层' : '锁定图层',
+        icon: node?.lock ? 'lucide:lock' : 'lucide:unlock',
+        shortcuts: [SHIFT, CMD, { label: 'L' }],
+        action: () => nodeContext.layer.setRecursiveProperty(nodeId, 'lock', !node?.lock)
     });
 
     menu.push({ id: 'div-state', label: '', divider: true });
@@ -114,7 +131,7 @@ export const buildNodeMenuItems = (
         label: '删除',
         icon: 'lucide:trash-2',
         shortcuts: [DEL],
-        action: () => { }
+        action: () => nodeContext.removeNode(nodeId)
     });
 
     return menu;

@@ -27,6 +27,7 @@ declare interface INode extends IAddNode {
   y: number;
   select?: boolean;
   lock?: boolean;
+  hide?: boolean;
   z: number;
   rotate?: number;
 }
@@ -38,6 +39,8 @@ declare interface INodeDelta {
   height?: number;
   x?: number;
   y?: number;
+  hide?: boolean;
+  lock?: boolean;
 }
 
 declare interface IEditorData {

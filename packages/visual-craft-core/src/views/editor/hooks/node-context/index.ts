@@ -2,6 +2,7 @@ import { watch, computed, readonly, reactive, ref, shallowReadonly, ComputedRef,
 import RBush from 'rbush';
 import { getUuid } from '../../../../assets/utils/index';
 import { GroupExtension } from './group';
+import { LayerExtension } from './layer';
 
 interface SpatialItem {
   minX: number;
@@ -29,6 +30,7 @@ export class CreateNodeContext {
   });
 
   public group: GroupExtension;
+  public layer: LayerExtension;
 
   constructor() {
     this.getNodeTree = this.getNodeTree.bind(this);
@@ -59,6 +61,7 @@ export class CreateNodeContext {
     this.syncSpatialIndex = this.syncSpatialIndex.bind(this);
 
     this.group = new GroupExtension(this);
+    this.layer = new LayerExtension(this);
   }
 
   getNodeTree() {
@@ -362,6 +365,14 @@ export class CreateNodeContext {
 
   #onAddNode(addNode: IAddNode, parentId: string, pos: INodePointerPos, refreshTree = true, skipSpatialSync = false) {
     if (addNode instanceof Object) {
+      // 计算该父级下的最大 z 值
+      let maxZ = 0;
+      this.#data?.nodes.forEach(n => {
+        if (n.parentId === parentId && n.z > maxZ) {
+          maxZ = n.z;
+        }
+      });
+
       const node: INode = {
         parentId: parentId,
         id: getUuid(),
@@ -375,9 +386,10 @@ export class CreateNodeContext {
         type: '',
         x: 0,
         y: 0,
-        z: 0,
+        z: maxZ + 1, // 新节点始终在最顶层
         select: false,
-        lock: false
+        lock: false,
+        hide: false
       };
 
       this.#data?.nodes.push(node);
@@ -394,6 +406,7 @@ export class CreateNodeContext {
       this.#addTreeNode(addedNode);
       if (refreshTree) this.#refreshNodeTree();
       return addedNode;
+
     }
   }
 

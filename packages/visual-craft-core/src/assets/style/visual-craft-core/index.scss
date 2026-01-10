@@ -44,6 +44,20 @@
   --db-editor-color-select: rgba(54, 98, 236, 0.3);
   --db-editor-color-select-light: rgba(54, 98, 236, 0.15);
 
+  // Primary color (derived from theme)
+  --db-editor-color-primary: var(--theme-color-blue-700);
+  --db-editor-color-primary-light: var(--db-editor-color-select-light);
+  --db-editor-color-primary-glow: var(--db-editor-color-select);
+
+  // Layer tree
+  --db-layer-item-height: 30px;
+  --db-layer-item-radius: 6px;
+  --db-layer-icon-size: 12px;
+  --db-layer-icon-size-active: 11px;
+  --db-layer-icon-opacity: 0.7;
+  --db-layer-icon-opacity-active: 0.8;
+  --db-layer-dot-size: 3px;
+
   // Canvas color
   --db-editor-color-canvas: var(--theme-color-real-gray-900);
   --db-editor-color-canvas-bg: #262626;

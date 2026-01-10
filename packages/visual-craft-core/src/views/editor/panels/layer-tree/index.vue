@@ -20,8 +20,19 @@ const findLayer = function (
   folders: readonly PanelLayerItemData[],
   cascades?: readonly PanelLayerItemData[]
 ): PanelLayerItemData[] {
-  const list = [...folders] as PanelLayerItemData[];
+  // 按 z 值降序排列（z 大的在前面，显示在顶部）
+  const list = [...folders].sort((a, b) => {
+    const zA = a.data?.z ?? 0;
+    const zB = b.data?.z ?? 0;
+    return zB - zA; // 降序
+  }) as PanelLayerItemData[];
+  
   list.forEach(folder => {
+    // Default to expanded (AFold = true) if not previously set
+    if (folder.AFold === undefined || folder.AFold === null) {
+      folder.AFold = true;
+    }
+    
     folder.cascades = cascades ? [...cascades, folder] : [folder];
     const children = folder.children || [];
     folder.children = findLayer(children, folder.cascades);
