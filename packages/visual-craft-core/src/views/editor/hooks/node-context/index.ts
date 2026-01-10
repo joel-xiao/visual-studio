@@ -1,7 +1,7 @@
 import { watch, computed, readonly, reactive, ref, shallowReadonly, ComputedRef, type App, type Ref } from 'vue';
 import RBush from 'rbush';
 import { getUuid } from '../../../../assets/utils/index';
-import { groupSelectedNodesImpl, unGroupImpl } from './group';
+import { GroupExtension } from './group';
 
 interface SpatialItem {
   minX: number;
@@ -27,6 +27,8 @@ export class CreateNodeContext {
     const node = this.#nodeMap.get('root');
     return node ? node : ({} as INode);
   });
+
+  public group: GroupExtension;
 
   constructor() {
     this.getNodeTree = this.getNodeTree.bind(this);
@@ -54,10 +56,29 @@ export class CreateNodeContext {
     this.install = this.install.bind(this);
     this.uninstall = this.uninstall.bind(this);
     this.searchNodesInArea = this.searchNodesInArea.bind(this);
+    this.syncSpatialIndex = this.syncSpatialIndex.bind(this);
+
+    this.group = new GroupExtension(this);
   }
 
   getNodeTree() {
     return shallowReadonly(this.#nodesTree);
+  }
+
+  getData() {
+    return this.#data;
+  }
+
+  getNodeMap() {
+    return this.#nodeMap;
+  }
+
+  refreshNodeTreeInternal() {
+    this.#refreshNodeTree();
+  }
+
+  addTreeNodeInternal(node: INode) {
+    this.#addTreeNode(node);
   }
 
   #refreshNodeTree(): void {
@@ -254,26 +275,11 @@ export class CreateNodeContext {
   }
 
   groupSelectedNodes(): INode | undefined {
-    return groupSelectedNodesImpl(
-      this.#data,
-      this.#nodeMap,
-      (node: INode) => this.#addTreeNode(node),
-      () => this.#refreshNodeTree(),
-      (id: string) => this.onSelectNode(id),
-      (id, delta) => this.updateNode(id, delta)
-    );
+    return this.group.groupSelectedNodes();
   }
 
   unGroup(groupId: string): void {
-    unGroupImpl(
-      this.#data,
-      this.#nodeMap,
-      (id: string, delta: INodeDelta) => this.updateNode(id, delta),
-      (id: string) => this.removeNode(id),
-      () => this.#refreshNodeTree(),
-      (id: string) => this.onSelectNode(id),
-      groupId
-    );
+    this.group.unGroup(groupId);
   }
 
   updateNodeProp(
@@ -527,6 +533,10 @@ export class CreateNodeContext {
     return items
       .map(item => this.#nodeMap.get(item.id))
       .filter((n): n is INode => !!n);
+  }
+
+  syncSpatialIndex() {
+    this.#syncSpatialIndex();
   }
 }
 

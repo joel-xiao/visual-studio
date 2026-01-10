@@ -18,7 +18,6 @@ import { getNodeStyle } from './../hooks/node-context/style';
 import { useComponentContext } from './../hooks/component-context';
 import { useCanvas } from '../hooks/canvas';
 import { useNodeMenu } from '../hooks/context-menu';
-import { handleNodeDrag, handleNodeResize } from './../hooks/node-context/group';
 
 interface Props {
   id: string;
@@ -27,7 +26,7 @@ const props = withDefaults(defineProps<Props>(), { id: '' });
 
 const nodeContext = useNodeContext();
 const componentContext = useComponentContext();
-const { getNode, updateNode, onSelectNode, addNodeInstance, getSelectedNodes, moveNodes } = nodeContext;
+const { getNode, onSelectNode, addNodeInstance, getSelectedNodes } = nodeContext;
 const selectedNodes = getSelectedNodes();
 const node = getNode(props.id);
 const nodeStyle = getNodeStyle(node);
@@ -79,9 +78,9 @@ const onResizing = (dragDataset: IDragDataset) => {
   if ((node as INode).lock) return;
 
   if (dw === 0 && dh === 0) {
-    handleNodeDrag(node as INode, dx, dy, unref(allNodes) as INode[], unref(selectedNodes) as INode[], updateNode, moveNodes);
+    nodeContext.group.handleNodeDrag(node as INode, dx, dy, unref(allNodes) as INode[], unref(selectedNodes) as INode[]);
   } else {
-    handleNodeResize(node as INode, dragDataset, unref(allNodes) as INode[], updateNode);
+    nodeContext.group.handleNodeResize(node as INode, dragDataset, unref(allNodes) as INode[]);
   }
 };
 
