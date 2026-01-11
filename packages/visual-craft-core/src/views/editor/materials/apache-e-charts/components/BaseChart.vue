@@ -1,9 +1,9 @@
 <template>
-  <v-chart class="chart" :option="option" autoresize />
+  <v-chart ref="chart" class="chart" :option="option" />
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import VChart from 'vue-echarts';
 import { use } from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
@@ -29,6 +29,7 @@ import {
 } from 'echarts/components';
 import { useChartOptions } from '../composables/use-chart-options';
 import { useChartThemesContext } from '../../../hooks/chart-themes-context';
+import { useAutoResize } from '../../../hooks/use-auto-resize';
 
 use([
   CanvasRenderer,
@@ -58,6 +59,18 @@ const props = defineProps<{
 const { option } = useChartOptions(props, props.defaultOption);
 const chartThemesContext = useChartThemesContext();
 const theme = computed(() => chartThemesContext.getCurrentTheme().value);
+
+const chart = ref();
+
+useAutoResize(computed(() => chart.value?.$el), (width, height) => {
+  chart.value?.resize({
+    width,
+    height,
+    animation: {
+      duration: 0
+    }
+  });
+});
 </script>
 
 <style scoped>
