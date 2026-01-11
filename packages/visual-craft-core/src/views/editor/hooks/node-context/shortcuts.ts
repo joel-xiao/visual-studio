@@ -1,97 +1,109 @@
 import { onMounted, onUnmounted } from 'vue';
 import type { CreateNodeContext } from './index';
+import { useBindKeysContext } from '../bind-keys-context';
 
 export const useKeyboardShortcuts = (nodeContext: CreateNodeContext) => {
-    const onKeyDown = (e: KeyboardEvent) => {
-        // Avoid triggering shortcuts when typing in inputs/textareas
-        const target = e.target as HTMLElement;
-        if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
-            return;
-        }
+    const { bindShortcut, unbindShortcut } = useBindKeysContext();
+    const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
 
-        const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-        const modifier = isMac ? e.metaKey : e.ctrlKey;
-
-        // Cmd/Ctrl + D: Duplicate
-        if (modifier && e.key.toLowerCase() === 'd') {
-            e.preventDefault();
-            const selectedNodes = nodeContext.getSelectedNodes().value;
-            if (selectedNodes.length > 0) {
-                nodeContext.clipboard.duplicate(selectedNodes.map(n => n.id));
+    const shortcuts = [
+        {
+            id: 'cut',
+            key: 'x',
+            [isMac ? 'meta' : 'ctrl']: true,
+            action: (e: KeyboardEvent) => {
+                const selectedNodes = nodeContext.getSelectedNodes().value;
+                if (selectedNodes.length > 0) {
+                    nodeContext.clipboard.cut(selectedNodes.map(n => n.id));
+                }
             }
-            return;
-        }
-
-        // Cmd/Ctrl + X: Cut
-        if (modifier && e.key.toLowerCase() === 'x') {
-            const selectedNodes = nodeContext.getSelectedNodes().value;
-            if (selectedNodes.length > 0) {
-                nodeContext.clipboard.cut(selectedNodes.map(n => n.id));
+        },
+        {
+            id: 'copy',
+            key: 'c',
+            [isMac ? 'meta' : 'ctrl']: true,
+            action: (e: KeyboardEvent) => {
+                const selectedNodes = nodeContext.getSelectedNodes().value;
+                if (selectedNodes.length > 0) {
+                    nodeContext.clipboard.copy(selectedNodes.map(n => n.id));
+                }
             }
-            return;
-        }
-
-        // Cmd/Ctrl + C: Copy
-        if (modifier && e.key.toLowerCase() === 'c') {
-            const selectedNodes = nodeContext.getSelectedNodes().value;
-            if (selectedNodes.length > 0) {
-                nodeContext.clipboard.copy(selectedNodes.map(n => n.id));
+        },
+        {
+            id: 'paste',
+            key: 'v',
+            [isMac ? 'meta' : 'ctrl']: true,
+            action: (e: KeyboardEvent) => {
+                if (nodeContext.clipboard.hasClipboardData()) {
+                    nodeContext.clipboard.paste();
+                }
             }
-            return;
-        }
-
-        // Cmd/Ctrl + V: Paste
-        if (modifier && e.key.toLowerCase() === 'v') {
-            if (nodeContext.clipboard.hasClipboardData()) {
-                nodeContext.clipboard.paste();
+        },
+        {
+            id: 'duplicate',
+            key: 'd',
+            [isMac ? 'meta' : 'ctrl']: true,
+            action: (e: KeyboardEvent) => {
+                e.preventDefault();
+                const selectedNodes = nodeContext.getSelectedNodes().value;
+                if (selectedNodes.length > 0) {
+                    nodeContext.clipboard.duplicate(selectedNodes.map(n => n.id));
+                }
             }
-            return;
-        }
-
-        // Cmd/Ctrl + A: Select All
-        if (modifier && e.key.toLowerCase() === 'a') {
-            e.preventDefault();
-            const allNodes = nodeContext.getNodes().value;
-            nodeContext.onSelectNodes(allNodes.map(n => n.id));
-            return;
-        }
-
-        // Delete / Backspace: Remove nodes
-        if (e.key === 'Delete' || e.key === 'Backspace') {
-            const selectedNodes = nodeContext.getSelectedNodes().value;
-            if (selectedNodes.length > 0) {
-                selectedNodes.forEach(n => {
-                    if (n.id !== 'root') {
-                        nodeContext.removeNode(n.id);
-                    }
-                });
+        },
+        {
+            id: 'select-all',
+            key: 'a',
+            [isMac ? 'meta' : 'ctrl']: true,
+            action: (e: KeyboardEvent) => {
+                e.preventDefault();
+                const allNodes = nodeContext.getNodes().value;
+                nodeContext.onSelectNodes(allNodes.map(n => n.id));
             }
-            return;
-        }
-
-        // Cmd/Ctrl + G: Group
-        if (modifier && e.key.toLowerCase() === 'g') {
-            e.preventDefault();
-            if (e.shiftKey) {
-                // Ungroup
+        },
+        {
+            id: 'delete-1',
+            key: 'Delete',
+            action: (e: KeyboardEvent) => {
                 const selectedNodes = nodeContext.getSelectedNodes().value;
                 selectedNodes.forEach(n => {
-                    if (n.schema === 'GROUP') {
-                        nodeContext.unGroup(n.id);
-                    }
+                    if (n.id !== 'root') nodeContext.removeNode(n.id);
                 });
-            } else {
-                nodeContext.groupSelectedNodes();
             }
-            return;
+        },
+        {
+            id: 'delete-2',
+            key: 'Backspace',
+            action: (e: KeyboardEvent) => {
+                const selectedNodes = nodeContext.getSelectedNodes().value;
+                selectedNodes.forEach(n => {
+                    if (n.id !== 'root') nodeContext.removeNode(n.id);
+                });
+            }
+        },
+        {
+            id: 'group',
+            key: 'g',
+            [isMac ? 'meta' : 'ctrl']: true,
+            action: (e: KeyboardEvent) => {
+                e.preventDefault();
+                if (e.shiftKey) {
+                    const selectedNodes = nodeContext.getSelectedNodes().value;
+                    selectedNodes.forEach(n => {
+                        if (n.schema === 'GROUP') nodeContext.unGroup(n.id);
+                    });
+                } else {
+                    nodeContext.groupSelectedNodes();
+                }
+            }
         }
-    };
+    ];
 
     onMounted(() => {
-        window.addEventListener('keydown', onKeyDown);
+        shortcuts.forEach(s => bindShortcut(s));
     });
 
     onUnmounted(() => {
-        window.removeEventListener('keydown', onKeyDown);
+        shortcuts.forEach(s => unbindShortcut(s.id));
     });
 };
