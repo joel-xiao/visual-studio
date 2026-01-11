@@ -19,7 +19,6 @@ export const buildNodeMenuItems = (
 
     const menu: ContextMenuItem[] = [];
 
-    // 1. Selection & Hierarchy
     if (hierarchyItems.length > 1) {
         menu.push({
             id: 'select-layer',
@@ -30,7 +29,6 @@ export const buildNodeMenuItems = (
         menu.push({ id: 'div-selection', label: '', divider: true });
     }
 
-    // 2. Main Editing
     menu.push({
         id: 'copy',
         label: '复制',
@@ -52,7 +50,6 @@ export const buildNodeMenuItems = (
     const selectedIds = selectedNodes.map(n => n.id);
     const targetIds = selectedIds.length > 0 ? selectedIds : [nodeId];
 
-    // 3. Arrangement
     menu.push({
         id: 'move-up',
         label: '上移一层',
@@ -81,7 +78,6 @@ export const buildNodeMenuItems = (
     });
     menu.push({ id: 'div-arrange', label: '', divider: true });
 
-    // 4. Grouping
     menu.push({
         id: 'group',
         label: '创建编组',
@@ -109,7 +105,6 @@ export const buildNodeMenuItems = (
 
     menu.push({ id: 'div-group', label: '', divider: true });
 
-    // 5. Visibility / Locking
     const node = nodeContext.getNodeMap().get(nodeId);
     menu.push({
         id: 'visible',
@@ -134,7 +129,6 @@ export const buildNodeMenuItems = (
 
     menu.push({ id: 'div-state', label: '', divider: true });
 
-    // 6. Delete
     menu.push({
         id: 'delete',
         label: '删除',

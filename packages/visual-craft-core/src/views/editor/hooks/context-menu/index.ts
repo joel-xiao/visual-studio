@@ -15,10 +15,6 @@ export * from './state';
 export const useNodeMenu = () => {
     const { open } = useContextMenu();
 
-    /**
-     * Show menu for a specific node (right click on element).
-     * Contexts must be provided to avoid internal hook dependencies.
-     */
     const showNodeMenu = (
         e: MouseEvent,
         nodeId: string,
@@ -29,13 +25,11 @@ export const useNodeMenu = () => {
         e.preventDefault();
         e.stopPropagation();
 
-        // Side effect: Selection management
         const node = nodeContext.getNode(nodeId);
         if (node && node.id && !node.select) {
             nodeContext.onSelectNode(nodeId);
         }
 
-        // Calculate canvas coordinates relative to the root container
         let coords: { x: number; y: number } | undefined = undefined;
         const canvasRootEl = document.getElementById('editor-canvas-root');
         if (canvasRootEl) {
@@ -50,9 +44,6 @@ export const useNodeMenu = () => {
         open(e.clientX, e.clientY, items);
     };
 
-    /**
-     * Show menu for the empty canvas.
-     */
     const showCanvasMenu = (
         e: MouseEvent,
         nodeContext: CreateNodeContext,
@@ -62,11 +53,10 @@ export const useNodeMenu = () => {
         e.preventDefault();
         e.stopPropagation();
 
-        // Calculate canvas coordinates
         let coords: { x: number; y: number } | undefined = undefined;
-        const canvasEl = document.getElementById('editor-canvas');
-        if (canvasEl) {
-            const rect = canvasEl.getBoundingClientRect();
+        const canvasRootEl = document.getElementById('editor-canvas-root');
+        if (canvasRootEl) {
+            const rect = canvasRootEl.getBoundingClientRect();
             coords = {
                 x: (e.clientX - rect.left) / scale,
                 y: (e.clientY - rect.top) / scale
@@ -75,7 +65,6 @@ export const useNodeMenu = () => {
 
         const items = buildCanvasMenuItems();
 
-        // If something is at this position (but wasn't direct-targeted), add hierarchy
         if (coords) {
             const hierarchyItems = buildHierarchyItems('root', nodeContext, componentContext, coords);
             if (hierarchyItems.length > 0) {
