@@ -16,7 +16,6 @@ export class Canvas {
   #minScale = 0.02;
   #option?: CanvasOption;
   #canvasUpdates: ICallbackUpdate[] = [];
-  #parentRect: DOMRect | null = null;
 
   public overlay: Overlay;
   public shortcuts: Shortcuts;
@@ -50,16 +49,7 @@ export class Canvas {
   addScaleEvent(opt: CanvasOption) {
     this.#option = opt;
     this.#option?.parentEl.addEventListener('wheel', this.onWheel);
-    this.#updateParentRect();
     this.#autoFit();
-
-    window.addEventListener('resize', this.#updateParentRect.bind(this));
-  }
-
-  #updateParentRect() {
-    if (this.#option?.parentEl) {
-      this.#parentRect = this.#option.parentEl.getBoundingClientRect();
-    }
   }
 
   #autoFit() {
@@ -96,7 +86,6 @@ export class Canvas {
 
   removeScaleEvent() {
     this.#option?.parentEl.removeEventListener('wheel', this.onWheel);
-    window.removeEventListener('resize', this.#updateParentRect.bind(this));
     this.#option = undefined;
   }
 
@@ -124,16 +113,16 @@ export class Canvas {
       this.#option.canvasEl.style.scale = `${this.#scale}`;
     }
 
-    if (this.#option?.canvasEl && this.#option?.parentEl && this.#parentRect) {
-      const parent_rect = this.#parentRect;
+    if (this.#option?.canvasEl && this.#option?.parentEl) {
+      const parent_rect = this.#option.parentEl.getBoundingClientRect();
       // Current position after dragging.
       const canvas_pos = getPos();
       // The current offset position of the scaled canvas canvas.
       const { x, y } = getScaleOffset() || { x: 0, y: 0 };
       // Calculate the actual position of the canvas canvas
       const canvas_rect = {
-        left: x + parent_rect.x + canvas_pos.x,
-        top: y + parent_rect.y + canvas_pos.y
+        left: x + parent_rect.left + this.#option.parentEl.clientLeft + canvas_pos.x,
+        top: y + parent_rect.top + this.#option.parentEl.clientTop + canvas_pos.y
       };
       // Calculate the position of the mouse pointer in the canvas.
       const disX = e.clientX - canvas_rect.left;
