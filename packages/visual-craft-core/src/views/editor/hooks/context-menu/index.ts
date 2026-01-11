@@ -34,15 +34,18 @@ export const useNodeMenu = () => {
             nodeContext.onSelectNode(nodeId);
         }
 
-        // Calculate canvas coordinates for hit-testing overlapping components
+        // Calculate canvas coordinates ONLY if the click is within the canvas area
         let coords: { x: number; y: number } | undefined = undefined;
         const canvasEl = document.getElementById('editor-canvas');
         if (canvasEl) {
             const rect = canvasEl.getBoundingClientRect();
-            coords = {
-                x: (e.clientX - rect.left) / scale,
-                y: (e.clientY - rect.top) / scale
-            };
+            if (e.clientX >= rect.left && e.clientX <= rect.right &&
+                e.clientY >= rect.top && e.clientY <= rect.bottom) {
+                coords = {
+                    x: (e.clientX - rect.left) / scale,
+                    y: (e.clientY - rect.top) / scale
+                };
+            }
         }
 
         const items = buildNodeMenuItems(nodeId, nodeContext, componentContext, coords);

@@ -3,39 +3,6 @@ import type { CreateNodeContext } from '../node-context';
 import type { CreateComponentContext } from '../component-context';
 
 /**
- * Helper to calculate absolute position of a node within the canvas.
- * It recursively adds parent coordinates.
- */
-const getAbsoluteRect = (nodeId: string, nodeContext: CreateNodeContext) => {
-    const node = nodeContext.getNode(nodeId);
-    if (!node || node.id === 'root') return { x: 0, y: 0, width: node?.width || 0, height: node?.height || 0 };
-
-    let absX = node.x || 0;
-    let absY = node.y || 0;
-    let currentParentId = node.parentId;
-
-    // Walk up to root
-    while (currentParentId && currentParentId !== 'root') {
-        const parent = nodeContext.getNode(currentParentId);
-        if (!parent || !parent.id) break;
-        absX += parent.x || 0;
-        absY += parent.y || 0;
-        currentParentId = parent.parentId;
-
-        // Circular dependency safety
-        if (currentParentId === nodeId) break;
-    }
-
-    return {
-        x: absX,
-        y: absY,
-        width: node.width || 0,
-        height: node.height || 0,
-        id: node.id
-    };
-};
-
-/**
  * Builds a list of layers at a specific position or based on a node's hierarchy.
  */
 export const buildHierarchyItems = (
@@ -44,83 +11,75 @@ export const buildHierarchyItems = (
     componentContext: CreateComponentContext,
     coords?: { x: number; y: number }
 ): ContextMenuItem[] => {
-    const items: ContextMenuItem[] = [];
-    // nodeMap stores nodes by ID. We use as INode because CreateNodeContext methods return INode or readonly INode
     const nodeMap = new Map<string, INode>();
 
-    if (coords) {
-        // Spatial Hit Test using absolute coordinates
-        const allNodes = (nodeContext.getNodes().value || []) as INode[];
-        allNodes.forEach((node) => {
-            if (node.id === 'root') return;
-
-            const absRect = getAbsoluteRect(node.id, nodeContext);
-
-            const isInside =
-                coords.x >= absRect.x &&
-                coords.x <= absRect.x + absRect.width &&
-                coords.y >= absRect.y &&
-                coords.y <= absRect.y + absRect.height;
-
-            if (isInside) {
-                nodeMap.set(node.id, node);
-            }
-        });
-
-        // Strategy: Always include the clicked node and its direct parents regardless of hit test margin errors
-        let current: INode | undefined = nodeContext.getNode(nodeId) as INode | undefined;
-        while (current && current.id) {
-            nodeMap.set(current.id, current);
-            if (current.id === 'root') break;
-            current = current.parentId ? nodeContext.getNode(current.parentId) as INode | undefined : nodeContext.getNode('root') as INode | undefined;
-        }
-    } else {
-        // Fallback: Tree Climb only
-        let current: INode | undefined = nodeContext.getNode(nodeId) as INode | undefined;
-        while (current && current.id) {
-            nodeMap.set(current.id, current);
-            if (current.id === 'root') break;
-            current = current.parentId ? nodeContext.getNode(current.parentId) as INode | undefined : nodeContext.getNode('root') as INode | undefined;
-        }
+    // 1. Always include the clicked node and its ancestors (The "Tree" path)
+    let current: INode | undefined = nodeContext.getNode(nodeId) as INode | undefined;
+    while (current && current.id) {
+        nodeMap.set(current.id, current);
+        if (current.id === 'root') break;
+        current = current.parentId ? nodeContext.getNode(current.parentId) as INode | undefined : undefined;
     }
 
-    // Convert map to array and sort
-    const overlappingNodes = Array.from(nodeMap.values());
+    // 2. Include overlapping nodes if we have coordinates (The "Spatial" part)
+    if (coords) {
+        const overlapping = nodeContext.searchNodesInArea({
+            x: coords.x,
+            y: coords.y,
+            width: 1,
+            height: 1
+        });
 
-    // Sort: Innermost children first, then parent depth, then smaller area
-    overlappingNodes.sort((a, b) => {
+        overlapping.forEach(node => {
+            // Add the hit node and its ancestors to allow selecting parent groups spatially
+            let p: INode | undefined = node;
+            while (p && p.id) {
+                nodeMap.set(p.id, p);
+                if (p.id === 'root') break;
+                p = p.parentId ? nodeContext.getNode(p.parentId) as INode | undefined : undefined;
+            }
+        });
+    }
+
+    // 3. Convert map to array and sort according to visual and logical hierarchy
+    const itemsList = Array.from(nodeMap.values());
+
+    itemsList.sort((a, b) => {
         if (a.id === 'root') return 1;
         if (b.id === 'root') return -1;
 
-        // Check if one is a descendant of the other
-        let parent: string | undefined = a.parentId;
-        while (parent && parent !== 'root') {
-            if (parent === b.id) return -1; // a is child of b
-            const pNode = nodeContext.getNode(parent);
-            parent = pNode?.parentId;
+        // Visual depth check: is one a descendant of the other?
+        // Descendants are always "higher" in the selection priority than their ancestors.
+        let p: string | undefined = a.parentId;
+        while (p && p !== 'root') {
+            if (p === b.id) return -1; // a is child of b -> a should be first
+            const pNode = nodeContext.getNode(p);
+            p = pNode?.parentId;
         }
 
-        parent = b.parentId;
-        while (parent && parent !== 'root') {
-            if (parent === a.id) return 1; // b is child of a
-            const pNode = nodeContext.getNode(parent);
-            parent = pNode?.parentId;
+        p = b.parentId;
+        while (p && p !== 'root') {
+            if (p === a.id) return 1; // b is child of a -> b should be first
+            const pNode = nodeContext.getNode(p);
+            p = pNode?.parentId;
         }
 
-        // Tie-break: Smaller area first
+        // Tie-breaker: Z-index (Rendering order)
+        // Since we reorder nodes array by Z, Z-index is the primary visual order for siblings/unrelated nodes.
+        if (a.z !== b.z) {
+            return b.z - a.z; // Higher Z-index comes first
+        }
+
+        // Final tie-breaker: Smaller area (Usually the more specific targeted item)
         return (a.width * a.height) - (b.width * b.height);
     });
 
-    // Map to ContextMenuItem
-    overlappingNodes.forEach((node) => {
-        items.push({
-            id: `select-${node.id}`,
-            label: node.name || node.id,
-            icon: componentContext.getComponentIcon ? componentContext.getComponentIcon(node.schema) : undefined,
-            checked: !!node.select,
-            action: () => nodeContext.onSelectNode(node.id)
-        });
-    });
-
-    return items;
+    // 4. Map to ContextMenuItem
+    return itemsList.map((node) => ({
+        id: `select-${node.id}`,
+        label: node.name || node.id,
+        icon: componentContext.getComponentIcon ? componentContext.getComponentIcon(node.schema) : undefined,
+        checked: !!node.select,
+        action: () => nodeContext.onSelectNode(node.id)
+    }));
 };
