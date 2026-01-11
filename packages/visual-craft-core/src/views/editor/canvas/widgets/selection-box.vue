@@ -123,17 +123,22 @@ const onDragStart = () => {
 const onResizing = (newBox: IDragDataset) => {
   const nbw = newBox.x2 - newBox.x;
   const nbh = newBox.y2 - newBox.y;
+  const allNodes = nodeContext.getNodes().value;
 
   initialNodesState.forEach(state => {
     const node = nodeContext.getNodeMap().get(state.id);
     if (node?.lock) return;
 
-    updateNode(state.id, {
-      x: newBox.x + state.leftRatio * nbw,
-      y: newBox.y + state.topRatio * nbh,
-      width: state.widthRatio * nbw,
-      height: state.heightRatio * nbh
-    });
+    const nextX = newBox.x + state.leftRatio * nbw;
+    const nextY = newBox.y + state.topRatio * nbh;
+    const nextW = state.widthRatio * nbw;
+    const nextH = state.heightRatio * nbh;
+
+    nodeContext.group.handleNodeResize(
+      node as INode, 
+      { x: nextX, y: nextY, x2: nextX + nextW, y2: nextY + nextH } as IDragDataset, 
+      allNodes as INode[]
+    );
   });
 
   boundingBox.value = { ...newBox };

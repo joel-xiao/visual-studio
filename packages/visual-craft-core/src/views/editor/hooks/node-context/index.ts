@@ -273,7 +273,7 @@ export class CreateNodeContext {
   moveNodes(ids: string[], dx: number, dy: number): void {
     for (const id of ids) {
       const node = this.#nodeMap.get(id);
-      if (node && !node.lock) {
+      if (node) {
         this.updateNode(id, {
           x: (node.x || 0) + dx,
           y: (node.y || 0) + dy

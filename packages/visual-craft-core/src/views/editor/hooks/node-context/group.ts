@@ -136,6 +136,7 @@ export class GroupExtension {
     const nodesToProcess = selectedNodes.length > 0 ? selectedNodes : [node];
 
     for (const n of nodesToProcess) {
+      if (n.lock) continue;
       moveIdsSet.add(n.id);
       this.collectDescendantIds(allNodes, n.id, moveIdsSet);
     }
@@ -164,7 +165,7 @@ export class GroupExtension {
     const oldWidth = node.width;
     const oldHeight = node.height;
 
-    if (node.lock) return;
+    if (node.lock && !isRecursive) return;
 
     this.context.updateNode(node.id, { x: newBox.x, y: newBox.y, width: newW, height: newH }, true, true);
 
