@@ -63,7 +63,7 @@ export const useNodeMenu = () => {
             };
         }
 
-        const items = buildCanvasMenuItems();
+        const items = buildCanvasMenuItems(nodeContext, coords);
 
         if (coords) {
             const hierarchyItems = buildHierarchyItems('root', nodeContext, componentContext, coords);

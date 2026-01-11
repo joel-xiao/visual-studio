@@ -3,6 +3,7 @@ import RBush from 'rbush';
 import { getUuid } from '../../../../assets/utils/index';
 import { GroupExtension } from './group';
 import { LayerExtension } from './layer';
+import { ClipboardExtension } from './clipboard';
 
 interface SpatialItem {
   minX: number;
@@ -31,6 +32,7 @@ export class CreateNodeContext {
 
   public group: GroupExtension;
   public layer: LayerExtension;
+  public clipboard: ClipboardExtension;
 
   constructor() {
     this.getNodeTree = this.getNodeTree.bind(this);
@@ -62,6 +64,7 @@ export class CreateNodeContext {
 
     this.group = new GroupExtension(this);
     this.layer = new LayerExtension(this);
+    this.clipboard = new ClipboardExtension(this);
   }
 
   getNodeTree() {
@@ -252,7 +255,14 @@ export class CreateNodeContext {
   }
 
   removeNode(id: string): void {
-    if (!this.#data) return;
+    if (!this.#data || id === 'root') return;
+
+    // Recursive removal of children
+    const children = this.#data.nodes.filter(n => n.parentId === id);
+    for (const child of children) {
+      this.removeNode(child.id);
+    }
+
     const idx = this.#data.nodes.findIndex(n => n.id === id);
     if (idx >= 0) {
       const node = this.#data.nodes[idx];

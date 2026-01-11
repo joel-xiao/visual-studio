@@ -35,6 +35,7 @@ import { useOverlay } from './../hooks/overlay-context';
 import { removeCanvas, useCanvas } from '../hooks/canvas';
 import { useMarqueeSelect } from '../hooks/node-context/marquee-select';
 import { useNodeMenu } from '../hooks/context-menu';
+import { useKeyboardShortcuts } from '../hooks/node-context/shortcuts';
 
 // interface Props {}
 // const props = withDefaults(defineProps<Props>(), {});
@@ -47,6 +48,8 @@ const componentContext = useComponentContext();
 const { getRootRef, getNodes, onSelectNode, onAddNode, onSelectNodes, searchNodesInArea } = nodeContext;
 const { getScale } = useCanvas();
 const { showCanvasMenu } = useNodeMenu();
+
+useKeyboardShortcuts(nodeContext);
 const { onMouseDown: onMarqueeMouseDown } = useMarqueeSelect(canvasRootEl, {
   searchNodesInArea,
   onSelect: onSelectNodes,

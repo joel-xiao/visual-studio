@@ -30,11 +30,36 @@ export const buildNodeMenuItems = (
     }
 
     menu.push({
+        id: 'cut',
+        label: '剪切',
+        icon: 'lucide:scissors',
+        shortcuts: [CMD, { label: 'X' }],
+        action: () => {
+            const ids = selectedNodes.length > 0 ? selectedNodes.map(n => n.id) : [nodeId];
+            nodeContext.clipboard.cut(ids);
+        }
+    });
+
+    menu.push({
         id: 'copy',
         label: '复制',
         icon: 'lucide:copy',
         shortcuts: [CMD, { label: 'C' }],
-        action: () => { }
+        action: () => {
+            const ids = selectedNodes.length > 0 ? selectedNodes.map(n => n.id) : [nodeId];
+            nodeContext.clipboard.copy(ids);
+        }
+    });
+
+    menu.push({
+        id: 'duplicate',
+        label: '重复',
+        icon: 'lucide:copy-plus',
+        shortcuts: [CMD, { label: 'D' }],
+        action: () => {
+            const ids = selectedNodes.length > 0 ? selectedNodes.map(n => n.id) : [nodeId];
+            nodeContext.clipboard.duplicate(ids);
+        }
     });
 
     menu.push({
@@ -42,7 +67,12 @@ export const buildNodeMenuItems = (
         label: '粘贴到这里',
         icon: 'lucide:clipboard-paste',
         shortcuts: [CMD, { label: 'V' }],
-        action: () => { }
+        disabled: !nodeContext.clipboard.hasClipboardData(),
+        action: () => {
+            const node = nodeContext.getNode(nodeId);
+            const parentId = (node?.schema === 'GROUP') ? node.id : (node?.parentId || 'root');
+            nodeContext.clipboard.paste(parentId, { offset: { x: 10, y: 10 } });
+        }
     });
 
     menu.push({ id: 'div-edit', label: '', divider: true });
