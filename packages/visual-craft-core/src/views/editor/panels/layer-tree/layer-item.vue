@@ -55,6 +55,7 @@ const onDragStart = (e: DragEvent, item: PanelLayerItemData) => {
     e.dataTransfer.setData('text/plain', item.id);
     e.dataTransfer.effectAllowed = 'move';
     draggingId.value = item.id;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (window as any)._draggingLayerId = item.id;
   }
 };
@@ -63,10 +64,12 @@ const onDragEnd = () => {
   draggingId.value = null;
   dragOverId.value = null;
   dropPos.value = null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (window as any)._draggingLayerId = null;
 };
 
 const onDragOver = (e: DragEvent, item: PanelLayerItemData) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const sourceId = (window as any)._draggingLayerId;
   if (!sourceId || sourceId === item.id) return;
 

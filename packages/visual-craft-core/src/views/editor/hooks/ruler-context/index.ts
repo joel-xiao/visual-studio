@@ -1,4 +1,4 @@
-import { nextTick, watch } from 'vue';
+import { watch, type Ref } from 'vue';
 
 class Ruler {
   #config: Readonly<RulerConfig> = {
@@ -112,8 +112,6 @@ class Ruler {
     const endValue = (canvasHeight - offsetY) / this.#scale;
     const step = this.#getStepByZoom(this.#scale);
 
-    const firstStep = Math.floor(startValue / step) * step;
-
     ctx.font = `10px ${this.#config.background === '#303030' ? 'Inter, sans-serif' : 'sans-serif'}`;
     ctx.fillStyle = this.#config.color;
     ctx.strokeStyle = this.#config.lineColor;
@@ -125,9 +123,6 @@ class Ruler {
 
     const startIdx = Math.floor(startValue / minorStep);
     const endIdx = Math.ceil(endValue / minorStep);
-
-    const labelXTranslate = canvasWidth / 2 - 3;
-    const labelSelectionFont = '10px Inter, sans-serif';
 
     // 1. Draw selection background first
     this.#selection.forEach(node => {
@@ -245,8 +240,6 @@ class Ruler {
     const endValue = (canvasWidth - offsetX) / this.#scale;
     const step = this.#getStepByZoom(this.#scale);
 
-    const firstStep = Math.floor(startValue / step) * step;
-
     ctx.font = `10px ${this.#config.background === '#303030' ? 'Inter, sans-serif' : 'sans-serif'}`;
     ctx.fillStyle = this.#config.color;
     ctx.strokeStyle = this.#config.lineColor;
@@ -260,7 +253,6 @@ class Ruler {
     const endIdx = Math.ceil(endValue / minorStep);
 
     const labelYTranslate = canvasHeight / 2 - 2;
-    const labelSelectionFont = '10px Inter, sans-serif';
 
     // 1. Draw selection background
     this.#selection.forEach(node => {
@@ -382,14 +374,14 @@ class Ruler {
     this.#scheduleDraw();
   }
 
-  setSelectionSync(selectedNodes: any) {
+  setSelectionSync(selectedNodes: Ref<readonly { id: string; x: number; y: number; width: number; height: number }[]>) {
     this.#stopSelectionWatch?.();
     this.#stopSelectionWatch = watch(
       () => selectedNodes.value,
-      (nodes: INode[]) => {
+      (nodes: readonly { id: string; x: number; y: number; width: number; height: number }[]) => {
         const selection = nodes
-          .filter((n: INode) => n.id !== 'root')
-          .map((n: INode) => ({
+          .filter(n => n.id !== 'root')
+          .map(n => ({
             x: n.x,
             y: n.y,
             width: n.width,

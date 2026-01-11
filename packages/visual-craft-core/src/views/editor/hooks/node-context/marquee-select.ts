@@ -1,4 +1,4 @@
-import { ref, reactive, type DeepReadonly, type Ref, unref, readonly } from 'vue';
+import { ref, reactive, type Ref, readonly } from 'vue';
 
 export interface MarqueeRect {
     x: number;

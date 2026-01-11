@@ -11,7 +11,7 @@ export const useKeyboardShortcuts = (nodeContext: CreateNodeContext) => {
             id: 'cut',
             key: 'x',
             [isMac ? 'meta' : 'ctrl']: true,
-            action: (e: KeyboardEvent) => {
+            action: (_e: KeyboardEvent) => {
                 const selectedNodes = nodeContext.getSelectedNodes().value;
                 if (selectedNodes.length > 0) {
                     nodeContext.clipboard.cut(selectedNodes.map(n => n.id));
@@ -22,7 +22,7 @@ export const useKeyboardShortcuts = (nodeContext: CreateNodeContext) => {
             id: 'copy',
             key: 'c',
             [isMac ? 'meta' : 'ctrl']: true,
-            action: (e: KeyboardEvent) => {
+            action: (_e: KeyboardEvent) => {
                 const selectedNodes = nodeContext.getSelectedNodes().value;
                 if (selectedNodes.length > 0) {
                     nodeContext.clipboard.copy(selectedNodes.map(n => n.id));
@@ -33,7 +33,7 @@ export const useKeyboardShortcuts = (nodeContext: CreateNodeContext) => {
             id: 'paste',
             key: 'v',
             [isMac ? 'meta' : 'ctrl']: true,
-            action: (e: KeyboardEvent) => {
+            action: (_e: KeyboardEvent) => {
                 if (nodeContext.clipboard.hasClipboardData()) {
                     nodeContext.clipboard.paste();
                 }
@@ -64,7 +64,7 @@ export const useKeyboardShortcuts = (nodeContext: CreateNodeContext) => {
         {
             id: 'delete-1',
             key: 'Delete',
-            action: (e: KeyboardEvent) => {
+            action: (_e: KeyboardEvent) => {
                 const selectedNodes = nodeContext.getSelectedNodes().value;
                 selectedNodes.forEach(n => {
                     if (n.id !== 'root') nodeContext.removeNode(n.id);
@@ -74,7 +74,7 @@ export const useKeyboardShortcuts = (nodeContext: CreateNodeContext) => {
         {
             id: 'delete-2',
             key: 'Backspace',
-            action: (e: KeyboardEvent) => {
+            action: (_e: KeyboardEvent) => {
                 const selectedNodes = nodeContext.getSelectedNodes().value;
                 selectedNodes.forEach(n => {
                     if (n.id !== 'root') nodeContext.removeNode(n.id);

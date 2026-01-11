@@ -258,7 +258,7 @@ export class GroupExtension {
           hRatio: child.height * invH
         };
         if (child.props?.layout) {
-          (child.props.layout as Record<string, any>)['groupRel'] = rel;
+          (child.props.layout as Record<string, unknown>)['groupRel'] = rel;
         }
       }
 

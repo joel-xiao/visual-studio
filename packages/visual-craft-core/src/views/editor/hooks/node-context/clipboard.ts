@@ -101,14 +101,19 @@ export class ClipboardExtension {
         for (const rawNode of this.clipboardData) {
             const node = JSON.parse(JSON.stringify(rawNode)) as INode;
             const oldId = node.id;
-            const newId = idMap.get(oldId)!;
+            const newId = idMap.get(oldId);
+            
+            if (!newId) continue;
 
             node.id = newId;
             node.select = false;
             node.z = maxZ + 1 + node.z;
 
             if (clipboardIds.has(rawNode.parentId)) {
-                node.parentId = idMap.get(rawNode.parentId)!;
+                const newParentId = idMap.get(rawNode.parentId);
+                if (newParentId) {
+                    node.parentId = newParentId;
+                }
             } else {
                 node.parentId = targetParentId;
                 node.x += finalDx;

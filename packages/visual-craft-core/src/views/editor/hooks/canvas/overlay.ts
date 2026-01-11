@@ -1,5 +1,4 @@
 import './overlay.scss';
-import { readonly, type Raw, markRaw } from 'vue';
 
 export type Pos = { x: number; y: number };
 

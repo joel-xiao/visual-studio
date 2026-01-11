@@ -80,10 +80,10 @@ export class Shortcuts {
         const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
 
         const key = event.key.toLowerCase();
-        const ctrl = event.ctrlKey;
+        const ctrl = isMac ? event.metaKey : event.ctrlKey;
         const shift = event.shiftKey;
         const alt = event.altKey;
-        const meta = event.metaKey;
+        const meta = isMac ? event.ctrlKey : event.metaKey;
 
         for (const shortcut of this.#shortcuts.values()) {
             if (isInput && !shortcut.allowInInput) continue;

@@ -1,4 +1,4 @@
-import { markRaw, type Raw } from 'vue';
+import { markRaw } from 'vue';
 import { useRuler } from '../ruler-context';
 import type { ICallbackUpdate } from './interface';
 import { Overlay } from './overlay';
