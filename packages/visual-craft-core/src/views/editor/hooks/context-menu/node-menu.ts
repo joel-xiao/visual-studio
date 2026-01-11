@@ -49,32 +49,35 @@ export const buildNodeMenuItems = (
 
     menu.push({ id: 'div-edit', label: '', divider: true });
 
+    const selectedIds = selectedNodes.map(n => n.id);
+    const targetIds = selectedIds.length > 0 ? selectedIds : [nodeId];
+
     // 3. Arrangement
     menu.push({
         id: 'move-up',
         label: '上移一层',
         icon: 'lucide:arrow-up-to-line',
         shortcuts: [CMD, { label: ']' }],
-        action: () => nodeContext.layer.moveLayer('up', nodeId)
+        action: () => nodeContext.layer.moveLayer('up', targetIds)
     });
     menu.push({
         id: 'move-down',
         label: '下移一层',
         icon: 'lucide:arrow-down-to-line',
         shortcuts: [CMD, { label: '[' }],
-        action: () => nodeContext.layer.moveLayer('down', nodeId)
+        action: () => nodeContext.layer.moveLayer('down', targetIds)
     });
     menu.push({
         id: 'move-top',
         label: '置于顶层',
         icon: 'lucide:chevrons-up',
-        action: () => nodeContext.layer.moveLayer('top', nodeId)
+        action: () => nodeContext.layer.moveLayer('top', targetIds)
     });
     menu.push({
         id: 'move-bottom',
         label: '置于底层',
         icon: 'lucide:chevrons-down',
-        action: () => nodeContext.layer.moveLayer('bottom', nodeId)
+        action: () => nodeContext.layer.moveLayer('bottom', targetIds)
     });
     menu.push({ id: 'div-arrange', label: '', divider: true });
 
@@ -113,14 +116,20 @@ export const buildNodeMenuItems = (
         label: node?.hide ? '显示图层' : '隐藏图层',
         icon: node?.hide ? 'lucide:eye' : 'lucide:eye-off',
         shortcuts: [SHIFT, CMD, { label: 'H' }],
-        action: () => nodeContext.layer.setRecursiveProperty(nodeId, 'hide', !node?.hide)
+        action: () => targetIds.forEach(id => {
+            const n = nodeContext.getNodeMap().get(id);
+            if (n) nodeContext.layer.setRecursiveProperty(id, 'hide', !n.hide);
+        })
     });
     menu.push({
         id: 'lock',
         label: node?.lock ? '解锁图层' : '锁定图层',
         icon: node?.lock ? 'lucide:lock' : 'lucide:unlock',
         shortcuts: [SHIFT, CMD, { label: 'L' }],
-        action: () => nodeContext.layer.setRecursiveProperty(nodeId, 'lock', !node?.lock)
+        action: () => targetIds.forEach(id => {
+            const n = nodeContext.getNodeMap().get(id);
+            if (n) nodeContext.layer.setRecursiveProperty(id, 'lock', !n.lock);
+        })
     });
 
     menu.push({ id: 'div-state', label: '', divider: true });
@@ -131,7 +140,7 @@ export const buildNodeMenuItems = (
         label: '删除',
         icon: 'lucide:trash-2',
         shortcuts: [DEL],
-        action: () => nodeContext.removeNode(nodeId)
+        action: () => targetIds.forEach(id => nodeContext.removeNode(id))
     });
 
     return menu;

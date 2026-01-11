@@ -20,10 +20,8 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits(['select', 'command', 'toggle-hide', 'toggle-lock', 'sort', 'contextmenu', 'toggle-fold']);
 
-// 跟踪展开/收起状态 (ID -> boolean)
 const expandedNodes = reactive(new Set<string>());
 
-// 初始化时默认展开所有
 watch(() => props.data, (newData) => {
   if (newData && expandedNodes.size === 0) {
     const initExpanded = (nodes: readonly PanelLayerItemData[]) => {
@@ -36,7 +34,6 @@ watch(() => props.data, (newData) => {
   }
 }, { immediate: true });
 
-// 辅助方法：展平树以寻找节点及其父级
 const findNodeWithParent = (
   nodes: readonly PanelLayerItemData[],
   targetId: string,
@@ -183,7 +180,6 @@ const onCommand = function (
   onMenuCommand(cmd);
 };
 
-// 转发子项事件
 const onToggleHide = (id: string) => emit('toggle-hide', id);
 const onToggleLock = (id: string) => emit('toggle-lock', id);
 const onSort = (sourceId: string, targetId: string, pos: string) => emit('sort', sourceId, targetId, pos);

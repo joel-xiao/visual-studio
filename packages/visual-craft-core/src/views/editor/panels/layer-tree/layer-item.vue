@@ -7,7 +7,6 @@ interface Props {
   data?: readonly PanelLayerItemData[];
   itemIcon?: string;
   itemMenus: readonly PanelLayerItemMenu[];
-  // 通用化 Prop
   getIcon?: (item: PanelLayerItemData) => string;
   isInheritedHide?: (item: PanelLayerItemData) => boolean;
   isInheritedLock?: (item: PanelLayerItemData) => boolean;
@@ -22,19 +21,14 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits(['select', 'command', 'toggle-hide', 'toggle-lock', 'sort', 'contextmenu', 'toggle-fold']);
 
-// 悬停状态
 const hoverId = ref<string | null>(null);
-
-// 拖拽状态
 const dragOverId = ref<string | null>(null);
 const dropPos = ref<'before' | 'after' | 'inside' | null>(null);
 const draggingId = ref<string | null>(null);
 
-// 计算缩进样式
 const layerItemStyle: { paddingLeft?: string } = reactive({});
 layerItemStyle.paddingLeft = 24 + props.recursion * 16 + 'px';
 
-// 获取图标
 const getItemIcon = (item: PanelLayerItemData): string => {
   if (item.icon) return item.icon;
   if (props.getIcon) {
@@ -53,11 +47,9 @@ const onArrow = (item: PanelLayerItemData): void => {
   emit('toggle-fold', item.id);
 };
 
-// 切换隐藏/锁定
 const onToggleHide = (item: PanelLayerItemData) => emit('toggle-hide', item.id);
 const onToggleLock = (item: PanelLayerItemData) => emit('toggle-lock', item.id);
 
-// 拖拽逻辑
 const onDragStart = (e: DragEvent, item: PanelLayerItemData) => {
   if (e.dataTransfer) {
     e.dataTransfer.setData('text/plain', item.id);
@@ -157,7 +149,6 @@ const onDrop = (e: DragEvent, item: PanelLayerItemData) => {
       </div>
       
       <div v-if="item.handle !== false" class="layer-item-handle">
-        <!-- 锁定按钮 -->
         <Icon 
           v-if="hoverId === item.id || item.data?.lock"
           button 
@@ -168,7 +159,6 @@ const onDrop = (e: DragEvent, item: PanelLayerItemData) => {
         />
         <span v-else-if="props.isInheritedLock?.(item)" class="inherited-dot"></span>
         
-        <!-- 隐藏按钮 -->
         <Icon 
           v-if="hoverId === item.id || item.data?.hide"
           button 

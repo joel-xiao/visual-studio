@@ -54,97 +54,142 @@ export class LayerExtension {
         return siblings.length > 0 ? siblings[0].z : 0;
     }
 
-    public moveLayer(direction: 'up' | 'down' | 'top' | 'bottom', id: string): void {
-        const node = this.context.getNodeMap().get(id);
-        if (!node || id === 'root') return;
+    public moveLayer(direction: 'up' | 'down' | 'top' | 'bottom', ids: string[] | string): void {
+        const idList = Array.isArray(ids) ? ids : [ids];
+        const nodeMap = this.context.getNodeMap();
+        const allNodes = idList.map(id => nodeMap.get(id)).filter((n): n is INode => !!n && n.id !== 'root');
 
-        const siblings = this.getSiblings(node.parentId);
-        const currentIdx = siblings.findIndex(s => s.id === id);
-        if (currentIdx === -1) return;
+        if (allNodes.length === 0) return;
 
-        const currentZ = node.z;
+        const groups = new Map<string, INode[]>();
+        for (const node of allNodes) {
+            const list = groups.get(node.parentId) || [];
+            list.push(node);
+            groups.set(node.parentId, list);
+        }
 
-        switch (direction) {
-            case 'up':
-                if (currentIdx < siblings.length - 1) {
-                    const upper = siblings[currentIdx + 1];
-                    node.z = upper.z;
-                    upper.z = currentZ;
+        for (const [parentId, nodesInGroup] of groups.entries()) {
+            const siblings = this.getSiblings(parentId);
+            const selectedIds = new Set(nodesInGroup.map(n => n.id));
+            let newOrder = [...siblings];
+
+            switch (direction) {
+                case 'up':
+                    for (let i = newOrder.length - 2; i >= 0; i--) {
+                        if (selectedIds.has(newOrder[i].id) && !selectedIds.has(newOrder[i + 1].id)) {
+                            [newOrder[i], newOrder[i + 1]] = [newOrder[i + 1], newOrder[i]];
+                        }
+                    }
+                    break;
+                case 'down':
+                    for (let i = 1; i < newOrder.length; i++) {
+                        if (selectedIds.has(newOrder[i].id) && !selectedIds.has(newOrder[i - 1].id)) {
+                            [newOrder[i], newOrder[i - 1]] = [newOrder[i - 1], newOrder[i]];
+                        }
+                    }
+                    break;
+                case 'top': {
+                    const others = newOrder.filter(s => !selectedIds.has(s.id));
+                    const selected = newOrder.filter(s => selectedIds.has(s.id));
+                    newOrder = [...others, ...selected];
+                    break;
                 }
-                break;
-            case 'down':
-                if (currentIdx > 0) {
-                    const lower = siblings[currentIdx - 1];
-                    node.z = lower.z;
-                    lower.z = currentZ;
+                case 'bottom': {
+                    const others = newOrder.filter(s => !selectedIds.has(s.id));
+                    const selected = newOrder.filter(s => selectedIds.has(s.id));
+                    newOrder = [...selected, ...others];
+                    break;
                 }
-                break;
-            case 'top':
-                if (currentIdx < siblings.length - 1) {
-                    node.z = siblings[siblings.length - 1].z + 1;
-                }
-                break;
-            case 'bottom':
-                if (currentIdx > 0) {
-                    node.z = siblings[0].z - 1;
-                }
-                break;
+            }
+
+            newOrder.forEach((node, index) => {
+                node.z = index;
+            });
         }
 
         this.reorderArrayByZ();
         this.context.refreshNodeTreeInternal();
     }
 
-    public sortNode(sourceId: string, targetId: string, position: 'before' | 'after' | 'inside'): void {
-        if (sourceId === 'root' || sourceId === targetId) return;
-        if (this.isDescendant(sourceId, targetId)) return;
+    public sortNode(sourceIds: string[] | string, targetId: string, position: 'before' | 'after' | 'inside'): void {
+        const idList = Array.isArray(sourceIds) ? sourceIds : [sourceIds];
+        if (idList.length === 0 || idList.includes(targetId) || idList.includes('root')) return;
 
         const nodeMap = this.context.getNodeMap();
-        const sourceNode = nodeMap.get(sourceId);
         const targetNode = nodeMap.get(targetId);
-        if (!sourceNode || !targetNode) return;
+        if (!targetNode) return;
 
-        const oldParentId = sourceNode.parentId;
+        const sourceNodes = idList
+            .map(id => nodeMap.get(id))
+            .filter((n): n is INode => !!n && !this.isDescendant(n.id, targetId))
+            .sort((a, b) => a.z - b.z);
+
+        if (sourceNodes.length === 0) return;
+
+        const oldParents = new Set<string>();
+        sourceNodes.forEach(n => {
+            if (n.parentId && n.parentId !== 'root') oldParents.add(n.parentId);
+        });
+
         let newParentId: string | undefined;
 
         if (position === 'inside' && targetNode.schema === 'GROUP') {
             newParentId = targetId;
-            sourceNode.parentId = targetId;
-            sourceNode.z = this.getMaxZ(targetId) + 1;
+            let currentMaxZ = this.getMaxZ(targetId);
+            sourceNodes.forEach(node => {
+                node.parentId = targetId;
+                node.z = ++currentMaxZ;
+            });
         } else {
             newParentId = targetNode.parentId;
-            sourceNode.parentId = newParentId;
-
             this.invalidateCache();
-            const siblings = this.getSiblings(newParentId, sourceId);
-            const targetIdx = siblings.findIndex(s => s.id === targetId);
-            const targetZ = targetNode.z;
 
-            if (position === 'before') {
-                sourceNode.z = targetIdx < siblings.length - 1
-                    ? (targetZ + siblings[targetIdx + 1].z) / 2
-                    : targetZ + 1;
+            const siblings = this.getSiblings(newParentId);
+            const filteredSiblings = siblings.filter(s => !idList.includes(s.id));
+            const targetIdx = filteredSiblings.findIndex(s => s.id === targetId);
+
+            if (targetIdx === -1) {
+                sourceNodes.forEach((node, i) => {
+                    node.parentId = newParentId || 'root';
+                    node.z = targetNode.z + i + 1;
+                });
             } else {
-                sourceNode.z = targetIdx > 0
-                    ? (targetZ + siblings[targetIdx - 1].z) / 2
-                    : targetZ - 1;
+                const targetZ = targetNode.z;
+                if (position === 'before') {
+                    const prevZ = targetIdx < filteredSiblings.length - 1 ? filteredSiblings[targetIdx + 1].z : targetZ + 1;
+                    const step = (prevZ - targetZ) / (sourceNodes.length + 1);
+                    sourceNodes.forEach((node, i) => {
+                        node.parentId = newParentId || 'root';
+                        node.z = targetZ + step * (i + 1);
+                    });
+                } else {
+                    const prevZ = targetIdx > 0 ? filteredSiblings[targetIdx - 1].z : targetZ - 1;
+                    const step = (targetZ - prevZ) / (sourceNodes.length + 1);
+                    sourceNodes.forEach((node, i) => {
+                        node.parentId = newParentId || 'root';
+                        node.z = prevZ + step * (i + 1);
+                    });
+                }
             }
         }
 
         this.invalidateCache();
         this.reorderArrayByZ();
 
-        if (oldParentId && oldParentId !== 'root' && oldParentId !== newParentId) {
-            this.context.group.refreshGroupBounds(oldParentId);
-        }
+        oldParents.forEach(pid => {
+            if (pid !== newParentId) this.context.group.refreshGroupBounds(pid);
+        });
+
         if (newParentId && newParentId !== 'root') {
             this.context.group.refreshGroupBounds(newParentId);
         }
 
-        if (newParentId && newParentId !== oldParentId) {
+        if (newParentId && newParentId !== 'root') {
             const newParent = nodeMap.get(newParentId);
-            if (newParent?.lock) this.setRecursiveProperty(sourceId, 'lock', true);
-            if (newParent?.hide) this.setRecursiveProperty(sourceId, 'hide', true);
+            sourceNodes.forEach(node => {
+                if (newParent?.lock) this.setRecursiveProperty(node.id, 'lock', true);
+                if (newParent?.hide) this.setRecursiveProperty(node.id, 'hide', true);
+            });
         }
 
         this.context.refreshNodeTreeInternal();

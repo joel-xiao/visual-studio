@@ -54,7 +54,6 @@ const onSelect = function (tab: PanelTab) {
   tab.show = true;
 };
 
-// 上下文 Hooks
 const nodeContext = useNodeContext();
 const componentContext = useComponentContext();
 const { showNodeMenu } = useNodeMenu();
@@ -63,7 +62,6 @@ const { getNodeTree } = nodeContext;
 const layerData = getNodeTree();
 const layerMenus = reactive<PanelLayerItemMenu[]>([]);
 
-// 业务逻辑实现
 const getLayerIcon = (item: PanelLayerItemData) => {
   return item.schema ? componentContext.getComponentIcon(item.schema) : '';
 };
@@ -99,14 +97,15 @@ const onLayerToggleLock = (id: string) => {
 };
 
 const onLayerSort = (sourceId: string, targetId: string, pos: 'before' | 'after' | 'inside') => {
-  nodeContext.layer.sortNode(sourceId, targetId, pos);
+  const selectedNodes = nodeContext.getNodes().value.filter(n => n.select);
+  const selectedIds = selectedNodes.length > 0 ? selectedNodes.map(n => n.id) : [sourceId];
+  nodeContext.layer.sortNode(selectedIds, targetId, pos);
 };
 
 const onLayerContextMenu = (e: MouseEvent, id: string) => {
   showNodeMenu(e, id, nodeContext, componentContext, 1);
 };
 
-// 组件部分
 const componentTabBars = reactive<PanelTab[]>([{ name: '组件库', id: 'component' }]);
 const componentTab = ref<PanelTab>(componentTabBars[0]);
 
