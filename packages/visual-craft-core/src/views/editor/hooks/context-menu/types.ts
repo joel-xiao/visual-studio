@@ -13,6 +13,7 @@ export interface ContextMenuItem {
     divider?: boolean;
     children?: readonly ContextMenuItem[];
     checked?: boolean;
+    level?: number;
     action?: () => void;
 }
 

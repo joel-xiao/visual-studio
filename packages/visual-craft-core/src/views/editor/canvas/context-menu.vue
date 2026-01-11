@@ -124,6 +124,7 @@ const onMouseEnter = (item: ContextMenuItem, event: MouseEvent) => {
                 'has-children': item.children?.length,
                 'is-active': activeSubMenu === item.id
               }"
+              :style="{ paddingLeft: (item.level ? (item.level * 16 + 4) : 4) + 'px' }"
               @click.stop="handleAction(item)"
               @mouseenter="onMouseEnter(item, $event)"
             >
@@ -171,6 +172,7 @@ const onMouseEnter = (item: ContextMenuItem, event: MouseEvent) => {
               v-else
               class="menu-item"
               :class="{ disabled: child.disabled }"
+              :style="{ paddingLeft: (child.level ? (child.level * 16 + 4) : 4) + 'px' }"
               @click.stop="handleAction(child)"
             >
               <div class="item-content">

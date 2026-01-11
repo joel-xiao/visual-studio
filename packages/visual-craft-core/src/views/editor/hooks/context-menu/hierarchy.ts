@@ -41,42 +41,51 @@ export const buildHierarchyItems = (
         });
     }
 
-    // 3. Convert map to array and filter out locked/hidden/root items per requirement
-    const itemsList = Array.from(nodeMap.values()).filter(n => !n.lock && !n.hide && n.id !== 'root');
+    // 3. Convert map to array and filter out locked/hidden/root items
+    const nodesArray = Array.from(nodeMap.values()).filter(n => !n.lock && !n.hide && n.id !== 'root');
 
-    itemsList.sort((a, b) => {
-        // Visual depth check: is one a descendant of the other?
-        // Descendants are always "higher" in the selection priority than their ancestors.
-        let p: string | undefined = a.parentId;
+    // Helper to get depth
+    const getDepth = (id: string): number => {
+        let depth = 0;
+        let p = nodeContext.getNode(id)?.parentId;
         while (p && p !== 'root') {
-            if (p === b.id) return -1; // a is child of b -> a should be first
+            depth++;
             const pNode = nodeContext.getNode(p);
             p = pNode?.parentId;
         }
+        return depth;
+    };
 
-        p = b.parentId;
-        while (p && p !== 'root') {
-            if (p === a.id) return 1; // b is child of a -> b should be first
-            const pNode = nodeContext.getNode(p);
-            p = pNode?.parentId;
+    nodesArray.sort((a, b) => {
+        // 1. Is one an ancestor of the other?
+        let cur: string | undefined = a.parentId;
+        while (cur && cur !== 'root') {
+            if (cur === b.id) return 1; // a is descendant of b -> b comes first
+            const pNode = nodeContext.getNode(cur);
+            cur = pNode?.parentId;
         }
 
-        // Tie-breaker: Z-index (Rendering order)
-        // Since we reorder nodes array by Z, Z-index is the primary visual order for siblings/unrelated nodes.
-        if (a.z !== b.z) {
-            return b.z - a.z; // Higher Z-index comes first
+        cur = b.parentId;
+        while (cur && cur !== 'root') {
+            if (cur === a.id) return -1; // b is descendant of a -> a comes first
+            const pNode = nodeContext.getNode(cur);
+            cur = pNode?.parentId;
         }
 
-        // Final tie-breaker: Smaller area (Usually the more specific targeted item)
+        // 2. Unrelated: Use Z-index (Higher Z first)
+        if (a.z !== b.z) return b.z - a.z;
+
+        // 3. Area tie-break
         return (a.width * a.height) - (b.width * b.height);
     });
 
-    // 4. Map to ContextMenuItem
-    return itemsList.map((node) => ({
+    // 4. Map to ContextMenuItem with level
+    return nodesArray.map((node) => ({
         id: `select-${node.id}`,
         label: node.name || node.id,
         icon: componentContext.getComponentIcon ? componentContext.getComponentIcon(node.schema) : undefined,
         checked: !!node.select,
+        level: getDepth(node.id),
         action: () => nodeContext.onSelectNode(node.id)
     }));
 };
