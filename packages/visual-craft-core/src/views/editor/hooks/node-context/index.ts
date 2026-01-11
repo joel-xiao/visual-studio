@@ -150,22 +150,28 @@ export class CreateNodeContext {
   }
 
   #addTreeNode(node: INode) {
+    const id = node.id;
+    const nodeMap = this.#nodeMap;
     const treeNode: TreeNode = reactive({
       get parentId() {
-        return node.parentId;
+        return nodeMap.get(id)?.parentId;
       },
-      id: node.id,
+      id: id,
       get name() {
-        return node.name;
+        return nodeMap.get(id)?.name;
       },
-      schema: node.schema,
+      get schema() {
+        return nodeMap.get(id)?.schema;
+      },
       get select() {
-        return node.select;
+        return nodeMap.get(id)?.select;
       },
-      data: node
+      get data() {
+        return nodeMap.get(id);
+      }
     }) as TreeNode;
     this.#nodesTreeSource.push(treeNode);
-    this.#treeNodeMap.set(node.id, treeNode);
+    this.#treeNodeMap.set(id, treeNode);
   }
 
   #createNodes() {

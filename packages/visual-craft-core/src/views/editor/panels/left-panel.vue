@@ -8,12 +8,18 @@
     v-show="selectTab === tabBars[0]"
     :data="layerData"
     :item-menus="layerMenus"
-    tem-icon="icon-wenjianjia"
+    item-icon="icon-wenjianjia"
+    :get-icon="getLayerIcon"
+    :is-inherited-hide="isLayerInheritedHide"
+    :is-inherited-lock="isLayerInheritedLock"
     @select="onLayerSelect"
-    @command="onLayerCommand"
+    @toggle-hide="onLayerToggleHide"
+    @toggle-lock="onLayerToggleLock"
+    @sort="onLayerSort"
+    @contextmenu="onLayerContextMenu"
     />
   <div
-v-if="tabBars[1].show"
+    v-if="tabBars[1].show"
     v-show="selectTab === tabBars[1]"
     class="panel-component"
     >
@@ -33,13 +39,7 @@ import { ref, reactive } from 'vue';
 import { useDrag } from './../hooks/drag-context';
 import { useComponentContext } from './../hooks/component-context';
 import { useNodeContext } from './../hooks/node-context';
-
-// interface Props {
-//   layerData: TreeNode[];
-// }
-// const props = withDefaults(defineProps<Props>(), {
-//   layerData: () => []
-// });
+import { useNodeMenu } from './../hooks/context-menu';
 
 const tabBars = reactive<PanelTab[]>([
   { name: '图层', id: 'layer', show: false },
@@ -54,57 +54,85 @@ const onSelect = function (tab: PanelTab) {
   tab.show = true;
 };
 
+// 上下文 Hooks
 const nodeContext = useNodeContext();
-const { getNodeTree, onSelectNode } = nodeContext;
-const layerData = getNodeTree();
+const componentContext = useComponentContext();
+const { showNodeMenu } = useNodeMenu();
+const { getNodeTree } = nodeContext;
 
+const layerData = getNodeTree();
 const layerMenus = reactive<PanelLayerItemMenu[]>([]);
 
-const onLayerSelect = function (item: PanelLayerItemData) {
-  onSelectNode(item.id);
+// 业务逻辑实现
+const getLayerIcon = (item: PanelLayerItemData) => {
+  return item.schema ? componentContext.getComponentIcon(item.schema) : '';
 };
 
-const onLayerCommand = function (cmd: PanelLayerItemMenu, item: PanelLayerItemData) {
+const isLayerInheritedHide = (item: PanelLayerItemData) => {
+  if (!item.parentId || item.parentId === 'root') return false;
+  const parent = nodeContext.getNodeMap().get(item.parentId);
+  return !!parent?.hide && !!item.data?.hide;
 };
 
+const isLayerInheritedLock = (item: PanelLayerItemData) => {
+  if (!item.parentId || item.parentId === 'root') return false;
+  const parent = nodeContext.getNodeMap().get(item.parentId);
+  return !!parent?.lock && !!item.data?.lock;
+};
+
+const onLayerSelect = (ids: string[]) => {
+  nodeContext.onSelectNodes(ids);
+};
+
+const onLayerToggleHide = (id: string) => {
+  const node = nodeContext.getNodeMap().get(id);
+  if (node) {
+    nodeContext.layer.setRecursiveProperty(id, 'hide', !node.hide);
+  }
+};
+
+const onLayerToggleLock = (id: string) => {
+  const node = nodeContext.getNodeMap().get(id);
+  if (node) {
+    nodeContext.layer.setRecursiveProperty(id, 'lock', !node.lock);
+  }
+};
+
+const onLayerSort = (sourceId: string, targetId: string, pos: 'before' | 'after' | 'inside') => {
+  nodeContext.layer.sortNode(sourceId, targetId, pos);
+};
+
+const onLayerContextMenu = (e: MouseEvent, id: string) => {
+  showNodeMenu(e, id, nodeContext, componentContext, 1);
+};
+
+// 组件部分
 const componentTabBars = reactive<PanelTab[]>([{ name: '组件库', id: 'component' }]);
 const componentTab = ref<PanelTab>(componentTabBars[0]);
 
 const { onDragStart, onDragStop } = useDrag();
-
-const { getMaterials } = useComponentContext();
-const componentData = reactive<PanelComponentData[]>(getMaterials());
+const componentData = reactive<PanelComponentData[]>(componentContext.getMaterials());
 </script>
 
 <style lang="scss">
 #visual-craft-core {
   .editor-left-panel {
-    position: absolute;
-    left: 0px;
-    top: var(--db-editor-nav-bar-height);
-    bottom: 0px;
-    width: var(--db-editor-left-menu-width);
-    border-right: 1px solid var(--db-editor-color-canvas);
+    position: absolute; left: 0px; top: var(--db-editor-nav-bar-height); bottom: 0px;
+    width: var(--db-editor-left-menu-width); border-right: 1px solid var(--db-editor-color-canvas);
     background-color: var(--db-editor-color-panel-bg);
 
     .panel-tab_bar {
-      border-bottom: 1px solid var(--db-editor-color-canvas);
-      padding: 0 12px 0 6px;
+      border-bottom: 1px solid var(--db-editor-color-canvas); padding: 0 12px 0 6px;
       height: var(--db-editor-tab-bar-height);
     }
 
     .panel-component {
       height: calc(100% - var(--db-editor-tab-bar-height));
-
       .panel-component-tab_bar {
-        border-bottom: 1px solid var(--db-editor-color-canvas);
-        padding: 0 12px 0 6px;
+        border-bottom: 1px solid var(--db-editor-color-canvas); padding: 0 12px 0 6px;
         height: var(--db-editor-tab-bar-height);
       }
-
-      .editor-resource-library {
-        height: calc(100% - var(--db-editor-tab-bar-height));
-      }
+      .editor-resource-library { height: calc(100% - var(--db-editor-tab-bar-height)); }
     }
   }
 }
