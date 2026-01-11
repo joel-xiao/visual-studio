@@ -8,7 +8,7 @@
   @dragover="onDragover"
   @contextmenu.stop.prevent="showCanvasMenu($event, nodeContext, componentContext, getScale())"
 >
-  <div ref="canvasRootEl" class="editor-canvas-root" :style="rootStyle" @mousedown.stop="onDown">
+  <div id="editor-canvas-root" ref="canvasRootEl" class="editor-canvas-root" :style="rootStyle" @mousedown.stop="onDown">
     <GridLine />
     <template v-for="item in nodes" :key="item.id">
       <CanvasNode :id="item.id" />

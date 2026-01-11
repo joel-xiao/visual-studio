@@ -26,8 +26,8 @@ export const buildHierarchyItems = (
         const overlapping = nodeContext.searchNodesInArea({
             x: coords.x,
             y: coords.y,
-            width: 1,
-            height: 1
+            width: 0.1,
+            height: 0.1
         });
 
         overlapping.forEach(node => {

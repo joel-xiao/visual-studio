@@ -35,18 +35,15 @@ export const useNodeMenu = () => {
             nodeContext.onSelectNode(nodeId);
         }
 
-        // Calculate canvas coordinates ONLY if the click is within the canvas area
+        // Calculate canvas coordinates relative to the root container
         let coords: { x: number; y: number } | undefined = undefined;
-        const canvasEl = document.getElementById('editor-canvas');
-        if (canvasEl) {
-            const rect = canvasEl.getBoundingClientRect();
-            if (e.clientX >= rect.left && e.clientX <= rect.right &&
-                e.clientY >= rect.top && e.clientY <= rect.bottom) {
-                coords = {
-                    x: (e.clientX - rect.left) / scale,
-                    y: (e.clientY - rect.top) / scale
-                };
-            }
+        const canvasRootEl = document.getElementById('editor-canvas-root');
+        if (canvasRootEl) {
+            const rootRect = canvasRootEl.getBoundingClientRect();
+            coords = {
+                x: (e.clientX - rootRect.left) / scale,
+                y: (e.clientY - rootRect.top) / scale
+            };
         }
 
         const items = buildNodeMenuItems(nodeId, nodeContext, componentContext, coords);
