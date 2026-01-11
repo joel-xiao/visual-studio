@@ -41,13 +41,10 @@ export const buildHierarchyItems = (
         });
     }
 
-    // 3. Convert map to array and sort according to visual and logical hierarchy
-    const itemsList = Array.from(nodeMap.values());
+    // 3. Convert map to array and filter out locked/hidden/root items per requirement
+    const itemsList = Array.from(nodeMap.values()).filter(n => !n.lock && !n.hide && n.id !== 'root');
 
     itemsList.sort((a, b) => {
-        if (a.id === 'root') return 1;
-        if (b.id === 'root') return -1;
-
         // Visual depth check: is one a descendant of the other?
         // Descendants are always "higher" in the selection priority than their ancestors.
         let p: string | undefined = a.parentId;

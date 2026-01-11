@@ -4,8 +4,8 @@
     :data="dragDataset"
     :disabled="node.lock"
     @resizing="onResizing"
-    @mousedown.stop.prevent="onDown"
-    @contextmenu.stop.prevent="showNodeMenu($event, id, nodeContext, componentContext, getScale())"
+    @mousedown="onDown"
+    @contextmenu="onContextMenu"
   >
     <div ref="vm" class="middle-node" :style="nodeStyle"></div>
   </DragResize>
@@ -70,7 +70,15 @@ addNodeInstance(node.id, { setActive, setSelection, updatePos });
 
 const onDown = (e: MouseEvent) => {
   if (node.lock) return;
+  e.stopPropagation();
+  e.preventDefault();
   onSelectNode(node.id, e.shiftKey);
+};
+
+const onContextMenu = (e: MouseEvent) => {
+  e.stopPropagation();
+  e.preventDefault();
+  showNodeMenu(e, props.id, nodeContext, componentContext, getScale());
 };
 
 const onResizing = (dragDataset: IDragDataset) => {

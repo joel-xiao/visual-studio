@@ -1,5 +1,6 @@
 import { useContextMenu } from './state';
 import { buildNodeMenuItems } from './node-menu';
+import { buildHierarchyItems } from './hierarchy';
 import { buildCanvasMenuItems } from './canvas-menu';
 import type { CreateNodeContext } from '../node-context';
 import type { CreateComponentContext } from '../component-context';
@@ -55,11 +56,42 @@ export const useNodeMenu = () => {
     /**
      * Show menu for the empty canvas.
      */
-    const showCanvasMenu = (e: MouseEvent) => {
+    const showCanvasMenu = (
+        e: MouseEvent,
+        nodeContext: CreateNodeContext,
+        componentContext: CreateComponentContext,
+        scale: number = 1
+    ) => {
         e.preventDefault();
         e.stopPropagation();
 
+        // Calculate canvas coordinates
+        let coords: { x: number; y: number } | undefined = undefined;
+        const canvasEl = document.getElementById('editor-canvas');
+        if (canvasEl) {
+            const rect = canvasEl.getBoundingClientRect();
+            coords = {
+                x: (e.clientX - rect.left) / scale,
+                y: (e.clientY - rect.top) / scale
+            };
+        }
+
         const items = buildCanvasMenuItems();
+
+        // If something is at this position (but wasn't direct-targeted), add hierarchy
+        if (coords) {
+            const hierarchyItems = buildHierarchyItems('root', nodeContext, componentContext, coords);
+            if (hierarchyItems.length > 0) {
+                items.unshift({ id: 'div-selection', label: '', divider: true });
+                items.unshift({
+                    id: 'select-layer',
+                    label: '选择图层',
+                    icon: 'lucide:layers',
+                    children: hierarchyItems
+                });
+            }
+        }
+
         open(e.clientX, e.clientY, items);
     };
 

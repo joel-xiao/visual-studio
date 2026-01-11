@@ -6,7 +6,7 @@
   @drop="onDrop"
   @dragenter="onDragenter"
   @dragover="onDragover"
-  @contextmenu.stop.prevent="showCanvasMenu($event)"
+  @contextmenu.stop.prevent="showCanvasMenu($event, nodeContext, componentContext, getScale())"
 >
   <div ref="canvasRootEl" class="editor-canvas-root" :style="rootStyle" @mousedown.stop="onDown">
     <GridLine />
@@ -42,7 +42,9 @@ import { useNodeMenu } from '../hooks/context-menu';
 const middleEl = ref<HTMLElement>();
 const canvasRootEl = ref<HTMLElement>();
 
-const { getRootRef, getNodes, onSelectNode, onAddNode, onSelectNodes, searchNodesInArea } = useNodeContext();
+const nodeContext = useNodeContext();
+const componentContext = useComponentContext();
+const { getRootRef, getNodes, onSelectNode, onAddNode, onSelectNodes, searchNodesInArea } = nodeContext;
 const { getScale } = useCanvas();
 const { showCanvasMenu } = useNodeMenu();
 const { onMouseDown: onMarqueeMouseDown } = useMarqueeSelect(canvasRootEl, {
