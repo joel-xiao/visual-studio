@@ -110,9 +110,9 @@ const onDrop = (e: DragEvent, item: PanelLayerItemData) => {
 
 <template>
   <div v-for="item in data" :key="item.id" class="layer-item" :class="{ 'layer-item_check': item.select }">
-    <div 
-      class="layer-item-nav" 
-      :class="{ 
+    <div
+      class="layer-item-nav"
+      :class="{
         active: item.select,
         'is-hidden': item.data?.hide,
         'is-locked': item.data?.lock,
@@ -120,67 +120,67 @@ const onDrop = (e: DragEvent, item: PanelLayerItemData) => {
         'drop-before': dragOverId === item.id && dropPos === 'before',
         'drop-after': dragOverId === item.id && dropPos === 'after',
         'drop-inside': dragOverId === item.id && dropPos === 'inside',
-      }" 
-      :style="layerItemStyle" 
+      }"
+      :style="layerItemStyle"
       draggable="true"
       @dragstart="onDragStart($event, item)"
       @dragend="onDragEnd"
       @dragover="onDragOver($event, item)"
       @dragleave="onDragLeave"
       @drop="onDrop($event, item)"
-      @click="onSelect($event, item)" 
+      @click="onSelect($event, item)"
       @mouseenter="hoverId = item.id"
       @mouseleave="hoverId = null"
       @contextmenu.stop.prevent="emit('contextmenu', $event, item.id)"
     >
       <div class="layer-item-left">
-        <Icon 
-          v-if="item?.children?.length" 
-          class="arrow" 
-          block 
-          src="icon-zhankai" 
-          :class="{ active: item.AFold }" 
-          @click.stop="onArrow(item)" 
+        <Icon
+          v-if="item?.children?.length"
+          class="arrow"
+          block
+          src="icon-zhankai"
+          :class="{ active: item.AFold }"
+          @click.stop="onArrow(item)"
         />
         <span v-else class="dot"></span>
         <Icon v-if="getItemIcon(item)" class="name-icon" block :src="getItemIcon(item)" />
         <span v-else class="name-icon-margin"></span>
         <span class="layer-item-labe">{{ item.name }}</span>
       </div>
-      
+
       <div v-if="item.handle !== false" class="layer-item-handle">
-        <Icon 
+        <Icon
           v-if="hoverId === item.id || item.data?.lock"
-          button 
-          class="lock-btn" 
+          button
+          class="lock-btn"
           :class="{ 'is-active': item.data?.lock }"
-          :src="item.data?.lock ? 'lucide:lock' : 'lucide:unlock'" 
-          @click.stop.prevent="onToggleLock(item)" 
+          :src="item.data?.lock ? 'lucide:lock' : 'lucide:unlock'"
+          @click.stop.prevent="onToggleLock(item)"
         />
         <span v-else-if="props.isInheritedLock?.(item)" class="inherited-dot"></span>
-        
-        <Icon 
+
+        <Icon
           v-if="hoverId === item.id || item.data?.hide"
-          button 
-          class="hide-btn" 
+          button
+          class="hide-btn"
           :class="{ 'is-active': item.data?.hide }"
-          :src="item.data?.hide ? 'lucide:eye-off' : 'lucide:eye'" 
-          @click.stop.prevent="onToggleHide(item)" 
+          :src="item.data?.hide ? 'lucide:eye-off' : 'lucide:eye'"
+          @click.stop.prevent="onToggleHide(item)"
         />
         <span v-else-if="props.isInheritedHide?.(item)" class="inherited-dot"></span>
       </div>
     </div>
-    
+
     <div v-if="!!item?.children?.length" v-show="item.AFold" class="layer-item-swapper">
-      <LayerItem 
-        :recursion="recursion + 1" 
-        :data="item.children" 
-        :item-icon="itemIcon" 
-        :item-menus="itemMenus" 
+      <LayerItem
+        :recursion="recursion + 1"
+        :data="item.children"
+        :item-icon="itemIcon"
+        :item-menus="itemMenus"
         :get-icon="getIcon"
         :is-inherited-hide="isInheritedHide"
         :is-inherited-lock="isInheritedLock"
-        @select="(id, shift, ctrl) => emit('select', id, shift, ctrl)" 
+        @select="(id, shift, ctrl) => emit('select', id, shift, ctrl)"
         @toggle-hide="id => emit('toggle-hide', id)"
         @toggle-lock="id => emit('toggle-lock', id)"
         @sort="(s, t, p) => emit('sort', s, t, p)"
@@ -293,16 +293,35 @@ const onDrop = (e: DragEvent, item: PanelLayerItemData) => {
 
       &.active {
         background-color: var(--db-editor-color-select);
+
         .layer-item-left {
-          .layer-item-labe, .name-icon { color: #fff; }
-        }
-        .layer-item-handle {
-          .lock-btn, .hide-btn {
-            color: rgba(255, 255, 255, 0.4); opacity: var(--db-layer-icon-opacity-active);
-            &.is-active { color: rgba(255, 255, 255, 0.7); }
-            &:hover { color: #fff; opacity: 1; }
+          .layer-item-labe {
+            color: var(--db-layer-text-active);
           }
-          .inherited-dot { background: rgba(255, 255, 255, 0.3); }
+          .name-icon {
+            color: var(--db-layer-text-active);
+          }
+        }
+
+        .layer-item-handle {
+          .lock-btn,
+          .hide-btn {
+            color: var(--db-layer-icon-color-active);
+            opacity: var(--db-layer-icon-opacity-active);
+
+            &.is-active {
+              color: var(--db-layer-icon-color-active-checked);
+            }
+
+            &:hover {
+              color: var(--db-layer-text-active);
+              opacity: 1;
+            }
+          }
+
+          .inherited-dot {
+            background: var(--db-layer-dot-bg-active);
+          }
         }
       }
     }
