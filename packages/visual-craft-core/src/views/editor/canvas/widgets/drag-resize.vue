@@ -10,16 +10,18 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 import { dragResizeDirective } from '../../../../directives/drag-resize';
 
 const vDragResize = dragResizeDirective;
 
 interface Props {
   data: IDragDataset;
+  disabled?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
-  data: () => ({ y2: 0, x2: 0, x: 0, y: 0 })
+  data: () => ({ y2: 0, x2: 0, x: 0, y: 0 }),
+  disabled: false
 });
 
 const emit = defineEmits<{
@@ -29,7 +31,7 @@ const emit = defineEmits<{
 
 const dragData = reactive<IDragResizeBinding>({
   pos: props.data,
-  disabled: false,
+  disabled: props.disabled,
   active: false,
   selection: false,
   scale: 1,
@@ -42,6 +44,10 @@ const dragData = reactive<IDragResizeBinding>({
   onDown: (dragDataset: IDragDataset) => {
     emit('drag-start', dragDataset);
   }
+});
+
+watch(() => props.disabled, (val) => {
+  dragData.disabled = !!val;
 });
 
 const dragDataComputed = computed<IDragResizeBinding>(() => ({ ...dragData }));

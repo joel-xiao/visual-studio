@@ -134,6 +134,8 @@ export class Drag {
 
   setDisabled(disabled: boolean): void {
     this.disabled = disabled;
+    this.el?.classList[disabled ? 'add' : 'remove']('disabled');
+    this.stickEl?.classList[disabled ? 'add' : 'remove']('disabled');
   }
 
   setActive(active: boolean): void {

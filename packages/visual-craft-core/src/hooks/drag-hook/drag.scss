@@ -10,6 +10,14 @@
   box-sizing: border-box;
   background-color: rgba(0, 0, 0, 0);
 
+  &.disabled {
+    cursor: default !important;
+
+    &>.v-drag-sticks {
+      display: none !important;
+    }
+  }
+
   &::after {
     content: "";
     position: absolute;

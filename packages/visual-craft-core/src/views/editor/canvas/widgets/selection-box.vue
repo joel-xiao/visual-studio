@@ -3,6 +3,7 @@
     <DragResize
       ref="resizeRef"
       :data="boundingBox"
+      :disabled="isAllLocked"
       @resizing="onResizing"
       @drag-start="onDragStart"
       @mousedown.stop
@@ -27,6 +28,9 @@ const componentContext = useComponentContext();
 const { showNodeMenu } = useNodeMenu();
 
 const resizeRef = ref<InstanceType<typeof DragResize> | null>(null);
+const isAllLocked = computed(() => {
+  return selectedNodes.value.length > 0 && selectedNodes.value.every(n => n.lock);
+});
 
 // Bounding box state
 const boundingBox = ref<IDragDataset>({ x: 0, y: 0, x2: 0, y2: 0 });
@@ -50,8 +54,11 @@ interface NodeInitialState {
 let initialNodesState: NodeInitialState[] = [];
 
 const calculateBoundingBox = async () => {
-  const nodes = unref(selectedNodes);
-  if (nodes.length <= 1) return;
+  const nodes = unref(selectedNodes).filter(n => !n.hide);
+  if (nodes.length <= 1) {
+    boundingBox.value = { x: 0, y: 0, x2: 0, y2: 0 };
+    return;
+  }
 
   let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
   nodes.forEach(node => {
@@ -118,6 +125,9 @@ const onResizing = (newBox: IDragDataset) => {
   const nbh = newBox.y2 - newBox.y;
 
   initialNodesState.forEach(state => {
+    const node = nodeContext.getNodeMap().get(state.id);
+    if (node?.lock) return;
+
     updateNode(state.id, {
       x: newBox.x + state.leftRatio * nbw,
       y: newBox.y + state.topRatio * nbh,
@@ -126,7 +136,6 @@ const onResizing = (newBox: IDragDataset) => {
     });
   });
 
-  // Update local box too
   boundingBox.value = { ...newBox };
 };
 

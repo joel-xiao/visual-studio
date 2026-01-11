@@ -164,6 +164,8 @@ export class GroupExtension {
     const oldWidth = node.width;
     const oldHeight = node.height;
 
+    if (node.lock) return;
+
     this.context.updateNode(node.id, { x: newBox.x, y: newBox.y, width: newW, height: newH }, true, true);
 
     if (node.schema === 'GROUP') {

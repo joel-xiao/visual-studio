@@ -2,6 +2,7 @@
   <DragResize
     ref="resize"
     :data="dragDataset"
+    :disabled="node.lock"
     @resizing="onResizing"
     @mousedown.stop.prevent="onDown"
     @contextmenu.stop.prevent="showNodeMenu($event, id, nodeContext, componentContext, getScale())"
@@ -67,7 +68,10 @@ onMounted(() => {
 
 addNodeInstance(node.id, { setActive, setSelection, updatePos });
 
-const onDown = (e: MouseEvent) => onSelectNode(node.id, e.shiftKey);
+const onDown = (e: MouseEvent) => {
+  if (node.lock) return;
+  onSelectNode(node.id, e.shiftKey);
+};
 
 const onResizing = (dragDataset: IDragDataset) => {
   const dx = dragDataset.x - node.x;
