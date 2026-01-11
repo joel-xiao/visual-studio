@@ -14,12 +14,13 @@ export function getNodeStyle(nodeOrRef: MaybeRef<StyleNode> | Readonly<Ref<Style
     '--node-height': string;
     overflow: string;
     transform: string;
+    'transform-origin': string;
+    display: string;
   }>(() => {
     const node = unref(nodeOrRef);
     const radius = Array.isArray(node?.radius) ? node.radius.map(r => (r || 0) + 'px') : [];
     const width = (node?.width || 0) + 'px';
     const height = (node?.height || 0) + 'px';
-    const rotate = (node?.rotate || 0) + 'deg';
     return {
       'border-top-left-radius': radius[0] || '0px',
       'border-top-right-radius': radius[1] || '0px',
@@ -30,7 +31,8 @@ export function getNodeStyle(nodeOrRef: MaybeRef<StyleNode> | Readonly<Ref<Style
       '--node-width': width,
       '--node-height': height,
       overflow: 'hidden',
-      transform: `rotate(${rotate})`,
+      transform: 'none',
+      'transform-origin': 'center center',
       display: node?.hide ? 'none' : 'block'
     };
   });

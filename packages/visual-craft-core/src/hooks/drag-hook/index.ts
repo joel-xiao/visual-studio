@@ -2,6 +2,15 @@
 // import { createComponent } from './../vue-hooks';
 import './drag.scss';
 
+const buildCornerRotateCursor = (angleDeg: number): string => {
+  const normalized = ((angleDeg % 360) + 360) % 360;
+  const d =
+    'M 20 9 L 17 6.5 M 20 9 L 17 11.5 M 9 20 L 6.5 17 M 9 20 L 11.5 17 M 9 17 A 8 8 0 0 1 17 9';
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g transform="rotate(${normalized}, 12, 12)"><path d="${d}" fill="none" stroke="#ffffff" stroke-width="3.8" stroke-linecap="square" stroke-linejoin="miter" stroke-miterlimit="4"/><path d="${d}" fill="none" stroke="black" stroke-width="2.8" stroke-linecap="square" stroke-linejoin="miter" stroke-miterlimit="4"/></g></svg>`;
+  const encoded = encodeURIComponent(svg);
+  return `url("data:image/svg+xml,${encoded}") 16 16, auto`;
+};
+
 export class Drag {
   el?: HTMLElement;
   resize: boolean;
@@ -23,9 +32,10 @@ export class Drag {
   pos: IDragDataset;
   #startInteractionPos: IDragDataset = { x: 0, y: 0, x2: 0, y2: 0 };
   cursorPos?: IDragCursorPos | null;
+  centerPos: { x: number; y: number } = { x: 0, y: 0 };
   binding: IDragBinding;
   constructor() {
-    this.sticks = ['tm', 'rm', 'bm', 'lm', 'tl', 'tr', 'br', 'bl'];
+    this.sticks = ['tm', 'rm', 'bm', 'lm', 'tl', 'tr', 'br', 'bl', 'rotate', 'rot-tl', 'rot-tr', 'rot-br', 'rot-bl'];
     this.currentStick = '';
     this.defaultPos = { x: 0, y: 0, x2: 0, y2: 0 };
     this.pos = { ...this.defaultPos };
@@ -223,6 +233,13 @@ export class Drag {
   }
 
   onDown(): void {
+    if (this.el) {
+      const rect = this.el.getBoundingClientRect();
+      this.centerPos = {
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2
+      };
+    }
     this.callbackDown?.(this.pos);
     document.documentElement.addEventListener('mousemove', this.onMove, false);
     document.documentElement.addEventListener('mouseup', this.onUp, false);
@@ -251,28 +268,118 @@ export class Drag {
       this.pos.y = startPos.y + diff_y;
       this.pos.x2 = startPos.x2 + diff_x;
       this.pos.y2 = startPos.y2 + diff_y;
-    } else if (stick === 'tl') {
-      this.pos.x = startPos.x + diff_x;
-      this.pos.y = startPos.y + diff_y;
-    } else if (stick === 'tr') {
-      this.pos.x2 = startPos.x2 + diff_x;
-      this.pos.y = startPos.y + diff_y;
-    } else if (stick === 'br') {
-      this.pos.x2 = startPos.x2 + diff_x;
-      this.pos.y2 = startPos.y2 + diff_y;
-    } else if (stick === 'bl') {
-      this.pos.x = startPos.x + diff_x;
-      this.pos.y2 = startPos.y2 + diff_y;
-    } else if (stick === 'tm') {
-      this.pos.y = startPos.y + diff_y;
-    } else if (stick === 'rm') {
-      this.pos.x2 = startPos.x2 + diff_x;
-    } else if (stick === 'bm') {
-      this.pos.y2 = startPos.y2 + diff_y;
-    } else if (stick === 'lm') {
-      this.pos.x = startPos.x + diff_x;
-    }
 
+    } else if (stick === 'rotate' || stick.startsWith('rot-')) {
+      const cx = this.centerPos.x;
+      const cy = this.centerPos.y;
+      const startAngle = Math.atan2(this.startPos.y - cy, this.startPos.x - cx);
+      const currentAngle = Math.atan2(event.y - cy, event.x - cx);
+      const diffAngle = (currentAngle - startAngle) * (180 / Math.PI);
+      this.pos.rotate = (startPos.rotate || 0) + diffAngle;
+    } else {
+      const rotate = startPos.rotate || 0;
+      const rad = rotate * (Math.PI / 180);
+      const cos = Math.cos(rad);
+      const sin = Math.sin(rad);
+
+      const cx = startPos.x + (startPos.x2 - startPos.x) / 2;
+      const cy = startPos.y + (startPos.y2 - startPos.y) / 2;
+      const w = startPos.x2 - startPos.x;
+      const h = startPos.y2 - startPos.y;
+
+      const ux = { x: cos, y: sin };
+      const uy = { x: -sin, y: cos };
+
+      let fx_rel = 0, fy_rel = 0;
+
+      switch (stick) {
+        case 'tl': fx_rel = w / 2; fy_rel = h / 2; break;
+        case 'tr': fx_rel = -w / 2; fy_rel = h / 2; break;
+        case 'br': fx_rel = -w / 2; fy_rel = -h / 2; break;
+        case 'bl': fx_rel = w / 2; fy_rel = -h / 2; break;
+        case 'tm': fx_rel = 0; fy_rel = h / 2; break;
+        case 'bm': fx_rel = 0; fy_rel = -h / 2; break;
+        case 'lm': fx_rel = w / 2; fy_rel = 0; break;
+        case 'rm': fx_rel = -w / 2; fy_rel = 0; break;
+      }
+
+      const fx_rot = fx_rel * cos - fy_rel * sin;
+      const fy_rot = fx_rel * sin + fy_rel * cos;
+      const F = { x: cx + fx_rot, y: cy + fy_rot };
+
+      // Correct M calculation:
+      // The Mouse Position is roughly (StartMouse + diff).
+      // But diff is in global space.
+      // Wait. diff_x = (event.x - startPos.x).
+      // But which startPos?
+      // In stickDown, startPos.x = event.x.
+      // So diff_x is (CurrentMouse - StartMouse).
+      // But we need the position relative to the Stick's original position.
+      // The stick was at SOME position.
+      // The math below uses M as the *Target Stick Position*.
+      // TargetStick = StartStick + Diff.
+      // Where is StartStick?
+      // StartStick is (F + Vector_F_to_Stick).
+      // Or simply: M = StartStickPos + Diff.
+      // But we don't track StartStickPos explicitly.
+      // But we know F (Fixed Point) and the initial Width/Height.
+      // StartStickPos relative to Center is (-fx_rel, -fy_rel).
+      // So StartStickPos = cx + (-fx_rel * cos - -fy_rel * sin), etc.
+      // Let's simplify:
+      // V (Vector from F to NewStick) = (Vector F to OldStick) + Diff.
+      // Vector F to OldStick = (cx - F.x - fx_rel_rot, cy - F.y - fy_rel_rot)?
+      // No. F is the opposite point.
+      // Vector F->OldStick is simply (StartW * ux_sign * ux + StartH * uy_sign * uy).
+      // It's easier to calculate M directly.
+      // M = (StartStickPos) + (diff_x, diff_y).
+      // StartStickPos?
+      // Center + Rotated(-fx_rel, -fy_rel).
+
+      const hx_rel = -fx_rel, hy_rel = -fy_rel;
+      const hx_rot = hx_rel * cos - hy_rel * sin;
+      const hy_rot = hx_rel * sin + hy_rel * cos;
+      const StartStickPos = { x: cx + hx_rot, y: cy + hy_rot };
+
+      const M_curr = { x: StartStickPos.x + diff_x, y: StartStickPos.y + diff_y };
+      const V = { x: M_curr.x - F.x, y: M_curr.y - F.y };
+
+      const proj_x = V.x * ux.x + V.y * ux.y;
+      const proj_y = V.x * uy.x + V.y * uy.y;
+
+      let newW = w;
+      let newH = h;
+      let local_x = 0;
+      let local_y = 0;
+
+      if (['tl', 'tr', 'br', 'bl'].includes(stick)) {
+        newW = Math.abs(proj_x);
+        newH = Math.abs(proj_y);
+        local_x = proj_x;
+        local_y = proj_y;
+      } else if (['tm', 'bm'].includes(stick)) {
+        newH = Math.abs(proj_y);
+        local_x = 0; // Constrained
+        local_y = proj_y;
+      } else if (['lm', 'rm'].includes(stick)) {
+        newW = Math.abs(proj_x);
+        local_x = proj_x;
+        local_y = 0; // Constrained
+      }
+
+      // Reconstruct vector from F to New Stick Position (aligned)
+      const V_aligned_global = {
+        x: local_x * ux.x + local_y * uy.x,
+        y: local_x * ux.y + local_y * uy.y
+      };
+
+      const newCx = F.x + V_aligned_global.x / 2;
+      const newCy = F.y + V_aligned_global.y / 2;
+
+      this.pos.x = newCx - newW / 2;
+      this.pos.y = newCy - newH / 2;
+      this.pos.x2 = newCx + newW / 2;
+      this.pos.y2 = newCy + newH / 2;
+    }
     this.updateStyle(this.pos);
     this.callbackMove?.(this.pos);
   }
@@ -284,67 +391,49 @@ export class Drag {
   updateStyle(pos: IDragDataset): void {
     let diff_rotate_x = 0;
     let diff_rotate_y = 0;
-    let rotate = '';
+    const transforms: string[] = [];
     if (pos.x2 - pos.x < 0 && pos.y2 - pos.y < 0) {
       diff_rotate_x = pos.x2 - pos.x;
       diff_rotate_y = pos.y2 - pos.y;
-      rotate = `rotate(180deg)`;
+      transforms.push('rotate(180deg)');
     } else if (pos.x2 - pos.x < 0 && pos.y2 - pos.y >= 0) {
       diff_rotate_x = pos.x2 - pos.x;
-      rotate = `rotateY(180deg)`;
+      transforms.push('rotateY(180deg)');
     } else if (pos.x2 - pos.x >= 0 && pos.y2 - pos.y <= 0) {
       diff_rotate_y = pos.y2 - pos.y;
-      rotate = `rotateX(180deg)`;
+      transforms.push('rotateX(180deg)');
+    }
+
+    if (pos.rotate) {
+      transforms.push(`rotate(${pos.rotate}deg)`);
     }
 
     if (this.el) {
-      this.el.style.transform = `translate(${pos.x + diff_rotate_x}px, ${pos.y + diff_rotate_y
-        }px) ${rotate}`;
+      const rotate = transforms.join(' ');
+      this.el.style.transform = `translate(${pos.x + diff_rotate_x}px, ${pos.y + diff_rotate_y}px) ${rotate}`;
       this.el.style.width = Math.abs(pos.x2 - pos.x) + 'px';
       this.el.style.height = Math.abs(pos.y2 - pos.y) + 'px';
     }
+
+    this.updateSticks(pos);
   }
 
-  updateSticks() {
-    for (const stickDom of this.stickEls) {
-      const scale = 1 / this.#scale;
-      const stick = stickDom.getAttribute('stick');
-      switch (stick) {
-        case 'rm':
-          stickDom.style.transformOrigin = 'right';
-          stickDom.style.transform = `scaleX(${scale})`;
-          break;
-        case 'lm':
-          stickDom.style.transformOrigin = 'left';
-          stickDom.style.transform = `scaleX(${scale})`;
-          break;
-        case 'tm':
-          stickDom.style.transformOrigin = 'top';
-          stickDom.style.transform = `scaleY(${scale})`;
-          break;
-        case 'bm':
-          stickDom.style.transformOrigin = 'bottom';
-          stickDom.style.transform = `scaleY(${scale})`;
-          break;
-        case 'tl':
-          stickDom.style.transformOrigin = 'center';
-          stickDom.style.transform = `translate(-50%, -50%) scale(${scale})`;
-          break;
-        case 'tr':
-          stickDom.style.transformOrigin = 'center';
-          stickDom.style.transform = `translate(50%, -50%)  scale(${scale})`;
-          break;
-        case 'br':
-          stickDom.style.transformOrigin = 'center';
-          stickDom.style.transform = `translate(50%, 50%) scale(${scale})`;
-          break;
-        case 'bl':
-          stickDom.style.transformOrigin = 'center';
-          stickDom.style.transform = `translate(-50%, 50%) scale(${scale})`;
-          break;
-        default:
-          break;
-      }
+  updateSticks(pos?: IDragDataset) {
+    const scale = 1 / this.#scale;
+    this.stickEl?.style.setProperty('--drag-scale', scale.toString());
+
+    const rotate = pos?.rotate ?? this.pos.rotate ?? 0;
+    const baseByStick: Record<string, number> = {
+      'rot-tl': 0,
+      'rot-tr': 90,
+      'rot-br': 180,
+      'rot-bl': -90
+    };
+    for (const stickEl of this.stickEls) {
+      const stick = stickEl.getAttribute('stick') || '';
+      const base = baseByStick[stick];
+      if (base === undefined) continue;
+      stickEl.style.cursor = buildCornerRotateCursor(rotate + base);
     }
   }
 }

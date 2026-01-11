@@ -68,10 +68,15 @@ const onUpdate = function (key: string, value: string | number | boolean | undef
   emit('update', [key, value]);
 };
 
+const normalizeRotate = (deg: number) => {
+  const normalized = ((deg % 360) + 360) % 360;
+  return normalized >= 180 ? normalized - 360 : normalized;
+};
+
 const onRotate = function (type: string) {
   let newRotate = props.modelValue.rotate;
-  if (type === 'x') newRotate = 180 - newRotate;
-  if (type === 'y') newRotate = -newRotate;
+  if (type === 'x') newRotate = normalizeRotate(180 - newRotate);
+  if (type === 'y') newRotate = normalizeRotate(-newRotate);
   emit('update', ['rotate', newRotate]);
 };
 </script>

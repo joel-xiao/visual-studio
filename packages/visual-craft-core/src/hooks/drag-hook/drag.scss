@@ -55,6 +55,16 @@
 
   &>.v-drag-sticks {
     display: none;
+    --drag-scale: 1;
+    --corner-rot-offset: 22px;
+    --rotate-offset: 32px;
+    --drag-rotate-bg: var(--theme-color-tran-8, #ffffff);
+    --drag-rotate-bg-hover: var(--theme-color-tran-12, #fafafa);
+    --drag-rotate-bg-active: var(--theme-color-tran-18, #f0f0f0);
+    --drag-rotate-border: var(--theme-color-tran-12, rgba(0, 0, 0, 0.1));
+    --drag-rotate-shadow: var(--shadow-s, 0 1px 3px rgba(0, 0, 0, 0.08));
+    --drag-rotate-shadow-hover: 0 2px 6px rgba(0, 0, 0, 0.12);
+    --drag-rotate-icon: var(--db-editor-icon-color, #555555);
 
     &.disabled {
       display: none !important;
@@ -103,6 +113,14 @@
         border-radius: 2px;
       }
 
+      &.v-drag-stick-rotate {
+        width: 8px;
+        height: 8px;
+        background: transparent;
+        border: none;
+        border-radius: 2px;
+      }
+
       &.v-drag-stick-tl,
       &.v-drag-stick-br {
         cursor: nwse-resize;
@@ -121,6 +139,89 @@
       &.v-drag-stick-lm,
       &.v-drag-stick-rm {
         cursor: ew-resize;
+      }
+
+      &.v-drag-stick-rotate {
+        width: 18px;
+        height: 18px;
+        background-color: var(--drag-rotate-bg);
+        border: 1px solid var(--drag-rotate-border);
+        box-shadow: var(--drag-rotate-shadow);
+        border-radius: 50%;
+        left: 50%;
+        top: 0;
+        right: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: grab;
+        position: relative;
+        transition: all 0.2s ease;
+
+        /* Dynamic transform using CSS variable set by JS */
+        --offset: var(--rotate-offset);
+        transform-origin: center;
+        transform: translate(-50%, calc(-50% - (var(--offset) * var(--drag-scale)))) scale(var(--drag-scale));
+      }
+
+      &.v-drag-stick-rotate::before {
+        content: "";
+        width: 10px;
+        height: 10px;
+        background-color: var(--drag-rotate-icon);
+        -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10H20c0 4.41-3.59 8-8 8s-8-3.59-8-8 3.59-8 8-8v4l6-6-6-6v4z'/%3E%3C/svg%3E");
+        -webkit-mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        -webkit-mask-size: 10px 10px;
+        mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10H20c0 4.41-3.59 8-8 8s-8-3.59-8-8 3.59-8 8-8v4l6-6-6-6v4z'/%3E%3C/svg%3E");
+        mask-repeat: no-repeat;
+        mask-position: center;
+        mask-size: 10px 10px;
+      }
+
+      &.v-drag-stick-rotate:hover {
+        /* Scale up on hover while maintaining position */
+        transform: translate(-50%, calc(-50% - (var(--offset) * var(--drag-scale)))) scale(calc(var(--drag-scale) * 1.1));
+        box-shadow: var(--drag-rotate-shadow-hover);
+        background-color: var(--drag-rotate-bg-hover);
+      }
+
+
+      &.v-drag-stick-rotate:active {
+        cursor: grabbing;
+        transform: translate(-50%, calc(-50% - (var(--offset) * var(--drag-scale)))) scale(calc(var(--drag-scale) * 0.95));
+        background-color: var(--drag-rotate-bg-active);
+      }
+
+      &.v-drag-stick-rot-tl,
+      &.v-drag-stick-rot-tr,
+      &.v-drag-stick-rot-br,
+      &.v-drag-stick-rot-bl {
+        width: 18px;
+        height: 18px;
+        background: transparent;
+        border: none;
+        border-radius: 50%;
+      }
+
+      &.v-drag-stick-rot-tl {
+        top: 0;
+        left: 0;
+      }
+
+      &.v-drag-stick-rot-tr {
+        top: 0;
+        right: 0;
+      }
+
+      &.v-drag-stick-rot-br {
+        right: 0;
+        bottom: 0;
+      }
+
+      &.v-drag-stick-rot-bl {
+        bottom: 0;
+        left: 0;
       }
 
       &.v-drag-stick-tl {
@@ -170,6 +271,24 @@
         left: 0;
         border-left: 1px solid var(--drag-resize-color);
       }
+
+      /* Corner Resizers Transform */
+      &.v-drag-stick-tl { transform-origin: center; transform: translate(-50%, -50%) scale(var(--drag-scale)); }
+      &.v-drag-stick-tr { transform-origin: center; transform: translate(50%, -50%) scale(var(--drag-scale)); }
+      &.v-drag-stick-br { transform-origin: center; transform: translate(50%, 50%) scale(var(--drag-scale)); }
+      &.v-drag-stick-bl { transform-origin: center; transform: translate(-50%, 50%) scale(var(--drag-scale)); }
+
+      /* Edge Resizers Transform */
+      &.v-drag-stick-tm { transform-origin: top; transform: scaleY(var(--drag-scale)); }
+      &.v-drag-stick-bm { transform-origin: bottom; transform: scaleY(var(--drag-scale)); }
+      &.v-drag-stick-lm { transform-origin: left; transform: scaleX(var(--drag-scale)); }
+      &.v-drag-stick-rm { transform-origin: right; transform: scaleX(var(--drag-scale)); }
+
+      /* Corner Rotation Handles Transform */
+      &.v-drag-stick-rot-tl { transform-origin: center; transform: translate(-50%, -50%) translate(calc(-1 * var(--corner-rot-offset) * var(--drag-scale)), calc(-1 * var(--corner-rot-offset) * var(--drag-scale))) scale(var(--drag-scale)); }
+      &.v-drag-stick-rot-tr { transform-origin: center; transform: translate(50%, -50%) translate(calc(var(--corner-rot-offset) * var(--drag-scale)), calc(-1 * var(--corner-rot-offset) * var(--drag-scale))) scale(var(--drag-scale)); }
+      &.v-drag-stick-rot-br { transform-origin: center; transform: translate(50%, 50%) translate(calc(var(--corner-rot-offset) * var(--drag-scale)), calc(var(--corner-rot-offset) * var(--drag-scale))) scale(var(--drag-scale)); }
+      &.v-drag-stick-rot-bl { transform-origin: center; transform: translate(-50%, 50%) translate(calc(-1 * var(--corner-rot-offset) * var(--drag-scale)), calc(var(--corner-rot-offset) * var(--drag-scale))) scale(var(--drag-scale)); }
     }
   }
 }

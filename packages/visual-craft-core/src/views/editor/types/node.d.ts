@@ -41,6 +41,7 @@ declare interface INodeDelta {
   y?: number;
   hide?: boolean;
   lock?: boolean;
+  rotate?: number;
 }
 
 declare interface IEditorData {

@@ -242,6 +242,7 @@ export class CreateNodeContext {
         if (delta.y !== undefined) layoutUpdates.push({ key: 'layout.y', value: delta.y });
         if (delta.width !== undefined) layoutUpdates.push({ key: 'layout.width', value: delta.width });
         if (delta.height !== undefined) layoutUpdates.push({ key: 'layout.height', value: delta.height });
+        if (delta.rotate !== undefined) layoutUpdates.push({ key: 'layout.rotate', value: delta.rotate });
 
         if (layoutUpdates.length > 0) {
           this.updateNodeProps(node.id, layoutUpdates, false);
@@ -336,6 +337,7 @@ export class CreateNodeContext {
         case 'y':
         case 'width':
         case 'height':
+        case 'rotate':
           nodeUpdates[field] = Number(value);
           break;
         case 'radius':

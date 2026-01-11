@@ -1,6 +1,11 @@
 const SCHEMA_NAME = 'COMMON_LAYOUT';
 const SCHEMA_KEY = 'layout';
 
+const normalizeRotate = (deg: number) => {
+  const normalized = ((deg % 360) + 360) % 360;
+  return normalized >= 180 ? normalized - 360 : normalized;
+};
+
 const schema: ISchemaExport = {
   name: SCHEMA_NAME,
   label: '',
@@ -70,9 +75,8 @@ const schema: ISchemaExport = {
         ctrl: 'C_BUTTON',
         size: 'small',
         click: props => {
-          if (typeof props.rotate === 'number') {
-            props.rotate = -props.rotate;
-          }
+          if (typeof props.rotate !== 'number') return;
+          return { rotate: normalizeRotate(-props.rotate) };
         }
       },
       {
@@ -84,9 +88,8 @@ const schema: ISchemaExport = {
         ctrl: 'C_BUTTON',
         size: 'small',
         click: props => {
-          if (typeof props.rotate === 'number') {
-            props.rotate = 180 - props.rotate;
-          }
+          if (typeof props.rotate !== 'number') return;
+          return { rotate: normalizeRotate(180 - props.rotate) };
         }
       }
     ],

@@ -20,7 +20,7 @@
         :options="prop?.options"
         :suffix="prop.suffix"
         :keys="getKeys(prop)"
-        @update="onUpdate(prop.key || '', $event)"
+        @update="onUpdateProp(prop, $event)"
         @click="onClick(prop)"
       />
     </template>
@@ -83,8 +83,23 @@ const onUpdate = function (key: string, value: string | number | boolean | undef
   emit('update', [key, value]);
 };
 
+const onUpdateProp = function (propSchema: SchemaKeyType, value: string | number | boolean | undefined | number[]) {
+  if (propSchema.click && propSchema.ctrl === 'C_BUTTON') return;
+  emit('update', [propSchema.key || '', value]);
+};
+
 const onClick = function (propSchema: SchemaKeyType) {
-  propSchema.click?.(props.modelValue);
+  if (!propSchema.click) return;
+  const result = propSchema.click(props.modelValue);
+  if (Array.isArray(result) && result.length === 2 && typeof result[0] === 'string') {
+    emit('update', result);
+    return;
+  }
+  if (result && typeof result === 'object' && !Array.isArray(result)) {
+    Object.entries(result).forEach(([key, value]) => {
+      if (typeof key === 'string') emit('update', [key, value]);
+    });
+  }
 };
 </script>
 

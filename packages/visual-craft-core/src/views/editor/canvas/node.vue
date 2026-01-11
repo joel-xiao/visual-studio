@@ -41,7 +41,8 @@ const dragDataset = readonly(
       x: node.x || 0,
       y: node.y || 0,
       x2: node.x + node.width,
-      y2: node.y + node.height
+      y2: node.y + node.height,
+      rotate: node.rotate || 0
     })
   )
 );
@@ -54,7 +55,8 @@ const updatePos = () => {
     x: node.x || 0,
     y: node.y || 0,
     x2: node.x + node.width,
-    y2: node.y + node.height
+    y2: node.y + node.height,
+    rotate: node.rotate || 0
   });
 };
 
@@ -86,10 +88,11 @@ const onResizing = (dragDataset: IDragDataset) => {
   const dy = dragDataset.y - node.y;
   const dw = dragDataset.x2 - dragDataset.x - node.width;
   const dh = dragDataset.y2 - dragDataset.y - node.height;
+  const dr = (dragDataset.rotate || 0) - (node.rotate || 0);
 
   if ((node as INode).lock) return;
 
-  if (dw === 0 && dh === 0) {
+  if (dw === 0 && dh === 0 && dr === 0) {
     nodeContext.group.handleNodeDrag(node as INode, dx, dy, unref(allNodes) as INode[], unref(selectedNodes) as INode[]);
   } else {
     nodeContext.group.handleNodeResize(node as INode, dragDataset, unref(allNodes) as INode[]);

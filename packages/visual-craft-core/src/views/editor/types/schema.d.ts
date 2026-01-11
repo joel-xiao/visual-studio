@@ -12,7 +12,12 @@ interface IDefaultSchemaKeyData {
     value: string | number;
     icon?: string;
   }[];
-  click?: (props: ComponentProp) => void;
+  click?: (
+    props: ComponentProp
+  ) =>
+    | void
+    | [key: string, value: ComponentPropValue]
+    | Record<string, ComponentPropValue>;
   change?: (props: ComponentProp) => void;
 }
 

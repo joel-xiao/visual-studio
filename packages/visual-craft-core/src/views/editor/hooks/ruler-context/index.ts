@@ -181,7 +181,7 @@ class Ruler {
 
       const drawLabel = (val: number, pos: number) => {
         ctx.save();
-        const text = Math.abs(val) < 1 ? val.toFixed(1) : String(Math.round(val));
+        const text = Number.isInteger(val) ? String(val) : String(Number(val.toFixed(1)));
         ctx.font = '10px Inter, sans-serif';
         const metrics = ctx.measureText(text);
         const labelWidth = metrics.width + 12;
@@ -306,7 +306,7 @@ class Ruler {
 
       const drawLabel = (val: number, pos: number) => {
         ctx.save();
-        const text = Math.abs(val) < 1 ? val.toFixed(1) : String(Math.round(val));
+        const text = Number.isInteger(val) ? String(val) : String(Number(val.toFixed(1)));
         ctx.font = '10px Inter, sans-serif';
         const metrics = ctx.measureText(text);
         const labelWidth = metrics.width + 12;

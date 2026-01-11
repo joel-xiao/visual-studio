@@ -160,6 +160,7 @@ export class GroupExtension {
   public handleNodeResize(node: INode, newBox: IDragDataset, allNodes: INode[], isRecursive = false) {
     const newW = newBox.x2 - newBox.x;
     const newH = newBox.y2 - newBox.y;
+    const newRotate = newBox.rotate;
     const oldX = node.x;
     const oldY = node.y;
     const oldWidth = node.width;
@@ -167,7 +168,7 @@ export class GroupExtension {
 
     if (node.lock && !isRecursive) return;
 
-    this.context.updateNode(node.id, { x: newBox.x, y: newBox.y, width: newW, height: newH }, true, true);
+    this.context.updateNode(node.id, { x: newBox.x, y: newBox.y, width: newW, height: newH, rotate: newRotate }, true, true);
 
     if (node.schema === 'GROUP') {
       const invOldW = 1 / Math.max(oldWidth, 1);

@@ -3,6 +3,7 @@ declare interface IDragDataset {
   x2: number;
   x: number;
   y: number;
+  rotate?: number;
 }
 
 declare interface IDragCursorPos {
