@@ -38,6 +38,8 @@ class Overlay {
   #pos: Pos = { x: 0, y: 0 };
   #scaleOffset: Pos = { x: 0, y: 0 };
   #option?: OverlayOption;
+  #isDirty = false;
+  #rafId: number | null = null;
   constructor() {
     this.install = this.install.bind(this);
 
@@ -81,6 +83,7 @@ class Overlay {
   }
 
   uninstall(): void {
+    if (this.#rafId) cancelAnimationFrame(this.#rafId);
     this.#overlayEl?.removeEventListener('mousedown', this.onMaskDown, true);
     this.#overlayEl?.remove();
     this.#overlayEl = undefined;
@@ -187,9 +190,20 @@ class Overlay {
   }
 
   updatePos() {
-    this.#updatePos();
+    this.#scheduleUpdate();
   }
-  #updatePos(): void {
+
+  #scheduleUpdate() {
+    if (this.#isDirty) return;
+    this.#isDirty = true;
+    this.#rafId = requestAnimationFrame(() => {
+      this.#applyUpdate();
+      this.#isDirty = false;
+      this.#rafId = null;
+    });
+  }
+
+  #applyUpdate(): void {
     this.#callbackUpdates.forEach(callback =>
       callback({
         x: this.#pos.x,
@@ -202,12 +216,13 @@ class Overlay {
     );
 
     if (this.#option) {
-      this.#option.canvasEl.style.translate = `${this.#pos.x + this.#scaleOffset.x}px ${
-        this.#pos.y + this.#scaleOffset.y
-      }px`;
+      this.#option.canvasEl.style.translate = `${this.#pos.x + this.#scaleOffset.x}px ${this.#pos.y + this.#scaleOffset.y
+        }px`;
     }
-    // if (!this.#disabled && this.#option?.parentEl) {
-    // }
+  }
+
+  #updatePos(): void {
+    this.#scheduleUpdate();
   }
 
   getPos(): Pos {

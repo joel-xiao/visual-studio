@@ -81,7 +81,7 @@ onUnmounted(() => {
 
 // Create Ruler Context
 const editorRef = ref();
-const { addRuler } = useRuler();
+const { addRuler, setSelectionSync } = useRuler();
 onMounted(() => {
   addRuler(editorRef.value, {
     left: layout.left_menu_width,
@@ -89,6 +89,7 @@ onMounted(() => {
     right: layout.right_menu_width,
     size: layout.ruler_size
   });
+  setSelectionSync(nodeContext.getSelectedNodes());
 });
 onUnmounted(() => {
   removeRuler();

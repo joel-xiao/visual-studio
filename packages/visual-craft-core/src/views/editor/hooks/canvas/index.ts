@@ -22,6 +22,7 @@ class Canvas {
   #minScale = 0.02;
   #option?: CanvasOption;
   #canvasUpdates: ICallbackUpdate[] = [];
+  #parentRect: DOMRect | null = null;
 
   constructor() {
     this.uninstall = this.uninstall.bind(this);
@@ -42,7 +43,16 @@ class Canvas {
   addScaleEvent(opt: CanvasOption) {
     this.#option = opt;
     this.#option?.parentEl.addEventListener('wheel', this.onWheel);
+    this.#updateParentRect();
     this.#autoFit();
+
+    window.addEventListener('resize', this.#updateParentRect.bind(this));
+  }
+
+  #updateParentRect() {
+    if (this.#option?.parentEl) {
+      this.#parentRect = this.#option.parentEl.getBoundingClientRect();
+    }
   }
 
   #autoFit() {
@@ -79,6 +89,7 @@ class Canvas {
 
   removeScaleEvent() {
     this.#option?.parentEl.removeEventListener('wheel', this.onWheel);
+    window.removeEventListener('resize', this.#updateParentRect.bind(this));
     this.#option = undefined;
   }
 
@@ -106,8 +117,8 @@ class Canvas {
       this.#option.canvasEl.style.scale = `${this.#scale}`;
     }
 
-    if (this.#option?.canvasEl && this.#option?.parentEl) {
-      const parent_rect = this.#option.parentEl.getBoundingClientRect();
+    if (this.#option?.canvasEl && this.#option?.parentEl && this.#parentRect) {
+      const parent_rect = this.#parentRect;
       // Current position after dragging.
       const canvas_pos = getPos();
       // The current offset position of the scaled canvas canvas.

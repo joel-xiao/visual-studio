@@ -1,5 +1,5 @@
-import { nextTick } from 'vue';
-import { cloneDeep } from 'lodash';
+import { nextTick, watch } from 'vue';
+
 class Ruler {
   #config: Readonly<RulerConfig> = {
     textTranslateLeft: 0,
@@ -12,6 +12,7 @@ class Ruler {
     deputyLineWidth: 0.5,
     fontSize: '9px'
   };
+
   #setting: Readonly<Required<RulerSetting>> = {
     left: 0,
     right: 0,
@@ -19,385 +20,439 @@ class Ruler {
     top: 0,
     size: 18
   };
+
   #parentEl?: Element | null;
   #rulerXEl?: HTMLCanvasElement;
   #rulerYEl?: HTMLCanvasElement;
   #rulerRectEl?: HTMLDivElement;
   #resizeObserver?: ResizeObserver;
+
   #pos = { x: 0, y: 0 };
   #scaleOffset = { x: 0, y: 0 };
   #scale = 1;
+  #selection: { x: number; y: number; width: number; height: number }[] = [];
+  #parentSize = { width: 0, height: 0 };
+
+  #isDirty = false;
+  #rafId: number | null = null;
+  #dpr = window.devicePixelRatio || 1;
+  #stopSelectionWatch: (() => void) | null = null;
+
   constructor() {
     this.addRuler = this.addRuler.bind(this);
     this.setRulerPos = this.setRulerPos.bind(this);
     this.setRulerScale = this.setRulerScale.bind(this);
     this.setRulerScaleOffset = this.setRulerScaleOffset.bind(this);
     this.setRulerScaleOffsetDelta = this.setRulerScaleOffsetDelta.bind(this);
+    this.setSelection = this.setSelection.bind(this);
+    this.setSelectionSync = this.setSelectionSync.bind(this);
+  }
+
+  #scheduleDraw() {
+    if (this.#isDirty) return;
+    this.#isDirty = true;
+    this.#rafId = requestAnimationFrame(() => {
+      this.#draw();
+      this.#isDirty = false;
+      this.#rafId = null;
+    });
   }
 
   #draw() {
-    const rect: RulerDOMRect = this.#parentEl?.getBoundingClientRect() || {
-      width: window.innerWidth,
-      height: window.innerHeight
-    };
-    rect.width = rect.width - (this.#setting.left + this.#setting.right);
-    rect.height = rect.height - (this.#setting.top + this.#setting.bottom);
+    if (!this.#parentEl) return;
 
-    this.#drawX(rect);
-    this.#drawY(rect);
+    const width = this.#parentSize.width - (this.#setting.left + this.#setting.right);
+    const height = this.#parentSize.height - (this.#setting.top + this.#setting.bottom);
+
+    if (width <= 0 || height <= 0) return;
+
+    this.#drawX(height);
+    this.#drawY(width);
     this.#drawRect();
   }
 
   #getStepByZoom(zoom: number) {
-    const steps = [1, 2, 5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000];
+    const steps = [0.1, 0.2, 0.5, 1, 2, 5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000];
     const step = 50 / zoom;
-    for (let i = 0, len = steps.length; i < len; i++) {
-      if (steps[i] >= step) return steps[i];
+    for (const s of steps) {
+      if (s >= step) return s;
     }
-    return steps[0];
+    return steps[steps.length - 1];
   }
 
-  #getScales(long_size: number, offset: number) {
-    const step = this.#getStepByZoom(this.#scale);
-    const fontSize = parseFloat(this.#config.fontSize);
-    const scales: {
-      number: number;
-      numberOffset: number;
-      opacity: string;
-      size: 'max' | 'min' | 'else';
-      pixel: number;
-    }[] = [];
-
-    if (this.#scale <= 1) {
-      long_size = Math.ceil(long_size / this.#scale);
-      offset = Math.ceil(offset / this.#scale);
-    }
-
-    let currentStep = 0;
-    while (currentStep <= long_size) {
-      scales.push({
-        number: currentStep,
-        numberOffset: getNumberOffset(currentStep, fontSize),
-        opacity: '',
-        size: 'max',
-        pixel: currentStep * this.#scale
-      });
-      currentStep = currentStep + step;
-    }
-
-    const is_offset_negative = offset > 0;
-    if (is_offset_negative) {
-      let currentStep = 0;
-      while (currentStep >= -offset) {
-        scales.push({
-          number: currentStep,
-          numberOffset: getNumberOffset(currentStep, fontSize),
-          opacity: '',
-          size: 'max',
-          pixel: currentStep * this.#scale
-        });
-        currentStep = currentStep - step;
-      }
-    }
-
-    function getNumberOffset(number: number, fontSize: number) {
-      const textOffsets: { [key: string]: number } = {
-        '-': 0,
-        '1': 0,
-        '2': 0,
-        '3': 0,
-        '4': 0,
-        '5': 2,
-        '6': 0,
-        '7': 0,
-        '8': 0,
-        '9': 0,
-        '0': 2
-      };
-      let textOffset = 0;
-
-      for (const text of number + '') {
-        textOffset += fontSize / 2 - textOffsets[text];
-      }
-      return -textOffset;
-    }
-
-    scales[scales.length - 1].opacity = '80';
-    return scales;
-  }
-
-  #getLineRect(pixel: number, offset: number) {
-    const config = {
-      ...this.#config,
-      fontSize: parseFloat(this.#config.fontSize)
-    };
-    return {
-      start: offset + pixel - this.#setting.size,
-      lineStart: this.#setting.size,
-      lineEnd: this.#setting.size - config.fontSize + this.#config.textMargin[2],
-      deputyLineEnd: this.#setting.size - config.fontSize + this.#config.textMargin[2]
-    };
-  }
-
-  #drawX(rect: RulerDOMRect) {
-    const config = cloneDeep({
-      ...this.#config,
-      width: this.#setting.size,
-      height: rect.height - this.#setting.size,
-      long_size: rect.height
-    });
-
+  #drawX(totalHeight: number) {
     if (!this.#rulerXEl) return;
-    this.#updateRulerStyle(
-      {
-        width: config.width,
-        height: config.height,
-        top: this.#setting.size + this.#setting.top,
-        left: this.#setting.left
-      },
-      this.#rulerXEl,
-      'X'
-    );
+    const canvas = this.#rulerXEl;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
-    nextTick(() => {
-      if (!this.#rulerXEl) return;
-      const ctx = this.#rulerXEl.getContext('2d');
-      if (!ctx) return;
+    const rulerSize = this.#setting.size;
+    const canvasWidth = rulerSize;
+    const canvasHeight = totalHeight - rulerSize;
 
-      ctx.clearRect(0, 0, config.width, config.height);
-      ctx.font = config.fontSize + 'Microsoft YaHei';
+    // Handle High DPI
+    if (canvas.width !== canvasWidth * this.#dpr || canvas.height !== canvasHeight * this.#dpr) {
+      canvas.width = canvasWidth * this.#dpr;
+      canvas.height = canvasHeight * this.#dpr;
+      canvas.style.width = canvasWidth + 'px';
+      canvas.style.height = canvasHeight + 'px';
+      canvas.style.top = (rulerSize + this.#setting.top) + 'px';
+      canvas.style.left = this.#setting.left + 'px';
+      canvas.style.borderRight = this.#config.border;
+    }
 
-      const scales = this.#getScales(config.long_size, this.#pos.y + this.#scaleOffset.y);
-      for (let idx = 0; idx < scales.length; idx++) {
-        const scale = scales[idx];
-        const lineRect = this.#getLineRect(scale.pixel, this.#pos.y + this.#scaleOffset.y);
-        const x = lineRect.lineStart;
-        const y = lineRect.start;
-        const x2 = lineRect.deputyLineEnd;
-        const x2_max = lineRect.lineEnd;
+    ctx.save();
+    ctx.scale(this.#dpr, this.#dpr);
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+    ctx.fillStyle = this.#config.background;
+    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-        if (scale.size === 'max') {
-          ctx.lineWidth = config.lineWidth;
-          ctx.fillStyle = config.color + scale.opacity;
-          ctx.strokeStyle = config.lineColor + scale.opacity;
-          ctx.lineTo(x2_max, y);
+    const offsetY = this.#pos.y + this.#scaleOffset.y;
+    const startValue = -offsetY / this.#scale;
+    const endValue = (canvasHeight - offsetY) / this.#scale;
+    const step = this.#getStepByZoom(this.#scale);
 
-          const scaleNumber = String(scale.number);
-          const tx = parseFloat(config.fontSize),
-            ty = y - config.textTranslateLeft - scale.numberOffset;
-          ctx.translate(tx, ty);
-          ctx.rotate((-90 * Math.PI) / 180);
-          ctx.fillText(scaleNumber, 0, config.textMargin[0]);
-          ctx.rotate((90 * Math.PI) / 180);
-          ctx.translate(-tx, -ty);
-        } else if (scale.size === 'min') {
-          ctx.lineWidth = config.lineWidth;
-          ctx.strokeStyle = config.lineColor + scale.opacity;
-          ctx.lineTo(x2, y);
-        } else {
-          ctx.lineWidth = config.deputyLineWidth;
-          ctx.strokeStyle = config.lineColor + scale.opacity;
-          ctx.lineTo(x2, y);
-        }
-        ctx.stroke();
-      }
-      ctx.restore();
+    const firstStep = Math.floor(startValue / step) * step;
+
+    ctx.font = `10px ${this.#config.background === '#303030' ? 'Inter, sans-serif' : 'sans-serif'}`;
+    ctx.fillStyle = this.#config.color;
+    ctx.strokeStyle = this.#config.lineColor;
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = 'center';
+
+    const majorStep = step;
+    const minorStep = majorStep / 10;
+
+    const startIdx = Math.floor(startValue / minorStep);
+    const endIdx = Math.ceil(endValue / minorStep);
+
+    const labelXTranslate = canvasWidth / 2 - 3;
+    const labelSelectionFont = '10px Inter, sans-serif';
+
+    // 1. Draw selection background first
+    this.#selection.forEach(node => {
+      const top = (node.y * this.#scale) + offsetY - rulerSize;
+      const bottom = ((node.y + node.height) * this.#scale) + offsetY - rulerSize;
+      if (bottom < 0 || top > canvasHeight) return;
+
+      ctx.fillStyle = 'rgba(59, 130, 246, 0.2)';
+      ctx.fillRect(0, top, canvasWidth, bottom - top);
     });
+
+    // 2. Draw default scales
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = this.#config.lineColor;
+    ctx.fillStyle = this.#config.color; // Reset to default color
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    for (let i = startIdx; i <= endIdx; i++) {
+      const val = i * minorStep;
+      const y = val * this.#scale + offsetY - rulerSize;
+      if (y < 0 || y > canvasHeight) continue;
+
+      const isMajor = i % 10 === 0;
+      const isSemi = i % 5 === 0;
+
+      ctx.beginPath();
+      ctx.moveTo(canvasWidth, y);
+
+      if (isMajor) {
+        ctx.globalAlpha = 1;
+        ctx.lineTo(canvasWidth - 4, y);
+
+        ctx.save();
+        ctx.translate(canvasWidth / 2 - 3, y);
+        ctx.rotate(-Math.PI / 2);
+        const label = Math.abs(val) < 1 ? val.toFixed(1) : String(Math.round(val));
+        ctx.fillText(label, 0, 0);
+        ctx.restore();
+      } else if (isSemi) {
+        ctx.globalAlpha = 0.6;
+        ctx.lineTo(canvasWidth - 3, y);
+      } else {
+        ctx.globalAlpha = 0.3;
+        ctx.lineTo(canvasWidth - 2, y);
+      }
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+
+    // 3. Draw selection labels on top
+    this.#selection.forEach(node => {
+      const top = (node.y * this.#scale) + offsetY - rulerSize;
+      const bottom = ((node.y + node.height) * this.#scale) + offsetY - rulerSize;
+      if (bottom < 0 || top > canvasHeight) return;
+
+      const drawLabel = (val: number, pos: number) => {
+        ctx.save();
+        const text = Math.abs(val) < 1 ? val.toFixed(1) : String(Math.round(val));
+        ctx.font = '10px Inter, sans-serif';
+        const metrics = ctx.measureText(text);
+        const labelWidth = metrics.width + 12;
+
+        ctx.translate(0, pos); // Translate to the left edge of vertical ruler
+        ctx.rotate(-Math.PI / 2);
+
+        ctx.fillStyle = '#3b82f6';
+        ctx.fillRect(-labelWidth / 2, 0, labelWidth, canvasWidth); // Fill from left to right
+
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text, 0, canvasWidth / 2);
+        ctx.restore();
+      };
+
+      drawLabel(node.y, top);
+      drawLabel(node.y + node.height, bottom);
+    });
+    ctx.globalAlpha = 1;
+    ctx.globalAlpha = 1;
+
+    ctx.restore();
   }
 
-  #drawY(rect: RulerDOMRect) {
-    const config = cloneDeep({
-      ...this.#config,
-      width: rect.width - this.#setting.size,
-      height: this.#setting.size,
-      long_size: rect.width
-    });
-
+  #drawY(totalWidth: number) {
     if (!this.#rulerYEl) return;
-    this.#updateRulerStyle(
-      {
-        width: config.width,
-        height: config.height,
-        top: this.#setting.top,
-        left: this.#setting.size + this.#setting.left
-      },
-      this.#rulerYEl,
-      'Y'
-    );
+    const canvas = this.#rulerYEl;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
-    nextTick(() => {
-      if (!this.#rulerYEl) return;
-      const ctx = this.#rulerYEl.getContext('2d');
-      if (!ctx) return;
+    const rulerSize = this.#setting.size;
+    const canvasWidth = totalWidth - rulerSize;
+    const canvasHeight = rulerSize;
 
-      ctx.clearRect(0, 0, config.width, config.height);
-      ctx.font = config.fontSize + 'Microsoft YaHei';
+    // Handle High DPI
+    if (canvas.width !== canvasWidth * this.#dpr || canvas.height !== canvasHeight * this.#dpr) {
+      canvas.width = canvasWidth * this.#dpr;
+      canvas.height = canvasHeight * this.#dpr;
+      canvas.style.width = canvasWidth + 'px';
+      canvas.style.height = canvasHeight + 'px';
+      canvas.style.top = this.#setting.top + 'px';
+      canvas.style.left = (rulerSize + this.#setting.left) + 'px';
+      canvas.style.borderBottom = this.#config.border;
+    }
 
-      const scales = this.#getScales(config.long_size, this.#pos.x + this.#scaleOffset.x);
-      for (let idx = 0; idx < scales.length; idx++) {
-        const scale = scales[idx];
+    ctx.save();
+    ctx.scale(this.#dpr, this.#dpr);
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+    ctx.fillStyle = this.#config.background;
+    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-        const lineRect = this.#getLineRect(scale.pixel, this.#pos.x + this.#scaleOffset.x);
-        const x = lineRect.start;
-        const y = lineRect.lineStart;
-        const y2 = lineRect.deputyLineEnd;
-        const y2_max = lineRect.lineEnd;
+    const offsetX = this.#pos.x + this.#scaleOffset.x;
+    const startValue = -offsetX / this.#scale;
+    const endValue = (canvasWidth - offsetX) / this.#scale;
+    const step = this.#getStepByZoom(this.#scale);
 
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-        if (scale.size === 'max') {
-          ctx.lineWidth = config.lineWidth;
-          ctx.fillStyle = config.color + scale.opacity;
-          ctx.strokeStyle = config.lineColor + scale.opacity;
-          ctx.lineTo(x, y2_max);
+    const firstStep = Math.floor(startValue / step) * step;
 
-          const scaleNumber = String(scale.number);
-          ctx.fillText(
-            scaleNumber,
-            x + scale.numberOffset + config.textTranslateLeft,
-            parseFloat(config.fontSize) + config.textMargin[0]
-          );
-        } else if (scale.size === 'min') {
-          ctx.lineWidth = config.lineWidth;
-          ctx.strokeStyle = config.lineColor + scale.opacity;
-          ctx.lineTo(x, y2);
-        } else {
-          ctx.lineWidth = config.deputyLineWidth;
-          ctx.strokeStyle = config.lineColor + scale.opacity;
-          ctx.lineTo(x, y2);
-        }
-        ctx.stroke();
-      }
-      ctx.restore();
+    ctx.font = `10px ${this.#config.background === '#303030' ? 'Inter, sans-serif' : 'sans-serif'}`;
+    ctx.fillStyle = this.#config.color;
+    ctx.strokeStyle = this.#config.lineColor;
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = 'center';
+
+    const majorStep = step;
+    const minorStep = majorStep / 10;
+
+    const startIdx = Math.floor(startValue / minorStep);
+    const endIdx = Math.ceil(endValue / minorStep);
+
+    const labelYTranslate = canvasHeight / 2 - 2;
+    const labelSelectionFont = '10px Inter, sans-serif';
+
+    // 1. Draw selection background
+    this.#selection.forEach(node => {
+      const left = (node.x * this.#scale) + offsetX - rulerSize;
+      const right = ((node.x + node.width) * this.#scale) + offsetX - rulerSize;
+      if (right < 0 || left > canvasWidth) return;
+
+      ctx.fillStyle = 'rgba(59, 130, 246, 0.2)';
+      ctx.fillRect(left, 0, right - left, canvasHeight);
     });
+
+    // 2. Draw default scales
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = this.#config.lineColor;
+    ctx.fillStyle = this.#config.color; // Reset to default color
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    for (let i = startIdx; i <= endIdx; i++) {
+      const val = i * minorStep;
+      const x = val * this.#scale + offsetX - rulerSize;
+      if (x < 0 || x > canvasWidth) continue;
+
+      const isMajor = i % 10 === 0;
+      const isSemi = i % 5 === 0;
+
+      ctx.beginPath();
+      ctx.moveTo(x, canvasHeight);
+
+      if (isMajor) {
+        ctx.globalAlpha = 1;
+        ctx.lineTo(x, canvasHeight - 4);
+        const label = Math.abs(val) < 1 ? val.toFixed(1) : String(Math.round(val));
+        ctx.fillText(label, x, labelYTranslate);
+      } else if (isSemi) {
+        ctx.globalAlpha = 0.6;
+        ctx.lineTo(x, canvasHeight - 3);
+      } else {
+        ctx.globalAlpha = 0.3;
+        ctx.lineTo(x, canvasHeight - 2);
+      }
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+
+    // 3. Draw selection labels on top
+    this.#selection.forEach(node => {
+      const left = (node.x * this.#scale) + offsetX - rulerSize;
+      const right = ((node.x + node.width) * this.#scale) + offsetX - rulerSize;
+      if (right < 0 || left > canvasWidth) return;
+
+      const drawLabel = (val: number, pos: number) => {
+        ctx.save();
+        const text = Math.abs(val) < 1 ? val.toFixed(1) : String(Math.round(val));
+        ctx.font = '10px Inter, sans-serif';
+        const metrics = ctx.measureText(text);
+        const labelWidth = metrics.width + 12;
+
+        ctx.fillStyle = '#3b82f6';
+        ctx.fillRect(pos - labelWidth / 2, 0, labelWidth, canvasHeight);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text, pos, canvasHeight / 2);
+        ctx.restore();
+      };
+
+      drawLabel(node.x, left);
+      drawLabel(node.x + node.width, right);
+    });
+    ctx.globalAlpha = 1;
+    ctx.globalAlpha = 1;
+
+    ctx.restore();
   }
 
   #drawRect() {
     if (!this.#rulerRectEl) return;
-    const config = {
-      width: this.#setting.size + 1,
-      height: this.#setting.size + 1,
-      top: this.#setting.top,
-      left: this.#setting.left
-    };
-
     const el = this.#rulerRectEl;
+    const size = this.#setting.size;
+
     el.style.position = 'absolute';
     el.style.borderRight = this.#config.border;
     el.style.borderBottom = this.#config.border;
     el.style.backgroundColor = this.#config.background;
-    el.style.left = (config.left || 0) + 'px';
-    el.style.top = (config.top || 0) + 'px';
-    el.style.width = (config.width || 0) + 'px';
-    el.style.height = (config.height || 0) + 'px';
+    el.style.left = this.#setting.left + 'px';
+    el.style.top = this.#setting.top + 'px';
+    el.style.width = size + 'px';
+    el.style.height = size + 'px';
+    el.style.zIndex = '100';
   }
-
-  #updateRulerStyle(
-    config: { left: number; top: number; height: number; width: number },
-    el: HTMLCanvasElement,
-    type: string
-  ) {
-    if (!el) return;
-    if (type === 'Y') {
-      el.style.borderBottom = this.#config.border;
-    } else if (type === 'X') {
-      el.style.borderRight = this.#config.border;
-    }
-
-    el.style.boxSizing = 'border-box';
-    el.style.backgroundColor = this.#config.background;
-    el.style.position = 'absolute';
-    el.style.left = (config.left || 0) + 'px';
-    el.style.top = (config.top || 0) + 'px';
-    el.width = config.width || 0;
-    el.height = config.height || 0;
-  }
-
-  #onResize = (_event?: Event | ResizeObserverEntry[]) => {
-    this.#draw();
-  };
 
   setRulerPos(pos: RulerPos) {
-    this.#setRulerPos(pos);
-  }
-  #setRulerPos(pos: RulerPos) {
     this.#pos.x = pos.x;
     this.#pos.y = pos.y;
-    this.#draw();
+    this.#scheduleDraw();
   }
 
   setRulerScale(scale: number) {
-    this.#setRulerScale(scale);
-  }
-  #setRulerScale(scale: number) {
     this.#scale = scale;
-    this.#draw();
+    this.#scheduleDraw();
   }
 
   setRulerScaleOffset(pos: RulerPos) {
-    this.#setRulerScaleOffset(pos);
-  }
-  #setRulerScaleOffset(pos: RulerPos) {
     this.#scaleOffset.x = pos.x;
     this.#scaleOffset.y = pos.y;
-    this.#draw();
+    this.#scheduleDraw();
   }
 
   setRulerScaleOffsetDelta(pos: RulerPos) {
-    this.#setRulerScaleOffsetDelta(pos);
-  }
-  #setRulerScaleOffsetDelta(pos: RulerPos) {
     this.#scaleOffset.x += pos.x;
     this.#scaleOffset.y += pos.y;
-    this.#draw();
+    this.#scheduleDraw();
+  }
+
+  setSelection(selection: { x: number; y: number; width: number; height: number }[]) {
+    this.#selection = selection;
+    this.#scheduleDraw();
+  }
+
+  setSelectionSync(selectedNodes: any) {
+    this.#stopSelectionWatch?.();
+    this.#stopSelectionWatch = watch(
+      () => selectedNodes.value,
+      (nodes: INode[]) => {
+        const selection = nodes
+          .filter((n: INode) => n.id !== 'root')
+          .map((n: INode) => ({
+            x: n.x,
+            y: n.y,
+            width: n.width,
+            height: n.height
+          }));
+        this.setSelection(selection);
+      },
+      { deep: true }
+    );
   }
 
   addRuler(parentEl: Element | string, setting?: RulerSetting): void {
-    this.#addRuler(parentEl, setting);
-  }
-  #addRuler(parentEl: Element | string, setting?: RulerSetting): void {
-    this.#setting = Object.assign(this.#setting, setting || {});
-
+    this.#setting = Object.assign({}, this.#setting, setting || {});
     this.#parentEl = typeof parentEl === 'string' ? document.querySelector(parentEl) : parentEl;
+
+    if (!this.#parentEl) return;
+
     this.#rulerYEl = document.createElement('canvas');
     this.#rulerXEl = document.createElement('canvas');
     this.#rulerRectEl = document.createElement('div');
 
-    if (this.#parentEl) {
-      this.#parentEl.appendChild(this.#rulerYEl);
-      this.#parentEl.appendChild(this.#rulerXEl);
-      this.#parentEl.appendChild(this.#rulerRectEl);
+    this.#rulerYEl.style.position = 'absolute';
+    this.#rulerXEl.style.position = 'absolute';
+    this.#rulerRectEl.style.position = 'absolute';
 
-      this.#resizeObserver = new ResizeObserver(() => {
-        this.#draw();
-      });
-      this.#resizeObserver.observe(this.#parentEl);
-    }
-    this.#draw();
+    this.#parentEl.appendChild(this.#rulerYEl);
+    this.#parentEl.appendChild(this.#rulerXEl);
+    this.#parentEl.appendChild(this.#rulerRectEl);
 
-    window.addEventListener('resize', this.#onResize);
+    const updateSize = () => {
+      const rect = (this.#parentEl as Element).getBoundingClientRect();
+      this.#parentSize.width = rect.width;
+      this.#parentSize.height = rect.height;
+      this.#scheduleDraw();
+    };
+
+    this.#resizeObserver = new ResizeObserver(updateSize);
+    this.#resizeObserver.observe(this.#parentEl);
+
+    updateSize();
+    window.addEventListener('resize', updateSize);
   }
 
   uninstall(): void {
-    this.#uninstall();
-  }
-  #uninstall(): void {
-    window.removeEventListener('resize', this.#onResize);
+    window.removeEventListener('resize', this.#scheduleDraw.bind(this));
     this.#resizeObserver?.disconnect();
-    this.#resizeObserver = undefined;
+    if (this.#rafId) cancelAnimationFrame(this.#rafId);
+    this.#stopSelectionWatch?.();
+    this.#stopSelectionWatch = null;
+
     this.#rulerXEl?.remove();
     this.#rulerYEl?.remove();
     this.#rulerRectEl?.remove();
-    this.#rulerYEl = undefined;
+
+    this.#parentEl = null;
     this.#rulerXEl = undefined;
+    this.#rulerYEl = undefined;
     this.#rulerRectEl = undefined;
   }
 }
 
 let ruler: Ruler | undefined;
-const createRuler = function () {
+export const useRuler = function () {
   if (!ruler) ruler = new Ruler();
   return ruler;
 };
@@ -405,9 +460,4 @@ const createRuler = function () {
 export const removeRuler = function () {
   ruler?.uninstall();
   ruler = undefined;
-};
-
-export const useRuler = function () {
-  ruler = createRuler();
-  return ruler;
 };
