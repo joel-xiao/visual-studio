@@ -1,22 +1,16 @@
-import { readonly, Raw, markRaw } from 'vue';
-import { useOverlay } from '../overlay-context';
+import { markRaw, type Raw } from 'vue';
 import { useRuler } from '../ruler-context';
 import type { ICallbackUpdate } from './interface';
+import { Overlay } from './overlay';
+import { Shortcuts } from './shortcuts';
+import { Drag } from './drag';
 
 export type CanvasOption = {
   parentEl: HTMLElement;
   canvasEl: HTMLElement;
 };
 
-export type CanvasApi = {
-  addScaleEvent: (opt: CanvasOption) => void;
-  removeScaleEvent: () => void;
-  addCanvasUpdated: (fn: ICallbackUpdate) => void;
-  removeCanvasUpdated: (fn: ICallbackUpdate) => void;
-  getScale: () => number;
-};
-
-class Canvas {
+export class Canvas {
   #scale = 1;
   #maxScale = 256;
   #minScale = 0.02;
@@ -24,20 +18,33 @@ class Canvas {
   #canvasUpdates: ICallbackUpdate[] = [];
   #parentRect: DOMRect | null = null;
 
-  constructor() {
-    this.uninstall = this.uninstall.bind(this);
+  public overlay: Overlay;
+  public shortcuts: Shortcuts;
+  public drag: Drag;
 
+  constructor() {
+    this.overlay = new Overlay();
+    this.shortcuts = new Shortcuts();
+    this.drag = new Drag();
+
+    this.uninstall = this.uninstall.bind(this);
     this.addScaleEvent = this.addScaleEvent.bind(this);
     this.removeScaleEvent = this.removeScaleEvent.bind(this);
     this.onWheel = this.onWheel.bind(this);
     this.addCanvasUpdated = this.addCanvasUpdated.bind(this);
     this.removeCanvasUpdated = this.removeCanvasUpdated.bind(this);
-
     this.getScale = this.getScale.bind(this);
+    this.install = this.install.bind(this);
+  }
+
+  install() {
+    this.shortcuts.install();
   }
 
   uninstall() {
     this.removeScaleEvent();
+    this.shortcuts.uninstall();
+    this.overlay.uninstall();
   }
 
   addScaleEvent(opt: CanvasOption) {
@@ -57,7 +64,7 @@ class Canvas {
 
   #autoFit() {
     if (!this.#option?.canvasEl || !this.#option?.parentEl) return;
-    const { overlaySetPos, setScaleOffset } = useOverlay();
+    const { setPos: overlaySetPos, setScaleOffset } = this.overlay;
     const { setRulerScaleOffset, setRulerScale } = useRuler();
 
     const parentRect = this.#option.parentEl.getBoundingClientRect();
@@ -95,7 +102,7 @@ class Canvas {
 
   onWheel(e: WheelEvent): void {
     e.preventDefault();
-    const { getScaleOffset, setScaleOffset, getPos } = useOverlay();
+    const { getScaleOffset, setScaleOffset, getPos } = this.overlay;
     const { setRulerScaleOffset, setRulerScale } = useRuler();
 
     let ratio = 1.1;
@@ -161,24 +168,31 @@ class Canvas {
   }
 }
 
-let canvas: Readonly<Raw<Canvas>> | undefined;
-const createCanvas = function () {
-  if (!canvas) canvas = readonly(markRaw(new Canvas()));
-  return canvas;
-};
+let canvas: Canvas | undefined;
+
 export const removeCanvas = function () {
   canvas?.uninstall();
   canvas = undefined;
 };
-export const useCanvas = function (): Readonly<CanvasApi> {
-  canvas = createCanvas();
-  return readonly(
-    markRaw({
-      addScaleEvent: canvas.addScaleEvent,
-      removeScaleEvent: canvas.removeScaleEvent,
-      addCanvasUpdated: canvas.addCanvasUpdated,
-      removeCanvasUpdated: canvas.removeCanvasUpdated,
-      getScale: canvas.getScale
-    })
-  ) as Readonly<CanvasApi>;
+
+export const useCanvas = function (): Canvas {
+  if (!canvas) {
+    canvas = markRaw(new Canvas());
+    canvas.install();
+  }
+  return canvas;
 };
+
+export const useOverlay = function () {
+  return useCanvas().overlay;
+};
+
+export const useShortcuts = function () {
+  return useCanvas().shortcuts;
+};
+
+export const useDrag = function () {
+  return useCanvas().drag;
+};
+
+export type CanvasApi = Canvas;

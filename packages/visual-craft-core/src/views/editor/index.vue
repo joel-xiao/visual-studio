@@ -38,7 +38,7 @@ const handleTabChange = (tabId: string) => {
   activeTab.value = tabId;
 };
 import { useNodeContext, removeNodeContext } from './hooks/node-context';
-import { createBindKeysContext, removeBindKeysContext } from './hooks/bind-keys-context';
+import { useCanvas, removeCanvas } from './hooks/canvas';
 import { createComponentContext, removeComponentContext } from './hooks/component-context';
 import { useRuler, removeRuler } from './hooks/ruler-context';
 
@@ -73,10 +73,10 @@ watch(
   }
 );
 
-// Create Bind Keys Context
-createBindKeysContext();
+// Create Canvas Context (includes Shortcuts)
+useCanvas();
 onUnmounted(() => {
-  removeBindKeysContext();
+  removeCanvas();
 });
 
 // Create Ruler Context

@@ -25,14 +25,11 @@ import CanvasNode from './node.vue';
 import MarqueeSelect from './widgets/marquee-select.vue';
 import SelectionBox from './widgets/selection-box.vue';
 import { ref, nextTick, onMounted, onBeforeUnmount } from 'vue';
-import { useDrag } from './../hooks/drag-context';
+import { useCanvas, removeCanvas } from '../hooks/canvas';
 import { useNodeContext } from './../hooks/node-context';
 import { getRootStyle } from './../hooks/node-context/style';
 import { useComponentContext } from './../hooks/component-context';
-import { useBindKeysContext } from './../hooks/bind-keys-context';
 import { useRuler } from './../hooks/ruler-context';
-import { useOverlay } from './../hooks/overlay-context';
-import { removeCanvas, useCanvas } from '../hooks/canvas';
 import { useMarqueeSelect } from '../hooks/node-context/marquee-select';
 import { useNodeMenu } from '../hooks/context-menu';
 import { useKeyboardShortcuts } from '../hooks/node-context/shortcuts';
@@ -46,7 +43,12 @@ const canvasRootEl = ref<HTMLElement>();
 const nodeContext = useNodeContext();
 const componentContext = useComponentContext();
 const { getRootRef, getNodes, onSelectNode, onAddNode, onSelectNodes, searchNodesInArea } = nodeContext;
-const { getScale } = useCanvas();
+
+// Use Canvas
+const canvasContext = useCanvas();
+const { addScaleEvent, overlay, shortcuts, drag, getScale } = canvasContext;
+const { addOverlayMoveUpdated, overlayUpdatePos, addOverlay, setOverlayDisabled } = overlay;
+
 const { showCanvasMenu } = useNodeMenu();
 
 useKeyboardShortcuts(nodeContext);
@@ -65,11 +67,6 @@ const onDown = function (e: MouseEvent): void {
 };
 
 
-// Use Overlay Hook
-const { addOverlayMoveUpdated, overlayUpdatePos, addOverlay, setOverlayDisabled } = useOverlay();
-
-// Use Canvas Mixin
-const { addScaleEvent } = useCanvas();
 
 onMounted(() => {
   nextTick(() => {
@@ -89,7 +86,6 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
-  removeCanvas();
 });
 
 const { setRulerPos } = useRuler();
@@ -97,12 +93,12 @@ addOverlayMoveUpdated(pos => {
   setRulerPos(pos);
 });
 
-const { addBindKeysUpdated } = useBindKeysContext();
+const { addBindKeysUpdated } = shortcuts;
 addBindKeysUpdated(bindKeys => {
   setOverlayDisabled(!bindKeys.isSpace);
 });
 
-const { onDragenter, onDragover, dropHandler } = useDrag();
+const { onDragenter, onDragover, dropHandler } = drag;
 
 const { getComponentProps } = useComponentContext();
 const onDrop = function (event: DragEvent): void {

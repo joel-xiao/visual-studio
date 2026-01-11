@@ -1,9 +1,9 @@
 import { onMounted, onUnmounted } from 'vue';
 import type { CreateNodeContext } from './index';
-import { useBindKeysContext } from '../bind-keys-context';
+import { useShortcuts } from '../canvas';
 
 export const useKeyboardShortcuts = (nodeContext: CreateNodeContext) => {
-    const { bindShortcut, unbindShortcut } = useBindKeysContext();
+    const { bindShortcut, unbindShortcut } = useShortcuts();
     const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
 
     const shortcuts = [

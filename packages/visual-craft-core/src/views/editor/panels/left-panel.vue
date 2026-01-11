@@ -36,7 +36,7 @@ import PanelTabBar from './tab-bar/index.vue';
 import PanelLayer from './layer-tree/index.vue';
 import PanelComponent from './resource-library/index.vue';
 import { ref, reactive } from 'vue';
-import { useDrag } from './../hooks/drag-context';
+import { useCanvas } from '../hooks/canvas';
 import { useComponentContext } from './../hooks/component-context';
 import { useNodeContext } from './../hooks/node-context';
 import { useNodeMenu } from './../hooks/context-menu';
@@ -109,7 +109,8 @@ const onLayerContextMenu = (e: MouseEvent, id: string) => {
 const componentTabBars = reactive<PanelTab[]>([{ name: '组件库', id: 'component' }]);
 const componentTab = ref<PanelTab>(componentTabBars[0]);
 
-const { onDragStart, onDragStop } = useDrag();
+const { drag } = useCanvas();
+const { onDragStart, onDragStop } = drag;
 const componentData = reactive<PanelComponentData[]>(componentContext.getMaterials());
 </script>
 
