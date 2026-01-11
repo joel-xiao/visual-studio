@@ -15,6 +15,7 @@ declare interface IDragBinding {
   pos?: IDragDataset;
   cursorPos?: IDragCursorPos | null;
   resize?: boolean;
+  rotateDisabled?: boolean;
   disabled?: boolean;
   active?: boolean;
   selection?: boolean;

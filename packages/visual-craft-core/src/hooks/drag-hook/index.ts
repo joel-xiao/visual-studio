@@ -17,6 +17,7 @@ export class Drag {
   disabled: boolean;
   active: boolean;
   selection: boolean;
+  rotateDisabled: boolean;
   // eslint-disable-next-line no-unused-private-class-members
   #moved: boolean;
   #scale = 1;
@@ -55,6 +56,7 @@ export class Drag {
     this.disabled = !!this.binding.disabled;
     this.active = !!this.binding.disabled;
     this.selection = false;
+    this.rotateDisabled = false;
     this.#moved = false;
 
     this.bodyDown = this.bodyDown.bind(this);
@@ -82,6 +84,7 @@ export class Drag {
     this.cursorPos = this.binding.cursorPos;
     this.resize = !!this.binding.resize;
     this.disabled = !!this.binding.disabled;
+    this.rotateDisabled = !!this.binding.rotateDisabled;
     this.active = !!this.binding.active;
     this.callbackUp = this.binding.onUp;
     this.callbackMove = this.binding.onMove;
@@ -111,6 +114,7 @@ export class Drag {
     }
 
     this.setDisabled(this.disabled);
+    this.setRotateDisabled(this.rotateDisabled);
     this.setActive(this.active);
     this.setSelection(this.selection);
     this.setPos(this.defaultPos);
@@ -146,6 +150,12 @@ export class Drag {
     this.disabled = disabled;
     this.el?.classList[disabled ? 'add' : 'remove']('disabled');
     this.stickEl?.classList[disabled ? 'add' : 'remove']('disabled');
+  }
+
+  setRotateDisabled(rotateDisabled: boolean): void {
+    this.rotateDisabled = rotateDisabled;
+    this.el?.classList[rotateDisabled ? 'add' : 'remove']('rotate-disabled');
+    this.stickEl?.classList[rotateDisabled ? 'add' : 'remove']('rotate-disabled');
   }
 
   setActive(active: boolean): void {
@@ -206,6 +216,10 @@ export class Drag {
     this.prevent(event);
     if (this.disabled) return;
     this.currentStick = (<HTMLElement>event.target).getAttribute('stick') || '';
+    if (this.rotateDisabled && (this.currentStick === 'rotate' || this.currentStick.startsWith('rot-'))) {
+      this.currentStick = '';
+      return;
+    }
     this.startPos.x = event.x;
     this.startPos.y = event.y;
     this.#startInteractionPos = { ...this.defaultPos };
@@ -270,6 +284,7 @@ export class Drag {
       this.pos.y2 = startPos.y2 + diff_y;
 
     } else if (stick === 'rotate' || stick.startsWith('rot-')) {
+      if (this.rotateDisabled) return;
       const cx = this.centerPos.x;
       const cy = this.centerPos.y;
       const startAngle = Math.atan2(this.startPos.y - cy, this.startPos.x - cx);

@@ -12,6 +12,7 @@ export const dragResizeDirective: Directive<HTMLElement, IDragResizeBinding> = {
     dragData[binding.instance?.$.uid || '']?.setActive(binding.value.active);
     dragData[binding.instance?.$.uid || '']?.setSelection(!!binding.value.selection);
     dragData[binding.instance?.$.uid || '']?.setDisabled(binding.value.disabled);
+    dragData[binding.instance?.$.uid || '']?.setRotateDisabled(!!binding.value.rotateDisabled);
     dragData[binding.instance?.$.uid || '']?.setPos(binding.value.pos);
     dragData[binding.instance?.$.uid || '']?.setScale(binding.value.scale || 1);
   },

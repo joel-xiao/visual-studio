@@ -3,6 +3,7 @@
     ref="resize"
     :data="dragDataset"
     :disabled="node.lock"
+    :disable-rotate="node.schema === 'GROUP'"
     @resizing="onResizing"
     @mousedown="onDown"
     @contextmenu="onContextMenu"

@@ -18,10 +18,12 @@ const vDragResize = dragResizeDirective;
 interface Props {
   data: IDragDataset;
   disabled?: boolean;
+  disableRotate?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
   data: () => ({ y2: 0, x2: 0, x: 0, y: 0 }),
-  disabled: false
+  disabled: false,
+  disableRotate: false
 });
 
 const emit = defineEmits<{
@@ -32,6 +34,7 @@ const emit = defineEmits<{
 const dragData = reactive<IDragResizeBinding>({
   pos: props.data,
   disabled: props.disabled,
+  rotateDisabled: props.disableRotate,
   active: false,
   selection: false,
   scale: 1,
@@ -48,6 +51,10 @@ const dragData = reactive<IDragResizeBinding>({
 
 watch(() => props.disabled, (val) => {
   dragData.disabled = !!val;
+});
+
+watch(() => props.disableRotate, (val) => {
+  dragData.rotateDisabled = !!val;
 });
 
 const dragDataComputed = computed<IDragResizeBinding>(() => ({ ...dragData }));

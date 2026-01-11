@@ -5,7 +5,7 @@ const schema: IComponentSchemaExport = {
   schemas: [
     {
       type: 'schema',
-      schema: 'COMMON_LAYOUT',
+      schema: 'GROUP_LAYOUT',
       default: {
         x: 0,
         y: 0,

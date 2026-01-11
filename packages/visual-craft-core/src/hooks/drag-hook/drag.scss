@@ -70,6 +70,16 @@
       display: none !important;
     }
 
+    &.rotate-disabled {
+      &>.v-drag-stick-rotate,
+      &>.v-drag-stick-rot-tl,
+      &>.v-drag-stick-rot-tr,
+      &>.v-drag-stick-rot-br,
+      &>.v-drag-stick-rot-bl {
+        display: none !important;
+      }
+    }
+
     &.no-opacity {
       &>.v-drag-stick {
 

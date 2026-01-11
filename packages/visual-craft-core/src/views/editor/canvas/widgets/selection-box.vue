@@ -3,6 +3,7 @@
     <DragResize
       ref="resizeRef"
       :data="boundingBox"
+      :disable-rotate="true"
       :disabled="isAllLocked"
       @resizing="onResizing"
       @drag-start="onDragStart"
@@ -135,8 +136,8 @@ const onResizing = (newBox: IDragDataset) => {
     const nextH = state.heightRatio * nbh;
 
     nodeContext.group.handleNodeResize(
-      node as INode, 
-      { x: nextX, y: nextY, x2: nextX + nextW, y2: nextY + nextH } as IDragDataset, 
+      node as INode,
+      { x: nextX, y: nextY, x2: nextX + nextW, y2: nextY + nextH } as IDragDataset,
       allNodes as INode[]
     );
   });
