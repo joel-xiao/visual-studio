@@ -3,20 +3,20 @@
   <div ref="panelSchemaWrapperRef" class="editor-schema-renderer-wrapper">
     <SchemaItems :items="PanelSchemaTypes.propsTypes" :props-data="PropsData" @update="onUpdate" />
   </div>
-  <Tabs :style="TabsStyle" :tabs="PanelSchemaTypes.categorySchemas as CategorySchemaTypes" @select-tab="onSelectTab">
+  <SideTabs :style="TabsStyle" :tabs="PanelSchemaTypes.categorySchemas as CategorySchemaTypes" @select-tab="onSelectTab">
     <template v-if="currentTab">
       <SchemaItems :items="currentTab.propsTypes" :props-data="PropsData" @update="onUpdate" />
       <InnerTabs v-if="currentTab.schemasTabs?.length" :tabs="currentTab.schemasTabs" v-slot="{ currentTab: innerTab }">
         <SchemaItems :items="innerTab?.propsTypes || []" :props-data="PropsData" @update="onUpdate" />
       </InnerTabs>
     </template>
-  </Tabs>
+  </SideTabs>
 </div>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import Tabs from './tabs/index.vue';
+import SideTabs from './side-tabs/index.vue';
 import InnerTabs from './inner-tabs/index.vue';
 import SchemaItems from './schema-items.vue';
 import { useComponentContext } from '../hooks/component-context';
