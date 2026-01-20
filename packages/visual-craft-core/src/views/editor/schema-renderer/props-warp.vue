@@ -3,10 +3,10 @@
   :key-value="'props-warp-' + keyValue"
   :label="propsType.label"
   :has-switch="propsType.show_switch"
-  :switch-value="!!getValue('show')"
+  :switch-value="switchValue"
   @update:switch-value="onUpdate('show', $event)"
 >
-  <PropsItem v-for="(schemaRow, idx) in Schema" :key="idx" :grid-template-columns="getGridTemplateColumns(idx)">
+  <PropsItem v-for="(schemaRow, idx) in visibleSchema" :key="idx" :grid-template-columns="getGridTemplateColumns(idx, schemaRow)">
     <template v-for="(prop, ctrl_idx) in schemaRow" :key="ctrl_idx">
       <PropsCtrl
         :model-value="getValue(prop.key || '')"
@@ -22,6 +22,7 @@
         :keys="getKeys(prop)"
         @update="onUpdateProp(prop, $event)"
         @click="onClick(prop)"
+        @show-change="onShowChange(prop, $event)"
       />
     </template>
   </PropsItem>
@@ -61,44 +62,44 @@ const emit = defineEmits(['update']);
 
 const Schema = computed(() => {
   const schema = Array.isArray(props.propsType.schema) ? props.propsType.schema : [];
-  return schema.filter(schema => Array.isArray(schema));
+  return schema.filter(schema => Array.isArray(schema)) as SchemaKeyType[][];
 });
 
-const getGridTemplateColumns = computed(() => {
-  return (idx: number) => {
-    return Array.isArray(Schema.value[idx]) ? Schema.value[idx].map(prop => prop?.size || 'default') : [];
-  };
+const switchValue = computed(() => (getValue('show') as boolean | undefined) ?? true);
+
+const visibleSchema = computed(() => {
+  return Schema.value
+    .map(row => row.filter(prop => !prop.v_if || !!get(props.modelValue, prop.v_if)))
+    .filter(row => row.length > 0);
 });
 
-const getValue = (key: string) => {
-  return key ? get(props.modelValue, key) : props.modelValue;
+const getGridTemplateColumns = (idx: number, row?: SchemaKeyType[]) => {
+  const targetRow = row || Schema.value[idx];
+  return Array.isArray(targetRow) ? targetRow.map(prop => prop?.size || 'default') : [];
 };
 
-const getKeys = (prop: SchemaKeyType) => {
-  if ('keys' in prop) return prop.keys;
-  return undefined;
+const getValue = (key: string) => (key ? get(props.modelValue, key) : props.modelValue);
+
+const getKeys = (prop: SchemaKeyType) => ('keys' in prop ? prop.keys : undefined);
+
+const onShowChange = (prop: SchemaKeyType, value: boolean) => emit('update', [`${prop.key}.show`, value]);
+
+const onUpdate = (key: string, value: any) => emit('update', [key, value]);
+
+const onUpdateProp = (prop: SchemaKeyType, value: any) => {
+  if (prop.click && prop.ctrl === 'C_BUTTON') return;
+  emit('update', [prop.key || '', value]);
 };
 
-const onUpdate = function (key: string, value: string | number | boolean | undefined | number[]) {
-  emit('update', [key, value]);
-};
+const onClick = (prop: SchemaKeyType) => {
+  if (!prop.click) return;
+  const result = prop.click(props.modelValue);
+  if (!result) return;
 
-const onUpdateProp = function (propSchema: SchemaKeyType, value: string | number | boolean | undefined | number[]) {
-  if (propSchema.click && propSchema.ctrl === 'C_BUTTON') return;
-  emit('update', [propSchema.key || '', value]);
-};
-
-const onClick = function (propSchema: SchemaKeyType) {
-  if (!propSchema.click) return;
-  const result = propSchema.click(props.modelValue);
-  if (Array.isArray(result) && result.length === 2 && typeof result[0] === 'string') {
-    emit('update', result);
-    return;
-  }
-  if (result && typeof result === 'object' && !Array.isArray(result)) {
-    Object.entries(result).forEach(([key, value]) => {
-      if (typeof key === 'string') emit('update', [key, value]);
-    });
+  if (Array.isArray(result)) {
+    if (result.length === 2 && typeof result[0] === 'string') emit('update', result);
+  } else if (typeof result === 'object') {
+    Object.entries(result).forEach(([key, value]) => emit('update', [key, value]));
   }
 };
 </script>

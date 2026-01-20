@@ -21,7 +21,7 @@ const props = withDefaults(defineProps<Props>(), {
   gridTemplateColumns: () => []
 });
 
-const gridTemplateOption: { [key: string]: string } = {
+const GRID_TEMPLATE_OPTIONS: Record<string, string> = {
   default: '1fr',
   small: '0.25fr',
   middle: '0.5fr',
@@ -32,26 +32,26 @@ const gridTemplateOption: { [key: string]: string } = {
 };
 
 const style = computed(() => {
-  const style = { '--grid-template-columns': ' 0.5fr 0.5fr 30px' };
-
-  if (props.gridTemplateColumns.length) {
-    let columns = props.gridTemplateColumns;
-    if (columns.length >= 1 && !columns.some(column => column === 'default' || !column))
-      columns = [
-        ...columns.filter(column => column !== 'mini').map(column => column || 'default'),
-        'mini'
-      ];
-
-    style['--grid-template-columns'] = columns.map(column => gridTemplateOption[column]).join(' ');
+  const { gridTemplateColumns } = props;
+  if (!gridTemplateColumns?.length) {
+    return { '--grid-template-columns': '0.5fr 0.5fr 30px' };
   }
 
-  return style;
+  let columns = [...gridTemplateColumns];
+  const hasDefault = columns.some(c => c === 'default' || !c);
+
+  if (!hasDefault) {
+    columns = [...columns.filter(c => c !== 'mini').map(c => c || 'default'), 'mini'];
+  }
+
+  return {
+    '--grid-template-columns': columns.map(c => GRID_TEMPLATE_OPTIONS[c] || c).join(' ')
+  };
 });
 </script>
 
 <style lang="scss">
 .editor-schema-renderer .schema-props-item {
-  min-height: 30px;
   width: 100%;
   display: grid;
   grid-gap: 6px;

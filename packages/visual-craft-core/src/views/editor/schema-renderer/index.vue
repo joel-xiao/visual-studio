@@ -1,52 +1,26 @@
 <template>
 <div class="editor-schema-renderer">
   <div ref="panelSchemaWrapperRef" class="editor-schema-renderer-wrapper">
-    <template v-for="item in PanelSchemaTypes.propsTypes" :key="item.key">
-      <template v-if="isComponent(item.name) && item.name !== 'PANEL_PROPS_WRAP'">
-        <component :is="getComponent(item.name) as Component" v-model="PropsData[item.key]" @update="onUpdate(item.key, item.schema as SchemaKeyTypes, $event)" />
-      </template>
-      <template v-else>
-        <component :is="getComponent('PANEL_PROPS_WRAP') as Component" v-model="PropsData[item.key]" :key-value="item.key" :props-type="item" @update="onUpdate(item.key, item.schema as SchemaKeyTypes, $event)" />
-      </template>
-    </template>
+    <SchemaItems :items="PanelSchemaTypes.propsTypes" :props-data="PropsData" @update="onUpdate" />
   </div>
   <Tabs :style="TabsStyle" :tabs="PanelSchemaTypes.categorySchemas as CategorySchemaTypes" @select-tab="onSelectTab">
     <template v-if="currentTab">
-      <template v-for="item in currentTab.propsTypes" :key="item.key">
-        <template v-if="isComponent(item.name) && item.name !== 'PANEL_PROPS_WRAP'">
-          <component :is="getComponent(item.name) as Component" v-model="PropsData[item.key]" @update="onUpdate(item.key, item.schema as SchemaKeyTypes, $event)" />
-        </template>
-        <template v-else>
-          <component :is="getComponent('PANEL_PROPS_WRAP') as Component" v-model="PropsData[item.key]" :key-value="item.key" :props-type="item" @update="onUpdate(item.key, item.schema as SchemaKeyTypes, $event)" />
-        </template>
-      </template>
+      <SchemaItems :items="currentTab.propsTypes" :props-data="PropsData" @update="onUpdate" />
+      <InnerTabs v-if="currentTab.schemasTabs?.length" :tabs="currentTab.schemasTabs" v-slot="{ currentTab: innerTab }">
+        <SchemaItems :items="innerTab?.propsTypes || []" :props-data="PropsData" @update="onUpdate" />
+      </InnerTabs>
     </template>
   </Tabs>
 </div>
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, markRaw, watchEffect, ref } from 'vue';
-import type { Component } from 'vue';
-import { cloneDeep } from 'lodash';
-import PropsWarp from './props-warp.vue';
-import Layout from './layout/index.vue';
+import { computed, ref } from 'vue';
 import Tabs from './tabs/index.vue';
+import InnerTabs from './inner-tabs/index.vue';
+import SchemaItems from './schema-items.vue';
 import { useComponentContext } from '../hooks/component-context';
 import { useNodeContext } from '../hooks/node-context';
-
-const components = reactive({
-  [Layout.schema_name as string]: markRaw(Layout),
-  [PropsWarp.component_name as string]: markRaw(PropsWarp)
-});
-
-const isComponent = (schema_name: string) => {
-  return !!components[schema_name];
-};
-
-const getComponent = (schema_name: string) => {
-  return components[schema_name];
-};
 
 const { getCurrentNode, updateNodeProp } = useNodeContext();
 const currentNode = getCurrentNode();
