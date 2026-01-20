@@ -1,41 +1,28 @@
 <template>
-  <div class="c-box-spacing">
+  <div class="c-compound-input">
     <BasicBox ref="boxRef" v-bind="$attrs" type="input">
-      <!-- Horizontal Part -->
-      <div class="c-box-spacing-section h-part">
+      <div
+        v-for="(key, index) in keys"
+        :key="key"
+        class="c-compound-input-section"
+        :class="{ 'has-border': index > 0 }"
+      >
         <BasicIcon
-          v-hint="hint"
-          icon="mdi:format-horizontal-align-center"
+          v-if="getIcon(index)"
+          v-hint="getHint(index)"
+          :icon="getIcon(index)"
           class="part-icon"
           :style="iconStyle"
-          @mousedown="onMouseDown($event, 'h')"
+          @mousedown="onMouseDown($event, index)"
         />
         <BasicInput
-          :model-value="hModel"
+          :model-value="getValue(key)"
           :data-type="Number"
-          @update="onHUpdate"
+          @update="val => onUpdate(key, val)"
           @focus="onFocus"
           @blur="onBlur"
         />
-        <span class="c-box-spacing-suffix">{{ suffix }}</span>
-      </div>
-
-      <!-- Vertical Part -->
-      <div class="c-box-spacing-section v-part">
-        <BasicIcon
-          icon="mdi:format-vertical-align-center"
-          class="part-icon"
-          :style="iconStyle"
-          @mousedown="onMouseDown($event, 'v')"
-        />
-        <BasicInput
-          :model-value="vModel"
-          :data-type="Number"
-          @update="onVUpdate"
-          @focus="onFocus"
-          @blur="onBlur"
-        />
-        <span class="c-box-spacing-suffix">{{ suffix }}</span>
+        <span v-if="suffix" class="c-compound-input-suffix">{{ suffix }}</span>
       </div>
     </BasicBox>
   </div>
@@ -45,7 +32,7 @@
 import { hintDirective } from '../../../../directives/hint';
 
 export default {
-  name: 'C_BOX_SPACING',
+  name: 'C_COMPOUND_INPUT',
   directives: {
     hint: hintDirective
   },
@@ -61,43 +48,47 @@ import BasicInput from '../../base/basic-input.vue';
 import BasicIcon from '../../base/basic-icon.vue';
 
 export interface IProps {
-  modelValue?: Record<string, number>;
-  keys?: [string, string];
+  modelValue?: Record<string, unknown>;
+  keys?: string[];
+  icon?: string | string[];
   suffix?: string;
-  hint?: string;
+  hint?: string | string[];
 }
 
 const props = withDefaults(defineProps<IProps>(), {
   modelValue: () => ({}),
   keys: () => ['h', 'v'],
-  suffix: 'px',
+  icon: () => [],
+  suffix: '',
   hint: ''
 });
 
 const emit = defineEmits(['update', 'update:modelValue']);
 
-const hKey = computed(() => props.keys[0]);
-const vKey = computed(() => props.keys[1]);
+const getValue = (key: string) => {
+  return (get(props.modelValue, key) as string | number) ?? 0;
+};
 
-const hModel = computed({
-  get: () => get(props.modelValue, hKey.value) ?? 0,
-  set: (val) => {
-    const newValue = cloneDeep(props.modelValue || {});
-    set(newValue, hKey.value, val);
-    emit('update', newValue);
-    emit('update:modelValue', newValue);
-  }
-});
+const onUpdate = (key: string, val: unknown) => {
+  const newValue = cloneDeep(props.modelValue || {});
+  set(newValue, key, val);
+  emit('update', newValue);
+  emit('update:modelValue', newValue);
+};
 
-const vModel = computed({
-  get: () => get(props.modelValue, vKey.value) ?? 0,
-  set: (val) => {
-    const newValue = cloneDeep(props.modelValue || {});
-    set(newValue, vKey.value, val);
-    emit('update', newValue);
-    emit('update:modelValue', newValue);
+const getIcon = (index: number) => {
+  if (Array.isArray(props.icon)) {
+    return props.icon[index] || '';
   }
-});
+  return index === 0 ? props.icon : '';
+};
+
+const getHint = (index: number) => {
+  if (Array.isArray(props.hint)) {
+    return props.hint[index] || '';
+  }
+  return index === 0 ? props.hint : '';
+};
 
 const boxRef = ref<null | InstanceType<typeof BasicBox>>(null);
 
@@ -105,21 +96,20 @@ const iconStyle = computed(() => {
   return { cursor: 'ew-resize' };
 });
 
-const onMouseDown = (e: MouseEvent, type: 'h' | 'v') => {
+const onMouseDown = (e: MouseEvent, index: number) => {
+  const key = props.keys[index];
+  if (!key) return;
+
   e.preventDefault();
   const startX = e.clientX;
-  const startValue = type === 'h' ? hModel.value : vModel.value;
+  const startValue = Number(getValue(key)) || 0;
 
   const onMouseMove = (event: MouseEvent) => {
     const deltaX = event.clientX - startX;
     const step = event.shiftKey ? 10 : (event.altKey ? 0.1 : 1);
     const newValueNum = startValue + Math.round(deltaX * step * 0.5) / (event.altKey ? 10 : 1);
 
-    if (type === 'h') {
-      onHUpdate(newValueNum);
-    } else {
-      onVUpdate(newValueNum);
-    }
+    onUpdate(key, newValueNum);
   };
 
   const onMouseUp = () => {
@@ -133,14 +123,6 @@ const onMouseDown = (e: MouseEvent, type: 'h' | 'v') => {
   document.body.style.cursor = 'ew-resize';
 };
 
-function onHUpdate(val: number) {
-  hModel.value = val;
-}
-
-function onVUpdate(val: number) {
-  vModel.value = val;
-}
-
 function onFocus() {
   boxRef.value?.focus();
 }
@@ -151,10 +133,10 @@ function onBlur() {
 </script>
 
 <style lang="scss">
-#visual-craft-core .c-box-spacing {
+#visual-craft-core .c-compound-input {
   width: 100%;
 
-  .c-box-spacing-section {
+  .c-compound-input-section {
     display: flex;
     align-items: center;
     flex: 1;
@@ -162,7 +144,7 @@ function onBlur() {
     padding: 0 8px;
     height: 100%;
 
-    &.v-part {
+    &.has-border {
       border-left: 1px solid var(--theme-color-gray-100);
     }
 
@@ -178,7 +160,7 @@ function onBlur() {
       text-align: center;
     }
 
-    .c-box-spacing-suffix {
+    .c-compound-input-suffix {
       font-size: 12px;
       color: var(--theme-color-text-secondary);
       margin-left: 2px;

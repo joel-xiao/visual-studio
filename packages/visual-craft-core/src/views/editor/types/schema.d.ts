@@ -1,52 +1,172 @@
-interface IDefaultSchemaKeyData {
-  key?: string;
-  label?: string;
-  icon?: string | string[];
+declare type ComponentPropValue = number | string | number[] | boolean | Record<string, unknown> | Record<string, unknown>[] | undefined;
+declare type ComponentProp = { [key: string]: ComponentPropValue };
+
+declare interface IDefaultSchemaKeyData {
+  key: string;
   ctrl: string;
-  ctrl_type?: string;
-  size?: 'default' | 'small' | 'middle' | 'wide' | 'large' | 'mini';
-  suffix?: string;
-  hint?: string;
-  options?: {
-    label?: string | number;
-    value: string | number;
-    icon?: string;
-  }[];
-  keys?: string[];
+  label?: string | number;
   v_if?: string;
+  icon?: string | string[];
+  hint?: string | string[];
+  size?: 'default' | 'small' | 'middle' | 'wide' | 'large' | 'mini' | string;
   click?: (
     props: ComponentProp
   ) =>
     | void
-    | [key: string, value: ComponentPropValue]
+    | [string, ComponentPropValue]
     | Record<string, ComponentPropValue>;
   change?: (props: ComponentProp) => void;
 }
 
-interface ISchemaKeyNumberData extends IDefaultSchemaKeyData {
-  type: NumberConstructor;
-  default: number;
+declare interface ISchemaInputData extends IDefaultSchemaKeyData {
+  ctrl: 'C_INPUT';
+  type: NumberConstructor | StringConstructor;
+  default: number | string;
+  suffix?: string;
+  ctrl_type?: string;
 }
 
-interface ISchemaKeyStringData extends IDefaultSchemaKeyData {
+declare interface ISchemaSelectData extends IDefaultSchemaKeyData {
+  ctrl: 'C_SELECT';
+  type: StringConstructor | NumberConstructor;
+  default: string | number;
+  ctrl_type?: string;
+  options?: {
+    label?: string | number;
+    value: string | number;
+    icon?: string;
+    hint?: string;
+  }[];
+}
+
+declare interface ISchemaColorPickerData extends IDefaultSchemaKeyData {
+  ctrl: 'C_COLOR_PICKER';
+  type: StringConstructor;
+  default: string;
+  ctrl_type?: string;
+}
+
+declare interface ISchemaGroupCheckData extends IDefaultSchemaKeyData {
+  ctrl: 'C_GROUP_CHECK';
+  type: ArrayConstructor;
+  default: unknown[];
+  options?: {
+    label?: string | number;
+    value: string | number;
+    icon?: string;
+    hint?: string;
+  }[];
+}
+
+declare interface ISchemaCompoundInputData extends IDefaultSchemaKeyData {
+  ctrl: 'C_COMPOUND_INPUT';
+  type: ObjectConstructor;
+  default: Record<string, unknown>;
+  keys?: string[];
+  suffix?: string;
+}
+
+declare interface ISchemaStrokeData extends IDefaultSchemaKeyData {
+  ctrl: 'C_STROKE';
+  type: ObjectConstructor;
+  default: {
+    show?: boolean;
+    lineStyle?: {
+      color?: string;
+      width?: number;
+      type?: string;
+    };
+    color?: string;
+    width?: number;
+    type?: string;
+  } | Record<string, unknown>;
+  keys?: string[];
+  suffix?: string;
+  options?: {
+    label?: string | number;
+    value: string | number;
+    icon?: string;
+    hint?: string;
+  }[];
+}
+
+declare interface ISchemaGroupSelectData extends IDefaultSchemaKeyData {
+  ctrl: 'C_GROUP_SELECT';
+  type: StringConstructor | NumberConstructor;
+  default: string | number;
+  options?: {
+    label?: string | number;
+    value: string | number;
+    icon?: string;
+    hint?: string;
+  }[];
+}
+
+declare interface ISchemaButtonData extends IDefaultSchemaKeyData {
+  ctrl: 'C_BUTTON';
+  type: BooleanConstructor;
+  default: boolean;
+  ctrl_type?: string;
+}
+
+declare interface ISchemaInputGroupData extends IDefaultSchemaKeyData {
+  ctrl: 'INPUT_GROUP';
+  type: ArrayConstructor;
+  default: unknown[];
+}
+
+declare interface ISchemaEdgeData extends IDefaultSchemaKeyData {
+  ctrl: 'C_EDGE';
+  type: ArrayConstructor;
+  default: number[];
+}
+
+declare interface ISchemaCodeEditorData extends IDefaultSchemaKeyData {
+  ctrl: 'C_CODE_EDITOR';
   type: StringConstructor;
   default: string;
 }
 
-interface ISchemaKeyBooleanData extends IDefaultSchemaKeyData {
+declare interface ISchemaPositionData extends IDefaultSchemaKeyData {
+  ctrl: 'C_POSITION';
+  type: StringConstructor;
+  default: string;
+}
+
+declare interface ISchemaKeyNumberData extends IDefaultSchemaKeyData {
+  ctrl: 'C_INPUT';
+  type: NumberConstructor;
+  default: number;
+}
+
+declare interface ISchemaKeyStringData extends IDefaultSchemaKeyData {
+  ctrl: 'C_INPUT';
+  type: StringConstructor;
+  default: string;
+}
+
+declare interface ISchemaKeyBooleanData extends IDefaultSchemaKeyData {
+  ctrl: 'C_SWITCH';
   type: BooleanConstructor;
   default: boolean;
 }
 
-interface ISchemaArrayData extends IDefaultSchemaKeyData {
+declare interface ISchemaArrayData extends IDefaultSchemaKeyData {
+  ctrl: string;
   type: ArrayConstructor;
-  icon?: string | string[];
-  default: any[];
+  default: unknown[];
+  options?: {
+    label?: string | number;
+    value: string | number;
+    icon?: string;
+    hint?: string;
+  }[];
 }
 
-interface ISchemaKeyObjectData extends IDefaultSchemaKeyData {
+declare interface ISchemaKeyObjectData extends IDefaultSchemaKeyData {
+  ctrl: string;
   type: ObjectConstructor;
-  default: Record<string, any>;
+  default: Record<string, unknown>;
 }
 
 declare interface BlendType {
@@ -55,30 +175,51 @@ declare interface BlendType {
   visible: boolean;
 }
 
-interface ISchemaBlendData extends IDefaultSchemaKeyData {
-  type: ObjectConstructor;
+declare interface ISchemaBlendData extends IDefaultSchemaKeyData {
   ctrl: 'C_BLEND';
+  type: ObjectConstructor;
   default: BlendType;
 }
 
-interface ISchemaBlendsData extends IDefaultSchemaKeyData {
-  type: ArrayConstructor;
+declare interface ISchemaBlendsData extends IDefaultSchemaKeyData {
   ctrl: 'BLENDS';
+  type: ArrayConstructor;
   default: BlendType[];
 }
-interface ISchemaFunctionData extends IDefaultSchemaKeyData {
+
+declare interface ISchemaFunctionData extends IDefaultSchemaKeyData {
+  ctrl: string;
   type: FunctionConstructor;
   default: () => void;
 }
 
-interface ISchemaSelectInputData extends IDefaultSchemaKeyData {
-  type: ObjectConstructor;
+declare interface ISchemaSelectInputData extends IDefaultSchemaKeyData {
   ctrl: 'C_SELECT_INPUT';
-  keys: [string, string];
+  type: ObjectConstructor;
   default: Record<string, string | number>;
+  keys?: string[];
+  suffix?: string;
+  options?: {
+    label?: string | number;
+    value: string | number;
+    icon?: string;
+    hint?: string;
+  }[];
 }
 
 declare type SchemaKeyType =
+  | ISchemaInputData
+  | ISchemaSelectData
+  | ISchemaColorPickerData
+  | ISchemaGroupCheckData
+  | ISchemaCompoundInputData
+  | ISchemaStrokeData
+  | ISchemaGroupSelectData
+  | ISchemaButtonData
+  | ISchemaInputGroupData
+  | ISchemaEdgeData
+  | ISchemaCodeEditorData
+  | ISchemaPositionData
   | ISchemaKeyNumberData
   | ISchemaKeyStringData
   | ISchemaKeyBooleanData
@@ -86,9 +227,10 @@ declare type SchemaKeyType =
   | ISchemaKeyObjectData
   | ISchemaBlendData
   | ISchemaBlendsData
-  | ISchemaSelectInputData;
+  | ISchemaSelectInputData
+  | ISchemaFunctionData;
 
-declare type SchemaKeyTypes = SchemaKeyType[][] | { [key: string]: SchemaKeyType };
+declare type SchemaKeyTypes = SchemaKeyType[] | SchemaKeyType[][] | { [key: string]: SchemaKeyType };
 
 declare interface ISchemaExportDefault {
   name: string;

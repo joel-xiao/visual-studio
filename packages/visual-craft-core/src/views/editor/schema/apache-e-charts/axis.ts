@@ -46,39 +46,37 @@ const schema: ISchemaExport = {
         ],
         [
             {
-                label: '标签背景',
-                key: 'axisLabel.backgroundColor',
-                type: String,
-                default: 'transparent',
-                icon: 'mdi:format-color-fill',
-                ctrl: 'C_COLOR_PICKER',
-                ctrl_type: 'color-input',
-                size: 'large'
-            }
-        ],
-        [
-            {
-                label: '背景边距',
+                label: '标签',
+                hint: ['水平边距', '垂直边距'],
                 key: 'axisLabel.padding',
                 type: Object,
                 default: {
                     h: 0,
                     v: 0
                 },
-                icon: 'mdi:arrow-expand-all',
-                ctrl: 'C_BOX_SPACING',
+                icon: ['mdi:format-horizontal-align-center', 'mdi:format-vertical-align-center'],
+                keys: ['h', 'v'],
+                ctrl: 'C_COMPOUND_INPUT',
                 suffix: 'px'
             }
         ],
         [
             {
-                label: '标签数',
+                hint: '标签数',
                 key: 'splitNumber',
                 type: Number,
                 default: 5,
                 icon: 'mdi:format-list-numbered',
                 ctrl: 'C_INPUT',
-                size: 'wide'
+                size: 'large'
+            },
+            {
+                key: 'axisLabel.backgroundColor',
+                type: String,
+                default: '#fff',
+                icon: 'mdi:format-color-fill',
+                ctrl: 'C_COLOR_PICKER',
+                size: 'mini'
             }
         ],
         [
@@ -88,12 +86,15 @@ const schema: ISchemaExport = {
                 type: Object,
                 default: {
                     show: true,
-                    color: '#fff',
-                    width: 1,
-                    type: 'solid'
+                    lineStyle: {
+                        color: '#fff',
+                        width: 1,
+                        type: 'solid'
+                    }
                 },
-                icon: 'mdi:vector-line',
                 ctrl: 'C_STROKE',
+                keys: ['lineStyle.color', 'lineStyle.width', 'lineStyle.type'],
+                hint: ['颜色', '粗细', '类型'],
                 options: options.LineStyleOptions,
                 suffix: 'px'
             }
@@ -105,12 +106,15 @@ const schema: ISchemaExport = {
                 type: Object,
                 default: {
                     show: true,
-                    color: '#fff',
-                    width: 1,
-                    type: 'solid'
+                    lineStyle: {
+                        color: '#fff',
+                        width: 1,
+                        type: 'solid'
+                    }
                 },
-                icon: 'mdi:segment',
                 ctrl: 'C_STROKE',
+                keys: ['lineStyle.color', 'lineStyle.width', 'lineStyle.type'],
+                hint: ['颜色', '粗细', '类型'],
                 options: options.LineStyleOptions,
                 suffix: 'px'
             }
@@ -135,12 +139,16 @@ const schema: ISchemaExport = {
                 type: Object,
                 default: {
                     show: true,
-                    color: '#fff',
-                    width: 1,
-                    type: 'solid'
+                    lineStyle: {
+                        color: '#fff',
+                        width: 1,
+                        type: 'solid'
+                    }
                 },
                 icon: 'mdi:grid',
                 ctrl: 'C_STROKE',
+                keys: ['lineStyle.color', 'lineStyle.width', 'lineStyle.type'],
+                hint: ['颜色', '粗细', '类型'],
                 options: options.LineStyleOptions,
                 suffix: 'px'
             }
