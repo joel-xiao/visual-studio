@@ -1,11 +1,27 @@
 <template>
-<div class="editor-schema-renderer-props-ctrl" :class="{ 'is-inline': layout === 'inline' }">
-  <div v-if="label" class="editor-schema-renderer-props-ctrl-label">
-    {{ label }}
+<div class="editor-schema-renderer-props-ctrl" :class="{ 'is-inline': layout === 'inline', 'is-disabled': hasShow && !showValue }">
+  <div v-if="showLabel" class="editor-schema-renderer-props-ctrl-header">
+    <CLiteSwitch
+      v-if="hasShow"
+      :model-value="showValue"
+      class="ctrl-switch"
+      @update:model-value="onShowChange"
+    />
+    <span class="editor-schema-renderer-props-ctrl-label">{{ label }}</span>
   </div>
-  <div class="editor-schema-renderer-props-ctrl-control">
-    <template v-if="isComponent(ctrl)">
-      <component :is="getComponent(ctrl)" :type="ctrlType" v-bind="$attrs" />
+  <div
+    v-if="!hasShow || showValue"
+    class="editor-schema-renderer-props-ctrl-control"
+  >
+    <template v-if="getComponent(ctrl)">
+      <component
+        :is="getComponent(ctrl)"
+        :model-value="modelValue"
+        :type="ctrlType"
+        v-bind="$attrs"
+        :hint="hint"
+        @update="onUpdate"
+      />
     </template>
     <div v-else>IS NO {{ ctrl }}</div>
   </div>
@@ -19,47 +35,49 @@ export default {
 };
 </script>
 <script setup lang="ts">
-import { reactive, markRaw, defineAsyncComponent } from 'vue';
+import { computed, markRaw } from 'vue';
 import type { Component } from 'vue';
+import CLiteSwitch from '../../ui/controls/c-lite-switch/index.vue';
+
 export interface Props {
   ctrl: string;
   ctrlType: string;
   layout?: string;
   label?: string;
+  hint?: string;
+  modelValue?: any;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   ctrl: '',
   ctrlType: '',
   layout: '',
-  label: ''
+  label: '',
+  hint: '',
+  modelValue: undefined
 });
 
-const component_models = import.meta.glob(
+const emit = defineEmits(['show-change', 'update']);
+
+const showValue = computed(() => (props.modelValue as any)?.show);
+const hasShow = computed(() => typeof showValue.value === 'boolean');
+const showLabel = computed(() => hasShow.value || !!props.label);
+
+const onShowChange = (val: boolean) => emit('show-change', val);
+
+const onUpdate = (val: any) => emit('update', val);
+
+const COMPONENT_MODELS = import.meta.glob(
   ['../../ui/controls/*/index.vue', './input-group/index.vue', './blends/index.vue'],
-  {
-    eager: true,
-    import: 'default'
-  }
+  { eager: true, import: 'default' }
 );
 
-const components: { [key: string]: Component } = Object.keys(component_models).reduce(
-  (acc, key: string) => {
-    const component = component_models[key];
-    // @ts-expect-error - Dynamic component registration
-    acc[component.name] = component;
-    return acc;
-  },
-  {}
-);
+const components: Record<string, Component> = {};
+Object.values(COMPONENT_MODELS).forEach((comp: any) => {
+  if (comp?.name) components[comp.name] = comp;
+});
 
-const isComponent = (schema_name: string) => {
-  return !!components[schema_name];
-};
-
-const getComponent = (schema_name: string) => {
-  return components[schema_name];
-};
+const getComponent = (name: string) => components[name];
 </script>
 <style lang="scss">
 .editor-schema-renderer .editor-schema-renderer-props-ctrl {
@@ -68,9 +86,21 @@ const getComponent = (schema_name: string) => {
   flex-direction: column;
   gap: 6px;
 
+  .editor-schema-renderer-props-ctrl-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+
+    .ctrl-switch {
+      flex-shrink: 0;
+    }
+  }
+
   .editor-schema-renderer-props-ctrl-label {
-    flex: 0 0 auto;
+    flex: 1;
     font-size: 12px;
+    line-height: 12px;
     font-weight: 600;
     color: var(--theme-color-text-secondary);
     overflow: hidden;
@@ -89,6 +119,12 @@ const getComponent = (schema_name: string) => {
     gap: 8px;
     .editor-schema-renderer-props-ctrl-label {
       width: 72px;
+    }
+  }
+
+  &.is-disabled {
+    .editor-schema-renderer-props-ctrl-label {
+      opacity: 0.5;
     }
   }
 }
