@@ -88,6 +88,7 @@ const getComponent = (name: string) => components[name];
   gap: 6px;
 
   .editor-schema-renderer-props-ctrl-header {
+    padding-top: 3px;
     display: flex;
     align-items: center;
     gap: 8px;

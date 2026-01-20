@@ -34,6 +34,6 @@ const onUpdate = (val: boolean) => {
 #visual-craft-core .c-lite-switch {
   display: flex;
   align-items: center;
-  height: 24px;
+  height: 16px;
 }
 </style>
