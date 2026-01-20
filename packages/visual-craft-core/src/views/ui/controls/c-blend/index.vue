@@ -2,7 +2,7 @@
   <div class="c-blend">
     <BasicBox ref="boxRef" type="input">
       <div ref="triggerRef" class="c-blend-select-trigger" @click="onOpenWrapper('wrapper')">
-        <BasicIcon :icon="icon" :lock="lock" />
+        <BasicIcon :hint="hint" :icon="icon" :lock="lock" />
         <BasicSelect
           ref="basicSelectRef"
           :model-value="mixModel"
@@ -57,6 +57,7 @@ export interface IProps {
   icon?: string;
   options?: Item[];
   lock?: boolean;
+  hint?: string;
 }
 
 const props = withDefaults(defineProps<IProps>(), {
@@ -67,7 +68,8 @@ const props = withDefaults(defineProps<IProps>(), {
   }),
   icon: 'mdi:opacity',
   options: () => [],
-  lock: false
+  lock: false,
+  hint: ''
 });
 
 const emit = defineEmits(['update', 'update:modelValue']);

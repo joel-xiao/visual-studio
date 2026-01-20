@@ -3,7 +3,7 @@
     <BasicBox ref="boxRef" type="input">
       <!-- Select Part -->
       <div ref="triggerRef" class="c-select-input-section select-part" @click="onOpenWrapper">
-        <BasicIcon :icon="getIcon(0) || currentOptionIcon" :lock="lock" class="part-icon" />
+        <BasicIcon :hint="hint" :icon="getIcon(0) || currentOptionIcon" :lock="lock" class="part-icon" />
         <BasicSelect
           ref="basicSelectRef"
           :model-value="selectModel"
@@ -53,6 +53,7 @@ export interface IProps {
   icon?: string | string[];
   suffix?: string;
   lock?: boolean;
+  hint?: string;
 }
 
 const props = withDefaults(defineProps<IProps>(), {
@@ -61,7 +62,8 @@ const props = withDefaults(defineProps<IProps>(), {
   keys: () => ['select', 'input'],
   icon: '',
   suffix: '',
-  lock: false
+  lock: false,
+  hint: ''
 });
 
 const emit = defineEmits(['update', 'update:modelValue']);
