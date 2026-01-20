@@ -52,7 +52,7 @@ const isIconText = computed(() => {
 </script>
 
 <template>
-<div v-hint="hintContent" class="basic-icon" :class="iconClass">
+<div v-if="icon" v-hint="hintContent" class="basic-icon" :class="iconClass">
   <Icon v-if="isIconify" :icon="icon" />
   <span v-else-if="isIconText" class="basic-icon-text">{{ icon }}</span>
   <i v-else-if="isIcon" class="icon-font" :class="icon"></i>

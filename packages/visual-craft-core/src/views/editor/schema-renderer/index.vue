@@ -6,7 +6,7 @@
   <SideTabs :style="TabsStyle" :tabs="PanelSchemaTypes.categorySchemas as CategorySchemaTypes" @select-tab="onSelectTab">
     <template v-if="currentTab">
       <SchemaItems :items="currentTab.propsTypes" :props-data="PropsData" @update="onUpdate" />
-      <InnerTabs v-if="currentTab.schemasTabs?.length" :tabs="currentTab.schemasTabs" v-slot="{ currentTab: innerTab }">
+      <InnerTabs v-if="currentTab.schemasTabs?.length" v-slot="{ currentTab: innerTab }" :tabs="currentTab.schemasTabs">
         <SchemaItems :items="innerTab?.propsTypes || []" :props-data="PropsData" @update="onUpdate" />
       </InnerTabs>
     </template>

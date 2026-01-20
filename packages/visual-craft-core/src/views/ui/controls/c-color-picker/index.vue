@@ -1,13 +1,18 @@
 <template>
 <BasicBox ref="box" class="c-color-picker" type="input">
-  <BasicColorPicker v-bind="$attrs" v-model="modelValue" @click="onFocus" @focus="onFocus" @blur="onBlur" @update:show="onUpdateShow" />
+  <BasicColorPicker v-model="modelValue" v-hint="hint" v-bind="$attrs" @click="onFocus" @focus="onFocus" @blur="onBlur" @update:show="onUpdateShow" />
   <BasicInput v-if="type === 'color-input'" v-bind="$attrs" v-model="modelValue" type="text" @focus="onFocus" @blur="onBlur" />
 </BasicBox>
 </template>
 
 <script lang="ts">
+import { hintDirective } from '../../../../directives/hint';
+
 export default {
   name: 'C_COLOR_PICKER',
+  directives: {
+    hint: hintDirective
+  },
   inheritAttrs: false
 };
 </script>
@@ -22,12 +27,14 @@ export interface IProps {
   type?: string; // color-input color
   modelValue?: string;
   focus?: boolean;
+  hint?: string;
 }
 
 const props = withDefaults(defineProps<IProps>(), {
   type: 'color',
   modelValue: '',
-  focus: true
+  focus: true,
+  hint: ''
 });
 
 const emit = defineEmits(['update:modelValue', 'update']);

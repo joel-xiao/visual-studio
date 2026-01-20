@@ -17,8 +17,9 @@ import PropsWarp from './props-warp.vue';
 import Layout from './layout/index.vue';
 
 defineProps<{
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   items: readonly any[];
-  propsData: any;
+  propsData: Record<string, unknown>;
 }>();
 
 const emit = defineEmits(['update']);
@@ -32,7 +33,7 @@ const getComponent = (name: string) => {
   return components[name] || components['PANEL_PROPS_WRAP'];
 };
 
-const onUpdate = (key: string, schema: any, event: any) => {
+const onUpdate = (key: string, schema: unknown, event: unknown) => {
   emit('update', key, schema, event);
 };
 </script>

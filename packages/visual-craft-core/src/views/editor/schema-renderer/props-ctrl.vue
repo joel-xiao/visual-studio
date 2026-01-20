@@ -43,9 +43,9 @@ export interface Props {
   ctrl: string;
   ctrlType: string;
   layout?: string;
-  label?: string;
-  hint?: string;
-  modelValue?: any;
+  label?: string | number;
+  hint?: string | string[];
+  modelValue?: unknown;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -53,19 +53,19 @@ const props = withDefaults(defineProps<Props>(), {
   ctrlType: '',
   layout: '',
   label: '',
-  hint: '',
+  hint: undefined,
   modelValue: undefined
 });
 
 const emit = defineEmits(['show-change', 'update']);
 
-const showValue = computed(() => (props.modelValue as any)?.show);
+const showValue = computed(() => (props.modelValue as Record<string, unknown>)?.show as boolean | undefined);
 const hasShow = computed(() => typeof showValue.value === 'boolean');
 const showLabel = computed(() => hasShow.value || !!props.label);
 
 const onShowChange = (val: boolean) => emit('show-change', val);
 
-const onUpdate = (val: any) => emit('update', val);
+const onUpdate = (val: unknown) => emit('update', val);
 
 const COMPONENT_MODELS = import.meta.glob(
   ['../../ui/controls/*/index.vue', './input-group/index.vue', './blends/index.vue'],
@@ -73,8 +73,9 @@ const COMPONENT_MODELS = import.meta.glob(
 );
 
 const components: Record<string, Component> = {};
-Object.values(COMPONENT_MODELS).forEach((comp: any) => {
-  if (comp?.name) components[comp.name] = comp;
+Object.values(COMPONENT_MODELS).forEach((comp: unknown) => {
+  const component = comp as Component & { name?: string };
+  if (component?.name) components[component.name] = component;
 });
 
 const getComponent = (name: string) => components[name];

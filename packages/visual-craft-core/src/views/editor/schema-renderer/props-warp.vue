@@ -16,9 +16,9 @@
         layout="vertical"
         :label="prop.label"
         :hint="prop.hint"
-        :ctrl-type="prop.ctrl_type || ''"
-        :options="prop?.options"
-        :suffix="prop.suffix"
+        :ctrl-type="(prop as any).ctrl_type || ''"
+        :options="(prop as any).options"
+        :suffix="(prop as any).suffix"
         :keys="getKeys(prop)"
         @update="onUpdateProp(prop, $event)"
         @click="onClick(prop)"
@@ -84,9 +84,9 @@ const getKeys = (prop: SchemaKeyType) => ('keys' in prop ? prop.keys : undefined
 
 const onShowChange = (prop: SchemaKeyType, value: boolean) => emit('update', [`${prop.key}.show`, value]);
 
-const onUpdate = (key: string, value: any) => emit('update', [key, value]);
+const onUpdate = (key: string, value: unknown) => emit('update', [key, value]);
 
-const onUpdateProp = (prop: SchemaKeyType, value: any) => {
+const onUpdateProp = (prop: SchemaKeyType, value: unknown) => {
   if (prop.click && prop.ctrl === 'C_BUTTON') return;
   emit('update', [prop.key || '', value]);
 };

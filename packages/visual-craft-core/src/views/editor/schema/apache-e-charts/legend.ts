@@ -56,6 +56,7 @@ const schema: ISchemaExport = {
         [
             {
                 label: '图例标记',
+                hint: ['标记形状', '标记宽度'],
                 key: '',
                 type: Object,
                 default: {

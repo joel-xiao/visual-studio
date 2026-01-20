@@ -1,4 +1,4 @@
-import { shallowRef, triggerRef } from 'vue';
+import { shallowRef } from 'vue';
 
 export interface AlignmentLine {
     type: 'vertical' | 'horizontal';
@@ -20,9 +20,6 @@ export interface MeasurementLine {
 
 // Distance threshold for snapping (in pixels)
 const SNAP_THRESHOLD = 5;
-
-// Define the edges we care about
-type Edge = 'start' | 'center' | 'end';
 
 interface SnapResult {
     dx: number;
@@ -211,7 +208,8 @@ class AlignmentExtension {
                     if (absDiff < closestDx) {
                         closestDx = absDiff;
                         snapDx = diff;
-                        while(vLines.length) this.#linePool.push(vLines.pop()!);
+                        this.#linePool.push(...vLines);
+                        vLines.length = 0;
                         const l = this.getPooledLine();
                         l.type = 'vertical'; l.pos = tx;
                         l.start = Math.min(nodeRect.y, target.y);
@@ -238,7 +236,8 @@ class AlignmentExtension {
                     if (absDiff < closestDy) {
                         closestDy = absDiff;
                         snapDy = diff;
-                        while(hLines.length) this.#linePool.push(hLines.pop()!);
+                        this.#linePool.push(...hLines);
+                        hLines.length = 0;
                         const l = this.getPooledLine();
                         l.type = 'horizontal'; l.pos = ty;
                         l.start = Math.min(nodeRect.x, target.x);

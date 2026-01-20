@@ -104,7 +104,7 @@ const schema: IComponentSchemaExport = {
                   fontSize: 12,
                   color: '#fff',
                   styles: [],
-                  backgroundColor: '#ffffff00',
+                  backgroundColor: '#fff',
                   padding: { h: 0, v: 0 }
                 },
                 splitNumber: 5,
@@ -146,7 +146,7 @@ const schema: IComponentSchemaExport = {
                   fontSize: 12,
                   color: '#fff',
                   styles: [],
-                  backgroundColor: '#ffffff00',
+                  backgroundColor: '#fff',
                   padding: { h: 0, v: 0 }
                 },
                 splitNumber: 5,

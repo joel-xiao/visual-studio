@@ -1,13 +1,19 @@
 <template>
-<ColorPicker v-bind="$attrs" v-model="modelValue" />
+<div v-hint="hint" class="basic-color-picker-wrapper">
+  <ColorPicker v-bind="$attrs" v-model="modelValue" />
+</div>
 </template>
 
 <script lang="ts">
+import { hintDirective } from '../../../directives/hint';
 import ColorPicker from '@/components/native-ui/color-picker/index.vue';
 
 export default {
   components: {
     ColorPicker
+  },
+  directives: {
+    hint: hintDirective
   }
 };
 </script>
@@ -18,9 +24,11 @@ import { computed } from 'vue';
 const props = withDefaults(
   defineProps<{
     modelValue?: string;
+    hint?: string;
   }>(),
   {
-    modelValue: ''
+    modelValue: '',
+    hint: ''
   }
 );
 
@@ -39,6 +47,12 @@ const modelValue = computed({
 </script>
 
 <style lang="scss">
+#visual-craft-core .basic-color-picker-wrapper {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
 #visual-craft-core .n-color-picker {
   width: 18px;
   height: 18px;

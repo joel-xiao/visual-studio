@@ -3,7 +3,7 @@
     <BasicBox ref="boxRef" type="input">
       <!-- Select Part -->
       <div ref="triggerRef" class="c-select-input-section select-part" @click="onOpenWrapper">
-        <BasicIcon :hint="hint" :icon="getIcon(0) || currentOptionIcon" :lock="lock" class="part-icon" />
+        <BasicIcon :hint="getHint(0)" :icon="getIcon(0) || currentOptionIcon" :lock="lock" class="part-icon" />
         <BasicSelect
           ref="basicSelectRef"
           :model-value="selectModel"
@@ -25,7 +25,7 @@
           @blur="onBlur"
         />
         <span v-if="suffix" class="c-select-input-suffix">{{ suffix }}</span>
-        <BasicIcon v-if="getIcon(1)" :icon="getIcon(1)" :lock="lock" class="part-icon" />
+        <BasicIcon v-if="getIcon(1)" v-hint="getHint(1)" :icon="getIcon(1)" :lock="lock" class="part-icon" />
       </div>
     </BasicBox>
   </div>
@@ -53,7 +53,7 @@ export interface IProps {
   icon?: string | string[];
   suffix?: string;
   lock?: boolean;
-  hint?: string;
+  hint?: string | string[];
 }
 
 const props = withDefaults(defineProps<IProps>(), {
@@ -96,6 +96,13 @@ const getIcon = (index: number) => {
     return props.icon[index] || '';
   }
   return index === 0 ? props.icon : '';
+};
+
+const getHint = (index: number) => {
+  if (Array.isArray(props.hint)) {
+    return props.hint[index] || '';
+  }
+  return index === 0 ? props.hint : '';
 };
 
 const currentOptionIcon = computed(() => {

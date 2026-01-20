@@ -12,8 +12,9 @@
       <!-- Width Part -->
       <div class="c-stroke-section width-part">
         <BasicIcon
-          v-hint="hint"
-          icon="mdi:line-weight"
+          v-if="getIcon(1)"
+          v-hint="getHint(1)"
+          :icon="getIcon(1)"
           class="part-icon"
           :style="iconStyle"
           @mousedown="onMouseDown"
@@ -67,7 +68,8 @@ export interface IProps {
   keys?: [string, string, string];
   options?: { label: string; value: string }[];
   suffix?: string;
-  hint?: string;
+  hint?: string | string[];
+  icon?: string | string[];
 }
 
 const props = withDefaults(defineProps<IProps>(), {
@@ -79,8 +81,23 @@ const props = withDefaults(defineProps<IProps>(), {
     { label: '点线', value: 'dotted' }
   ],
   suffix: 'px',
-  hint: ''
+  hint: undefined,
+  icon: undefined
 });
+
+const getHint = (index: number) => {
+  if (Array.isArray(props.hint)) {
+    return props.hint[index] || '';
+  }
+  return index === 1 ? (props.hint || '') : ''; // Width part is at index 1 conceptually
+};
+
+const getIcon = (index: number) => {
+  if (Array.isArray(props.icon)) {
+    return props.icon[index] || '';
+  }
+  return index === 1 ? props.icon : '';
+};
 
 const emit = defineEmits(['update', 'update:modelValue']);
 
@@ -200,12 +217,13 @@ function onBlur() {
     &.width-part {
       flex: 1;
       justify-content: center;
+      padding: 0 8px;
     }
 
     &.type-part {
       flex: 1.2;
       cursor: pointer;
-      border-radius: 0 6px 6px 0;
+      border-radius: 0 4px 4px 0;
       border-left: 1px solid var(--theme-color-gray-100);
       transition: background 0.2s;
 
@@ -229,6 +247,10 @@ function onBlur() {
     .basic-select {
       flex: 1;
       width: 100%;
+
+      .basic-select-label {
+        margin-left: 10px;
+      }
     }
 
     .c-stroke-suffix {
