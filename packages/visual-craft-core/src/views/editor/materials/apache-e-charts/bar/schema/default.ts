@@ -84,6 +84,126 @@ const schema: IComponentSchemaExport = {
       ]
     },
     {
+      name: '坐标轴',
+      icon: '',
+      category: 'AXIS',
+      schemas: [],
+      schemasTabs: [
+        {
+          name: 'X轴',
+          tab: 'xAxis',
+          schemas: [
+            {
+              type: 'schema',
+              schema: 'ECHARTS_AXIS',
+              label: '',
+              key: 'xAxis',
+              default: {
+                axisLabel: {
+                  fontFamily: 'Microsoft YaHei',
+                  fontSize: 12,
+                  color: '#fff',
+                  styles: [],
+                  backgroundColor: '#ffffff00',
+                  padding: { h: 0, v: 0 }
+                },
+                splitNumber: 5,
+                axisLine: {
+                  show: true,
+                  color: '#fff',
+                  width: 1,
+                  type: 'solid'
+                },
+                axisTick: {
+                  show: true,
+                  color: '#fff',
+                  width: 1,
+                  type: 'solid',
+                  length: 5
+                },
+                splitLine: {
+                  show: false,
+                  color: '#fff',
+                  width: 1,
+                  type: 'solid'
+                }
+              }
+            }
+          ]
+        },
+        {
+          name: 'Y轴',
+          tab: 'yAxis',
+          schemas: [
+            {
+              type: 'schema',
+              schema: 'ECHARTS_AXIS',
+              label: '',
+              key: 'yAxis',
+              default: {
+                axisLabel: {
+                  fontFamily: 'Microsoft YaHei',
+                  fontSize: 12,
+                  color: '#fff',
+                  styles: [],
+                  backgroundColor: '#ffffff00',
+                  padding: { h: 0, v: 0 }
+                },
+                splitNumber: 5,
+                axisLine: {
+                  show: true,
+                  color: '#fff',
+                  width: 1,
+                  type: 'solid'
+                },
+                axisTick: {
+                  show: true,
+                  color: '#fff',
+                  width: 1,
+                  type: 'solid',
+                  length: 5
+                },
+                splitLine: {
+                  show: true,
+                  color: '#fff',
+                  width: 1,
+                  type: 'dashed'
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      name: '提示框',
+      icon: '',
+      category: 'TOOLTIP',
+      schemas: [
+        {
+          show_switch: true,
+          type: 'schema',
+          schema: 'COMMON_TEXT',
+          label: '提示框文本',
+          key: 'tooltip',
+          default: {
+            textStyle: {
+              fontFamily: 'Microsoft YaHei',
+              fontSize: 12,
+              color: '#fff',
+              styles: []
+            }
+          }
+        }
+      ]
+    },
+    {
+      name: '条件',
+      icon: '',
+      category: 'CONDITIONS',
+      schemas: []
+    },
+    {
       name: '自定义',
       icon: '',
       category: 'CODE',
