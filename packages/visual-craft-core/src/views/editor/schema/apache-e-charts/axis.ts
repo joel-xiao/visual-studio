@@ -46,6 +46,18 @@ const schema: ISchemaExport = {
         ],
         [
             {
+                label: '分割',
+                hint: '分割段数',
+                key: 'splitNumber',
+                type: Number,
+                default: 5,
+                icon: 'mdi:format-list-numbered',
+                ctrl: 'C_INPUT',
+                size: 'large'
+            }
+        ],
+        [
+            {
                 label: '标签',
                 hint: ['水平边距', '垂直边距'],
                 key: 'axisLabel.padding',
@@ -58,17 +70,6 @@ const schema: ISchemaExport = {
                 keys: ['h', 'v'],
                 ctrl: 'C_COMPOUND_INPUT',
                 suffix: 'px'
-            }
-        ],
-        [
-            {
-                hint: '标签数',
-                key: 'splitNumber',
-                type: Number,
-                default: 5,
-                icon: 'mdi:format-list-numbered',
-                ctrl: 'C_INPUT',
-                size: 'large'
             },
             {
                 key: 'axisLabel.backgroundColor',

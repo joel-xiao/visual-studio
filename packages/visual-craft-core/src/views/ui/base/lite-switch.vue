@@ -108,7 +108,7 @@ const toggle = () => {
     }
 
     .switch-thumb {
-      transform: translateX(11px);
+      transform: translateX(10px);
       background: var(--theme-color-white);
     }
   }

@@ -78,6 +78,19 @@ const getGridTemplateColumns = (idx: number, row?: SchemaKeyType[]) => {
   return Array.isArray(targetRow) ? targetRow.map(prop => prop?.size || 'default') : [];
 };
 
+const getRowLabel = (row: SchemaKeyType[]) => {
+  return row.find(prop => prop.label)?.label;
+};
+
+const getPropLabel = (prop: SchemaKeyType, row: SchemaKeyType[]) => {
+  // If this is the first item with a label in the row, it's used as the row label
+  const rowLabel = getRowLabel(row);
+  if (prop.label === rowLabel && row.indexOf(prop) === row.findIndex(p => p.label === rowLabel)) {
+    return '';
+  }
+  return prop.label;
+};
+
 const getValue = (key: string) => (key ? get(props.modelValue, key) : props.modelValue);
 
 const getKeys = (prop: SchemaKeyType) => ('keys' in prop ? prop.keys : undefined);
