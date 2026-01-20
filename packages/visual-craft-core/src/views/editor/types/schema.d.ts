@@ -12,6 +12,8 @@ interface IDefaultSchemaKeyData {
     value: string | number;
     icon?: string;
   }[];
+  keys?: string[];
+  v_if?: string;
   click?: (
     props: ComponentProp
   ) =>
@@ -39,7 +41,12 @@ interface ISchemaKeyBooleanData extends IDefaultSchemaKeyData {
 interface ISchemaArrayData extends IDefaultSchemaKeyData {
   type: ArrayConstructor;
   icon?: string | string[];
-  default: number[];
+  default: any[];
+}
+
+interface ISchemaKeyObjectData extends IDefaultSchemaKeyData {
+  type: ObjectConstructor;
+  default: Record<string, any>;
 }
 
 declare interface BlendType {
@@ -76,11 +83,12 @@ declare type SchemaKeyType =
   | ISchemaKeyStringData
   | ISchemaKeyBooleanData
   | ISchemaArrayData
+  | ISchemaKeyObjectData
   | ISchemaBlendData
   | ISchemaBlendsData
   | ISchemaSelectInputData;
 
-declare type SchemaKeyTypes = { [key: string]: SchemaKeyType } | SchemaKeyType[][];
+declare type SchemaKeyTypes = SchemaKeyType[][] | { [key: string]: SchemaKeyType };
 
 declare interface ISchemaExportDefault {
   name: string;

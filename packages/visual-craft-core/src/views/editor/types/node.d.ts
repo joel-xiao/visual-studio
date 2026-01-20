@@ -7,6 +7,7 @@ declare interface IBasicNode {
   name: string;
   component: string;
   schema: string;
+  props?: IComponentProps;
 }
 
 declare interface IAddNode extends IBasicNode {

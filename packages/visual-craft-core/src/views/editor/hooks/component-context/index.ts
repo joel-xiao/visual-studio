@@ -304,11 +304,22 @@ export class CreateComponentContext {
     if (isSchemaObject) {
       if (Array.isArray(componentSchemas.categorySchemas)) {
         for (const category of componentSchemas.categorySchemas) {
+          const schemasTabs: SchemaTabType[] = [];
+          if (Array.isArray(category.schemasTabs)) {
+            for (const tab of category.schemasTabs) {
+              schemasTabs.push({
+                name: tab.name,
+                tab: tab.tab,
+                propsTypes: this.#parseSchema(tab.schemas)
+              });
+            }
+          }
           categorySchemas.push({
             name: category.name,
             icon: category.icon,
             category: category.category,
-            propsTypes: this.#parseSchema(category.schemas)
+            propsTypes: this.#parseSchema(category.schemas),
+            schemasTabs: schemasTabs.length > 0 ? schemasTabs : undefined
           });
         }
       }
@@ -418,6 +429,17 @@ export class CreateComponentContext {
           const result = this.#parseSchemaProp(category.schemas);
           for (const key of Object.keys(result)) {
             props[key] = result[key];
+          }
+          // Handle schemasTabs (e.g., X轴/Y轴)
+          if (Array.isArray(category.schemasTabs)) {
+            for (const tab of category.schemasTabs) {
+              if (Array.isArray(tab.schemas)) {
+                const tabResult = this.#parseSchemaProp(tab.schemas);
+                for (const key of Object.keys(tabResult)) {
+                  props[key] = tabResult[key];
+                }
+              }
+            }
           }
         }
       }
