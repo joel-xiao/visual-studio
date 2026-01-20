@@ -7,6 +7,7 @@
     @resizing="onResizing"
     @mousedown="onDown"
     @contextmenu="onContextMenu"
+    @drag-end="onDragEnd"
   >
     <div ref="vm" class="middle-node" :style="nodeStyle"></div>
   </DragResize>
@@ -20,6 +21,7 @@ import { getNodeStyle } from './../hooks/node-context/style';
 import { useComponentContext } from './../hooks/component-context';
 import { useCanvas } from '../hooks/canvas';
 import { useNodeMenu } from '../hooks/context-menu';
+import { useAlignment } from '../hooks/ruler-context/alignment';
 
 interface Props {
   id: string;
@@ -84,6 +86,10 @@ const onContextMenu = (e: MouseEvent) => {
   showNodeMenu(e, props.id, nodeContext, componentContext, getScale());
 };
 
+const onDragEnd = () => {
+  useAlignment().clearLines();
+};
+
 const onResizing = (dragDataset: IDragDataset) => {
   const dx = dragDataset.x - node.x;
   const dy = dragDataset.y - node.y;
@@ -94,7 +100,14 @@ const onResizing = (dragDataset: IDragDataset) => {
   if ((node as INode).lock) return;
 
   if (dw === 0 && dh === 0 && dr === 0) {
-    nodeContext.group.handleNodeDrag(node as INode, dx, dy, unref(allNodes) as INode[], unref(selectedNodes) as INode[]);
+    const alignment = useAlignment();
+    const selected = unref(selectedNodes) as INode[];
+    const allNodesList = unref(allNodes) as INode[];
+    const movingNodes = selected.length > 0 ? selected : [node as INode];
+
+    const snap = alignment.calculateSnappingWithNodes(movingNodes, allNodesList, { dx, dy });
+
+    nodeContext.group.handleNodeDrag(node as INode, dx + snap.dx, dy + snap.dy, allNodesList, selected);
   } else {
     nodeContext.group.handleNodeResize(node as INode, dragDataset, unref(allNodes) as INode[]);
   }

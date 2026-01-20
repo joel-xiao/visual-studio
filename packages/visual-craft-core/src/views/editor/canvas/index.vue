@@ -15,6 +15,7 @@
     </template>
     <MarqueeSelect />
     <SelectionBox />
+    <GuideLines />
   </div>
 </div>
 </template>
@@ -24,6 +25,7 @@ import GridLine from './widgets/grid-line.vue';
 import CanvasNode from './node.vue';
 import MarqueeSelect from './widgets/marquee-select.vue';
 import SelectionBox from './widgets/selection-box.vue';
+import GuideLines from './widgets/guide-lines.vue';
 import { ref, nextTick, onMounted, onBeforeUnmount } from 'vue';
 import { useCanvas, removeCanvas } from '../hooks/canvas';
 import { useNodeContext } from './../hooks/node-context';
