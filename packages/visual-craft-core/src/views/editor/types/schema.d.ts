@@ -60,8 +60,8 @@ declare interface ISchemaGroupCheckData extends IDefaultSchemaKeyData {
 
 declare interface ISchemaCompoundInputData extends IDefaultSchemaKeyData {
   ctrl: 'C_COMPOUND_INPUT';
-  type: ObjectConstructor;
-  default: Record<string, unknown>;
+  type: ObjectConstructor | ArrayConstructor;
+  default: Record<string, unknown> | unknown[];
   keys?: string[];
   suffix?: string;
 }

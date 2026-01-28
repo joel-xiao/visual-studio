@@ -183,16 +183,19 @@ const schema: IComponentSchemaExport = {
         {
           show_switch: true,
           type: 'schema',
-          schema: 'COMMON_TEXT',
-          label: '提示框文本',
+          schema: 'ECHARTS_TOOLTIP',
+          label: '提示框设置',
           key: 'tooltip',
           default: {
             textStyle: {
-              fontFamily: 'Microsoft YaHei',
+              fontFamily: 'SimSun',
               fontSize: 12,
               color: '#fff',
               styles: []
-            }
+            },
+            padding: [10, 10],
+            borderColor: '#000000A6',
+            backgroundColor: '#000000A6'
           }
         }
       ]
