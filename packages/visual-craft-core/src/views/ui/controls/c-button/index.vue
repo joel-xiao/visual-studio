@@ -1,5 +1,5 @@
 <template>
-<BasicBox v-hint="hint" class="c-button" v-bind="$attrs" :type="type || 'button'" @update="onUpdate">
+<BasicBox v-hint="hint" class="c-button" :class="{ 'c-button-small': size === 'small' }" v-bind="$attrs" :type="type || 'button'" @update="onUpdate">
   <BasicIcon v-if="resolvedIcon" :icon="resolvedIcon" :spin="resolvedIcon === 'mdi:loading'" />
   <div class="c-button-text" :class="buttonTextClass">
     <slot ></slot>
@@ -29,13 +29,15 @@ export interface Props {
   loading?: boolean;
   dataType?: BooleanConstructor;
   hint?: string;
+  size?: 'small' | 'default';
 }
 const props = withDefaults(defineProps<Props>(), {
   type: 'button',
   icon: '',
   loading: false,
   dataType: Boolean,
-  hint: ''
+  hint: '',
+  size: 'default'
 });
 
 const resolvedIcon = computed(() => {
@@ -77,6 +79,22 @@ const onUpdate = function (value: boolean) {
 
     &:hover {
       background: var(--db-color-button-cancel-bg-hover);
+    }
+  }
+
+  &.c-button-small {
+    height: 24px;
+    min-height: 24px;
+    padding: 0 4px;
+    
+    .basic-icon {
+      font-size: 14px;
+    }
+    
+    .c-button-text {
+      font-size: 11px;
+      padding: 0 6px;
+      &.no-padding { padding: 0; }
     }
   }
 }

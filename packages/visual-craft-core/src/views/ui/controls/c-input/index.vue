@@ -1,6 +1,6 @@
 <template>
-<BasicBox ref="box" type="input">
-  <BasicIcon  v-hint="hint || ''" :lock="lock" :icon="icon" :style="iconStyle" @mousedown="onMouseDown" />
+<BasicBox ref="box" type="input" :class="{ 'c-input-small': size === 'small' }">
+  <BasicIcon v-if="size !== 'small'" v-hint="hint || ''" :lock="lock" :icon="icon" :style="iconStyle" @mousedown="onMouseDown" />
   <div class="c-input-content">
     <BasicInput :disabled="lock" v-bind="$attrs" :model-value="modelValue" type="text" @focus="onFocus" @blur="onBlur" @update="onUpdate" />
     <span v-if="suffix" class="c-input-suffix">{{ suffix }}</span>
@@ -33,6 +33,7 @@ export interface IProps {
   modelValue?: string | number;
   suffix?: string;
   hint?: string;
+  size?: 'small' | 'default';
 }
 const props = withDefaults(defineProps<IProps>(), {
   lock: false,
@@ -40,7 +41,8 @@ const props = withDefaults(defineProps<IProps>(), {
   focus: true,
   modelValue: '',
   suffix: '',
-  hint: ''
+  hint: '',
+  size: 'default'
 });
 
 const emit = defineEmits(['update']);
@@ -120,6 +122,20 @@ const onUpdate = function (value: string | number) {
       display: flex;
       align-items: center;
       line-height: 1;
+    }
+  }
+
+  .c-input-small {
+    height: 24px;
+    min-height: 24px;
+    padding: 0 6px;
+
+    .c-input-content {
+      padding-right: 4px;
+    }
+
+    .basic-input {
+      font-size: 11px;
     }
   }
 }

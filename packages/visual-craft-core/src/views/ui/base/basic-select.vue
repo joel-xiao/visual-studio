@@ -1,11 +1,11 @@
 <template>
-<div class="basic-select" :class="{ 'has-label': showLabel, disabled: disabled }" @click="onTriggerClick">
+<div class="basic-select" :class="[{ 'has-label': showLabel, disabled: disabled }, size === 'small' ? 'basic-select-small' : '']" @click="onTriggerClick">
   <div v-if="showLabel" class="basic-select-label" :style="{ textAlign: labelAlign }">{{ currLabel }}</div>
   <div class="basic-select-arrow">
     <i class="icon-font icon-shouqi2"></i>
   </div>
   <div ref="selectMaskRef" class="basic-select-mask" @click.stop="onClose"></div>
-  <div ref="selectWrapperRef" class="basic-select-wrapper" @click.stop>
+  <div ref="selectWrapperRef" class="basic-select-wrapper" :class="size === 'small' ? 'wrapper-small' : ''" @click.stop>
     <template v-for="(item, idx) of options" :key="idx">
       <div
         class="basic-select-item"
@@ -40,6 +40,7 @@ interface Props {
   showLabel?: boolean;
   labelAlign?: 'left' | 'center' | 'right';
   disabled?: boolean;
+  size?: 'small' | 'default';
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -47,7 +48,8 @@ const props = withDefaults(defineProps<Props>(), {
   options: () => [],
   showLabel: true,
   labelAlign: 'left',
-  disabled: false
+  disabled: false,
+  size: 'default'
 });
 
 const emit = defineEmits(['update:modelValue', 'update', 'close', 'click']);
@@ -81,7 +83,10 @@ function open(triggerEl: HTMLElement) {
     selectMaskRef.value.style.display = 'block';
     selectWrapperRef.value.style.display = 'block';
     selectWrapperRef.value.style.visibility = 'hidden';
-    selectWrapperRef.value.style.width = triggerRect.width + 'px';
+    selectWrapperRef.value.style.minWidth = triggerRect.width + 'px';
+    selectWrapperRef.value.style.width = 'auto';
+    selectWrapperRef.value.style.maxWidth = '300px'; // 增加最大宽度防止过长
+    selectWrapperRef.value.style.whiteSpace = 'nowrap'; // 防止选项文字换行
 
     // Initial positioning
     selectWrapperRef.value.style.top = triggerRect.top + 'px';
@@ -245,6 +250,21 @@ defineExpose({ open, close });
       height: 1px;
       background-color: var(--theme-color-gray-100);
       margin: 6px 6px;
+    }
+
+    &.wrapper-small {
+      padding: 4px 0;
+      .basic-select-item {
+        height: 24px;
+        margin: 0 4px;
+        span { font-size: 11px; }
+      }
+      .basic-select-item-icon {
+        width: 18px;
+        height: 18px;
+        .basic-icon { font-size: 12px; }
+      }
+      .basic-select-item-split-line { margin: 4px 4px; }
     }
   }
 

@@ -1,7 +1,7 @@
 <template>
-<BasicBox ref="box" class="c-color-picker" type="input">
+<BasicBox ref="box" class="c-color-picker" :class="{ 'c-color-picker-small': size === 'small' }" type="input">
   <BasicColorPicker v-model="modelValue" v-hint="hint" v-bind="$attrs" @click="onFocus" @focus="onFocus" @blur="onBlur" @update:show="onUpdateShow" />
-  <BasicInput v-if="type === 'color-input'" v-bind="$attrs" v-model="modelValue" type="text" @focus="onFocus" @blur="onBlur" />
+  <BasicInput v-if="type === 'color-input'" v-bind="$attrs" v-model="modelValue" :style="size === 'small' ? { fontSize: '11px' } : {}" type="text" @focus="onFocus" @blur="onBlur" />
 </BasicBox>
 </template>
 
@@ -28,13 +28,15 @@ export interface IProps {
   modelValue?: string;
   focus?: boolean;
   hint?: string;
+  size?: 'small' | 'default';
 }
 
 const props = withDefaults(defineProps<IProps>(), {
   type: 'color',
   modelValue: '',
   focus: true,
-  hint: ''
+  hint: '',
+  size: 'default'
 });
 
 const emit = defineEmits(['update:modelValue', 'update']);
@@ -74,5 +76,11 @@ const onUpdateShow = (show: boolean) => {
 #visual-craft-core .c-color-picker {
   display: flex;
   justify-content: center;
+
+  &.c-color-picker-small {
+    height: 24px;
+    min-height: 24px;
+    padding: 0 4px;
+  }
 }
 </style>

@@ -1,10 +1,10 @@
 <template>
-  <div class="c-select">
+  <div class="c-select" :class="{ 'c-select-small': size === 'small' }">
     <BasicBox ref="boxRef" :type="Type" @click="onOpenWrapper('wrapper')">
-      <BasicIcon :lock="lock" :icon="icon" :style="iconStyle" @mousedown="onMouseDown" />
+      <BasicIcon v-if="size !== 'small'" :lock="lock" :icon="icon" :style="iconStyle" @mousedown="onMouseDown" />
       <div v-if="Type === 'input-select'" class="c-select-label-wrapper">
         <BasicInput
-          v-model="modelValue"
+          :model-value="props.modelValue"
           :disabled="lock"
           v-bind="$attrs"
           type="text"
@@ -13,10 +13,11 @@
       </div>
       <BasicSelect
         ref="basicSelectRef"
-        :model-value="modelValue"
+        :model-value="props.modelValue"
         :options="Items"
         :show-label="Type !== 'input-select'"
         :disabled="lock"
+        :size="size"
         @update="onUpdate"
         @click="onOpenWrapper('arrow')"
       />
@@ -44,6 +45,7 @@ export interface IProps {
   lock?: boolean;
   icon?: string;
   options?: Item[];
+  size?: 'small' | 'default';
 }
 export type Item = {
   label: string;
@@ -56,7 +58,8 @@ const props = withDefaults(defineProps<IProps>(), {
   modelValue: '',
   lock: false,
   icon: '',
-  options: () => []
+  options: () => [],
+  size: 'default'
 });
 
 const emit = defineEmits(['update', 'update:modelValue']);
@@ -68,10 +71,10 @@ const Type = computed(() => {
 const Items = computed(() => {
   const result = [...(props.options || [])];
 
-  if (!result.some(item => modelValue.value === item.value)) {
+  if (!result.some(item => props.modelValue === item.value)) {
     result.unshift({
-      label: modelValue.value + '',
-      value: modelValue.value,
+      label: props.modelValue + '',
+      value: props.modelValue,
       splitLine: true
     });
   }
@@ -79,14 +82,7 @@ const Items = computed(() => {
   return result;
 });
 
-const modelValue = ref(props.modelValue);
-const currValue = ref(modelValue.value);
-const enterValue = ref(currValue.value);
-
 const onUpdate = function (value: string | number) {
-  modelValue.value = value;
-  currValue.value = value;
-  enterValue.value = value;
   emit('update:modelValue', value);
   emit('update', value);
 };
@@ -109,7 +105,7 @@ const onMouseDown = (e: MouseEvent) => {
 
     if (Math.abs(delta) >= threshold) {
       const step = delta > 0 ? 1 : -1;
-      const currentIndex = Items.value.findIndex(item => item.value === currValue.value);
+      const currentIndex = Items.value.findIndex(item => item.value === props.modelValue);
       let newIndex = currentIndex + step;
 
       // Clamp index
@@ -162,6 +158,24 @@ function onOpenWrapper(event_type: string) {
   .basic-select {
     margin-right: 2px;
     flex-shrink: 0;
+  }
+
+  &.c-select-small {
+    .basic-box {
+      height: 24px;
+      min-height: 24px;
+      padding: 0 4px;
+    }
+
+    .basic-select-label {
+      font-size: 11px;
+    }
+
+    .basic-select-arrow {
+      width: 18px;
+      height: 18px;
+      transform: scale(0.7) rotate(90deg);
+    }
   }
 }
 </style>
