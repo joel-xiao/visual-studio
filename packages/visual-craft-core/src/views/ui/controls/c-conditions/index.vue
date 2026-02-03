@@ -301,7 +301,8 @@ const removeExpr = (ci: number, gi: number, ei: number) => {
 
   /* Portal: Integrated CButton Entrance */
   .s-entrance-portal {
-    padding: 16px 8px; display: flex; justify-content: center; margin-top: 4px;
+    padding-top: 6px;
+    display: flex; justify-content: center; margin-top: 4px;
     .c-button-text { letter-spacing: 0.3px; font-weight: 800; }
   }
 }
