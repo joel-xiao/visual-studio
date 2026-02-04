@@ -316,8 +316,8 @@ const removeExpr = (ci: number, gi: number, ei: number) => {
   .s-rule-rail {
     width: 20px; position: relative; display: flex; flex-direction: column; align-items: center; flex: none;
     .rail-path { position: absolute; left: 10px; top: 0; bottom: -8px; width: 1px; background: var(--theme-color-border); opacity: 0.15; &.is-end { bottom: 65%; } }
-    .rail-logic { position: absolute; top: 20px; z-index: 5; background: #1a1a1a; font-size: 9px; font-weight: 900; color: var(--theme-color-blue-700); padding: 0 2px; cursor: pointer; &.is-or { color: #f59e0b; } }
-    .rail-point { position: absolute; top: 6px; font-size: 9px; font-weight: 900; color: #444; }
+    .rail-logic { position: absolute; top: 16px; z-index: 5; background: #1a1a1a; font-size: 11px; font-weight: 900; color: var(--theme-color-blue-700); padding: 0 2px; cursor: pointer; &.is-or { color: #f59e0b; } }
+    .rail-point { position: absolute; top: 4px; font-size: 11px; font-weight: 900; color: #444; }
   }
 
   /* Input Composition Area */

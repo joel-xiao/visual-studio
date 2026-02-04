@@ -11,7 +11,7 @@
   </div>
   <div class="nav-panel-right">
     <CButton class="share-btn" @click="onShare">分享</CButton>
-    <CButton size="medium" circle icon="icon-yulan" />
+    <CButton size="default" circle icon="icon-yulan" />
   </div>
 </div>
 </template>

@@ -80,7 +80,6 @@ const onUpdateShow = (show: boolean) => {
   &.c-color-picker-small {
     height: 24px;
     min-height: 24px;
-    padding: 0 4px;
   }
 }
 </style>

@@ -65,10 +65,7 @@ const swatches = ref([
     border: none;
     border-radius: 0;
     .n-color-picker-trigger__fill {
-      left: 0;
-      top: 0;
-      bottom: 0;
-      right: 0;
+      inset: 0;
       .n-color-picker-trigger__value,
       .n-color-picker-checkboard {
         display: none;
@@ -81,39 +78,111 @@ const swatches = ref([
   .v-binder-follower-content {
     width: 196px;
     box-sizing: border-box;
+    
     .n-color-picker-panel {
-      box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.6);
-      background-color: #212121;
-      border-radius: 6px;
+      --n-panel-background: #1e1e1e;
+      --n-bezier: cubic-bezier(.4, 0, .2, 1);
+      
+      background-color: var(--n-panel-background);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
       width: 100%;
-      .n-color-picker-control {
-        padding: 6px;
+      overflow: hidden;
 
-        .n-color-picker-pallete .n-color-picker-pallete__layer {
-          border-radius: 4px;
+      .n-color-picker-control {
+        padding: 8px;
+
+        .n-color-picker-pallete {
+          height: 130px;
+          .n-color-picker-pallete__layer {
+            border-radius: 4px;
+          }
         }
-        .n-color-picker-swatches {
-          padding-left: 4px;
-          box-sizing: border-box;
+
+        .n-color-picker-preview {
+          margin-top: 8px;
+          .n-color-picker-preview__dot {
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+          }
         }
 
         .n-color-picker-input {
-          font-size: 12px;
+          margin-top: 10px;
+          font-size: 11px;
+          
           .n-color-picker-input__mode {
-            width: 54px;
-            padding-left: 2px;
-            text-align: left;
+            color: var(--theme-color-text-secondary, rgba(255, 255, 255, 0.5));
+            font-weight: 600;
+            width: 48px;
+            padding-right: 4px;
           }
-          .n-input-group {
+
+          .n-input {
+            --n-border: 1px solid transparent !important;
+            --n-border-focus: 1px solid var(--theme-color-blue-700, #3662ec) !important;
+            --n-border-hover: 1px solid transparent !important;
+            --n-box-shadow-focus: inset 0 0 0 1px var(--theme-color-blue-700, #3662ec) !important;
+            --n-color: var(--theme-color-tran-8, rgba(255, 255, 255, 0.08)) !important;
+            --n-color-focus: var(--theme-color-tran-12, rgba(255, 255, 255, 0.12)) !important;
+            --n-text-color: var(--theme-color-text-primary, rgba(255, 255, 255, 0.9)) !important;
+            --n-caret-color: var(--theme-color-blue-700, #3662ec) !important;
+            --n-placeholder-color: rgba(255, 255, 255, 0.2) !important;
+            --n-height: 26px !important;
+            --n-border-radius: 4px !important;
+            
+            background-color: var(--n-color);
+            border-radius: var(--n-border-radius);
+            font-size: 11px;
+            transition: background-color .3s var(--n-bezier);
+
+            .n-input__border, .n-input__state-border {
+              border: var(--n-border);
+              transition: border-color .3s var(--n-bezier), box-shadow .3s var(--n-bezier);
+            }
+
+            &:hover {
+              background-color: var(--theme-color-tran-12, rgba(255, 255, 255, 0.12));
+              .n-input__state-border {
+                border: var(--n-border-hover);
+              }
+            }
+
+            &.n-input--focus {
+              background-color: var(--n-color-focus);
+              .n-input__state-border {
+                border: var(--n-border-focus);
+                box-shadow: var(--n-box-shadow-focus);
+              }
+            }
+
+            .n-input__input-el {
+              height: var(--n-height);
+              line-height: var(--n-height);
+              color: var(--n-text-color) !important;
+            }
+          }
+        }
+
+        .n-color-picker-swatches {
+          padding: 8px 10px;
+          margin: 8px -8px -8px;
+          background: rgba(0, 0, 0, 0.1);
+          border-top: 1px solid rgba(255, 255, 255, 0.06);
+
+          .n-color-picker-swatch {
             border-radius: 4px;
             overflow: hidden;
-            .n-input {
-              background-color: rgba(255, 255, 255, 0.08);
+            transition: transform .2s ease;
+            
+            &:hover {
+              transform: scale(1.1);
+              z-index: 1;
+            }
 
-              .n-input__input-el {
-                height: 24px;
-                line-height: 24px;
-              }
+            .n-color-picker-trigger__fill {
+              inset: 0;
             }
           }
         }
