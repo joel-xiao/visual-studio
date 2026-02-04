@@ -15,6 +15,26 @@ const schema: IComponentSchemaExport = {
         radius: [0, 0, 0, 0]
       }
     }
+  ],
+  categorySchemas: [
+    {
+      name: '条件',
+      icon: '',
+      category: 'CONDITIONS',
+      schemas: [
+        {
+          type: 'schema',
+          schema: 'CONDITIONS',
+          key: 'conditions',
+          schemas: [
+            {
+              type: 'conditionsSchema',
+              schema: 'ECHARTS_RADAR'
+            }
+          ]
+        }
+      ]
+    }
   ]
 };
 export default schema;

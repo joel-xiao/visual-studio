@@ -184,7 +184,6 @@ const schema: IComponentSchemaExport = {
           show_switch: true,
           type: 'schema',
           schema: 'ECHARTS_TOOLTIP',
-          label: '提示框设置',
           key: 'tooltip',
           default: {
             textStyle: {
@@ -204,7 +203,19 @@ const schema: IComponentSchemaExport = {
       name: '条件',
       icon: '',
       category: 'CONDITIONS',
-      schemas: []
+      schemas: [
+        {
+          type: 'schema',
+          schema: 'CONDITIONS',
+          key: 'conditions',
+          schemas: [
+            {
+              type: 'conditionsSchema',
+              schema: 'ECHARTS_BAR'
+            }
+          ]
+        }
+      ]
     },
     {
       name: '自定义',

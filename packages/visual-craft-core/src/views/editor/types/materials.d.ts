@@ -9,6 +9,8 @@ declare interface IComponentProps {
 declare interface ISchemaPropTypes extends ISchemaExportDefault {
   schema: SchemaKeyTypes;
   show_switch?: boolean;
+  effectSchema?: string;           // 统一命名：效果 schema 引用（schema 名称）
+  schemas?: ISchemaPropTypes[];    // 嵌套 schemas，传递给子组件使用
 }
 
 declare type SchemaPropsTypes = ISchemaPropTypes[];
@@ -35,14 +37,17 @@ declare type ComponentPropsTypes = {
   CategorySchemasTypes: CategorySchemaTypes;
 };
 
-declare type ComponentSchemaExportSchemas = {
-  type: string;
+declare type ComponentSchemaExportSchema = {
+  type: string;                    // schema 属性名（如 'schema'、'conditionsSchema'）
   label?: string;
   key?: string;
-  schema: string;
-  default: ComponentProp;
+  schema: string;                  // schema 名称（必须）
+  default?: ComponentProp;
   show_switch?: boolean;
-}[];
+  schemas?: ComponentSchemaExportSchema[];  // 嵌套 schemas，传递给子组件使用
+};
+
+declare type ComponentSchemaExportSchemas = ComponentSchemaExportSchema[];
 
 declare interface IComponentSchemaExport {
   name: string;

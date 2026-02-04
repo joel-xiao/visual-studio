@@ -7,7 +7,7 @@
       class="ctrl-switch"
       @update:model-value="onShowChange"
     />
-    <span class="editor-schema-renderer-props-ctrl-label">{{ label }}</span>
+    <span class="editor-schema-renderer-props-ctrl-label" :class="{ 'is-small': ctrl_size === 'small' }">{{ label }}</span>
   </div>
   <div
     v-if="!hasShow || showValue"
@@ -17,7 +17,11 @@
       <component
         :is="getComponent(ctrl)"
         :model-value="modelValue"
-        :type="ctrlType"
+        :type="ctrl_type"
+        :size="ctrl_size"
+        :schema-type="schemaType"
+        :effect-schema="effectSchema"
+        :schemas="schemas"
         v-bind="$attrs"
         :hint="hint"
         @update="onUpdate"
@@ -37,24 +41,33 @@ export default {
 <script setup lang="ts">
 import { computed, markRaw } from 'vue';
 import type { Component } from 'vue';
+import { getControlComponent } from './controls-registry';
 import CLiteSwitch from '../../ui/controls/c-lite-switch/index.vue';
 
 export interface Props {
   ctrl: string;
-  ctrlType: string;
+  ctrl_type?: string;
+  ctrl_size?: string;
   layout?: string;
   label?: string | number;
   hint?: string | string[];
   modelValue?: unknown;
+  schemaType?: string;
+  effectSchema?: string;
+  schemas?: ISchemaPropTypes[];
 }
 
 const props = withDefaults(defineProps<Props>(), {
   ctrl: '',
-  ctrlType: '',
+  ctrl_type: '',
+  ctrl_size: '',
   layout: '',
   label: '',
   hint: undefined,
-  modelValue: undefined
+  modelValue: undefined,
+  schemaType: '',
+  effectSchema: '',
+  schemas: undefined
 });
 
 const emit = defineEmits(['show-change', 'update']);
@@ -67,18 +80,8 @@ const onShowChange = (val: boolean) => emit('show-change', val);
 
 const onUpdate = (val: unknown) => emit('update', val);
 
-const COMPONENT_MODELS = import.meta.glob(
-  ['../../ui/controls/*/index.vue', './input-group/index.vue', './blends/index.vue'],
-  { eager: true, import: 'default' }
-);
 
-const components: Record<string, Component> = {};
-Object.values(COMPONENT_MODELS).forEach((comp: unknown) => {
-  const component = comp as Component & { name?: string };
-  if (component?.name) components[component.name] = component;
-});
-
-const getComponent = (name: string) => components[name];
+const getComponent = (name: string) => getControlComponent(name);
 </script>
 <style lang="scss">
 .editor-schema-renderer .editor-schema-renderer-props-ctrl {
@@ -108,6 +111,12 @@ const getComponent = (name: string) => components[name];
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+
+    &.is-small {
+      font-size: 10px;
+      line-height: 10px;
+      font-weight: 500;
+    }
   }
 
   .editor-schema-renderer-props-ctrl-control {

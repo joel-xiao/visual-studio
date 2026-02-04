@@ -1,6 +1,7 @@
 import { ref, watch, toRefs } from 'vue';
 
 export function useChartOptions(props: { config?: IComponentProps }, defaultOption: Record<string, unknown>) {
+  console.log('defaultOption', defaultOption, props);
   const option = ref({ ...defaultOption });
   const { config } = toRefs(props);
 

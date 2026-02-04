@@ -46,11 +46,11 @@ const schema: ISchemaExport = {
         ],
         [
             {
-                label: '背景边距',
+                label: '背景',
                 key: 'padding',
                 type: Array,
                 default: [10, 10],
-                hint: ['水平', '垂直'],
+                hint: ['水平边距', '垂直边距'],
                 ctrl: 'C_COMPOUND_INPUT',
                 icon: ['mdi:format-horizontal-align-center', 'mdi:format-vertical-align-center'],
                 keys: ['1', '0'],

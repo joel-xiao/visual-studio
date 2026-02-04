@@ -64,28 +64,7 @@ export interface IConditionGroup {
 }
 
 // 图表效果配置
-export interface IChartEffect {
-    // 通用
-    color?: string;
-    opacity?: number;
-    // 柱状图
-    borderColor?: string;
-    borderWidth?: number;
-    // 折线图
-    lineColor?: string;
-    lineWidth?: number;
-    lineType?: 'solid' | 'dashed' | 'dotted';
-    areaColor?: string;
-    // 饼图
-    sectorColor?: string;
-    // 散点图
-    symbolSize?: number;
-    // 雷达图
-    radarColor?: string;
-    // K线图
-    upColor?: string;
-    downColor?: string;
-}
+export type IChartEffect = Record<string, any>;
 
 // 条件配置类型
 export interface IConditionConfig {
@@ -103,25 +82,6 @@ export interface IConditionsData {
     activeConditionId?: string;
 }
 
-// 响应效果 Schema 映射
-export const EFFECT_SCHEMAS: Record<string, any[]> = {
-    bar: [
-        { label: '图形填充颜色', key: 'color', ctrl: 'C_COLOR_PICKER', props: { type: 'color-input', size: 'small' } },
-        { label: '描孔/边框颜色', key: 'borderColor', ctrl: 'C_COLOR_PICKER', props: { type: 'color-input', size: 'small' } }
-    ],
-    line: [
-        { label: '线条主色', key: 'lineColor', ctrl: 'C_COLOR_PICKER', props: { type: 'color-input', size: 'small' } },
-        { label: '区域填充', key: 'areaColor', ctrl: 'C_COLOR_PICKER', props: { type: 'color-input', size: 'small' } }
-    ],
-    pie: [
-        { label: '扇区填充颜色', key: 'sectorColor', ctrl: 'C_COLOR_PICKER', props: { type: 'color-input', size: 'small' } },
-        { label: '描边/边框颜色', key: 'borderColor', ctrl: 'C_COLOR_PICKER', props: { type: 'color-input', size: 'small' } }
-    ],
-    radar: [
-        { label: '雷达色域', key: 'radarColor', ctrl: 'C_COLOR_PICKER', props: { type: 'color-input', size: 'small' } }
-    ]
-};
-
 const schema: ISchemaExport = {
     name: SCHEMA_NAME,
     label: '条件',
@@ -129,7 +89,7 @@ const schema: ISchemaExport = {
     schema: [
         [
             {
-                key: 'conditions',
+                key: '',
                 type: Array,
                 default: [],
                 ctrl: 'C_CONDITIONS',

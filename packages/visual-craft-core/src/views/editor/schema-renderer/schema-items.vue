@@ -5,6 +5,7 @@
       :model-value="propsData[item.key]"
       :key-value="item.key"
       :props-type="item"
+      :schema-type="schemaType"
       @update="onUpdate(item.key, item.schema, $event)"
     />
   </template>
@@ -20,6 +21,7 @@ defineProps<{
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   items: readonly any[];
   propsData: Record<string, unknown>;
+  schemaType?: string;
 }>();
 
 const emit = defineEmits(['update']);

@@ -38,6 +38,7 @@ export class CreateComponentContext {
     this.createNodeComponentApp = this.createNodeComponentApp.bind(this);
     this.getAvailableComponents = this.getAvailableComponents.bind(this);
     this.getComponentIcon = this.getComponentIcon.bind(this);
+    this.getSchemaByType = this.getSchemaByType.bind(this);
   }
 
   #install() {
@@ -242,6 +243,15 @@ export class CreateComponentContext {
     return schema?.icon ? this.#getIcon(schema.icon) : '';
   }
 
+  getSchemaByType(schemaName: string, type: string): SchemaKeyTypes {
+    const schema = this.#schemas[schemaName];
+    if (!schema) {
+      console.warn(`[ComponentContext] Schema not found: ${schemaName}`);
+      return [];
+    }
+    return (schema as Record<string, unknown>)[type] as SchemaKeyTypes || [];
+  }
+
   getAvailableComponents(): Array<{ type: string; name: string; category: 'canvas' | 'chart' }> {
     const components: Array<{ type: string; name: string; category: 'canvas' | 'chart' }> = [];
 
@@ -277,12 +287,25 @@ export class CreateComponentContext {
           !Array.isArray(component_schema)
         ) {
           const schema = schemas[component_schema.schema];
+          if (!schema) {
+            console.warn(`[ComponentContext] Schema not found: ${component_schema.schema}`);
+            continue;
+          }
+
+          const schemaData = (schema as Record<string, unknown>)[component_schema.type] as SchemaKeyTypes;
+
+          const nestedSchemas = component_schema.schemas
+            ? this.#parseSchema(component_schema.schemas)
+            : undefined;
+
           propsTypes.push({
             name: schema.name,
             label: component_schema.label || schema.label,
             key: component_schema.key || schema.key,
             show_switch: component_schema.show_switch ?? schema.show_switch,
-            schema: (schema as Record<string, unknown>)[component_schema.type] as SchemaKeyTypes
+            schema: schemaData || [],
+            effectSchema: component_schema.schema,
+            schemas: nestedSchemas
           });
         }
       }
@@ -346,6 +369,11 @@ export class CreateComponentContext {
           !Array.isArray(component_schema)
         ) {
           const schema = schemas[component_schema.schema];
+          if (!schema) {
+            console.warn(`[ComponentContext] Schema not found: ${component_schema.schema}`);
+            continue;
+          }
+
           const schema_data: SchemaKeyTypes | null =
             !Array.isArray(schema) && typeof schema === 'object'
               ? (schema as Record<string, unknown>)[component_schema.type] as SchemaKeyTypes | undefined ?? null
@@ -359,10 +387,10 @@ export class CreateComponentContext {
             !Array.isArray(component_schema.default) &&
             typeof component_schema.default === 'object';
 
-          const prop: ComponentProp = {};
+          let prop: ComponentProp = {};
 
           if (is_component_schema) {
-            const component_schema_default: ComponentProp = component_schema.default;
+            const component_schema_default: ComponentProp = component_schema.default || {};
 
             if (is_array_schema) {
               for (const row_array of schema_data) {
@@ -391,6 +419,8 @@ export class CreateComponentContext {
                     if (item.key === '') {
                       if (value && typeof value === 'object' && !Array.isArray(value)) {
                         Object.assign(prop, value);
+                      } else {
+                        prop = value as unknown as ComponentProp;
                       }
                     } else {
                       set(prop, item.key, value);
@@ -401,7 +431,7 @@ export class CreateComponentContext {
             }
           }
 
-          props[component_schema.key || schema.key] = prop;
+          set(props, component_schema.key || schema.key, prop);
         }
       }
     }

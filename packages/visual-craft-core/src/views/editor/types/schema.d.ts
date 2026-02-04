@@ -9,6 +9,7 @@ declare interface IDefaultSchemaKeyData {
   icon?: string | string[];
   hint?: string | string[];
   size?: 'default' | 'small' | 'middle' | 'wide' | 'large' | 'mini' | string;
+  ctrl_size?: 'default' | 'small' | 'middle' | 'large' | string;
   click?: (
     props: ComponentProp
   ) =>
@@ -207,6 +208,12 @@ declare interface ISchemaSelectInputData extends IDefaultSchemaKeyData {
   }[];
 }
 
+declare interface ISchemaConditionsData extends IDefaultSchemaKeyData {
+  ctrl: 'C_CONDITIONS';
+  type: ArrayConstructor;
+  default: unknown[];
+}
+
 declare type SchemaKeyType =
   | ISchemaInputData
   | ISchemaSelectData
@@ -228,7 +235,8 @@ declare type SchemaKeyType =
   | ISchemaBlendData
   | ISchemaBlendsData
   | ISchemaSelectInputData
-  | ISchemaFunctionData;
+  | ISchemaFunctionData
+  | ISchemaConditionsData;
 
 declare type SchemaKeyTypes = SchemaKeyType[] | SchemaKeyType[][] | { [key: string]: SchemaKeyType };
 
@@ -240,7 +248,9 @@ declare interface ISchemaExportDefault {
 }
 
 declare interface ISchemaExport extends ISchemaExportDefault {
-  schema: SchemaKeyTypes;
+  schema?: SchemaKeyTypes;
+  conditionsSchema?: SchemaKeyTypes;
+  default?: ComponentProp;
   [key: string]: unknown;
 }
 

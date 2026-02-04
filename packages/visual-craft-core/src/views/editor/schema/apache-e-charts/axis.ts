@@ -32,7 +32,8 @@ const schema: ISchemaExport = {
         type: String,
         default: '#fff',
         ctrl: 'C_COLOR_PICKER',
-        size: 'mini'
+        ctrl_type: 'color-input',
+        size: 'small'
       }
     ],
     [
@@ -47,15 +48,24 @@ const schema: ISchemaExport = {
     [
       {
         label: '标签',
-        hint: ['水平边距', '垂直边距'],
+        hint: [
+          '水平边距',
+          '垂直边距'
+        ],
         key: 'axisLabel.padding',
         type: Object,
         default: {
           h: 0,
           v: 0
         },
-        icon: ['mdi:format-horizontal-align-center', 'mdi:format-vertical-align-center'],
-        keys: ['h', 'v'],
+        icon: [
+          'mdi:format-horizontal-align-center',
+          'mdi:format-vertical-align-center'
+        ],
+        keys: [
+          'h',
+          'v'
+        ],
         ctrl: 'C_COMPOUND_INPUT',
         suffix: 'px'
       }
@@ -76,7 +86,8 @@ const schema: ISchemaExport = {
         default: '#fff',
         icon: 'mdi:format-color-fill',
         ctrl: 'C_COLOR_PICKER',
-        size: 'mini'
+        ctrl_type: 'color-input',
+        size: 'small'
       }
     ],
     [
@@ -93,8 +104,16 @@ const schema: ISchemaExport = {
           }
         },
         ctrl: 'C_STROKE',
-        keys: ['lineStyle.color', 'lineStyle.width', 'lineStyle.type'],
-        hint: ['颜色', '粗细', '类型'],
+        keys: [
+          'lineStyle.color',
+          'lineStyle.width',
+          'lineStyle.type'
+        ],
+        hint: [
+          '颜色',
+          '粗细',
+          '类型'
+        ],
         options: options.LineStyleOptions,
         suffix: 'px'
       }
@@ -113,8 +132,16 @@ const schema: ISchemaExport = {
           }
         },
         ctrl: 'C_STROKE',
-        keys: ['lineStyle.color', 'lineStyle.width', 'lineStyle.type'],
-        hint: ['颜色', '粗细', '类型'],
+        keys: [
+          'lineStyle.color',
+          'lineStyle.width',
+          'lineStyle.type'
+        ],
+        hint: [
+          '颜色',
+          '粗细',
+          '类型'
+        ],
         options: options.LineStyleOptions,
         suffix: 'px'
       }
@@ -146,8 +173,16 @@ const schema: ISchemaExport = {
           }
         },
         ctrl: 'C_STROKE',
-        keys: ['lineStyle.color', 'lineStyle.width', 'lineStyle.type'],
-        hint: ['颜色', '粗细', '类型'],
+        keys: [
+          'lineStyle.color',
+          'lineStyle.width',
+          'lineStyle.type'
+        ],
+        hint: [
+          '颜色',
+          '粗细',
+          '类型'
+        ],
         options: options.LineStyleOptions,
         suffix: 'px'
       }

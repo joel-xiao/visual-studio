@@ -13,12 +13,16 @@
         :data-type="prop.type"
         :ctrl="prop.ctrl"
         :icon="prop.icon"
+        :schema-type="schemaType"
         layout="vertical"
         :label="prop.label"
         :hint="prop.hint"
-        :ctrl-type="(prop as any).ctrl_type || ''"
+        :ctrl_type="(prop as any).ctrl_type || ''"
+        :ctrl_size="(prop as any).ctrl_size || ''"
         :options="(prop as any).options"
         :suffix="(prop as any).suffix"
+        :effect-schema="propsType.effectSchema"
+        :schemas="propsType.schemas"
         :keys="getKeys(prop)"
         @update="onUpdateProp(prop, $event)"
         @click="onClick(prop)"
@@ -45,6 +49,7 @@ export interface Props {
   modelValue: ComponentProp;
   propsType: ISchemaPropTypes;
   keyValue: string;
+  schemaType?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -83,7 +88,6 @@ const getRowLabel = (row: SchemaKeyType[]) => {
 };
 
 const getPropLabel = (prop: SchemaKeyType, row: SchemaKeyType[]) => {
-  // If this is the first item with a label in the row, it's used as the row label
   const rowLabel = getRowLabel(row);
   if (prop.label === rowLabel && row.indexOf(prop) === row.findIndex(p => p.label === rowLabel)) {
     return '';

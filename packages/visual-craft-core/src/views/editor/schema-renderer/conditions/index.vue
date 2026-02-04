@@ -1,7 +1,6 @@
 <template>
 <div class="c-ultra-compact-industrial">
   <div class="s-main-stack">
-    <!-- Condition Unit Segment -->
     <div 
       v-for="(cond, ci) in conditions" 
       :key="cond.id" 
@@ -9,7 +8,6 @@
       :class="{ 'is-active': activeId === cond.id, 'is-disabled': !cond.enabled }"
       @click="activeId = cond.id"
     >
-      <!-- Header -->
       <div class="s-unit-header">
         <div class="s-active-pin"></div>
         <div class="s-unit-label">
@@ -23,7 +21,6 @@
         </div>
       </div>
 
-      <!-- Detail Body -->
       <div v-show="activeId === cond.id" class="s-unit-body">
         <template v-for="(group, gi) in cond.groups" :key="group.id">
           
@@ -37,7 +34,6 @@
 
           <div class="s-expr-group">
             <div v-for="(expr, ei) in group.expressions" :key="expr.id" class="s-rule-row">
-              <!-- Sidebar Rail -->
               <div class="s-rule-rail">
                 <div class="rail-path" :class="{ 'is-end': ei === group.expressions.length - 1 }"></div>
                 <div 
@@ -51,7 +47,6 @@
                 <div v-else class="rail-point">IF</div>
               </div>
 
-              <!-- Main Content Area: Using Common Components -->
               <div class="s-rule-main-wrap">
                 <div class="s-rule-inputs">
                   <div class="s-input-line">
@@ -81,7 +76,6 @@
                   </div>
                 </div>
 
-                <!-- Vertical Actions: Using Common CButton -->
                 <div class="s-rule-actions">
                   <CButton icon="mdi:plus" size="small" @click.stop="addExpr(ci, gi, ei)" />
                   <CButton icon="mdi:minus" size="small" @click.stop="removeExpr(ci, gi, ei)" />
@@ -91,30 +85,17 @@
           </div>
         </template>
 
-        <!-- Effects Area: Schema Driven -->
         <div class="s-effects-shelf">
-          <div class="f-content">
-            <div 
-              v-for="item in (EFFECT_SCHEMAS[currentEffectType] || EFFECT_SCHEMAS.bar)" 
-              :key="item.key"
-              class="prop-item"
-            >
-              <div class="prop-label">{{ item.label }}</div>
-              <div class="prop-control">
-                <component 
-                  :is="getControl(item.ctrl)" 
-                  v-bind="item.props"
-                  :modelValue="cond.effects[item.key as keyof IChartEffect]"
-                  @update:modelValue="(val: any) => updateEffect(ci, item.key as keyof IChartEffect, val)"
-                />
-              </div>
-            </div>
-          </div>
+          <SchemaItems 
+            :items="effectItems" 
+            :propsData="{ effects: cond.effects }" 
+            :schema-type="schemaType"
+            @update="(k, s, val) => onUpdateEffect(ci, val)"
+          />
         </div>
       </div>
     </div>
 
-    <!-- Entrance: Using Common CButton for full branding consistency -->
     <div class="s-entrance-portal">
        <CButton icon="mdi:plus-circle-outline" style="width: 100%" @click="addCond()">
          新建逻辑判定分支
@@ -129,35 +110,72 @@ export default { name: 'C_CONDITIONS', inheritAttrs: false };
 </script>
 
 <script setup lang="ts">
-import { ref, watch, reactive, computed } from 'vue';
-import LiteSwitch from '../../base/lite-switch.vue';
-import BasicIcon from '../../base/basic-icon.vue';
-import CButton from '../c-button/index.vue';
-import CInput from '../c-input/index.vue';
-import CSelect from '../c-select/index.vue';
-import CColorPicker from '../c-color-picker/index.vue';
+import { ref, watch, computed } from 'vue';
+import { set } from 'lodash';
+import LiteSwitch from '../../../ui/base/lite-switch.vue';
+import BasicIcon from '../../../ui/base/basic-icon.vue';
+import CButton from '../../../ui/controls/c-button/index.vue';
+import CInput from '../../../ui/controls/c-input/index.vue';
+import CSelect from '../../../ui/controls/c-select/index.vue';
+import SchemaItems from '../schema-items.vue';
 
-import type { IConditionConfig, IConditionGroup, IConditionExpression, IChartEffect, EffectType } from '../../../editor/schema/conditions/index';
-import { OperatorOptions, DefaultFieldOptions, EFFECT_SCHEMAS } from '../../../editor/schema/conditions/index';
+import { useComponentContext } from '../../hooks/component-context';
+import type { IConditionConfig, IChartEffect, EffectType } from '../../schema/conditions/index';
+import { OperatorOptions, DefaultFieldOptions } from '../../schema/conditions/index';
 
 interface Props {
   modelValue?: IConditionConfig[];
   type?: EffectType;
+  schemaType?: string;
+  effectSchema?: string;
+  schemas?: ISchemaPropTypes[];
 }
 const props = withDefaults(defineProps<Props>(), {
   modelValue: () => [],
-  type: 'bar'
+  type: 'bar',
+  schemaType: '',
+  effectSchema: '',
+  schemas: undefined
 });
 
 const emit = defineEmits(['update', 'update:modelValue']);
 const conditions = ref<IConditionConfig[]>([]);
 const activeId = ref('');
 
-const currentEffectType = computed(() => props.type || 'bar');
-const getControl = (name: string) => {
-  const map: Record<string, any> = { C_INPUT: CInput, C_SELECT: CSelect, C_COLOR_PICKER: CColorPicker };
-  return map[name] || CInput;
-};
+const { getSchemaByType } = useComponentContext();
+
+const currentEffects = computed(() => {
+  let rawSchema: SchemaKeyTypes = [];
+  
+  if (props.schemas && props.schemas.length > 0) {
+    const conditionsSchemaItem = props.schemas.find(s => s.effectSchema);
+    if (conditionsSchemaItem && conditionsSchemaItem.effectSchema) {
+      rawSchema = conditionsSchemaItem.schema || [];
+    }
+  }
+  
+  if (!rawSchema.length && props.effectSchema) {
+    rawSchema = getSchemaByType(props.effectSchema, 'conditionsSchema') || [];
+  }
+
+  if (Array.isArray(rawSchema)) {
+    return rawSchema.map((row: any) => {
+      if (Array.isArray(row)) {
+        return row.map((item: any) => ({ ...item, ctrl_size: item.ctrl_size || 'small' }));
+      }
+      return row;
+    });
+  }
+  
+  return [];
+});
+
+const effectItems = computed(() => [{
+  name: 'PANEL_PROPS_WRAP',
+  label: '', 
+  key: 'effects',
+  schema: currentEffects.value
+}]);
 
 watch(() => props.modelValue, (v) => {
   const newV = JSON.stringify(v || []);
@@ -174,15 +192,44 @@ const trigger = () => {
 };
 const toggleLogic = (obj: any, key: string) => { obj[key] = obj[key] === 'and' ? 'or' : 'and'; trigger(); };
 
-const updateEffect = (ci: number, key: keyof IChartEffect, val: any) => {
+const onUpdateEffect = (ci: number, [key, val]: [string, any]) => {
   if (!conditions.value[ci].effects) conditions.value[ci].effects = {};
-  (conditions.value[ci].effects as any)[key] = val;
+  if (!key) {
+    Object.assign(conditions.value[ci].effects, val);
+  } else {
+    set(conditions.value[ci].effects, key, val);
+  }
   trigger();
 };
 
+const getDefaultEffects = () => {
+  const result: Record<string, any> = {};
+  if (Array.isArray(currentEffects.value)) {
+    currentEffects.value.forEach((row: any) => {
+      if (Array.isArray(row)) {
+        row.forEach((item: any) => {
+          if (item?.key) {
+            result[item.key] = item.default;
+          }
+        });
+      }
+    });
+  }
+  return result;
+};
+
 const addCond = () => {
-  const n: IConditionConfig = { id: gen(), name: '新逻辑单元', enabled: true, logic: 'and', groups: [{ id: gen(), logic: 'and', expressions: [{ id: gen(), field: 's', operator: 'eq', value: '' }] }], effects: {} };
-  conditions.value.push(n); activeId.value = n.id; trigger();
+  const n: IConditionConfig = { 
+    id: gen(), 
+    name: '新逻辑单元', 
+    enabled: true, 
+    logic: 'and', 
+    groups: [{ id: gen(), logic: 'and', expressions: [{ id: gen(), field: 's', operator: 'eq', value: '' }] }], 
+    effects: getDefaultEffects() 
+  };
+  conditions.value.push(n); 
+  activeId.value = n.id; 
+  trigger();
 };
 const removeCond = (i: number) => { conditions.value.splice(i, 1); activeId.value = conditions.value[0]?.id || ''; trigger(); };
 const addExpr = (ci: number, gi: number, ei: number) => { conditions.value[ci].groups[gi].expressions.splice(ei+1, 0, { id: gen(), field: 's', operator: 'eq', value: '' }); trigger(); };
@@ -275,8 +322,8 @@ const removeExpr = (ci: number, gi: number, ei: number) => {
 
   /* Input Composition Area */
   .s-rule-main-wrap { flex: 1; display: flex; align-items: stretch; gap: 2px; min-width: 0; }
-  .s-rule-inputs { flex: 1; display: flex; flex-direction: column; gap: 2x; min-width: 0; }
-  .s-input-line { display: flex; align-items: center; height: 26px; gap: 2px; }
+  .s-rule-inputs { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .s-input-line { display: flex; align-items: center; gap: 2px; }
 
   /* Override Shared Components */
   .field-select { flex: 1; }
@@ -286,18 +333,20 @@ const removeExpr = (ci: number, gi: number, ei: number) => {
   /* Vertical Action Hub: Alignment with CButton */
   .s-rule-actions { 
     display: flex; flex-direction: column; width: 24px; flex: none;
-    transform: translateY(1px);
     gap: 2px; 
     
     .c-button { width: 22px; }
   }
 
-  /* Response Effect Shelf: Schema Optimized */
-  .s-effects-shelf { margin-top: 6px; padding-top: 4px; border-top: 1px solid rgba(255,255,255,0.04); }
-  
-  .prop-item { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
-  .prop-label { font-size: 10px; font-weight: 700; color: #555; text-transform: uppercase; padding-left: 2px; }
-  .prop-control { height: 24px; width: 100%; }
+  /* Response Effect Shelf: Standard Renderer Styles */
+  .s-effects-shelf { 
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(255,255,255,0.04); 
+    .schema-props-layout-pro {
+      margin: 0px;
+    }
+  }
 
   /* Portal: Integrated CButton Entrance */
   .s-entrance-portal {
