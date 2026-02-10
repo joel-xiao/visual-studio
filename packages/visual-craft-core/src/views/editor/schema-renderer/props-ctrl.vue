@@ -7,7 +7,7 @@
       class="ctrl-switch"
       @update:model-value="onShowChange"
     />
-    <span class="editor-schema-renderer-props-ctrl-label" :class="{ 'is-small': ctrl_size === 'small' }">{{ label }}</span>
+    <span class="editor-schema-renderer-props-ctrl-label" :class="{ 'is-small': finalSize === 'small' }">{{ label }}</span>
   </div>
   <div
     v-if="!hasShow || showValue"
@@ -17,11 +17,18 @@
       <component
         :is="getComponent(ctrl)"
         :model-value="modelValue"
-        :type="ctrl_type"
-        :size="ctrl_size"
+        :type="ctrlType"
+        :size="finalSize"
+        :content="content"
         :schema-type="schemaType"
         :effect-schema="effectSchema"
         :schemas="schemas"
+        :ctrls="ctrls"
+        :keys="keys"
+        :icons="icons"
+        :hints="hints"
+        :suffixes="suffixes"
+        :options="options"
         v-bind="$attrs"
         :hint="hint"
         @update="onUpdate"
@@ -46,31 +53,51 @@ import CLiteSwitch from '../../ui/controls/c-lite-switch/index.vue';
 
 export interface Props {
   ctrl: string;
-  ctrl_type?: string;
-  ctrl_size?: string;
+  ctrlType?: string;
+  ctrlSize?: string;
   layout?: string;
   label?: string | number;
+  content?: string | number;
   hint?: string | string[];
+  size?: string;
+  ctrls?: string[];
+  keys?: string[];
+  icons?: string[];
+  hints?: string[];
+  suffixes?: string[];
+  options?: unknown[];
   modelValue?: unknown;
   schemaType?: string;
   effectSchema?: string;
   schemas?: ISchemaPropTypes[];
+  type?: unknown; // To consume it from $attrs
 }
 
 const props = withDefaults(defineProps<Props>(), {
   ctrl: '',
-  ctrl_type: '',
-  ctrl_size: '',
+  ctrlType: '',
+  ctrlSize: '',
   layout: '',
   label: '',
+  content: '',
   hint: undefined,
+  size: '',
+  ctrls: () => [],
+  keys: () => [],
+  icons: () => [],
+  hints: () => [],
+  suffixes: () => [],
+  options: () => [],
   modelValue: undefined,
   schemaType: '',
   effectSchema: '',
-  schemas: undefined
+  schemas: undefined,
+  type: undefined
 });
 
 const emit = defineEmits(['show-change', 'update']);
+
+const finalSize = computed(() => props.ctrlSize || props.size || '');
 
 const showValue = computed(() => (props.modelValue as Record<string, unknown>)?.show as boolean | undefined);
 const hasShow = computed(() => typeof showValue.value === 'boolean');

@@ -50,6 +50,7 @@ export interface IProps {
 export type Item = {
   label: string;
   value: string | number;
+  icon?: string;
   splitLine?: boolean;
 };
 

@@ -30,6 +30,45 @@ const schema: IComponentSchemaExport = {
 
   categorySchemas: [
     {
+      name: '图表',
+      icon: '',
+      category: 'CHART',
+      schemas: [
+        {
+          type: 'schema',
+          schema: 'ECHARTS_BAR',
+          label: '',
+          key: 'series.0',
+          default: {
+            barWidth: 50,
+            barCategoryGap: 100,
+            itemStyle: {
+              color: '#3662EC',
+              borderRadius: [0, 0, 0, 0],
+              borderColor: '#3662EC',
+              borderWidth: 0,
+              borderType: 'solid',
+              shadowColor: '#00000033',
+              shadowOffsetX: 0,
+              shadowOffsetY: 0,
+              shadowBlur: 0
+            },
+            backgroundStyle: {
+              color: '#B4B4B41A'
+            },
+            label: {
+              show: false,
+              fontFamily: 'SimSun',
+              fontSize: 12,
+              color: '#fff',
+              styles: [],
+              position: 'top'
+            }
+          }
+        }
+      ]
+    },
+    {
       name: '标题',
       icon: '',
       category: 'TITLE',

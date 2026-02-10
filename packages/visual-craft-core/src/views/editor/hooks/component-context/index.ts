@@ -1,5 +1,6 @@
 import { readonly, createVNode, type Component as VueComponent } from 'vue';
-import { cloneDeep, get, set } from 'lodash';
+import { cloneDeep, get, set, merge } from 'lodash';
+import { normalizePath } from '../../../../assets/utils';
 import { createComponent } from '../../../../hooks/vue-hooks';
 import { getEditorIcon } from 'virtual:visual-craft-core-public-assets';
 
@@ -423,7 +424,8 @@ export class CreateComponentContext {
                         prop = value as unknown as ComponentProp;
                       }
                     } else {
-                      set(prop, item.key, value);
+                      const itemPath = normalizePath(item.key);
+                      set(prop, itemPath, value);
                     }
                   }
                 }
@@ -431,7 +433,8 @@ export class CreateComponentContext {
             }
           }
 
-          set(props, component_schema.key || schema.key, prop);
+          const path = normalizePath(component_schema.key || schema.key);
+          set(props, path, prop);
         }
       }
     }
@@ -449,7 +452,7 @@ export class CreateComponentContext {
     if (isSchemaObject) {
       const result = this.#parseSchemaProp(componentSchemas.schemas);
       for (const key of Object.keys(result)) {
-        props[key] = result[key];
+        props[key] = merge(props[key] || {}, result[key]);
       }
     }
 
@@ -458,7 +461,7 @@ export class CreateComponentContext {
         for (const category of componentSchemas.categorySchemas) {
           const result = this.#parseSchemaProp(category.schemas);
           for (const key of Object.keys(result)) {
-            props[key] = result[key];
+            props[key] = merge(props[key] || {}, result[key]);
           }
           // Handle schemasTabs (e.g., X轴/Y轴)
           if (Array.isArray(category.schemasTabs)) {
@@ -466,7 +469,7 @@ export class CreateComponentContext {
               if (Array.isArray(tab.schemas)) {
                 const tabResult = this.#parseSchemaProp(tab.schemas);
                 for (const key of Object.keys(tabResult)) {
-                  props[key] = tabResult[key];
+                  props[key] = merge(props[key] || {}, tabResult[key]);
                 }
               }
             }

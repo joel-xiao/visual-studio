@@ -1,13 +1,26 @@
 export const MarkerOptions = [
-    { label: '圆形', value: 'circle', icon: 'mdi:circle' },
-    { label: '三角形', value: 'triangle', icon: 'mdi:triangle' },
-    { label: '矩形', value: 'rect', icon: 'mdi:rectangle' },
-    { label: '圆角矩形', value: 'roundRect', icon: 'mdi:rectangle-rounded-corner' },
-    { label: '大头针', value: 'pin', icon: 'mdi:map-marker' },
-    { label: '菱形', value: 'diamond', icon: 'mdi:diamond-outline' }
+    { label: '圆形', value: 'circle' },
+    { label: '三角形', value: 'triangle' },
+    { label: '矩形', value: 'rect' },
+    { label: '圆角矩形', value: 'roundRect' },
+    { label: '大头针', value: 'pin' },
+    { label: '菱形', value: 'diamond' }
+];
+
+export const BarLabelPositionOptions = [
+    { label: '顶部', value: 'top' },
+    { label: '底部', value: 'bottom' },
+    { label: '左侧', value: 'left' },
+    { label: '右侧', value: 'right' },
+    { label: '内部', value: 'inside' },
+    { label: '内左侧', value: 'insideLeft' },
+    { label: '内右侧', value: 'insideRight' },
+    { label: '内顶部', value: 'insideTop' },
+    { label: '内底部', value: 'insideBottom' }
 ];
 
 export default {
-    MarkerOptions
+    MarkerOptions,
+    BarLabelPositionOptions
 };
 

@@ -1,10 +1,13 @@
 <template>
-  <LiteSwitch
-    class="c-lite-switch"
-    v-bind="$attrs"
-    :model-value="modelValue"
-    @update:model-value="onUpdate"
-  />
+  <div class="c-lite-switch-wrapper">
+    <LiteSwitch
+      class="c-lite-switch"
+      v-bind="$attrs"
+      :model-value="modelValue"
+      @update:model-value="onUpdate"
+    />
+    <span v-if="content" class="c-lite-switch-content">{{ content }}</span>
+  </div>
 </template>
 
 <script lang="ts">
@@ -19,6 +22,7 @@ import LiteSwitch from '../../base/lite-switch.vue';
 
 export interface Props {
   modelValue?: boolean;
+  content?: string | number;
 }
 
 defineProps<Props>();
@@ -31,9 +35,23 @@ const onUpdate = (val: boolean) => {
 </script>
 
 <style lang="scss">
-#visual-craft-core .c-lite-switch {
+#visual-craft-core .c-lite-switch-wrapper {
   display: flex;
   align-items: center;
-  height: 16px;
+  gap: 8px;
+  height: 24px;
+
+  .c-lite-switch {
+    display: flex;
+    align-items: center;
+    height: 16px;
+  }
+
+  .c-lite-switch-content {
+    font-size: 12px;
+    color: var(--theme-color-text-secondary);
+    font-weight: 600;
+    white-space: nowrap;
+  }
 }
 </style>

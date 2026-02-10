@@ -64,7 +64,7 @@ export interface IConditionGroup {
 }
 
 // 图表效果配置
-export type IChartEffect = Record<string, any>;
+export type IChartEffect = Record<string, unknown>;
 
 // 条件配置类型
 export interface IConditionConfig {
@@ -84,7 +84,7 @@ export interface IConditionsData {
 
 const schema: ISchemaExport = {
     name: SCHEMA_NAME,
-    label: '条件',
+    label: '',
     key: SCHEMA_KEY,
     schema: [
         [

@@ -1,10 +1,18 @@
 declare type ComponentPropValue = number | string | number[] | boolean | Record<string, unknown> | Record<string, unknown>[] | undefined;
 declare type ComponentProp = { [key: string]: ComponentPropValue };
 
+declare interface SchemaOptionItem {
+  label?: string | number;
+  value: string | number;
+  icon?: string;
+  hint?: string;
+}
+
 declare interface IDefaultSchemaKeyData {
   key: string;
   ctrl: string;
   label?: string | number;
+  content?: string | number;
   v_if?: string;
   icon?: string | string[];
   hint?: string | string[];
@@ -32,12 +40,7 @@ declare interface ISchemaSelectData extends IDefaultSchemaKeyData {
   type: StringConstructor | NumberConstructor;
   default: string | number;
   ctrl_type?: string;
-  options?: {
-    label?: string | number;
-    value: string | number;
-    icon?: string;
-    hint?: string;
-  }[];
+  options?: SchemaOptionItem[];
 }
 
 declare interface ISchemaColorPickerData extends IDefaultSchemaKeyData {
@@ -51,12 +54,7 @@ declare interface ISchemaGroupCheckData extends IDefaultSchemaKeyData {
   ctrl: 'C_GROUP_CHECK';
   type: ArrayConstructor;
   default: unknown[];
-  options?: {
-    label?: string | number;
-    value: string | number;
-    icon?: string;
-    hint?: string;
-  }[];
+  options?: SchemaOptionItem[];
 }
 
 declare interface ISchemaCompoundInputData extends IDefaultSchemaKeyData {
@@ -83,24 +81,14 @@ declare interface ISchemaStrokeData extends IDefaultSchemaKeyData {
   } | Record<string, unknown>;
   keys?: string[];
   suffix?: string;
-  options?: {
-    label?: string | number;
-    value: string | number;
-    icon?: string;
-    hint?: string;
-  }[];
+  options?: SchemaOptionItem[];
 }
 
 declare interface ISchemaGroupSelectData extends IDefaultSchemaKeyData {
   ctrl: 'C_GROUP_SELECT';
   type: StringConstructor | NumberConstructor;
   default: string | number;
-  options?: {
-    label?: string | number;
-    value: string | number;
-    icon?: string;
-    hint?: string;
-  }[];
+  options?: SchemaOptionItem[];
 }
 
 declare interface ISchemaButtonData extends IDefaultSchemaKeyData {
@@ -156,12 +144,7 @@ declare interface ISchemaArrayData extends IDefaultSchemaKeyData {
   ctrl: string;
   type: ArrayConstructor;
   default: unknown[];
-  options?: {
-    label?: string | number;
-    value: string | number;
-    icon?: string;
-    hint?: string;
-  }[];
+  options?: SchemaOptionItem[];
 }
 
 declare interface ISchemaKeyObjectData extends IDefaultSchemaKeyData {
@@ -200,18 +183,25 @@ declare interface ISchemaSelectInputData extends IDefaultSchemaKeyData {
   default: Record<string, string | number>;
   keys?: string[];
   suffix?: string;
-  options?: {
-    label?: string | number;
-    value: string | number;
-    icon?: string;
-    hint?: string;
-  }[];
+  options?: SchemaOptionItem[];
 }
 
 declare interface ISchemaConditionsData extends IDefaultSchemaKeyData {
   ctrl: 'C_CONDITIONS';
   type: ArrayConstructor;
   default: unknown[];
+}
+
+declare interface ISchemaMixGroupData extends IDefaultSchemaKeyData {
+  ctrl: 'C_MIX_GROUP';
+  type: ObjectConstructor;
+  default: Record<string, unknown>;
+  ctrls: string[];
+  keys: string[];
+  icons?: string[];
+  hints?: string[];
+  suffixes?: string[];
+  options?: SchemaOptionItem[][];
 }
 
 declare type SchemaKeyType =
@@ -236,7 +226,8 @@ declare type SchemaKeyType =
   | ISchemaBlendsData
   | ISchemaSelectInputData
   | ISchemaFunctionData
-  | ISchemaConditionsData;
+  | ISchemaConditionsData
+  | ISchemaMixGroupData;
 
 declare type SchemaKeyTypes = SchemaKeyType[] | SchemaKeyType[][] | { [key: string]: SchemaKeyType };
 

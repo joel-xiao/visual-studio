@@ -18,7 +18,7 @@ const aiConfig = {
   },
   suggestions: {
     suggestions: {
-      enabled: true,
+      enabled: false,
       maxAISuggestions: 3,
       maxPresetSuggestions: 6
     }

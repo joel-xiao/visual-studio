@@ -15,6 +15,7 @@
       >
         <div class="basic-select-item-icon">
           <BasicIcon v-if="modelValue === item.value" icon="mdi:check" />
+          <BasicIcon v-else-if="item.icon" :icon="item.icon" />
         </div>
         <span>{{ item.label }}</span>
       </div>
@@ -31,6 +32,7 @@ import BasicIcon from './basic-icon.vue';
 interface Item {
   label: string;
   value: string | number;
+  icon?: string;
   splitLine?: boolean;
 }
 

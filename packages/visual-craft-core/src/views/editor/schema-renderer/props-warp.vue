@@ -9,6 +9,7 @@
   <PropsItem v-for="(schemaRow, idx) in visibleSchema" :key="idx" :grid-template-columns="getGridTemplateColumns(idx, schemaRow)">
     <template v-for="(prop, ctrl_idx) in schemaRow" :key="ctrl_idx">
       <PropsCtrl
+        v-bind="prop"
         :model-value="getValue(prop.key || '')"
         :data-type="prop.type"
         :ctrl="prop.ctrl"
@@ -16,6 +17,7 @@
         :schema-type="schemaType"
         layout="vertical"
         :label="prop.label"
+        :content="prop.content"
         :hint="prop.hint"
         :ctrl_type="(prop as any).ctrl_type || ''"
         :ctrl_size="(prop as any).ctrl_size || ''"

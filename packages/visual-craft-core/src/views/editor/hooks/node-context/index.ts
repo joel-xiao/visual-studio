@@ -1,6 +1,7 @@
 import { watch, computed, readonly, reactive, ref, shallowReadonly, ComputedRef, type App, type Ref } from 'vue';
 import RBush from 'rbush';
-import { getUuid } from '../../../../assets/utils/index';
+import { set } from 'lodash';
+import { getUuid, normalizePath } from '../../../../assets/utils/index';
 import { GroupExtension } from './group';
 import { LayerExtension } from './layer';
 import { ClipboardExtension } from './clipboard';
@@ -311,23 +312,8 @@ export class CreateNodeContext {
     const node = this.#nodeMap.get(id);
     if (!node || !key) return;
 
-    const keyArr = key.split('.');
-    let current: Record<string, ComponentPropValue | ComponentProp> = node.props;
-
-    if (!current) {
-      node.props = {} as IComponentProps;
-      current = node.props;
-    }
-
-    for (let i = 0; i < keyArr.length - 1; i++) {
-      const k = keyArr[i];
-      if (!current[k] || typeof current[k] !== 'object') {
-        current[k] = {};
-      }
-      current = current[k] as Record<string, ComponentPropValue | ComponentProp>;
-    }
-    const lastKey = keyArr[keyArr.length - 1];
-    current[lastKey] = value;
+    const path = normalizePath(key);
+    set(node.props, path, value);
 
     if (syncNode && key.startsWith('layout.')) {
       const field = key.split('.')[1];

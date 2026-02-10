@@ -46,3 +46,12 @@ export const getUuid = function (): string {
     return (c === 'x' ? random : (random & 0x3) | 0x8).toString(16);
   });
 };
+
+/**
+ * 将路径中的数字索引转换为 lodash 支持的数组索引格式
+ * e.g. series.0.barWidth -> series[0].barWidth
+ */
+export const normalizePath = function (path: string): string {
+  if (!path) return '';
+  return path.replace(/\.(\d+)(?=\.|$)/g, '[$1]');
+};

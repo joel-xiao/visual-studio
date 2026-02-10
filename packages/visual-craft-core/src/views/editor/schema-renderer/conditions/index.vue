@@ -14,7 +14,7 @@
           <input v-model="cond.name" class="s-unit-name-input" placeholder="判定标题" @change="trigger" />
         </div>
         <div class="s-unit-tools">
-          <LiteSwitch :modelValue="cond.enabled" @update:modelValue="v => (cond.enabled = v, trigger())" />
+          <LiteSwitch :model-value="cond.enabled" @update:model-value="v => (cond.enabled = v, trigger())" />
           <div class="s-tool-btn del" @click.stop="removeCond(ci)">
             <BasicIcon icon="mdi:close" />
           </div>
@@ -24,10 +24,10 @@
       <div v-show="activeId === cond.id" class="s-unit-body">
         <template v-for="(group, gi) in cond.groups" :key="group.id">
           
-          <div v-if="gi > 0" class="s-logic-bridge" @click.stop="toggleLogic(cond, 'logic')">
+          <div v-if="gi > 0" class="s-logic-bridge" @click.stop="toggleLogic(cond, 'group', gi)">
             <div class="b-line"></div>
             <span class="b-pill" :class="{ 'is-or': cond.logic === 'or' }">
-              {{ cond.logic === 'and' ? '并且同时满足' : '或者满足其一' }}
+              {{ cond.logic === 'and' ? '并且' : '或者' }}
             </span>
             <div class="b-line"></div>
           </div>
@@ -40,7 +40,7 @@
                   v-if="ei > 0" 
                   class="rail-logic" 
                   :class="{ 'is-or': group.logic === 'or' }"
-                  @click.stop="toggleLogic(group, 'logic')"
+                  @click.stop="toggleLogic(cond, 'expr', gi, ei)"
                 >
                   {{ group.logic === 'and' ? '且' : '或' }}
                 </div>
@@ -53,7 +53,7 @@
                     <CSelect 
                       class="field-select"
                       size="small"
-                      :modelValue="expr.field" 
+                      :model-value="expr.field" 
                       :options="DefaultFieldOptions" 
                       @update="v => (expr.field = String(v), trigger())"
                     />
@@ -62,14 +62,14 @@
                     <CSelect 
                       class="op-select"
                       size="small"
-                      :modelValue="expr.operator" 
+                      :model-value="expr.operator" 
                       :options="OperatorOptions" 
                       @update="v => (expr.operator = String(v), trigger())"
                     />
                     <CInput 
                       class="val-input"
                       size="small"
-                      :modelValue="expr.value" 
+                      :model-value="expr.value" 
                       placeholder="判定值"
                       @update="v => (expr.value = String(v), trigger())" 
                     />
@@ -88,7 +88,7 @@
         <div class="s-effects-shelf">
           <SchemaItems 
             :items="effectItems" 
-            :propsData="{ effects: cond.effects }" 
+            :props-data="{ effects: cond.effects }" 
             :schema-type="schemaType"
             @update="(k, s, val) => onUpdateEffect(ci, val)"
           />
@@ -112,6 +112,7 @@ export default { name: 'C_CONDITIONS', inheritAttrs: false };
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue';
 import { set } from 'lodash';
+import { normalizePath } from '../../../../assets/utils';
 import LiteSwitch from '../../../ui/base/lite-switch.vue';
 import BasicIcon from '../../../ui/base/basic-icon.vue';
 import CButton from '../../../ui/controls/c-button/index.vue';
@@ -190,14 +191,49 @@ const trigger = () => {
   const d = JSON.parse(JSON.stringify(conditions.value));
   emit('update:modelValue', d); emit('update', d);
 };
-const toggleLogic = (obj: any, key: string) => { obj[key] = obj[key] === 'and' ? 'or' : 'and'; trigger(); };
+const toggleLogic = (cond: any, type: 'group' | 'expr', gi: number, ei?: number) => {
+  if (type === 'expr' && ei !== undefined) {
+    const group = cond.groups[gi];
+    const currentInner = group.logic;
+    const target = currentInner === 'and' ? 'or' : 'and';
+    
+    if (target === cond.logic) {
+      const moved = group.expressions.splice(ei);
+      cond.groups.splice(gi + 1, 0, { id: gen(), logic: currentInner, expressions: moved });
+    } else {
+      const allBefore: any[] = [];
+      for (let i = 0; i < gi; i++) allBefore.push(...cond.groups[i].expressions);
+      allBefore.push(...group.expressions.slice(0, ei));
+      
+      const allAfter: any[] = [...group.expressions.slice(ei)];
+      for (let i = gi + 1; i < cond.groups.length; i++) allAfter.push(...cond.groups[i].expressions);
+      
+      const oldOuter = cond.logic;
+      cond.logic = target;
+      cond.groups = [
+        { id: gen(), logic: oldOuter, expressions: allBefore },
+        { id: gen(), logic: oldOuter, expressions: allAfter }
+      ].filter(g => g.expressions.length > 0);
+    }
+  } else if (type === 'group') {
+    const prev = cond.groups[gi - 1];
+    const curr = cond.groups[gi];
+    const target = cond.logic === 'and' ? 'or' : 'and';
+    
+    prev.expressions.push(...curr.expressions);
+    prev.logic = target;
+    cond.groups.splice(gi, 1);
+  }
+  trigger();
+};
 
 const onUpdateEffect = (ci: number, [key, val]: [string, any]) => {
   if (!conditions.value[ci].effects) conditions.value[ci].effects = {};
   if (!key) {
     Object.assign(conditions.value[ci].effects, val);
   } else {
-    set(conditions.value[ci].effects, key, val);
+    const path = normalizePath(key);
+    set(conditions.value[ci].effects, path, val);
   }
   trigger();
 };

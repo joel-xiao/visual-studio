@@ -2,7 +2,7 @@
   <template v-for="item in items" :key="item.key">
     <component
       :is="getComponent(item.name)"
-      :model-value="propsData[item.key]"
+      :model-value="getPropValue(propsData, item.key)"
       :key-value="item.key"
       :props-type="item"
       :schema-type="schemaType"
@@ -14,6 +14,7 @@
 <script setup lang="ts">
 import { markRaw } from 'vue';
 import type { Component } from 'vue';
+import { get } from 'lodash';
 import PropsWarp from './props-warp.vue';
 import Layout from './layout/index.vue';
 
@@ -37,5 +38,9 @@ const getComponent = (name: string) => {
 
 const onUpdate = (key: string, schema: unknown, event: unknown) => {
   emit('update', key, schema, event);
+};
+
+const getPropValue = (propsData: Record<string, unknown>, key: string) => {
+  return get(propsData, key);
 };
 </script>
