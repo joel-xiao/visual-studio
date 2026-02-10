@@ -30,7 +30,7 @@ import { ref, nextTick, computed } from 'vue';
 import BasicIcon from './basic-icon.vue';
 
 interface Item {
-  label: string;
+  label: string | number;
   value: string | number;
   icon?: string;
   splitLine?: boolean;

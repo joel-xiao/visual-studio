@@ -124,7 +124,7 @@ import { useComponentContext } from '../../hooks/component-context';
 import type { IConditionConfig, IChartEffect, EffectType } from '../../schema/conditions/index';
 import { OperatorOptions, DefaultFieldOptions } from '../../schema/conditions/index';
 
-interface Props {
+export interface Props {
   modelValue?: IConditionConfig[];
   type?: EffectType;
   schemaType?: string;

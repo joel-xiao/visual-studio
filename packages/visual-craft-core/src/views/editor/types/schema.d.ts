@@ -2,7 +2,7 @@ declare type ComponentPropValue = number | string | number[] | boolean | Record<
 declare type ComponentProp = { [key: string]: ComponentPropValue };
 
 declare interface SchemaOptionItem {
-  label?: string | number;
+  label: string | number;
   value: string | number;
   icon?: string;
   hint?: string;
@@ -220,6 +220,7 @@ declare type SchemaKeyType =
   | ISchemaKeyNumberData
   | ISchemaKeyStringData
   | ISchemaKeyBooleanData
+  | ISchemaLiteSwitchData
   | ISchemaArrayData
   | ISchemaKeyObjectData
   | ISchemaBlendData

@@ -74,7 +74,7 @@ const schema: ISchemaExport = {
         hint: '垂直翻转',
         ctrl: 'C_BUTTON',
         size: 'small',
-        click: props => {
+        click: (props: ComponentProp) => {
           if (typeof props.rotate !== 'number') return;
           return { rotate: normalizeRotate(-props.rotate) };
         }
@@ -87,7 +87,7 @@ const schema: ISchemaExport = {
         hint: '水平翻转',
         ctrl: 'C_BUTTON',
         size: 'small',
-        click: props => {
+        click: (props: ComponentProp) => {
           if (typeof props.rotate !== 'number') return;
           return { rotate: normalizeRotate(180 - props.rotate) };
         }
