@@ -64,10 +64,14 @@ const swatches = ref([
   .n-color-picker-trigger {
     border: none;
     border-radius: 0;
+    background:
+      repeating-conic-gradient(
+        rgba(255, 255, 255, 0.08) 0% 25%,
+        rgba(255, 255, 255, 0.02) 0% 50%
+      ) 0 0 / 8px 8px;
     .n-color-picker-trigger__fill {
       inset: 0;
-      .n-color-picker-trigger__value,
-      .n-color-picker-checkboard {
+      .n-color-picker-trigger__value {
         display: none;
       }
     }
