@@ -1,3 +1,5 @@
+import radar from './radar';
+
 export const MarkerOptions = [
     { label: '圆形', value: 'circle' },
     { label: '三角形', value: 'triangle' },
@@ -35,6 +37,7 @@ export default {
     MarkerOptions,
     BarLabelPositionOptions,
     PieLabelPositionOptions,
-    PieLabelTypeOptions
+    PieLabelTypeOptions,
+    ...radar
 };
 

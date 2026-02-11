@@ -15,10 +15,7 @@ const schema: ISchemaExport = {
                 type: String,
                 default: 'polygon',
                 ctrl: 'C_GROUP_SELECT',
-                options: [
-                    { label: '多边形', value: 'polygon' },
-                    { label: '圆形', value: 'circle' }
-                ]
+                options: options.RadarShapeOptions
             }
         ],
         [

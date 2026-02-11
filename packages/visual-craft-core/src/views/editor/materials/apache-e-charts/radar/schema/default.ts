@@ -133,6 +133,63 @@ const schema: IComponentSchemaExport = {
       ]
     },
     {
+      name: '坐标轴',
+      icon: '',
+      category: 'AXIS',
+      schemas: [
+        {
+          type: 'schema',
+          schema: 'ECHARTS_RADAR_AXIS',
+          label: '',
+          key: 'radar',
+          default: {
+            splitLine: {
+              show: true,
+              lineStyle: {
+                color: '#E0E6F1',
+                width: 1,
+                type: 'solid'
+              }
+            },
+            axisLine: {
+              show: true,
+              lineStyle: {
+                color: '#E0E6F1',
+                width: 1,
+                type: 'solid'
+              }
+            },
+            axisName: {
+              show: true,
+              fontFamily: 'Microsoft YaHei',
+              fontSize: 12,
+              color: '#fff',
+              styles: []
+            },
+            nameGap: 15,
+            axisTick: {
+              show: true,
+              length: 5,
+              lineStyle: {
+                color: '#E0E6F1',
+                width: 1,
+                type: 'solid'
+              }
+            },
+            axisLabel: {
+              show: true,
+              fontFamily: 'Microsoft YaHei',
+              fontSize: 12,
+              color: '#fff',
+              styles: [],
+              margin: 8
+            },
+            splitNumber: 5
+          }
+        }
+      ]
+    },
+    {
       name: '提示框',
       icon: '',
       category: 'TOOLTIP',
