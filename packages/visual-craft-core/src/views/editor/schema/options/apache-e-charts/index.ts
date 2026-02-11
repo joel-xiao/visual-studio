@@ -19,8 +19,22 @@ export const BarLabelPositionOptions = [
     { label: '内底部', value: 'insideBottom' }
 ];
 
+export const PieLabelPositionOptions = [
+    { label: '外部', value: 'outside' },
+    { label: '内部', value: 'inside' },
+    { label: '中心', value: 'center' }
+];
+
+export const PieLabelTypeOptions = [
+    { label: '名称', value: 'name' },
+    { label: '数值', value: 'value' },
+    { label: '百分比', value: 'percent' }
+];
+
 export default {
     MarkerOptions,
-    BarLabelPositionOptions
+    BarLabelPositionOptions,
+    PieLabelPositionOptions,
+    PieLabelTypeOptions
 };
 

@@ -177,7 +177,6 @@ const schema: ISchemaExport = {
                 type: String,
                 default: '#3662EC',
                 ctrl_type: 'color-input',
-                size: 'small'
             },
             {
                 label: '区域填充',
@@ -186,7 +185,6 @@ const schema: ISchemaExport = {
                 type: String,
                 default: 'transparent',
                 ctrl_type: 'color-input',
-                size: 'small'
             }
         ]
     ]

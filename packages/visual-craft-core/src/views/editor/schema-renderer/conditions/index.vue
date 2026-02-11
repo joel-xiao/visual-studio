@@ -179,17 +179,46 @@ const effectItems = computed(() => [{
 }]);
 
 watch(() => props.modelValue, (v) => {
-  const newV = JSON.stringify(v || []);
+  let arr: any[] = [];
+  if (Array.isArray(v)) {
+    arr = v;
+  } else if (v && typeof v === 'object') {
+    // If it's the IConditionsData object structure
+    if (Array.isArray((v as any).conditions)) {
+      arr = (v as any).conditions;
+    }
+  }
+
+  const newV = JSON.stringify(arr);
   const oldV = JSON.stringify(conditions.value);
   if (newV === oldV) return;
-  conditions.value = JSON.parse(JSON.stringify(v || []));
-  if (conditions.value.length && !activeId.value) activeId.value = conditions.value[0].id;
+
+  conditions.value = JSON.parse(JSON.stringify(arr));
+  
+  // Try to restore activeId from parent or default to first
+  if (v && typeof v === 'object' && (v as any).activeConditionId) {
+    activeId.value = (v as any).activeConditionId;
+  } else if (conditions.value.length && !activeId.value) {
+    activeId.value = conditions.value[0].id;
+  }
 }, { immediate: true, deep: true });
 
 const gen = () => Math.random().toString(36).slice(2, 11);
 const trigger = () => {
-  const d = JSON.parse(JSON.stringify(conditions.value));
-  emit('update:modelValue', d); emit('update', d);
+  const conds = JSON.parse(JSON.stringify(conditions.value));
+  let output: any = conds;
+
+  // If we received an object structure, keep it and sync activeId
+  if (props.modelValue && typeof props.modelValue === 'object' && !Array.isArray(props.modelValue)) {
+    output = {
+      ...JSON.parse(JSON.stringify(props.modelValue)),
+      conditions: conds,
+      activeConditionId: activeId.value
+    };
+  }
+
+  emit('update:modelValue', output); 
+  emit('update', output);
 };
 const toggleLogic = (cond: any, type: 'group' | 'expr', gi: number, ei?: number) => {
   if (type === 'expr' && ei !== undefined) {

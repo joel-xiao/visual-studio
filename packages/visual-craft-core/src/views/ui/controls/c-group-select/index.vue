@@ -8,7 +8,8 @@
       :model-value="item.value === modelValue"
       @click="select(item.value)"
     >
-    <basic-icon :icon="item.icon" />
+    <basic-icon v-if="item.icon" :icon="item.icon" />
+    <span v-if="item.label"> {{ item.label }}</span>
   </basic-box>
 </div>
 </template>
@@ -28,6 +29,7 @@ export interface Option {
 export interface Props {
   modelValue?: string | number;
   options?: Option[];
+  size?: 'small' | 'medium' | 'large';
 }
 
 const props = withDefaults(defineProps<Props>(), {
