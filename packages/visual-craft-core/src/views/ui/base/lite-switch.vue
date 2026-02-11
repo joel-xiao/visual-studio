@@ -1,23 +1,28 @@
 <template>
-  <div
-    class="lite-switch"
-    :class="{ 'is-active': modelValue, 'is-disabled': disabled }"
-    @click.stop="toggle"
-  >
-    <div class="switch-track">
-      <div class="switch-thumb"></div>
+  <div class="lite-switch-outer" :class="{ 'is-disabled': disabled }">
+    <div
+      class="lite-switch"
+      :class="{ 'is-active': modelValue }"
+      @click.stop="toggle"
+    >
+      <div class="switch-track">
+        <div class="switch-thumb"></div>
+      </div>
     </div>
+    <span v-if="content" class="lite-switch-content" @click.stop="toggle">{{ content }}</span>
   </div>
 </template>
 
 <script setup lang="ts">
 interface Props {
   modelValue?: boolean;
+  content?: string | number;
   disabled?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   modelValue: false,
+  content: '',
   disabled: false
 });
 
@@ -32,6 +37,27 @@ const toggle = () => {
 </script>
 
 <style lang="scss">
+#visual-craft-core .lite-switch-outer {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+
+  &.is-disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+    filter: grayscale(1);
+  }
+
+  .lite-switch-content {
+    font-size: 12px;
+    color: var(--theme-color-text-secondary);
+    font-weight: 600;
+    white-space: nowrap;
+    user-select: none;
+  }
+}
+
 #visual-craft-core .lite-switch {
   --lite-track-w: 22px;
   --lite-track-h: 12px;
@@ -44,7 +70,6 @@ const toggle = () => {
   align-items: center;
   justify-content: center;
   width: 24px;
-  cursor: pointer;
   user-select: none;
   flex-shrink: 0;
   box-sizing: border-box;
@@ -80,7 +105,7 @@ const toggle = () => {
     border: 0.5px solid rgba(0, 0, 0, 0.2);
   }
 
-  &:hover:not(.is-disabled) {
+  &:hover {
     .switch-track {
       border-color: rgba(0, 0, 0, 0.6);
     }
@@ -101,7 +126,7 @@ const toggle = () => {
         0 1px 0 rgba(255, 255, 255, 0.1);
     }
 
-    &:hover:not(.is-disabled) {
+    &:hover {
       .switch-track {
         background-color: var(--theme-color-blue-600);
       }
@@ -112,11 +137,6 @@ const toggle = () => {
       background: var(--theme-color-white);
     }
   }
-
-  &.is-disabled {
-    cursor: not-allowed;
-    opacity: 0.4;
-    filter: grayscale(1);
-  }
 }
 </style>
+

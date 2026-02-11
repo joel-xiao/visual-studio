@@ -1,20 +1,24 @@
 <template>
-  <div
-    class="basic-switch-pro"
-    :class="{ 'is-active': modelValue, 'is-disabled': disabled }"
-    @click.stop="toggle"
-  >
-    <div class="switch-track">
-      <div class="switch-thumb">
-        <div v-if="modelValue" class="switch-light"></div>
+  <div class="basic-switch-outer" :class="{ 'is-disabled': disabled }">
+    <div
+      class="basic-switch-pro"
+      :class="{ 'is-active': modelValue }"
+      @click.stop="toggle"
+    >
+      <div class="switch-track">
+        <div class="switch-thumb">
+          <div v-if="modelValue" class="switch-light"></div>
+        </div>
       </div>
     </div>
+    <span v-if="content" class="basic-switch-content" @click.stop="toggle">{{ content }}</span>
   </div>
 </template>
 
 <script setup lang="ts">
 interface Props {
   modelValue?: boolean;
+  content?: string | number;
   disabled?: boolean;
 }
 
@@ -34,6 +38,26 @@ const toggle = () => {
 </script>
 
 <style lang="scss">
+#visual-craft-core .basic-switch-outer {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+
+  &.is-disabled {
+    cursor: not-allowed;
+    opacity: 0.3;
+  }
+
+  .basic-switch-content {
+    font-size: 12px;
+    color: var(--theme-color-text-secondary);
+    font-weight: 600;
+    white-space: nowrap;
+    user-select: none;
+  }
+}
+
 #visual-craft-core .basic-switch-pro {
   --switch-width: 26px;
   --switch-height: 12px;
@@ -41,8 +65,6 @@ const toggle = () => {
   --switch-active-bg: var(--theme-color-blue-700);
 
   display: inline-flex;
-  cursor: pointer;
-  user-select: none;
   padding: 4px;
 
   .switch-track {
@@ -89,12 +111,7 @@ const toggle = () => {
     }
   }
 
-  &.is-disabled {
-    cursor: not-allowed;
-    opacity: 0.3;
-  }
-
-  &:hover:not(.is-disabled) .switch-thumb {
+  &:hover .switch-thumb {
     transform: scale(1.1);
   }
 }

@@ -1,10 +1,12 @@
 <template>
-  <div class="c-switch">
+  <div class="c-switch-wrapper">
     <BasicSwitch
+      class="c-switch"
       v-bind="$attrs"
       :model-value="modelValue"
       @update:model-value="onUpdate"
     />
+    <span v-if="content" class="c-switch-content">{{ content }}</span>
   </div>
 </template>
 
@@ -20,6 +22,7 @@ import BasicSwitch from '../../base/basic-switch.vue';
 
 export interface Props {
   modelValue?: boolean;
+  content?: string | number;
 }
 
 defineProps<Props>();
@@ -32,9 +35,23 @@ const onUpdate = (val: boolean) => {
 </script>
 
 <style lang="scss">
-#visual-craft-core .c-switch {
+#visual-craft-core .c-switch-wrapper {
   display: flex;
   align-items: center;
+  gap: 8px;
   height: 30px;
+
+  .c-switch {
+    display: flex;
+    align-items: center;
+  }
+
+  .c-switch-content {
+    font-size: 12px;
+    color: var(--theme-color-text-secondary);
+    font-weight: 600;
+    white-space: nowrap;
+  }
 }
 </style>
+

@@ -14,13 +14,14 @@
         <template v-if="ctrls[index] === 'C_COLOR_PICKER'">
           <BasicColorPicker
             :model-value="(getValue(key) as string)"
+            :hint="getHint(index)"
             @update:model-value="val => onUpdate(key, val)"
           />
         </template>
 
         <!-- Input -->
         <template v-else-if="ctrls[index] === 'C_INPUT'">
-          <div class="input-inner">
+          <div class="input-inner" v-hint="!getIcon(index) ? getHint(index) : ''">
             <BasicIcon
               v-if="getIcon(index)"
               v-hint="getHint(index)"
@@ -39,7 +40,7 @@
 
         <!-- Select -->
         <template v-else-if="ctrls[index] === 'C_SELECT'">
-          <div class="select-inner" @click="e => onOpenSelect(e, index)">
+          <div class="select-inner" v-hint="getHint(index)" @click="e => onOpenSelect(e, index)">
             <BasicSelect
               :ref="el => setSelectRef(el, index)"
               :model-value="(getValue(key) as any)"
