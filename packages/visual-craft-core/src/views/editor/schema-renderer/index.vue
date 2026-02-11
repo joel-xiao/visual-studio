@@ -1,5 +1,5 @@
 <template>
-<div class="editor-schema-renderer">
+<div class="editor-schema-renderer" :key="currentNode?.id">
   <div ref="panelSchemaWrapperRef" class="editor-schema-renderer-wrapper">
     <SchemaItems :items="PanelSchemaTypes.propsTypes" :props-data="PropsData" :schema-type="currentNode.schema" @update="onUpdate" />
   </div>

@@ -15,15 +15,15 @@ const schema: ISchemaExport = {
                 key: 'lineStyle',
                 type: Object,
                 default: {
+                    color: '#3662EC',
                     width: 2,
                     type: 'solid'
                 },
-                ctrl: 'C_MIX_GROUP',
-                keys: ['width', 'type'],
-                ctrls: ['C_INPUT', 'C_SELECT'],
-                hints: ['粗细', '类型'],
-                options: [undefined, options.LineStyleOptions],
-                suffixes: ['px', '']
+                ctrl: 'C_STROKE',
+                keys: ['color', 'width', 'type'],
+                hint: ['颜色', '粗细', '类型'],
+                options: options.LineStyleOptions,
+                suffix: 'px'
             }
         ],
         [
