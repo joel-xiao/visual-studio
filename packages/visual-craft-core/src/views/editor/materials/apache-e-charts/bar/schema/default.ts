@@ -26,6 +26,13 @@ const schema: IComponentSchemaExport = {
         }]
       }
     },
+    {
+      type: 'schema',
+      schema: 'COMMON_COLOR_SCHEME',
+      default: {
+        theme: 'dark'
+      }
+    },
   ],
 
   categorySchemas: [

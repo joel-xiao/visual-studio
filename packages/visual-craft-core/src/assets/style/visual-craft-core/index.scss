@@ -3,6 +3,14 @@
 * @author: Joel
 */
 
+// Popover (defined at :root so Teleport-to-body elements can inherit)
+:root {
+  --db-popover-bg: #212121;
+  --db-popover-border: rgba(255, 255, 255, 0.08);
+  --db-popover-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  --db-popover-text: rgba(255, 255, 255, 0.9);
+}
+
 :where(#visual-craft-core, #visual-craft-core-project) {
   user-select: none;
 

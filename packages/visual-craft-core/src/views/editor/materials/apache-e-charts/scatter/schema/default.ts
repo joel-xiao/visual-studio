@@ -14,6 +14,13 @@ const schema: IComponentSchemaExport = {
         rotate: 0,
         radius: [0, 0, 0, 0]
       }
+    },
+    {
+      type: 'schema',
+      schema: 'COMMON_COLOR_SCHEME',
+      default: {
+        theme: 'dark'
+      }
     }
   ],
   categorySchemas: [

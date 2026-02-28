@@ -1,5 +1,5 @@
 <template>
-  <Popover v-bind="$attrs">
+  <Popover ref="popoverRef" v-bind="$attrs">
     <template #trigger>
       <slot name="trigger"></slot>
     </template>
@@ -7,6 +7,20 @@
   </Popover>
 </template>
 
+<script lang="ts">
+export default {
+  inheritAttrs: false
+};
+</script>
+
 <script setup lang="ts">
-import Popover from '@/components/native-ui/popover/index.vue';
+import { ref } from 'vue';
+import Popover from '@/components/popover/index.vue';
+
+const popoverRef = ref<InstanceType<typeof Popover> | null>(null);
+
+defineExpose({
+  open: () => popoverRef.value?.open(),
+  close: () => popoverRef.value?.close()
+});
 </script>
