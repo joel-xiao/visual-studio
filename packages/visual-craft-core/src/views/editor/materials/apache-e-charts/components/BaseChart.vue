@@ -14,6 +14,8 @@ import {
   RadarChart,
   ScatterChart,
   CandlestickChart,
+  BoxplotChart,
+  HeatmapChart,
   MapChart,
   EffectScatterChart
 } from 'echarts/charts';
@@ -39,6 +41,8 @@ use([
   RadarChart,
   ScatterChart,
   CandlestickChart,
+  BoxplotChart,
+  HeatmapChart,
   MapChart,
   EffectScatterChart,
   TitleComponent,

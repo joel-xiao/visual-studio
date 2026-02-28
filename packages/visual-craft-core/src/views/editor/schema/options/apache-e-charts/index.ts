@@ -1,4 +1,5 @@
 import radar from './radar';
+export * from './radar';
 
 export const MarkerOptions = [
     { label: '圆形', value: 'circle' },
@@ -33,11 +34,17 @@ export const PieLabelTypeOptions = [
     { label: '百分比', value: 'percent' }
 ];
 
+export const ChartOrientOptions = [
+    { label: '纵向', value: 'vertical' },
+    { label: '横向', value: 'horizontal' }
+];
+
 export default {
     MarkerOptions,
     BarLabelPositionOptions,
     PieLabelPositionOptions,
     PieLabelTypeOptions,
-    ...radar
+    ChartOrientOptions,
+    ...radar,
 };
 
