@@ -24,11 +24,11 @@
         <div class="color-grid">
           <div v-for="(color, index) in form.color" :key="index" class="color-item">
             <BasicColorPicker v-model="form.color[index]" class="color-picker-trigger" />
-            <div class="remove-btn" @click="removeColor(index)" title="删除颜色">
+            <div class="remove-btn" title="删除颜色" @click="removeColor(index)">
               <BasicIcon icon="mdi:close" style="font-size: 10px;" />
             </div>
           </div>
-          <div class="add-color-btn" @click="addColor" title="添加颜色">
+          <div class="add-color-btn" title="添加颜色" @click="addColor">
             <BasicIcon icon="mdi:plus" />
           </div>
         </div>
@@ -67,7 +67,7 @@
 
     <template #footer>
       <div class="manager-footer">
-        <BasicButton @click="updateVisible(false)" cancel>取消</BasicButton>
+        <BasicButton cancel @click="updateVisible(false)">取消</BasicButton>
         <BasicButton primary @click="handleSave">保存方案</BasicButton>
       </div>
     </template>

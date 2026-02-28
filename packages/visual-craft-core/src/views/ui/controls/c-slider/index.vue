@@ -1,5 +1,5 @@
 <template>
-  <div class="c-slider-wrapper" v-hint="hint || ''" :class="{ 'c-slider-small': size === 'small' }">
+  <div v-hint="hint || ''" class="c-slider-wrapper" :class="{ 'c-slider-small': size === 'small' }">
     <span v-if="content" class="c-slider-label">{{ content }}</span>
     <div class="c-slider">
       <div class="c-slider-group">

@@ -1,7 +1,7 @@
 <template>
   <div
-    class="basic-slider"
     ref="trackRef"
+    class="basic-slider"
     @mousedown="onMouseDown"
   >
     <div class="basic-slider-track">

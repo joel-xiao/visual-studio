@@ -10,21 +10,18 @@ import BasicChipSwitch from '../../base/basic-chip-switch.vue';
 import { computed } from 'vue';
 
 export interface Props {
-  modelValue?: any;
+  modelValue?: string | number | boolean;
   content?: string | number;
-  activeValue?: any;
-  inactiveValue?: any;
-  active_value?: any; // For snake_case schema compatibility
-  inactive_value?: any;
+  /* eslint-disable vue/prop-name-casing */
+  active_value?: string | number | boolean; // 开启态的值
+  inactive_value?: string | number | boolean; // 关闭态的值
+  /* eslint-enable vue/prop-name-casing */
 }
 
 const props = defineProps<Props>();
 const emit = defineEmits(['update', 'update:modelValue']);
 
-const finalActiveValue = computed(() => props.activeValue !== undefined ? props.activeValue : props.active_value);
-const finalInactiveValue = computed(() => props.inactiveValue !== undefined ? props.inactiveValue : props.inactive_value);
-
-const onUpdate = (val: any) => {
+const onUpdate = (val: string | number | boolean) => {
   emit('update:modelValue', val);
   emit('update', val);
 };
@@ -36,8 +33,8 @@ const onUpdate = (val: any) => {
     v-bind="$attrs"
     :model-value="modelValue"
     :content="content"
-    :active-value="finalActiveValue"
-    :inactive-value="finalInactiveValue"
+    :active-value="active_value"
+    :inactive-value="inactive_value"
     @update:model-value="onUpdate"
   />
 </template>

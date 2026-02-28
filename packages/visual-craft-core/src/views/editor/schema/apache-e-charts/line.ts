@@ -1,4 +1,3 @@
-import { get } from 'lodash';
 import options from '../options';
 
 const SCHEMA_NAME = 'ECHARTS_LINE';

@@ -20,11 +20,11 @@
 import { computed } from 'vue';
 
 interface Props {
-  modelValue?: any;
+  modelValue?: string | number | boolean;
   content?: string | number;
   disabled?: boolean;
-  activeValue?: any;
-  inactiveValue?: any;
+  activeValue?: string | number | boolean;
+  inactiveValue?: string | number | boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {

@@ -21,7 +21,7 @@
 
         <!-- Input -->
         <template v-else-if="ctrls[index] === 'C_INPUT'">
-          <div class="input-inner" v-hint="!getIcon(index) ? getHint(index) : ''">
+          <div v-hint="!getIcon(index) ? getHint(index) : ''" class="input-inner">
             <BasicIcon
               v-if="getIcon(index)"
               v-hint="getHint(index)"
@@ -40,7 +40,7 @@
 
         <!-- Select -->
         <template v-else-if="ctrls[index] === 'C_SELECT'">
-          <div class="select-inner" v-hint="getHint(index)" @click="e => onOpenSelect(e, index)">
+          <div v-hint="getHint(index)" class="select-inner" @click="e => onOpenSelect(e, index)">
             <BasicSelect
               :ref="el => setSelectRef(el, index)"
               :model-value="(getValue(key) as any)"
