@@ -1,7 +1,7 @@
 <template>
   <div
     class="nano-tech-chip"
-    :class="{ 'is-active': modelValue, 'is-disabled': disabled }"
+    :class="{ 'is-active': isActive, 'is-disabled': disabled }"
     @click.stop="toggle"
   >
     <!-- 左侧精密棱镜 -->
@@ -17,23 +17,33 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
+
 interface Props {
-  modelValue?: boolean;
+  modelValue?: any;
   content?: string | number;
   disabled?: boolean;
+  activeValue?: any;
+  inactiveValue?: any;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   modelValue: false,
   content: '',
-  disabled: false
+  disabled: false,
+  activeValue: true,
+  inactiveValue: false
 });
 
 const emit = defineEmits(['update:modelValue', 'change']);
 
+const isActive = computed(() => {
+  return props.modelValue === props.activeValue;
+});
+
 const toggle = () => {
   if (props.disabled) return;
-  const newValue = !props.modelValue;
+  const newValue = isActive.value ? props.inactiveValue : props.activeValue;
   emit('update:modelValue', newValue);
   emit('change', newValue);
 };
