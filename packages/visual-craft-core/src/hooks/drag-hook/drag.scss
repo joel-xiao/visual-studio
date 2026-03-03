@@ -71,6 +71,7 @@
     }
 
     &.rotate-disabled {
+
       &>.v-drag-stick-rotate,
       &>.v-drag-stick-rot-tl,
       &>.v-drag-stick-rot-tr,
@@ -283,22 +284,67 @@
       }
 
       /* Corner Resizers Transform */
-      &.v-drag-stick-tl { transform-origin: center; transform: translate(-50%, -50%) scale(var(--drag-scale)); }
-      &.v-drag-stick-tr { transform-origin: center; transform: translate(50%, -50%) scale(var(--drag-scale)); }
-      &.v-drag-stick-br { transform-origin: center; transform: translate(50%, 50%) scale(var(--drag-scale)); }
-      &.v-drag-stick-bl { transform-origin: center; transform: translate(-50%, 50%) scale(var(--drag-scale)); }
+      &.v-drag-stick-tl {
+        transform-origin: center;
+        transform: translate(-50%, -50%) scale(var(--drag-scale));
+      }
+
+      &.v-drag-stick-tr {
+        transform-origin: center;
+        transform: translate(50%, -50%) scale(var(--drag-scale));
+      }
+
+      &.v-drag-stick-br {
+        transform-origin: center;
+        transform: translate(50%, 50%) scale(var(--drag-scale));
+      }
+
+      &.v-drag-stick-bl {
+        transform-origin: center;
+        transform: translate(-50%, 50%) scale(var(--drag-scale));
+      }
 
       /* Edge Resizers Transform */
-      &.v-drag-stick-tm { transform-origin: top; transform: scaleY(var(--drag-scale)); }
-      &.v-drag-stick-bm { transform-origin: bottom; transform: scaleY(var(--drag-scale)); }
-      &.v-drag-stick-lm { transform-origin: left; transform: scaleX(var(--drag-scale)); }
-      &.v-drag-stick-rm { transform-origin: right; transform: scaleX(var(--drag-scale)); }
+      &.v-drag-stick-tm {
+        transform-origin: top;
+        transform: scaleY(var(--drag-scale));
+      }
+
+      &.v-drag-stick-bm {
+        transform-origin: bottom;
+        transform: scaleY(var(--drag-scale));
+      }
+
+      &.v-drag-stick-lm {
+        transform-origin: left;
+        transform: scaleX(var(--drag-scale));
+      }
+
+      &.v-drag-stick-rm {
+        transform-origin: right;
+        transform: scaleX(var(--drag-scale));
+      }
 
       /* Corner Rotation Handles Transform */
-      &.v-drag-stick-rot-tl { transform-origin: center; transform: translate(-50%, -50%) translate(calc(-1 * var(--corner-rot-offset) * var(--drag-scale)), calc(-1 * var(--corner-rot-offset) * var(--drag-scale))) scale(var(--drag-scale)); }
-      &.v-drag-stick-rot-tr { transform-origin: center; transform: translate(50%, -50%) translate(calc(var(--corner-rot-offset) * var(--drag-scale)), calc(-1 * var(--corner-rot-offset) * var(--drag-scale))) scale(var(--drag-scale)); }
-      &.v-drag-stick-rot-br { transform-origin: center; transform: translate(50%, 50%) translate(calc(var(--corner-rot-offset) * var(--drag-scale)), calc(var(--corner-rot-offset) * var(--drag-scale))) scale(var(--drag-scale)); }
-      &.v-drag-stick-rot-bl { transform-origin: center; transform: translate(-50%, 50%) translate(calc(-1 * var(--corner-rot-offset) * var(--drag-scale)), calc(var(--corner-rot-offset) * var(--drag-scale))) scale(var(--drag-scale)); }
+      &.v-drag-stick-rot-tl {
+        transform-origin: center;
+        transform: translate(-50%, -50%) translate(calc(-1 * var(--corner-rot-offset) * var(--drag-scale)), calc(-1 * var(--corner-rot-offset) * var(--drag-scale))) scale(var(--drag-scale));
+      }
+
+      &.v-drag-stick-rot-tr {
+        transform-origin: center;
+        transform: translate(50%, -50%) translate(calc(var(--corner-rot-offset) * var(--drag-scale)), calc(-1 * var(--corner-rot-offset) * var(--drag-scale))) scale(var(--drag-scale));
+      }
+
+      &.v-drag-stick-rot-br {
+        transform-origin: center;
+        transform: translate(50%, 50%) translate(calc(var(--corner-rot-offset) * var(--drag-scale)), calc(var(--corner-rot-offset) * var(--drag-scale))) scale(var(--drag-scale));
+      }
+
+      &.v-drag-stick-rot-bl {
+        transform-origin: center;
+        transform: translate(-50%, 50%) translate(calc(-1 * var(--corner-rot-offset) * var(--drag-scale)), calc(var(--corner-rot-offset) * var(--drag-scale))) scale(var(--drag-scale));
+      }
     }
   }
 }

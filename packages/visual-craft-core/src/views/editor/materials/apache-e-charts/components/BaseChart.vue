@@ -17,6 +17,7 @@ import {
   BoxplotChart,
   HeatmapChart,
   SankeyChart,
+  TreeChart,
   MapChart,
   EffectScatterChart
 } from 'echarts/charts';
@@ -45,6 +46,7 @@ use([
   BoxplotChart,
   HeatmapChart,
   SankeyChart,
+  TreeChart,
   MapChart,
   EffectScatterChart,
   TitleComponent,
