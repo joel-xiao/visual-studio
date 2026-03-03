@@ -18,6 +18,7 @@ import {
   HeatmapChart,
   SankeyChart,
   TreeChart,
+  FunnelChart,
   MapChart,
   EffectScatterChart
 } from 'echarts/charts';
@@ -47,6 +48,7 @@ use([
   HeatmapChart,
   SankeyChart,
   TreeChart,
+  FunnelChart,
   MapChart,
   EffectScatterChart,
   TitleComponent,
