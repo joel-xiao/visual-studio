@@ -10,17 +10,20 @@ const props = defineProps<{
 }>();
 
 const defaultOption = {
-  xAxis: {
-    type: 'category',
-    data: []
-  },
-  yAxis: {
-    type: 'value'
+  tooltip: {
+    formatter: '{a} <br/>{b} : {c}%'
   },
   series: [
     {
-      data: [],
-      type: 'bar'
+      type: 'gauge',
+      progress: {
+        show: true
+      },
+      detail: {
+        valueAnimation: true,
+        formatter: '{value}'
+      },
+      data: []
     }
   ]
 };

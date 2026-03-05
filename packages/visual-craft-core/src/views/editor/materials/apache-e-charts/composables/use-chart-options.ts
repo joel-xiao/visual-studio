@@ -1,5 +1,6 @@
 import { ref, watch, toRefs } from 'vue';
 import { cloneDeep, merge } from 'lodash';
+import { transformChartOptions } from './parsers';
 
 export function useChartOptions(props: { config?: IComponentProps }, defaultOption: Record<string, unknown>) {
   const option = ref(cloneDeep(defaultOption));
@@ -12,6 +13,9 @@ export function useChartOptions(props: { config?: IComponentProps }, defaultOpti
 
       if (newVal?.props) {
         currentOptions = merge(currentOptions, newVal.props);
+
+        // 使用针对性的解析器处理数据绑定与属性映射
+        transformChartOptions(currentOptions, newVal.props.data as any);
       }
 
       const code = newVal?.code as Record<string, unknown> | undefined;

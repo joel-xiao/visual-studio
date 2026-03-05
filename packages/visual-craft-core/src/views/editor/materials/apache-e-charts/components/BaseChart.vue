@@ -20,7 +20,8 @@ import {
   TreeChart,
   FunnelChart,
   MapChart,
-  EffectScatterChart
+  EffectScatterChart,
+  GaugeChart
 } from 'echarts/charts';
 import {
   TitleComponent,
@@ -58,7 +59,8 @@ use([
   DatasetComponent,
   TransformComponent,
   DataZoomComponent,
-  VisualMapComponent
+  VisualMapComponent,
+  GaugeChart
 ]);
 
 const props = defineProps<{

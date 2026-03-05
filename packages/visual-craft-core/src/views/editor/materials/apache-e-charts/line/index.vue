@@ -23,14 +23,14 @@ const props = defineProps<{
 const defaultOption = {
   xAxis: {
     type: 'category',
-    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    data: []
   },
   yAxis: {
     type: 'value'
   },
   series: [
     {
-      data: [150, 230, 224, 218, 135, 147, 260],
+      data: [],
       type: 'line'
     }
   ]
