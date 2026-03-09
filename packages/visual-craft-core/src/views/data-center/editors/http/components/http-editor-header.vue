@@ -2,7 +2,7 @@
   <div class="editor-tabs">
     <div class="header-left">
       <div v-if="currentStepIndex !== -1" class="active-step-info">
-         <div class="method-badge" :class="currentStep.method.toLowerCase()">{{ currentStep.method }}</div>
+         <div v-if="currentStep?.method" class="method-badge" :class="currentStep.method?.toLowerCase()">{{ currentStep.method }}</div>
          <input v-model="currentStep.name" class="header-step-name" placeholder="步骤名称" />
          <div class="header-id-badge">
            <span class="label">ID:</span>

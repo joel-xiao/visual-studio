@@ -1,6 +1,21 @@
 <template>
   <div class="step-manager">
     <div class="steps-list">
+      <!-- Global Config Entry -->
+      <div 
+        class="step-item global-config-step"
+        :class="{ active: modelValue === -2 }"
+        @click="$emit('update:modelValue', -2)"
+      >
+        <div class="step-num"><BasicIcon icon="mdi:cog-outline" font-size="14px" /></div>
+        <div class="step-info">
+          <div class="step-name">流程全链路配置</div>
+          <div class="step-meta">全局参数 / 认证 / 变量</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
       <div 
         v-for="(step, index) in steps" 
         :key="step.id" 
@@ -17,7 +32,17 @@
               <BasicIcon icon="mdi:content-copy" font-size="9px" class="copy-icon" />
             </span>
           </div>
-          <div class="step-meta" v-hint="step.url">{{ step.method }} {{ step.url || '未填写地址' }}</div>
+          <div class="step-meta" v-hint="step.url">
+            <template v-if="step.type === 'reference'">
+               <BasicIcon icon="mdi:link-variant" font-size="10px" /> 引用: {{ step.refId }}
+            </template>
+            <template v-else-if="step.type === 'script'">
+               <BasicIcon icon="mdi:xml" font-size="10px" /> 脚本加工
+            </template>
+            <template v-else>
+               {{ step.method }} {{ step.url || '未填写地址' }}
+            </template>
+          </div>
         </div>
         <div class="step-actions">
            <div class="order-btns">
@@ -84,7 +109,8 @@ function addStep() {
   const nextNumber = props.steps.length + 1;
   const newStep = {
     id: 'step' + nextNumber,
-    name: '步骤 ' + nextNumber,
+    name: '请求 ' + nextNumber,
+    type: 'request',
     method: 'GET',
     url: '',
     headers: [{ key: '', value: '', enabled: true }],
@@ -94,6 +120,10 @@ function addStep() {
   const newSteps = [...props.steps, newStep];
   emit('change', newSteps);
   emit('update:modelValue', newSteps.length - 1);
+}
+
+function addScriptStep() {
+  // Removed per user request
 }
 
 function removeStep(index: number) {
@@ -242,6 +272,21 @@ function moveStep(index: number, direction: number) {
       border-color: var(--theme-color-blue-700);
       background: rgba(54, 98, 236, 0.08);
       color: var(--theme-color-blue-700);
+      .step-num { background: var(--theme-color-blue-700); color: #fff; }
+    }
+  }
+
+  .global-config-step {
+    border-style: solid;
+    margin-bottom: 4px;
+    background: var(--theme-color-gray-50);
+    .step-num { 
+      background: var(--theme-color-gray-200);
+      color: var(--theme-color-text-secondary);
+    }
+    &.active {
+      background: rgba(54, 98, 236, 0.05);
+      border-color: var(--theme-color-blue-700);
       .step-num { background: var(--theme-color-blue-700); color: #fff; }
     }
   }

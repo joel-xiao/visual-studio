@@ -1,6 +1,7 @@
 import './assets/style/index.scss';
 
 export { default as Editor } from './views/editor/index.vue';
+export { default as DataCenter } from './views/data-center/index.vue';
 export { default as CoreMainLayout } from './views/layout/main/index.vue';
 export { default as CoreProjectsLayout } from './views/layout/projects/index.vue';
 export { default as CoreDataLayout } from './views/layout/data/index.vue';

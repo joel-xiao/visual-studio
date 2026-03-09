@@ -1,89 +1,56 @@
 <script setup lang="ts">
-import { CoreDataLayout as CoreData } from 'visual-craft-core';
+import { DataCenter } from 'visual-craft-core';
 import { ref, onMounted } from 'vue';
-import { useDashboardStore } from '@/store/dashboard';
+import { dataCenterApi } from '@/service/api/data-center';
 
-onMounted(() => {
-  initLayout();
+const dataSourceList = ref([]);
+const currentResponse = ref<any>(null);
+
+onMounted(async () => {
+  await fetchSources();
 });
 
-const folderTree = ref<ITreeItemData[]>([]);
-const folderMenus = ref<ITreeItemMenu[]>([]);
-const buttons = ref<IDbLayoutNewProjectData[]>([]);
-
-function initLayout() {
-  folderTree.value = [
-    { name: '全部数据', id: 'all', sum: 0, handle: false },
-    { name: '未分组', id: 'no-group', sum: 0, handle: false },
-    {
-      name: 'xiao',
-      id: '123',
-      sum: 0,
-      children: [
-        { name: '全部数据', id: 'all', sum: 0, handle: false },
-        { name: '未分组', id: 'no-group', sum: 0, handle: false },
-        {
-          name: 'xiao',
-          id: '123',
-          sum: 0,
-          children: [
-            {
-              name: '汇总数据',
-              id: '1all',
-              prefix: '<span class="data-type get">GET</span>',
-              handle: false
-            },
-            {
-              name: 'i爱吃醋你时序',
-              id: '1no-group',
-              prefix: '<span class="data-type post">POST</span>',
-              handle: false
-            },
-            {
-              name: '啊数据啊就',
-              id: '1123',
-              prefix: '<span class="data-type get">GET</span>',
-              handle: false
-            }
-          ]
-        }
-      ]
-    }
-  ];
-
-  folderMenus.value = [
-    {
-      name: '更多',
-      id: 'more',
-      icon: 'icon-dian',
-      disabled: true,
-      children: [
-        { name: '编辑', id: 'edit', icon: 'icon-bianji', disabled: true },
-        { name: '删除', id: 'delete', icon: 'icon-delete', disabled: true }
-      ]
-    },
-    { name: '添加组', id: 'add', icon: 'icon-jiahao', disabled: true }
-  ];
-
-  buttons.value = [
-    { name: 'POST', id: 'post', icon: '' },
-    { name: 'GET', id: 'get', icon: '' },
-    { name: '导入', id: 'import', icon: '' }
-  ];
+async function fetchSources() {
+  try {
+    const res = await dataCenterApi.getSources();
+    dataSourceList.value = res.data || [];
+  } catch (e: any) {
+    console.error('Failed to fetch data sources', e);
+  }
 }
 
-const { saveCrumbs } = useDashboardStore();
-function onButtonClick(opt: DbLayoutCreateProject) {
-  saveCrumbs(opt.folder?.cascades);
+async function handleSave(config: any) {
+  try {
+    await dataCenterApi.saveSource(config);
+    await fetchSources(); // Refresh list
+    alert('保存成功');
+  } catch (e: any) {
+    console.error('Save failed', e);
+  }
+}
+
+async function handleTest(config: any) {
+  try {
+    const res = await dataCenterApi.testSource(config);
+    currentResponse.value = res.data; // This will flow back to the editor via props if passed
+  } catch (e: any) {
+    console.error('Test failed', e);
+    currentResponse.value = { error: e.message };
+  }
+}
+
+function handleDelete(id: string) {
+    console.log('Delete requested', id);
 }
 </script>
 
 <template>
-  <CoreData
-    :folder-tree="folderTree"
-    :folder-menus="folderMenus"
-    :buttons="buttons"
-    @button-click="onButtonClick"
+  <DataCenter
+    :data-source-list="dataSourceList"
+    :response="currentResponse"
+    @save="handleSave"
+    @test="handleTest"
+    @delete="handleDelete"
   />
 </template>
 

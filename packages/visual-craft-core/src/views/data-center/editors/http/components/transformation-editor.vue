@@ -26,13 +26,14 @@
        </div>
 
        <div v-if="showHelp" class="help-box">
-          <p>可用变量:</p>
+          <p>可用变量与函数:</p>
           <ul>
-            <li><code>results</code>: 包含所有步骤执行结果的对象。例如 <code>results.step1.data</code></li>
-            <li><code>_</code>: lodash 工具库 (如果环境支持)</li>
+            <li><code>results</code>: 包含全链路执行结果的对象。如 <code>results.step1.data</code></li>
+            <li v-pre><code>set(key, val)</code>: <b>核心！</b> 将数据存入流程全局变量。后续步骤可通过 <code>{{key}}</code> 直接引用。</li>
+            <li><code>data / res</code>: 当前步骤的响应内容。</li>
           </ul>
           <p>示例脚本:</p>
-          <pre><code>return results.login.data.token ? results.data.list : []</code></pre>
+          <pre><code>set('token', data.accessToken); \nreturn data.list;</code></pre>
        </div>
 
        <div class="code-editor-wrap">

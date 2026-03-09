@@ -39,6 +39,28 @@
     </div>
 
     <div class="tab-pane">
+      <!-- 0. Variables (Cascading only) -->
+      <div v-if="activeTab === 'variables' && isCascading" class="variables-section">
+         <div class="field-label">
+           <span>入参声明</span>
+           <span class="tip">定义当前步骤所需的输入变量。在该接口被其他流程引用时，这些变量将变为可对接的“插槽”。</span>
+         </div>
+         <KVEditor
+           :model-value="step.variables"
+           label-key="变量名"
+           label-value="测试默认值"
+           label-desc="参数说明"
+           @update:model-value="(val) => updateStep('variables', val)"
+         />
+         <div class="help-box">
+            <p>使用指引:</p>
+            <ul>
+               <li><b>配置解耦</b>: 在 URL 或参数中使用 <code>&lbrace;&lbrace;variableName&rbrace;&rbrace;</code> 引用此处定义的变量。</li>
+               <li><b>能力编排</b>: 声明的变量在“引用步骤”模式下会显式呈现在入参映射列表。</li>
+            </ul>
+         </div>
+      </div>
+
       <!-- 1. Condition (Cascading only) -->
       <div v-if="activeTab === 'condition' && isCascading" class="condition-section">
         <div class="field-label">
@@ -64,29 +86,38 @@
 
       <!-- 2. Query Params -->
       <div v-if="activeTab === 'params'" class="params-section">
-         <KVEditor 
-           :model-value="step.query" 
-           label-key="参数名" 
-           label-value="参数值" 
-           @update:model-value="(val) => updateStep('query', val)" 
+         <KVEditor
+           :model-value="step.query"
+           label-key="参数名"
+           label-value="参数值"
+           @update:model-value="(val) => updateStep('query', val)"
          />
       </div>
 
       <!-- 3. Authentication -->
       <div v-if="activeTab === 'auth'" class="auth-section">
-        <AuthEditor 
-          :model-value="step.auth" 
-          @update:model-value="(val) => updateStep('auth', val)" 
+        <AuthEditor
+          :model-value="step.auth"
+          :global-auth="globalConfig?.globalAuth"
+          @update:model-value="(val) => updateStep('auth', val)"
         />
       </div>
 
       <!-- 4. Headers -->
       <div v-if="activeTab === 'headers'" class="kv-section">
-        <KVEditor 
-          :model-value="step.headers" 
-          label-key="Header Name" 
-          label-value="Value" 
-          @update:model-value="(val) => updateStep('headers', val)" 
+        <div v-if="globalConfig?.globalHeaders?.length > 0" class="global-headers-preview">
+           <div class="preview-title">已继承全局 Headers:</div>
+           <div class="preview-tags">
+              <span v-for="h in globalConfig.globalHeaders.filter((i:any) => i.enabled)" :key="h.key" class="header-tag">
+                {{ h.key }}: {{ h.value }}
+              </span>
+           </div>
+        </div>
+        <KVEditor
+          :model-value="step.headers"
+          label-key="局部 Header"
+          label-value="Value (将覆盖全局)"
+          @update:model-value="(val) => updateStep('headers', val)"
         />
       </div>
 
@@ -116,27 +147,22 @@
         </div>
       </div>
 
-      <!-- 6. Transform (New) -->
+      <!-- 6. Transform (Output Handle) -->
       <div v-if="activeTab === 'transform'" class="transform-section">
         <div class="field-label">
-          <span>结果脱敏与转换</span>
-           <span class="tip">使用 JavaScript 处理该步骤的原始返回内容 (res.data)</span>
+           <BasicIcon icon="mdi:tray-arrow-up" font-size="16px" />
+           <span>出参处理 (Output Handle)</span>
+           <span class="tip">在此解析并清洗返回数据，转换后的对象将存入缓存供后续步骤使用。</span>
         </div>
         <div class="script-editor-wrap">
-           <CCodeEditor
-             :model-value="step.transformResponse"
-             language="javascript"
-             placeholder="// 示例: return { token: data.access_token }"
-             @update:model-value="(val) => updateStep('transformResponse', val)"
-           />
+          <TransformationEditor
+            :model-value="step.transformation"
+            @update:model-value="(val) => updateStep('transformation', val)"
+          />
         </div>
         <div class="help-box">
-          <p>可用对象:</p>
-          <ul>
-            <li><code>res</code>: 完整响应对象 (含 status)</li>
-            <li><code>data</code>: 响应体内容 (简写)</li>
-            <li><code>results</code>: 上游步骤的所有结果</li>
-          </ul>
+           <BasicIcon icon="mdi:lightbulb-outline" />
+           <span>提示：通过此流程预处理数据，可以极大简化后续链路的引用配置。</span>
         </div>
       </div>
     </div>
@@ -149,12 +175,14 @@ import CSelect from '@/views/ui/controls/c-select/index.vue';
 import CInput from '@/views/ui/controls/c-input/index.vue';
 import CCodeEditor from '@/views/ui/controls/c-code-editor/index.vue';
 import CButton from '@/views/ui/controls/c-button/index.vue';
+import TransformationEditor from './components/transformation-editor.vue';
 import KVEditor from './components/kv-editor.vue';
 import AuthEditor from './components/auth-editor.vue';
 
 const props = defineProps<{
   step: any;
   isCascading: boolean;
+  globalConfig?: any;
 }>();
 
 const emit = defineEmits<{
@@ -162,7 +190,7 @@ const emit = defineEmits<{
   (e: 'send'): void;
 }>();
 
-const activeTab = ref('params');
+const activeTab = ref(props.isCascading ? 'params' : 'params');
 
 const tabs = computed(() => {
   const base = [
@@ -170,10 +198,13 @@ const tabs = computed(() => {
     { label: 'Auth', id: 'auth' },
     { label: 'Headers', id: 'headers' },
     { label: 'Body', id: 'body' },
-    { label: 'Transform', id: 'transform' }
+    { label: '出参处理 (Output)', id: 'transform' }
   ];
   if (props.isCascading) {
-    base.unshift({ label: 'Condition', id: 'condition' });
+    base.unshift(
+      { label: '执行条件 (Condition)', id: 'condition' },
+      { label: '入参定义 (Variables)', id: 'variables' }
+    );
   }
   return base;
 });
@@ -192,10 +223,12 @@ function updateStep(field: string, value: any) {
 }
 
 function getCount(tabId: string) {
-  if (tabId === 'headers') return props.step.headers?.filter(h => h.key && h.enabled !== false).length || 0;
-  if (tabId === 'params') return props.step.query?.filter(q => q.key && q.enabled !== false).length || 0;
+  if (tabId === 'variables') return props.step.variables?.filter((v: any) => v.key && v.enabled !== false).length || 0;
+  if (tabId === 'headers') return props.step.headers?.filter((h: any) => h.key && h.enabled !== false).length || 0;
+  if (tabId === 'params') return props.step.query?.filter((q: any) => q.key && q.enabled !== false).length || 0;
   if (tabId === 'body' && (props.step.bodyMode === 'json' || props.step.bodyMode === 'raw')) return props.step.body ? 1 : 0;
-  if (tabId === 'body' && props.step.bodyMode !== 'none') return props.step.bodyParams?.filter(p => p.key && p.enabled !== false).length || 0;
+  if (tabId === 'body' && props.step.bodyMode !== 'none') return props.step.bodyParams?.filter((p: any) => p.key && p.enabled !== false).length || 0;
+  if (tabId === 'transform') return (props.step.transformation?.script && props.step.transformation.script !== '// 输入 JavaScript 代码对结果进行处理\nreturn data;') ? 1 : 0;
   return 0;
 }
 
@@ -208,6 +241,13 @@ onMounted(() => {
   if (!props.step.auth) updateStep('auth', { type: 'none', config: {} });
   if (!props.step.query) updateStep('query', [{ key: '', value: '', enabled: true }]);
   if (!props.step.headers) updateStep('headers', [{ key: '', value: '', enabled: true }]);
+  if (!props.step.variables) updateStep('variables', [{ key: '', value: '', description: '', enabled: true }]);
+  if (!props.step.transformation) {
+    updateStep('transformation', {
+      type: 'raw',
+      script: '// 输入 JavaScript 代码对结果进行处理\nreturn data;'
+    });
+  }
 });
 </script>
 
@@ -316,8 +356,8 @@ onMounted(() => {
       transform: translateY(-0.5px);
     }
 
-    &:hover { 
-      color: var(--theme-color-text-bold); 
+    &:hover {
+      color: var(--theme-color-text-bold);
     }
 
     &.active {
@@ -348,41 +388,44 @@ onMounted(() => {
   flex: 1;
 
   .condition-section,
-  .transform-section {
+  .transform-section,
+  .variables-section,
+  .auth-section,
+  .kv-section {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    gap: 16px;
 
     .field-label {
       display: flex;
       align-items: center;
       gap: 12px;
-      margin-bottom: 12px;
       font-size: 13px;
       font-weight: 700;
       color: var(--theme-color-text-bold);
       .tip { font-size: 11px; font-weight: 400; color: var(--theme-color-text-secondary); opacity: 0.7; }
     }
 
+    .help-box {
+      background: var(--theme-color-tran-4);
+      padding: 12px 16px;
+      border-radius: 6px;
+      font-size: 11px;
+      line-height: 1.8;
+      color: var(--theme-color-text-secondary);
+      border: 1px dashed var(--theme-color-border);
+      p { font-weight: 700; margin-bottom: 6px; color: var(--theme-color-text-bold); }
+      ul { padding-left: 20px; margin: 0; }
+      li { margin-bottom: 4px; }
+      code { background: var(--theme-color-tran-10); padding: 1px 4px; border-radius: 4px; }
+    }
+
     .script-editor-wrap {
       flex: 1;
       height: 260px;
-      margin-bottom: 16px;
       border: 1px solid var(--theme-color-border);
       border-radius: 6px;
       overflow: hidden;
-    }
-
-    .help-box {
-      background: var(--theme-color-gray-50);
-      padding: 12px;
-      border-radius: 6px;
-      font-size: 11px;
-      line-height: 1.6;
-      color: var(--theme-color-text-secondary);
-      border: 1px dashed var(--theme-color-border);
-      p { font-weight: 700; margin-bottom: 4px; color: var(--theme-color-text-bold); }
-      ul { padding-left: 16px; margin: 0; }
     }
   }
 
@@ -415,6 +458,28 @@ onMounted(() => {
     border: 1px solid var(--theme-color-border);
     border-radius: 6px;
     overflow: hidden;
+  }
+
+  .global-headers-preview {
+    background: var(--theme-color-gray-50);
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px dashed var(--theme-color-border);
+    margin-bottom: 20px;
+    .preview-title { font-size: 11px; color: var(--theme-color-text-secondary); margin-bottom: 8px; font-weight: 700; }
+    .preview-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      .header-tag {
+        font-size: 11px;
+        background: var(--theme-color-gray-200);
+        padding: 2px 8px;
+        border-radius: 12px;
+        color: var(--theme-color-text-secondary);
+        border: 1px solid var(--theme-color-border);
+      }
+    }
   }
 }
 </style>

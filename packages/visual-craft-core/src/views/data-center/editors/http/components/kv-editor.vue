@@ -16,15 +16,15 @@
     </div>
     
     <div class="rows-container">
-      <div v-for="(item, index) in modelValue" :key="index" class="kv-row">
+      <div v-for="(item, index) in localItems" :key="index" class="kv-row">
         <div class="col key">
-          <CInput v-model="item.key" placeholder="Key" @input="onInput(index)" />
+          <CInput v-model="item.key" placeholder="Key" @input="onInput" />
         </div>
         <div class="col val">
-          <CInput v-model="item.value" placeholder="Value" @input="onInput(index)" />
+          <CInput v-model="item.value" placeholder="Value" @input="onInput" />
         </div>
         <div class="col desc">
-          <CInput v-model="item.description" placeholder="Description" @input="onInput(index)" />
+          <CInput v-model="item.description" placeholder="Description" @input="onInput" />
         </div>
         <div class="col actions">
           <CButton 
@@ -33,7 +33,7 @@
             icon="mdi:delete-outline" 
             class="del-btn"
             @click="removeRow(index)"
-            :disabled="modelValue.length <= 1"
+            :disabled="localItems.length <= 1"
           />
         </div>
       </div>
@@ -46,6 +46,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref, watch } from 'vue';
 import CInput from '@/views/ui/controls/c-input/index.vue';
 import CButton from '@/views/ui/controls/c-button/index.vue';
 import BasicIcon from '@/views/ui/base/basic-icon.vue';
@@ -62,29 +63,30 @@ const props = withDefaults(defineProps<{
   labelDesc: '描述'
 });
 
-const emit = defineEmits(['update:modelValue', 'change']);
+const emit = defineEmits(['update:modelValue']);
 
-function onInput(index: number) {
-  // Keeping auto-add but only if the user types in the last row's key
-  if (index === props.modelValue.length - 1 && props.modelValue[index].key) {
-    addRow();
-  }
+const localItems = ref<any[]>([]);
+
+watch(() => props.modelValue, (val) => {
+  localItems.value = JSON.parse(JSON.stringify(val));
+}, { immediate: true, deep: true });
+
+function onInput() {
+  emit('update:modelValue', localItems.value);
 }
 
 function addRow() {
-  props.modelValue.push({ key: '', value: '', description: '', enabled: true });
-  emit('change', props.modelValue);
+  localItems.value.push({ key: '', value: '', description: '', enabled: true });
+  emit('update:modelValue', localItems.value);
 }
 
 function removeRow(index: number) {
-  if (props.modelValue.length > 1) {
-    props.modelValue.splice(index, 1);
-    emit('change', props.modelValue);
+  if (localItems.value.length > 1) {
+    localItems.value.splice(index, 1);
   } else {
-    // If it's the last row, just clear it
-    props.modelValue[0] = { key: '', value: '', description: '', enabled: true };
-    emit('change', props.modelValue);
+    localItems.value[0] = { key: '', value: '', description: '', enabled: true };
   }
+  emit('update:modelValue', localItems.value);
 }
 </script>
 

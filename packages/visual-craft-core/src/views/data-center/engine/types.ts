@@ -28,9 +28,14 @@ export interface IRequestStep {
 
     /**
      * Data transformation:
-     * - `transformResponse`: JS string/func to process raw response.
+     * - `transformation`: Structured JS processing configuration.
+     * - `transformResponse`: (Legacy) JS string/func to process raw response.
      * - `cacheKey`: Where to save the result for downstream steps (e.g. 'auth.token').
      */
+    transformation?: {
+        type: string;
+        script: string;
+    };
     transformResponse?: string;
     cacheKey?: string;
 
@@ -45,8 +50,22 @@ export interface IDataSourceConfig {
     name: string;
     type: string; // 'api' | 'mqtt' | 'sql' | 'huawei' etc.
     baseUrl?: string;
-    globalHeaders?: Record<string, string>;
+
+    // Global properties that can be inherited
+    globalAuth?: {
+        type: 'none' | 'bearer' | 'basic' | 'apikey';
+        config: Record<string, any>;
+    };
+    globalHeaders?: Array<{ key: string; value: string; enabled: boolean }>;
+
+    // Shared state/variables across the whole flow
+    variables?: Array<{ key: string; value: any; description?: string }>;
+
     steps: IRequestStep[];
+    transformation?: {
+        type: string;
+        script: string;
+    };
 }
 
 export interface IDataSourceLegacy extends IDataSourceConfig {

@@ -2,9 +2,15 @@
   <div id="visual-craft-core" ref="editorRef">
     <Canvas />
     <NavPanel @change="handleTabChange" />
-    <!-- <ToolbarPanel /> -->
-    <LeftPanel />
-    <RightPanel />
+    <LeftPanel v-show="activeTab === 'design'" />
+    <RightPanel v-show="activeTab === 'design'" />
+    
+    <!-- Data Mode Panels -->
+    <DataCenter v-show="activeTab === 'data' && !hasSelection" />
+    <div v-show="activeTab === 'data' && hasSelection" class="data-binding-layout">
+        <DataPanel class="right-data-panel" />
+    </div>
+
     <AIPanel v-show="activeTab === 'ai'" />
     <ContextMenu />
   </div>
@@ -16,6 +22,8 @@ import AIPanel from './panels/ai-panel.vue';
 // import ToolbarPanel from './panels/toolbar-panel.vue';
 import LeftPanel from './panels/left-panel.vue';
 import RightPanel from './panels/right-panel.vue';
+import DataPanel from './panels/data-panel.vue';
+import DataCenter from '../data-center/index.vue';
 import Canvas from './canvas/index.vue';
 import ContextMenu from './canvas/context-menu.vue';
 
@@ -58,6 +66,7 @@ const rightMenuWidth = computed(() => {
 
 // Create  Node
 const nodeContext = useNodeContext();
+const hasSelection = computed(() => nodeContext.getSelectedNodes().value.length > 0);
 applyMeta(props.data);
 nodeContext.install(editorData);
 onUnmounted(() => {
@@ -113,5 +122,16 @@ onUnmounted(() => {
   width: 100%;
   height: 100%;
   overflow: hidden;
+
+  .data-binding-layout {
+    position: absolute;
+    right: 0;
+    top: var(--db-editor-nav-bar-height);
+    bottom: 0;
+    width: var(--db-editor-right-menu-width);
+    border-left: 1px solid var(--db-editor-color-canvas);
+    background-color: var(--db-editor-color-panel-bg);
+    z-index: 50;
+  }
 }
 </style>
