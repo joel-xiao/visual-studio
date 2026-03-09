@@ -90,7 +90,9 @@ function onButtonClick(opt: DbLayoutCreateProject) {
     @folder-select="onFolderSelect"
     @button-click="onButtonClick"
   >
-    <slot></slot>
+    <template #content>
+      <slot></slot>
+    </template>
   </MainLayout>
 </template>
 

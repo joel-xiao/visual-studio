@@ -1,11 +1,13 @@
 <template>
-<BasicBox ref="box" type="input" :class="{ 'c-input-small': size === 'small' }">
-  <BasicIcon v-if="size !== 'small'" v-hint="hint || ''" :lock="lock" :icon="icon" :style="iconStyle" @mousedown="onMouseDown" />
-  <div class="c-input-content">
-    <BasicInput :disabled="lock" v-bind="$attrs" :model-value="modelValue" type="text" @focus="onFocus" @blur="onBlur" @update="onUpdate" />
-    <span v-if="suffix" class="c-input-suffix">{{ suffix }}</span>
-  </div>
-</BasicBox>
+<div class="c-input" :class="{ 'c-input-small': size === 'small' }" v-bind="$attrs">
+  <BasicBox ref="box" type="input">
+    <BasicIcon v-if="size !== 'small'" v-hint="hint || ''" :lock="lock" :icon="icon" :style="iconStyle" @mousedown="onMouseDown" />
+    <div class="c-input-content">
+      <BasicInput :disabled="lock" v-bind="$attrs" :model-value="modelValue" type="text" @focus="onFocus" @blur="onBlur" @update="onUpdate" />
+      <span v-if="suffix" class="c-input-suffix">{{ suffix }}</span>
+    </div>
+  </BasicBox>
+</div>
 </template>
 
 <script lang="ts">
@@ -101,6 +103,14 @@ const onUpdate = function (value: string | number) {
 
 <style lang="scss">
 #visual-craft-core {
+  .c-input {
+    width: 100%;
+    
+    .basic-box {
+      width: 100%;
+    }
+  }
+
   .c-input-content {
     flex: 1;
     display: flex;

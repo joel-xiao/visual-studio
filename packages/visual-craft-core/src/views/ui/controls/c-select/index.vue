@@ -1,5 +1,5 @@
 <template>
-  <div class="c-select" :class="{ 'c-select-small': size === 'small' }">
+  <div class="c-select" :class="{ 'c-select-small': size === 'small' }" v-bind="$attrs">
     <BasicBox ref="boxRef" :type="Type" @click="onOpenWrapper('wrapper')">
       <BasicIcon v-if="size !== 'small'" :lock="lock" :icon="icon" :style="iconStyle" @mousedown="onMouseDown" />
       <div v-if="Type === 'input-select'" class="c-select-label-wrapper">

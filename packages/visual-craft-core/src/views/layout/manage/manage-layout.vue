@@ -220,16 +220,18 @@ function onButton(item: IDbLayoutNewProjectData): void {
     width: calc(100% - 300px);
     min-width: 0;
     height: 100%;
-    padding: 24px 32px;
+    padding: 0;
     position: relative;
+    display: flex;
+    flex-direction: column;
 
-    .new-projects {
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-      margin-bottom: 24px;
-      row-gap: 16px;
-      column-gap: 16px;
+      .new-projects {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        padding: 24px 32px;
+        row-gap: 16px;
+        column-gap: 16px;
 
       .new-project {
         position: relative;
@@ -292,6 +294,7 @@ function onButton(item: IDbLayoutNewProjectData): void {
       align-items: center;
       height: 36px;
       margin: 0 6px;
+      padding: 0 26px; // Adjust for 32px total padding
       margin-top: 8px;
       margin-bottom: 4px;
 
@@ -320,8 +323,9 @@ function onButton(item: IDbLayoutNewProjectData): void {
 
     .projects-content {
       width: 100%;
-      height: calc(100% - 264px);
-      overflow: auto;
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 0;
     }
   }
 }
