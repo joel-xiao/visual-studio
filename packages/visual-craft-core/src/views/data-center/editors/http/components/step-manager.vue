@@ -57,7 +57,7 @@
 </template>
 
 <script lang="ts">
-import { hintDirective } from '../../../directives/hint';
+import { hintDirective } from '@/directives/hint';
 export default {
   directives: {
     hint: hintDirective
@@ -67,7 +67,7 @@ export default {
 
 <script setup lang="ts">
 import BasicIcon from '@/views/ui/base/basic-icon.vue';
-import { getUuid, copyToClipboard } from '@/assets/utils/index';
+import { copyToClipboard } from '@/assets/utils/index';
 
 const props = defineProps<{
   steps: any[];
@@ -77,8 +77,7 @@ const props = defineProps<{
 const emit = defineEmits(['update:modelValue', 'change', 'add-ref']);
 
 const copyId = async (id: string) => {
-  const success = await copyToClipboard(id);
-  // Ideally, show a toast or message. For now, simple console log or hint change.
+  await copyToClipboard(id);
 }
 
 function addStep() {
@@ -249,28 +248,35 @@ function moveStep(index: number, direction: number) {
 
   .step-actions-footer {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 8px;
+    padding: 0 4px;
   }
-
+  
   .add-step {
-    padding: 10px;
+    flex: 1;
+    padding: 8px 4px;
     border: 1px dashed var(--theme-color-border);
     border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
     color: var(--theme-color-text-secondary);
-    font-size: 12px;
+    font-size: 11px;
     cursor: pointer;
     transition: all 0.2s;
-    &:hover { border-color: var(--theme-color-blue-700); color: var(--theme-color-blue-700); background: var(--theme-color-gray-50); }
-    
-    &.ref-step {
-       border-style: solid;
-       background: var(--theme-color-gray-50);
-       &:hover { background: var(--theme-color-gray-100); }
+    background: transparent;
+    white-space: nowrap;
+
+    &:hover { 
+      border-color: var(--theme-color-blue-700); 
+      color: var(--theme-color-blue-700); 
+      background: var(--theme-color-gray-50); 
+    }
+
+    .basic-icon {
+      font-size: 14px;
     }
   }
 
@@ -289,7 +295,7 @@ function moveStep(index: number, direction: number) {
       .basic-icon { font-size: 12px; }
     }
     &.active {
-      background: rgba(var(--theme-color-blue-700-rgb), 0.05);
+      background: rgba(54, 98, 236, 0.05);
       .step-num { background: var(--theme-color-blue-700); color: #fff; }
     }
   }

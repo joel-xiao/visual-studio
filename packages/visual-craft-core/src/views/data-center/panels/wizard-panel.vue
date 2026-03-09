@@ -117,7 +117,7 @@ import CSelect from '@/views/ui/controls/c-select/index.vue';
 import CInput from '@/views/ui/controls/c-input/index.vue';
 import CButton from '@/views/ui/controls/c-button/index.vue';
 import CCodeEditor from '@/views/ui/controls/c-code-editor/index.vue';
-import KVEditor from '../components/kv-editor.vue';
+import KVEditor from '../editors/http/components/kv-editor.vue';
 
 const props = defineProps<{ initialData: any }>();
 const emit = defineEmits(['save', 'cancel']);

@@ -149,8 +149,8 @@ import CSelect from '@/views/ui/controls/c-select/index.vue';
 import CInput from '@/views/ui/controls/c-input/index.vue';
 import CCodeEditor from '@/views/ui/controls/c-code-editor/index.vue';
 import CButton from '@/views/ui/controls/c-button/index.vue';
-import KVEditor from '../../components/kv-editor.vue';
-import AuthEditor from '../../components/auth-editor.vue';
+import KVEditor from './components/kv-editor.vue';
+import AuthEditor from './components/auth-editor.vue';
 
 const props = defineProps<{
   step: any;

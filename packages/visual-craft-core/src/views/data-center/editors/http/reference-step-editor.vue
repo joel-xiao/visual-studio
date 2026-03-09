@@ -39,7 +39,7 @@
 <script setup lang="ts">
 import BasicIcon from '@/views/ui/base/basic-icon.vue';
 import CCodeEditor from '@/views/ui/controls/c-code-editor/index.vue';
-import TransformationEditor from '../../components/transformation-editor.vue';
+import TransformationEditor from './components/transformation-editor.vue';
 
 const props = defineProps<{
   step: any;

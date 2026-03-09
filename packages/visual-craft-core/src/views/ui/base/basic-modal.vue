@@ -1,12 +1,14 @@
 <template>
 <teleport :to="teleportTo">
   <transition name="fade">
-    <div v-if="modelValue" class="basic-modal-mask" @click="onMaskClick">
+    <div v-if="modelValue" class="basic-modal-mask" v-bind="$attrs" @click="onMaskClick">
       <div class="basic-modal-wrapper" :style="{ width: width }" @click.stop>
         <div class="basic-modal-header">
-          <span class="basic-modal-title">{{ title }}</span>
+          <slot name="header">
+            <span class="basic-modal-title">{{ title }}</span>
+          </slot>
           <div class="basic-modal-close" @click="onClose">
-            <i class="icon-font icon-guanbi"></i>
+            <BasicIcon icon="mdi:close" font-size="18px" />
           </div>
         </div>
         <div class="basic-modal-body">
@@ -23,6 +25,11 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
+import BasicIcon from './basic-icon.vue';
+
+defineOptions({
+  inheritAttrs: false
+});
 
 interface Props {
   modelValue: boolean;
