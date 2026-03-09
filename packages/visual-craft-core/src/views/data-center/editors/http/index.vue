@@ -12,25 +12,31 @@
       </div>
 
       <div class="editor-body-container">
-        <!-- Top Nav Tabs (Postman style) -->
+        <!-- Top Nav Header (More Breadcrumb/Info Style) -->
         <div class="editor-tabs">
-          <div v-if="currentStepIndex !== -1" class="tab-item active">
-             <BasicIcon icon="mdi:api" font-size="14px" class="api-icon" />
-             <div class="step-name-box">
-                <input v-model="currentStep.name" class="step-name-input" placeholder="步骤名称" />
-                <div class="step-id-edit">
-                   <span class="prefix">ID:</span>
-                   <input v-model="currentStep.id" class="id-input" placeholder="stepId" />
-                </div>
-             </div>
+          <div class="header-left">
+            <div v-if="currentStepIndex !== -1" class="active-step-info">
+               <div class="method-badge" :class="currentStep.method.toLowerCase()">{{ currentStep.method }}</div>
+               <input v-model="currentStep.name" class="header-step-name" placeholder="步骤名称" />
+               <div class="header-id-badge">
+                 <span class="label">ID:</span>
+                 <input v-model="currentStep.id" class="badge-id-input" placeholder="stepId" />
+                 <BasicIcon icon="mdi:content-copy" font-size="10px" class="copy-icon" @click="copyId(currentStep.id)" />
+               </div>
+            </div>
+            <div v-else class="active-step-info transformation">
+               <BasicIcon icon="mdi:auto-fix" font-size="14px" />
+               <span class="header-step-name">结果数据转换 (Final Output)</span>
+            </div>
           </div>
-          <div v-else class="tab-item active transformation-tab">
-             <BasicIcon icon="mdi:function-variant" font-size="14px" class="api-icon" />
-             <span class="tab-label">结果数据转换 (Final Output)</span>
-          </div>
-          <div class="mode-toggle">
-             <label>连带请求模式</label>
-             <input type="checkbox" v-model="isCascading" @change="toggleCascading" />
+
+          <div class="header-right">
+            <div class="cascading-toggle" :class="{ active: isCascading }" @click="isCascading = !isCascading; toggleCascading()">
+               <span class="toggle-track">
+                 <span class="toggle-thumb"></span>
+               </span>
+               <label>多接口联动模式</label>
+            </div>
           </div>
         </div>
 
@@ -111,6 +117,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, watch } from 'vue';
 import CInput from '@/views/ui/controls/c-input/index.vue';
+import { copyToClipboard } from '@/assets/utils/index';
 import RequestStepEditor from './request-step-editor.vue';
 import CButton from '@/views/ui/controls/c-button/index.vue';
 import BasicIcon from '@/views/ui/base/basic-icon.vue';
@@ -134,6 +141,10 @@ const emit = defineEmits<{
 const isCascading = ref(!!props.initialData?.steps?.length);
 const currentStepIndex = ref(0);
 const { dataSourceList } = useDataCenterContext();
+
+const copyId = async (id: string) => {
+  await copyToClipboard(id);
+}
 const isSelectingRef = ref(false);
 const refSearch = ref('');
 
@@ -290,89 +301,145 @@ defineExpose({ submit });
   .editor-tabs {
     display: flex;
     padding: 0 16px;
-    gap: 2px;
-    height: 40px;
+    height: 48px;
     background: var(--db-editor-color-panel-bg);
     border-bottom: 1px solid var(--theme-color-border);
     justify-content: space-between;
     align-items: center;
     flex: none;
 
-    .tab-item {
-      padding: 0 20px;
-      height: 100%;
-      font-size: 13px;
-      color: var(--theme-color-text-secondary);
-      cursor: default;
+    .header-left {
       display: flex;
       align-items: center;
-      gap: 8px;
-      border-right: 1px solid var(--theme-color-border);
-      background: var(--db-color-main);
+      gap: 12px;
+      flex: 1;
+      min-width: 0;
 
-      .api-icon { color: var(--db-main-color-get); }
-      
-      .step-name-box {
+      .active-step-info {
         display: flex;
-        flex-direction: column;
-        justify-content: center;
-        gap: 2px;
-        .step-name-input {
+        align-items: center;
+        gap: 12px;
+        background: var(--db-color-main);
+        padding: 4px 12px;
+        border-radius: 6px;
+        border: 1px solid var(--theme-color-border);
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+
+        .method-badge {
+          font-size: 10px;
+          font-weight: 800;
+          color: var(--theme-color-blue-700);
+          background: rgba(54, 98, 236, 0.1);
+          padding: 2px 6px;
+          border-radius: 4px;
+          text-transform: uppercase;
+          
+          &.get { color: var(--db-main-color-get); background: rgba(14, 165, 233, 0.1); }
+          &.post { color: var(--db-main-color-post); background: rgba(52, 211, 153, 0.1); }
+          &.put { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
+          &.delete { color: #ef4444; background: rgba(239, 68, 68, 0.1); }
+        }
+
+        .header-step-name {
           border: none;
           background: transparent;
-          font-size: 13px;
-          color: inherit;
+          font-size: 14px;
           font-weight: 600;
-          width: 140px;
-          height: 18px;
+          color: var(--theme-color-text-bold);
+          width: 200px;
+          height: 24px;
+          padding: 0;
           &:focus { outline: none; }
         }
-        .step-id-edit {
+
+        .header-id-badge {
           display: flex;
           align-items: center;
-          gap: 4px;
-          font-size: 10px;
-          opacity: 0.5;
-          .prefix { font-weight: 700; color: var(--theme-color-blue-700); }
-          .id-input {
+          gap: 6px;
+          background: var(--theme-color-gray-50);
+          padding: 2px 8px;
+          padding-right: 0px;
+          border-radius: 4px;
+          border: 1px solid var(--theme-color-border);
+          .label { font-size: 10px; font-weight: 700; color: var(--theme-color-text-secondary); opacity: 0.7; }
+          .badge-id-input {
             border: none;
             background: transparent;
-            font-size: 10px;
-            color: inherit;
-            width: 100px;
+            font-size: 11px;
+            font-family: monospace;
+            color: var(--theme-color-blue-700);
+            width: 80px;
             padding: 0;
-            &:focus { outline: none; color: var(--theme-color-blue-700); }
+            &:focus { outline: none; }
+          }
+          .copy-icon {
+             cursor: pointer;
+             opacity: 0.4;
+             transition: all 0.2s;
+             transform: scale(0.8);
+             &:hover { opacity: 1; color: var(--theme-color-blue-700); }
           }
         }
-      }
-            &.active {
-        color: var(--theme-color-text-bold);
-        background: var(--db-color-main);
-        border-bottom: 2px solid var(--theme-color-blue-700);
-        margin-bottom: -1px;
-        .api-icon { color: var(--theme-color-blue-700); }
-      }
 
-      .api-icon { color: var(--theme-color-text-secondary); transition: color 0.2s; }
-
-      &.transformation-tab.active {
-        border-bottom-color: #3b82f6;
-        .api-icon { color: #3b82f6; }
+        &.transformation {
+          border-color: #3b82f6;
+          background: rgba(59, 130, 246, 0.05);
+          color: #3b82f6;
+          box-shadow: none;
+        }
       }
     }
 
-    .mode-toggle {
-       display: flex;
-       align-items: center;
-       gap: 10px;
-       font-size: 12px;
-       color: var(--theme-color-text-secondary);
-       padding: 0 12px;
-       cursor: pointer;
-       border-radius: 4px;
-       height: 28px;
-       &:hover { background: var(--theme-color-gray-100); }
-       input { cursor: pointer; accent-color: var(--theme-color-blue-700); }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+
+      .cascading-toggle {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        user-select: none;
+        padding: 4px 8px;
+        border-radius: 4px;
+        transition: background 0.2s;
+        
+        &:hover { background: var(--theme-color-gray-50); }
+
+        .toggle-track {
+          width: 28px;
+          height: 16px;
+          background: var(--theme-color-gray-300);
+          border-radius: 10px;
+          position: relative;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          .toggle-thumb {
+            position: absolute;
+            left: 2px;
+            top: 2px;
+            width: 12px;
+            height: 12px;
+            background: #fff;
+            border-radius: 50%;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+          }
+        }
+
+        label {
+          font-size: 12px;
+          color: var(--theme-color-text-secondary);
+          font-weight: 500;
+          cursor: pointer;
+        }
+
+        &.active {
+          .toggle-track { background: var(--theme-color-blue-700); }
+          .toggle-thumb { left: 14px; }
+          label { color: var(--theme-color-text-bold); font-weight: 600; }
+        }
+      }
     }
   }
 

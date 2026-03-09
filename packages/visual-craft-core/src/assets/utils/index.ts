@@ -55,3 +55,13 @@ export const normalizePath = function (path: string): string {
   if (!path) return '';
   return path.replace(/\.(\d+)(?=\.|$)/g, '[$1]');
 };
+
+export const copyToClipboard = async (text: string): Promise<boolean> => {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch (err) {
+    console.error('Failed to copy: ', err);
+    return false;
+  }
+};

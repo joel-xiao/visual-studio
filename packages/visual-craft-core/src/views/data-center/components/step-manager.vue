@@ -11,10 +11,13 @@
         <div class="step-num">{{ index + 1 }}</div>
         <div class="step-info">
           <div class="step-name-row">
-            <span class="step-name">{{ step.name || '未命名步骤' }}</span>
-            <span class="step-id">{{ step.id }}</span>
+            <span class="step-name" v-hint="step.name">{{ step.name || '未命名步骤' }}</span>
+            <span class="step-id copyable" @click.stop="copyId(step.id)">
+              {{ step.id }}
+              <BasicIcon icon="mdi:content-copy" font-size="9px" class="copy-icon" />
+            </span>
           </div>
-          <div class="step-meta">{{ step.method }} {{ step.url || '未填写地址' }}</div>
+          <div class="step-meta" v-hint="step.url">{{ step.method }} {{ step.url || '未填写地址' }}</div>
         </div>
         <div class="step-actions">
            <div class="order-btns">
@@ -53,9 +56,18 @@
   </div>
 </template>
 
+<script lang="ts">
+import { hintDirective } from '../../../directives/hint';
+export default {
+  directives: {
+    hint: hintDirective
+  }
+};
+</script>
+
 <script setup lang="ts">
 import BasicIcon from '@/views/ui/base/basic-icon.vue';
-import { getUuid } from '@/assets/utils/index';
+import { getUuid, copyToClipboard } from '@/assets/utils/index';
 
 const props = defineProps<{
   steps: any[];
@@ -63,6 +75,11 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits(['update:modelValue', 'change', 'add-ref']);
+
+const copyId = async (id: string) => {
+  const success = await copyToClipboard(id);
+  // Ideally, show a toast or message. For now, simple console log or hint change.
+}
 
 function addStep() {
   const nextNumber = props.steps.length + 1;
@@ -158,14 +175,37 @@ function moveStep(index: number, direction: number) {
         gap: 8px;
         margin-bottom: 2px;
       }
-      .step-name { font-size: 13px; font-weight: 600; color: var(--theme-color-text-bold); }
+      .step-name { 
+        font-size: 13px; 
+        font-weight: 600; 
+        color: var(--theme-color-text-bold); 
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
       .step-id { 
         font-size: 10px; 
         color: var(--theme-color-text-secondary); 
         background: var(--theme-color-gray-100);
-        padding: 0 4px;
+        padding: 0 6px;
+        padding-right: 0px;
         border-radius: 4px;
         opacity: 0.8;
+        flex: none;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        transition: all 0.2s;
+        
+        &.copyable {
+          .copy-icon { opacity: 1; transform: scale(0.7); }
+          &:hover {
+             background: var(--theme-color-blue-100);
+             color: var(--theme-color-blue-700);
+          }
+        }
       }
       .step-meta { font-size: 11px; color: var(--theme-color-text-secondary); opacity: 0.6; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     }
@@ -182,7 +222,7 @@ function moveStep(index: number, direction: number) {
         flex-direction: column;
         color: var(--theme-color-text-secondary);
         .basic-icon {
-          font-size: 14px;
+          font-size: 12px;
           &:hover:not(.disabled) { color: var(--theme-color-blue-700); }
           &.disabled { opacity: 0.2; cursor: not-allowed; }
         }
@@ -243,7 +283,11 @@ function moveStep(index: number, direction: number) {
   .transformation-step {
     border-style: solid;
     background: var(--db-main-color-left-bar-bg);
-    .step-num { background: var(--theme-color-blue-100); color: var(--theme-color-blue-700); }
+    .step-num { 
+      background: var(--theme-color-blue-100); 
+      color: var(--theme-color-blue-700); 
+      .basic-icon { font-size: 12px; }
+    }
     &.active {
       background: rgba(var(--theme-color-blue-700-rgb), 0.05);
       .step-num { background: var(--theme-color-blue-700); color: #fff; }

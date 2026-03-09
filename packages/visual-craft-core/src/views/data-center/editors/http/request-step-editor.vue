@@ -179,6 +179,13 @@ const tabs = computed(() => {
 });
 
 const bodyModes = ['none', 'form-data', 'x-www-form-urlencoded', 'json', 'raw'];
+const methodOptions = [
+  { label: 'GET', value: 'GET' },
+  { label: 'POST', value: 'POST' },
+  { label: 'PUT', value: 'PUT' },
+  { label: 'DELETE', value: 'DELETE' },
+  { label: 'PATCH', value: 'PATCH' }
+];
 
 function updateStep(field: string, value: any) {
   emit('update:step', { ...props.step, [field]: value });
@@ -277,10 +284,12 @@ onMounted(() => {
   border-bottom: 1px solid var(--theme-color-border);
   padding: 0 16px;
   flex: none;
-  gap: 4px;
+  gap: 8px;
+  height: 40px;
 
   .tab-item {
-    padding: 10px 12px;
+    height: 100%;
+    padding: 0 4px;
     font-size: 12px;
     font-weight: 500;
     color: var(--theme-color-text-secondary);
@@ -290,6 +299,7 @@ onMounted(() => {
     display: flex;
     align-items: center;
     gap: 6px;
+    white-space: nowrap;
 
     .count-badge {
       font-size: 10px;
@@ -303,28 +313,29 @@ onMounted(() => {
       align-items: center;
       justify-content: center;
       line-height: 1;
+      transform: translateY(-0.5px);
     }
 
     &:hover { 
       color: var(--theme-color-text-bold); 
-      background: var(--theme-color-gray-100);
     }
 
     &.active {
       color: var(--theme-color-blue-700);
       font-weight: 700;
       .count-badge {
-        background: rgba(54, 98, 236, 0.1);
-        color: var(--theme-color-blue-700);
+        background: var(--theme-color-blue-700);
+        color: #fff;
       }
       &:after {
         content: '';
         position: absolute;
-        bottom: -1px;
+        bottom: 0px;
         left: 0;
         right: 0;
         height: 2px;
         background: var(--theme-color-blue-700);
+        border-radius: 2px 2px 0 0;
       }
     }
   }
