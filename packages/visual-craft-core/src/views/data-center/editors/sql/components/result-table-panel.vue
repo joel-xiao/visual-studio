@@ -12,15 +12,23 @@
           <span :data-text="t.name">{{ t.name }}</span>
         </div>
       </div>
-      <div v-if="response" class="resp-meta">
-         <span class="status" :class="{ success: !response.error }">
-           {{ response.error ? '错误' : '成功' }}
-         </span>
-         <span class="rows">{{ response.rows?.length || 0 }} 行</span>
-         <span class="time">{{ response.time || 0 }}ms</span>
-      </div>
-      <div class="actions">
-        <CButton quaternary size="small" icon="mdi:export" @click="exportCsv">导出 CSV</CButton>
+
+      <div class="header-spacer"></div>
+
+      <div v-if="response" class="resp-meta-actions">
+        <div class="resp-meta">
+           <span class="status" :class="{ success: !response.error }">
+             {{ response.error ? '执行成功' : '执行失败' }}
+           </span>
+           <span class="rows" v-if="!response.error">{{ response.rows?.length || 0 }} rows</span>
+           <span class="time">{{ response.time || 0 }}ms</span>
+        </div>
+        
+        <div class="action-divider" v-if="!response.error && response.rows?.length"></div>
+
+        <div class="actions" v-if="!response.error && response.rows?.length">
+          <CButton quaternary size="small" icon="mdi:download-outline" @click="exportCsv">导出 CSV</CButton>
+        </div>
       </div>
     </div>
 
@@ -214,23 +222,53 @@ function exportCsv() {
       }
     }
     
-    .actions {
+    .header-spacer { flex: 1; }
+    
+    .resp-meta-actions {
       display: flex;
-      gap: 8px;
+      align-items: center;
+      gap: 16px;
+      height: 100%;
     }
 
     .resp-meta {
       display: flex;
-      gap: 16px;
-      margin-left: auto;
-      margin-right: 20px;
-      font-size: 12px;
+      align-items: center;
+      gap: 12px;
+      font-size: 11px;
+      color: var(--theme-color-text-secondary);
+
       .status { 
-        font-weight: 700; color: #f87171; 
-        &.success { color: #34D399; }
+        font-weight: 700; 
+        padding: 1px 6px;
+        border-radius: 4px;
+        background: rgba(248, 113, 113, 0.1);
+        color: #f87171; 
+        &.success { 
+          background: rgba(52, 211, 153, 0.1);
+          color: #34D399; 
+        }
       }
-      .rows { color: var(--theme-color-text-secondary); }
-      .time { color: var(--theme-color-text-secondary); opacity: 0.8; }
+      .rows { font-weight: 500; }
+      .time { opacity: 0.7; }
+    }
+
+    .action-divider {
+      width: 1px;
+      height: 16px;
+      background: var(--db-main-border-black);
+      opacity: 0.5;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      :deep(.c-button) {
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        color: var(--sql-color-primary);
+        &:hover { background: var(--sql-color-primary-light); }
+      }
     }
   }
 
