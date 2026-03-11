@@ -3,44 +3,65 @@ export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 /**
  * Single request step in a chain
  */
-export interface IRequestStep {
+export interface IBaseStep {
     id: string;
     name: string;
+    type: 'http' | 'sql' | 'redis' | 'mqtt' | 'reference';
+    condition?: string;
+    transformation?: { script: string; };
+}
+
+export interface IHttpStep extends IBaseStep {
+    type: 'http';
     url: string;
     method: HttpMethod;
     headers?: Record<string, string>;
     query?: Record<string, string>;
     bodyMode?: 'none' | 'form-data' | 'x-www-form-urlencoded' | 'raw' | 'json';
     body?: any;
-    auth?: {
-        type: 'none' | 'bearer' | 'basic' | 'apikey' | 'inherit';
-        config: Record<string, any>;
-    };
-    enable?: boolean;
-
-    /**
-     * Logic for cascading: 
-     * - `dependsOn`: IDs of steps that must complete before this one.
-     * - `condition`: JS expression or func (string if handled by backend/sandbox) to decide if this step runs.
-     */
-    dependsOn?: string[];
-    condition?: string;
-
-    /**
-     * Data transformation:
-     * - `transformation`: Structured JS processing configuration.
-     * - `transformResponse`: (Legacy) JS string/func to process raw response.
-     * - `cacheKey`: Where to save the result for downstream steps (e.g. 'auth.token').
-     */
-    transformation?: {
-        type: string;
-        script: string;
-    };
-    transformResponse?: string;
-    cacheKey?: string;
-
-    retryCount?: number;
+    auth?: any;
 }
+
+export interface ISqlStep extends IBaseStep {
+    type: 'sql';
+    dbType: 'mysql' | 'postgres' | 'oracle';
+    host: string;
+    port: number;
+    username?: string;
+    password?: string;
+    database: string;
+    query: string;
+}
+
+export interface IRedisStep extends IBaseStep {
+    type: 'redis';
+    host: string;
+    port: number;
+    password?: string;
+    db: number;
+    command: string;
+    args: Record<string, any>;
+}
+
+export interface IMqttStep extends IBaseStep {
+    type: 'mqtt';
+    brokerUrl: string;
+    port: number;
+    username?: string;
+    password?: string;
+    action: 'publish' | 'subscribe';
+    topic: string;
+    payload?: any;
+    qos: 0 | 1 | 2;
+}
+
+export interface IReferenceStep extends IBaseStep {
+    type: 'reference';
+    refId: string;
+    variables: Record<string, any>;
+}
+
+export type IRequestStep = IHttpStep | ISqlStep | IRedisStep | IMqttStep | IReferenceStep;
 
 /**
  * Full data source configuration

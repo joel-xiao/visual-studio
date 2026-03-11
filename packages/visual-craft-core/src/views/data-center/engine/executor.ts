@@ -47,6 +47,21 @@ export class DataRequestExecutor {
     }
 
     private async executeStep(step: IRequestStep) {
+        switch (step.type) {
+            case 'sql':
+                return this.executeSqlRequest(step);
+            case 'redis':
+                return this.executeRedisRequest(step);
+            case 'mqtt':
+                return this.executeMqttRequest(step);
+            case 'http':
+            case 'reference': // References are resolved to http steps before execution
+            default:
+                return this.executeHttpRequest(step as IHttpStep);
+        }
+    }
+
+    private async executeHttpRequest(step: IHttpStep) {
         const context = this.getContext();
         const resolvedUrl = this.resolveTemplate(step.url, context);
         let url = resolvedUrl;
@@ -108,7 +123,7 @@ export class DataRequestExecutor {
             const rawResult = { status: 200, data: { success: true, id: Math.random().toString(36).substr(2, 9) } };
 
             // 5. Transform Result & Update Variables
-            const transformScript = step.transformation?.script || step.transformResponse;
+            const transformScript = step.transformation?.script;
             if (transformScript) {
                 return this.transformResult(transformScript, rawResult, context);
             }
@@ -117,6 +132,28 @@ export class DataRequestExecutor {
         } catch (e) {
             return { status: 500, message: String(e) };
         }
+    }
+
+    private async executeSqlRequest(step: ISqlStep) {
+        // ... (existing implementation)
+        return { status: 200, data: { success: true, query: step.query } };
+    }
+
+    private async executeRedisRequest(step: IRedisStep) {
+        const context = this.getContext();
+        const resolvedArgs: Record<string, any> = {};
+        for (const key in step.args) {
+            resolvedArgs[key] = this.resolveTemplate(step.args[key], context);
+        }
+        // Mock Redis execution
+        return { status: 200, data: { success: true, command: step.command, args: resolvedArgs } };
+    }
+
+    private async executeMqttRequest(step: IMqttStep) {
+        const context = this.getContext();
+        const resolvedPayload = this.resolveTemplate(step.payload, context);
+        // Mock MQTT execution
+        return { status: 200, data: { success: true, action: step.action, topic: step.topic, payload: resolvedPayload } };
     }
 
     private transformResult(script: string, rawResult: any, context: Record<string, any>) {

@@ -1,7 +1,9 @@
 <template>
   <div class="c-select" :class="{ 'c-select-small': size === 'small' }" v-bind="$attrs">
     <BasicBox ref="boxRef" :type="Type" @click="onOpenWrapper('wrapper')">
-      <BasicIcon v-if="size !== 'small'" :lock="lock" :icon="icon" :style="iconStyle" @mousedown="onMouseDown" />
+      <slot name="prefix">
+        <BasicIcon v-if="icon" :lock="lock" :icon="icon" :style="iconStyle" @mousedown="onMouseDown" />
+      </slot>
       <div v-if="Type === 'input-select'" class="c-select-label-wrapper">
         <BasicInput
           :model-value="props.modelValue"
@@ -163,9 +165,9 @@ function onOpenWrapper(event_type: string) {
 
   &.c-select-small {
     .basic-box {
-      height: 24px;
-      min-height: 24px;
-      padding: 0 4px;
+      height: 28px;
+      min-height: 28px;
+      padding: 0 8px;
     }
 
     .basic-select-label {

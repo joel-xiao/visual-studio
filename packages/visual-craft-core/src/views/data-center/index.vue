@@ -44,7 +44,7 @@
             </div>
             <div class="divider"></div>
             <div class="nav-title">
-               {{ viewMode === 'http-editor' ? 'HTTP 接口编辑器' : '协议接入配置' }}
+               {{ viewMode === 'http-editor' ? 'HTTP 接口编辑器' : viewMode === 'sql-editor' ? '数据库查询编辑器' : '协议接入配置' }}
                <span class="sub">- {{ editingSource?.name }}</span>
             </div>
           </div>
@@ -58,6 +58,14 @@
           <HttpEditor 
             ref="editorRef"
             v-if="viewMode === 'http-editor'"
+            :initial-data="editingSource"
+            :response="response"
+            @save="onSaveSource"
+            @test="onTest"
+          />
+          <SqlEditor
+            ref="editorRef"
+            v-if="viewMode === 'sql-editor'"
             :initial-data="editingSource"
             :response="response"
             @save="onSaveSource"
@@ -79,6 +87,7 @@
 import { ref, onUnmounted, watch } from 'vue';
 import HomePanel from './panels/home-panel.vue';
 import HttpEditor from './editors/http/index.vue';
+import SqlEditor from './editors/sql/index.vue';
 import WizardPanel from './panels/wizard-panel.vue';
 import CButton from '@/views/ui/controls/c-button/index.vue';
 import BasicIcon from '@/views/ui/base/basic-icon.vue';
@@ -145,7 +154,9 @@ function onStartAdd() {
 
 function onEditSource(source: any) {
   setEditingSource(JSON.parse(JSON.stringify(source))); // Deep copy for editing
-  if (source.type === 'api' || !source.type) {
+  if (source.type === 'sql') {
+    setViewMode('sql-editor');
+  } else if (source.type === 'api' || !source.type) {
     setViewMode('http-editor');
   } else {
     setViewMode('wizard-editor');
@@ -158,18 +169,33 @@ function onDeleteSource(id: string) {
 }
 
 function onConnectorSelect(connector: any) {
-  setEditingSource({ 
-    name: '新建' + connector.name, 
-    type: connector.id,
-    method: connector.id === 'api' ? 'GET' : 'POST',
-    url: '',
-    steps: connector.id === 'api' ? [
-        { id: 'main', name: '步骤 1', method: 'GET', url: '', headers: [], bodyMode: 'none' }
-    ] : []
-  });
-  if (connector.id === 'api') {
+  if (connector.id === 'sql') {
+    setEditingSource({
+      name: '新建数据库查询',
+      type: 'sql',
+      connection: { dbType: 'mysql', host: '', port: '', database: '', username: '', password: '', timeout: '30', charset: 'utf8mb4', ssl: false },
+      variables: [{ key: '', value: '', description: '', enabled: true }],
+      steps: [{ id: 'query1', name: '查询 1', queryType: 'raw', sql: 'SELECT * FROM table_name LIMIT 100', condition: '', transformation: { script: 'return data;', type: 'raw' } }],
+      transformation: { script: 'return results.query1;', type: 'raw' }
+    });
+    setViewMode('sql-editor');
+  } else if (connector.id === 'api') {
+    setEditingSource({ 
+      name: '新建' + connector.name, 
+      type: connector.id,
+      method: 'GET',
+      url: '',
+      steps: [{ id: 'main', name: '步骤 1', method: 'GET', url: '', headers: [], bodyMode: 'none' }]
+    });
     setViewMode('http-editor');
   } else {
+    setEditingSource({ 
+      name: '新建' + connector.name, 
+      type: connector.id,
+      method: 'POST',
+      url: '',
+      steps: []
+    });
     setViewMode('wizard-editor');
   }
 }

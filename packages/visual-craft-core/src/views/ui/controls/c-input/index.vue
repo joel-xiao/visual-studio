@@ -1,7 +1,9 @@
 <template>
 <div class="c-input" :class="{ 'c-input-small': size === 'small' }" v-bind="$attrs">
   <BasicBox ref="box" type="input">
-    <BasicIcon v-if="size !== 'small'" v-hint="hint || ''" :lock="lock" :icon="icon" :style="iconStyle" @mousedown="onMouseDown" />
+    <slot name="prefix">
+      <BasicIcon v-if="icon" v-hint="hint || ''" :lock="lock" :icon="icon" :style="iconStyle" @mousedown="onMouseDown" />
+    </slot>
     <div class="c-input-content">
       <BasicInput :disabled="lock" v-bind="$attrs" :model-value="modelValue" type="text" @focus="onFocus" @blur="onBlur" @update="onUpdate" />
       <span v-if="suffix" class="c-input-suffix">{{ suffix }}</span>
@@ -136,9 +138,11 @@ const onUpdate = function (value: string | number) {
   }
 
   .c-input-small {
-    height: 24px;
-    min-height: 24px;
-    padding: 0 6px;
+    .basic-box {
+      height: 28px;
+      min-height: 28px;
+      padding: 0 8px;
+    }
 
     .c-input-content {
       padding-right: 4px;
