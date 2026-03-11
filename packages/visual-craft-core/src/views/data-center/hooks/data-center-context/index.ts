@@ -1,6 +1,6 @@
 import { ref, reactive, computed, toRefs, type Ref } from 'vue';
 
-export type ViewMode = 'home' | 'http-editor' | 'sql-editor' | 'wizard-editor' | 'mall';
+export type ViewMode = 'home' | 'http-editor' | 'sql-editor' | 'mqtt-editor' | 'wizard-editor' | 'mall';
 
 export interface IDataCenterState {
     viewMode: ViewMode;
