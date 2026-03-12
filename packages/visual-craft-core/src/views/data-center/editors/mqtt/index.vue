@@ -1,5 +1,5 @@
 <template>
-  <div class="mqtt-editor">
+  <div class="mqtt-editor mqtt-database-editor">
     <div class="editor-main-layout">
       <!-- Left Step Sidebar -->
       <div class="steps-sider">
@@ -38,7 +38,7 @@
             <!-- Global Variables -->
             <div class="config-section mt-30">
               <div class="section-title">
-                <BasicIcon icon="mdi:layers-search-outline" font-size="16px" class="section-icon" />
+                <span class="dot"></span>
                 全局引用变量
               </div>
               <KVEditor v-model="config.variables" label-key="变量名" label-value="初始值" label-desc="说明" />

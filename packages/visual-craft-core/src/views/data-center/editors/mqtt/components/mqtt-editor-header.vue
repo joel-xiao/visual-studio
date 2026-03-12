@@ -2,15 +2,15 @@
   <div class="mqtt-editor-header">
     <div class="header-breadcrumb">
       <div class="crumb-item">
-        <BasicIcon icon="mdi:transit-connection-variant" font-size="14px" />
+        <BasicIcon icon="mdi:access-point-network" font-size="14px" />
         <span>{{ configName }}</span>
       </div>
       <div class="crumb-separator">/</div>
       <div class="crumb-item active">
         <BasicIcon v-if="currentStepIndex === -2" icon="mdi:cog-network-outline" font-size="14px" />
         <BasicIcon v-else-if="currentStepIndex === -1" icon="mdi:function-variant" font-size="14px" />
-        <BasicIcon v-else-if="currentStep.action === 'publish'" icon="mdi:cloud-upload-outline" font-size="14px" />
-        <BasicIcon v-else icon="mdi:cloud-download-outline" font-size="14px" />
+        <BasicIcon v-else-if="currentStep.action === 'publish'" icon="mdi:arrow-up-right-bold-outline" font-size="14px" />
+        <BasicIcon v-else icon="mdi:arrow-down-left-bold-outline" font-size="14px" />
         <span>{{ currentStep.name || (currentStepIndex === -2 ? 'Broker 配置' : '未命名步骤') }}</span>
       </div>
     </div>

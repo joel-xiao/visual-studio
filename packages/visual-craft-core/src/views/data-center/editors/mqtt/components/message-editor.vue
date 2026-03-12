@@ -19,14 +19,16 @@
         <div class="action-toolbar">
           <div class="toolbar-left">
             <div class="action-type-selector">
-              <span class="label"><BasicIcon icon="mdi:gesture-tap" font-size="13px" /> 动作类型</span>
-              <CSelect 
-                icon="mdi:swap-vertical-variant"
-                v-model="step.action" 
-                :options="actionOptions" 
-                size="small" 
-                @update:model-value="(v: string) => update('action', v)" 
-              />
+              <span class="label"><BasicIcon icon="mdi:gesture-tap" font-size="13px" /> 流程动作类型</span>
+              <div class="select-wrap">
+                <CSelect 
+                  icon="mdi:swap-vertical-variant"
+                  v-model="step.action" 
+                  :options="actionOptions" 
+                  size="small" 
+                  @update:model-value="(v: string) => update('action', v)" 
+                />
+              </div>
             </div>
           </div>
           <div class="toolbar-right">
@@ -37,40 +39,45 @@
                class="exec-btn" 
                @click="$emit('send')"
              >
-               执行此动作
+               立即执行 (Mock)
              </CButton>
           </div>
         </div>
 
-        <div class="config-rows">
+        <div class="config-grid">
           <div class="form-row">
-            <div class="form-item main-item">
-              <label><BasicIcon icon="mdi:map-marker-path" font-size="13px" /> MQTT 主题 (Topic)</label>
+            <div class="label"><BasicIcon icon="mdi:map-marker-path" font-size="13px" /> MQTT 目标主题 (Topic)</div>
+            <div class="input-wrap">
               <CInput 
                 icon="mdi:tag-outline"
                 v-model="step.topic" 
                 placeholder="devices/sensor/data" 
-                size="small" 
                 @update:model-value="(v: string) => update('topic', v)" 
               />
             </div>
-            <div class="form-item small-item">
-              <label><BasicIcon icon="mdi:check-decagram-outline" font-size="13px" /> QoS 等级</label>
-              <CSelect 
-                icon="mdi:numeric"
-                v-model="step.qos" 
-                :options="qosOptions" 
-                size="small" 
-                @update:model-value="(v: number) => update('qos', v)" 
-              />
-            </div>
-            <div class="form-item mid-item" v-if="step.action === 'publish'">
-              <label><BasicIcon icon="mdi:bookmark-check-outline" font-size="13px" /> Retain 标志</label>
-              <div class="switch-placeholder">
-                <CSwitch 
-                  v-model="step.retain" 
-                  @update:model-value="(v: boolean) => update('retain', v)" 
+          </div>
+
+          <div class="form-row-group">
+            <div class="form-row">
+              <div class="label"><BasicIcon icon="mdi:check-decagram-outline" font-size="13px" /> QoS 质量等级</div>
+              <div class="input-wrap">
+                <CSelect 
+                  icon="mdi:numeric"
+                  v-model="step.qos" 
+                  :options="qosOptions" 
+                  @update:model-value="(v: number) => update('qos', v)" 
                 />
+              </div>
+            </div>
+            <div class="form-row" v-if="step.action === 'publish'">
+              <div class="label"><BasicIcon icon="mdi:bookmark-check-outline" font-size="13px" /> Retain 消息保留</div>
+              <div class="input-wrap">
+                <div class="toggle-switch" :class="{ active: step.retain }" @click="update('retain', !step.retain)">
+                  <span class="toggle-track">
+                    <span class="toggle-thumb"></span>
+                  </span>
+                  <label>{{ step.retain ? '已启用' : '未启用' }}</label>
+                </div>
               </div>
             </div>
           </div>
@@ -79,14 +86,12 @@
 
       <!-- Payload Tab -->
       <div v-if="activeTab === 'payload'" class="payload-section">
-        <div class="json-header">
-           <div class="title">
-             <BasicIcon icon="mdi:code-json" font-size="16px" />
-             <span>消息负载 (JSON Payload)</span>
-           </div>
-           <div class="format-btn" @click="formatJson">格式化 JSON</div>
+        <div class="field-label">
+           <BasicIcon icon="mdi:code-json" font-size="16px" class="sec-icon" />
+           <span>消息负载 (JSON Payload)</span>
+           <span class="format-btn" @click="formatJson">格式化 JSON</span>
         </div>
-        <div class="payload-editor-container">
+        <div class="editor-wrap">
            <textarea 
              v-model="step.payload" 
              class="payload-area" 
@@ -98,22 +103,22 @@
 
       <!-- Condition Tab -->
       <div v-if="activeTab === 'condition'" class="condition-section">
-         <div class="condition-header">
-            <div class="title">
-              <BasicIcon icon="mdi:function-variant" font-size="16px" />
-              <span>执行条件 (JS Condition)</span>
-            </div>
+         <div class="field-label">
+            <BasicIcon icon="mdi:filter-check-outline" font-size="16px" class="sec-icon" />
+            <span>执行控制条件</span>
+            <span class="tip">控制此 MQTT 步骤的触发逻辑</span>
          </div>
-         <div class="condition-editor-container">
+         <div class="editor-wrap">
            <textarea 
              v-model="step.condition" 
              class="condition-area" 
              @input="(e: any) => update('condition', e.target.value)"
-             placeholder="results.step1.success === true"
+             placeholder="// 示例: results.step1.temp > 50"
            ></textarea>
          </div>
-         <div class="condition-hint">
-            使用 JavaScript 表达式控制此步骤。例如引用上游结果: <code>results.step1.temp > 50</code>
+         <div class="info-banner">
+            <BasicIcon icon="mdi:information-outline" font-size="16px" />
+            <span>支持 JS 表达式。可使用 <code>results.xxx</code> 引用上一步或 <code>vars.xxx</code> 引用全局变量。</span>
          </div>
       </div>
     </div>
@@ -124,7 +129,6 @@
 import { ref } from 'vue';
 import CInput from '@/views/ui/controls/c-input/index.vue';
 import CSelect from '@/views/ui/controls/c-select/index.vue';
-import CSwitch from '@/views/ui/controls/c-switch/index.vue';
 import CButton from '@/views/ui/controls/c-button/index.vue';
 import BasicIcon from '@/views/ui/base/basic-icon.vue';
 
@@ -137,9 +141,9 @@ const emit = defineEmits(['update:step', 'send']);
 
 const activeTab = ref('behavior');
 const tabs = [
-  { id: 'behavior', name: '行为配置', icon: 'mdi:upload-network' },
-  { id: 'payload', name: '消息负载', icon: 'mdi:code-json' },
-  { id: 'condition', name: '执行条件', icon: 'mdi:function-variant' }
+  { id: 'behavior', name: '行为配置', icon: 'mdi:play-box-outline' },
+  { id: 'payload', name: '数据负载', icon: 'mdi:toy-brick-plus-outline' },
+  { id: 'condition', name: '执行控制', icon: 'mdi:play-pause' }
 ];
 
 const actionOptions = [
@@ -176,7 +180,7 @@ function formatJson() {
 
   .config-tabs {
     flex: none;
-    height: 36px;
+    height: 42px;
     padding: 0 20px;
     display: flex;
     align-items: center;
@@ -204,8 +208,8 @@ function formatJson() {
           content: '';
           position: absolute;
           bottom: 0px;
-          left: 0;
-          right: 0;
+          left: -4px;
+          right: -4px;
           height: 2px;
           background: var(--mqtt-color-primary);
         }
@@ -215,7 +219,7 @@ function formatJson() {
 
   .tab-pane {
     flex: 1;
-    overflow: hidden;
+    overflow-y: auto;
     padding: 24px;
   }
 
@@ -232,48 +236,95 @@ function formatJson() {
        align-items: center;
        gap: 12px;
        .label { font-size: 12px; color: var(--theme-color-text-secondary); opacity: 0.6; }
+       .select-wrap { width: 180px; }
+    }
+
+    .exec-btn {
+      background: var(--mqtt-color-primary) !important;
+      border-color: var(--mqtt-color-primary) !important;
+      color: #000;
+      font-weight: 800;
     }
   }
 
-  .config-rows {
-    .form-row {
-      display: flex;
-      gap: 20px;
-      .form-item {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        label { font-size: 12px; font-weight: 600; color: var(--theme-color-text-secondary); }
-        .switch-placeholder { height: 28px; display: flex; align-items: center; }
-      }
-      .main-item { flex: 2; }
-      .mid-item { flex: 1; }
-      .small-item { width: 120px; }
-    }
-  }
-
-  .json-header, .condition-header {
+  .config-grid {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-    .title {
-       display: flex;
-       align-items: center;
-       gap: 8px;
-       font-size: 14px;
-       font-weight: 700;
-       color: var(--theme-color-text-bold);
-    }
-    .format-btn {
-       font-size: 11px;
-       color: var(--mqtt-color-primary);
-       cursor: pointer;
-       &:hover { opacity: 0.8; }
+    flex-direction: column;
+    gap: 16px;
+    max-width: 800px;
+  }
+
+  .form-row-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    .label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--theme-color-text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
   }
 
-  .payload-editor-container, .condition-editor-container {
+  .toggle-switch {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+    height: 32px;
+
+    .toggle-track {
+      width: 28px;
+      height: 16px;
+      background: var(--theme-color-gray-300);
+      border-radius: 10px;
+      position: relative;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      flex: none;
+      .toggle-thumb {
+        position: absolute;
+        left: 2px;
+        top: 2px;
+        width: 12px;
+        height: 12px;
+        background: #fff;
+        border-radius: 50%;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      }
+    }
+
+    label { font-size: 12px; color: var(--theme-color-text-secondary); cursor: pointer; }
+    &.active {
+      .toggle-track { background: var(--mqtt-color-primary); }
+      .toggle-thumb { left: 14px; }
+      label { color: var(--theme-color-text-bold); font-weight: 600; }
+    }
+  }
+
+  .field-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--theme-color-text-bold);
+    margin-bottom: 16px;
+    .sec-icon { color: var(--mqtt-color-primary); }
+    .tip { font-size: 11px; font-weight: 400; color: var(--theme-color-text-secondary); opacity: 0.6; margin-left: auto; }
+    .format-btn { font-size: 11px; color: var(--mqtt-color-primary); cursor: pointer; margin-left: auto; &:hover { text-decoration: underline; } }
+  }
+
+  .editor-wrap {
     flex: 1;
     border: 1px solid var(--theme-color-border);
     border-radius: 8px;
@@ -292,12 +343,18 @@ function formatJson() {
     }
   }
 
-  .condition-hint {
-     margin-top: 12px;
-     font-size: 12px;
-     color: var(--theme-color-text-secondary);
-     opacity: 0.6;
-     code { background: rgba(0,0,0,0.3); padding: 2px 4px; border-radius: 4px; }
+  .info-banner {
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: var(--mqtt-color-primary-light);
+    border: 1px solid rgba(129, 140, 248, 0.1);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 12px;
+    color: var(--theme-color-text-secondary);
+    code { background: rgba(0,0,0,0.2); padding: 1px 4px; border-radius: 3px; }
   }
 }
 </style>

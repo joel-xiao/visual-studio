@@ -2,7 +2,7 @@
   <div class="mqtt-step-manager">
     <div class="manager-header">
       <div class="title">
-        <BasicIcon icon="mdi:transit-connection-variant" font-size="16px" />
+        <BasicIcon icon="mdi:format-list-bulleted-type" font-size="16px" />
         <span>MQTT 条目流</span>
       </div>
       <div class="badge">{{ steps.length }}</div>
@@ -38,8 +38,8 @@
         @click="$emit('update:modelValue', index)"
       >
         <div class="step-icon-box">
-           <BasicIcon v-if="element.action === 'publish'" icon="mdi:cloud-upload-outline" font-size="16px" />
-           <BasicIcon v-else icon="mdi:cloud-download-outline" font-size="16px" />
+           <BasicIcon v-if="element.action === 'publish'" icon="mdi:arrow-up-right-bold-outline" font-size="16px" />
+           <BasicIcon v-else icon="mdi:arrow-down-left-bold-outline" font-size="16px" />
         </div>
         <div class="step-info">
           <div class="step-name-row">
@@ -187,7 +187,7 @@ function moveStep(index: number, direction: number) {
       border-radius: 9px;
       font-size: 10px;
       font-weight: 800;
-      color: var(--mqtt-color-primary);
+      color: #34D399;
       display: flex;
       align-items: center;
     }
