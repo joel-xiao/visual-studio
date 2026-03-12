@@ -6,7 +6,7 @@ export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 export interface IBaseStep {
     id: string;
     name: string;
-    type: 'http' | 'sql' | 'redis' | 'mqtt' | 'websocket' | 'reference';
+    type: 'http' | 'sql' | 'redis' | 'mqtt' | 'websocket' | 'modbus' | 'reference';
     condition?: string;
     transformation?: { script: string; };
 }
@@ -61,6 +61,14 @@ export interface IReferenceStep extends IBaseStep {
     variables: Record<string, any>;
 }
 
+export interface IModbusStep extends IBaseStep {
+    type: 'modbus';
+    functionCode: number; // 1 (Read Coils), 2 (Read Discrete Inputs), 3 (Read Holding Regs), 4 (Read Input Regs), 5 (Write Single Coil), 6 (Write Single Reg), 15 (Write Multiple Coils), 16 (Write Multiple Regs)
+    address: number;
+    quantity?: number;
+    value?: number | number[] | boolean | boolean[];
+}
+
 export interface IWebsocketStep extends IBaseStep {
     type: 'websocket';
     action: 'send' | 'listen';
@@ -69,7 +77,7 @@ export interface IWebsocketStep extends IBaseStep {
     timeout?: number;
 }
 
-export type IRequestStep = IHttpStep | ISqlStep | IRedisStep | IMqttStep | IWebsocketStep | IReferenceStep;
+export type IRequestStep = IHttpStep | ISqlStep | IRedisStep | IMqttStep | IWebsocketStep | IModbusStep | IReferenceStep;
 
 /**
  * Full data source configuration
