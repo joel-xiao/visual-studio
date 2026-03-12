@@ -44,7 +44,7 @@
             </div>
             <div class="divider"></div>
             <div class="nav-title">
-                {{ viewMode === 'http-editor' ? 'HTTP 接口编辑器' : viewMode === 'sql-editor' ? '数据库查询编辑器' : viewMode === 'mqtt-editor' ? 'MQTT 物联网编辑器' : '协议接入配置' }}
+                {{ viewMode === 'http-editor' ? 'HTTP 接口编辑器' : viewMode === 'sql-editor' ? '数据库查询编辑器' : viewMode === 'mqtt-editor' ? 'MQTT 物联网编辑器' : viewMode === 'redis-editor' ? 'Redis 缓存编辑器' : '协议接入配置' }}
                <span class="sub">- {{ editingSource?.name }}</span>
             </div>
           </div>
@@ -79,6 +79,14 @@
             @save="onSaveSource"
             @test="onTest"
           />
+          <RedisEditor
+            ref="editorRef"
+            v-if="viewMode === 'redis-editor'"
+            :initial-data="editingSource"
+            :response="response"
+            @save="onSaveSource"
+            @test="onTest"
+          />
           <WizardPanel 
             v-if="viewMode === 'wizard-editor'"
             :initial-data="editingSource"
@@ -97,6 +105,7 @@ import HomePanel from './panels/home-panel.vue';
 import HttpEditor from './editors/http/index.vue';
 import SqlEditor from './editors/sql/index.vue';
 import MqttEditor from './editors/mqtt/index.vue';
+import RedisEditor from './editors/redis/index.vue';
 import WizardPanel from './panels/wizard-panel.vue';
 import CButton from '@/views/ui/controls/c-button/index.vue';
 import BasicIcon from '@/views/ui/base/basic-icon.vue';
@@ -167,6 +176,8 @@ function onEditSource(source: any) {
     setViewMode('sql-editor');
   } else if (source.type === 'mqtt') {
     setViewMode('mqtt-editor');
+  } else if (source.type === 'redis') {
+    setViewMode('redis-editor');
   } else if (source.type === 'api' || !source.type) {
     setViewMode('http-editor');
   } else {
@@ -209,6 +220,16 @@ function onConnectorSelect(connector: any) {
       transformation: { script: 'return results.step1;', type: 'raw' }
     });
     setViewMode('mqtt-editor');
+  } else if (connector.id === 'redis') {
+    setEditingSource({
+      name: '新建 Redis 操作',
+      type: 'redis',
+      connection: { host: '127.0.0.1', port: 6379, username: '', password: '', db: 0, ssl: false, timeout: 5000 },
+      variables: [{ key: '', value: '', description: '', enabled: true }],
+      steps: [{ id: 'cmd1', name: '命令 1', actionType: 'raw', command: 'GET my_key', condition: '', variables: [{ key: '', value: '', description: '', enabled: true }], transformation: { script: 'return data;', type: 'raw' } }],
+      transformation: { script: 'return results.cmd1;', type: 'raw' }
+    });
+    setViewMode('redis-editor');
   } else {
     setEditingSource({ 
       name: '新建' + connector.name, 
