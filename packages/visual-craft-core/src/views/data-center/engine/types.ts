@@ -6,7 +6,7 @@ export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 export interface IBaseStep {
     id: string;
     name: string;
-    type: 'http' | 'sql' | 'redis' | 'mqtt' | 'reference';
+    type: 'http' | 'sql' | 'redis' | 'mqtt' | 'websocket' | 'reference';
     condition?: string;
     transformation?: { script: string; };
 }
@@ -61,7 +61,15 @@ export interface IReferenceStep extends IBaseStep {
     variables: Record<string, any>;
 }
 
-export type IRequestStep = IHttpStep | ISqlStep | IRedisStep | IMqttStep | IReferenceStep;
+export interface IWebsocketStep extends IBaseStep {
+    type: 'websocket';
+    action: 'send' | 'listen';
+    payload: string; // JSON or text
+    format: 'text' | 'json';
+    timeout?: number;
+}
+
+export type IRequestStep = IHttpStep | ISqlStep | IRedisStep | IMqttStep | IWebsocketStep | IReferenceStep;
 
 /**
  * Full data source configuration
