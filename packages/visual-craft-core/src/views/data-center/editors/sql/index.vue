@@ -297,20 +297,15 @@ defineExpose({ submit });
 
 <style lang="scss">
 :is(#visual-craft-core, #visual-craft-core-project) {
-  /* Unified SQL Module Theme */
+  /* SQL Module local accent colors (do NOT override global blue) */
   --sql-color-primary: #10b981;
   --sql-color-primary-hover: #059669;
   --sql-color-primary-light: rgba(16, 185, 129, 0.12);
-  
+
   --sql-color-accent-join: #818cf8;
   --sql-color-accent-join-light: rgba(129, 140, 248, 0.1);
-  
+
   --sql-color-accent-agg: #f59e0b;
   --sql-color-accent-agg-light: rgba(245, 158, 11, 0.1);
-  
-  /* Standardizing component overrides */
-  --db-editor-color-primary: var(--sql-color-primary);
-  --theme-color-blue-700: var(--sql-color-primary);
-  --theme-color-blue-800: var(--sql-color-primary-hover);
 }
 </style>

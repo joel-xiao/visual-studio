@@ -1,121 +1,217 @@
 <template>
   <div class="mqtt-editor-header">
-     <div class="header-left">
-        <div class="step-badge">
-           <span v-if="currentStepIndex === -1">FINAL</span>
-           <span v-else-if="currentStepIndex === -2">CONFIG</span>
-           <span v-else>STEP {{ currentStepIndex + 1 }}</span>
-        </div>
-        <div class="step-title-group">
-           <div class="main-title">{{ currentStep.name }}</div>
-           <div class="sub-path">
-              {{ currentStepIndex === -2 ? 'Broker Connection Details' : currentStepIndex === -1 ? 'Data Pipeline Outlet' : currentStep.topic || 'No topic defined' }}
-           </div>
-        </div>
-     </div>
+    <div class="header-breadcrumb">
+      <div class="crumb-item">
+        <BasicIcon icon="mdi:transit-connection-variant" font-size="14px" />
+        <span>{{ configName }}</span>
+      </div>
+      <div class="crumb-separator">/</div>
+      <div class="crumb-item active">
+        <BasicIcon v-if="currentStepIndex === -2" icon="mdi:cog-network-outline" font-size="14px" />
+        <BasicIcon v-else-if="currentStepIndex === -1" icon="mdi:function-variant" font-size="14px" />
+        <BasicIcon v-else-if="currentStep.action === 'publish'" icon="mdi:cloud-upload-outline" font-size="14px" />
+        <BasicIcon v-else icon="mdi:cloud-download-outline" font-size="14px" />
+        <span>{{ currentStep.name || (currentStepIndex === -2 ? 'Broker 配置' : '未命名步骤') }}</span>
+      </div>
+    </div>
 
-     <div class="header-right">
-        <div class="connection-status" :class="connectionStatus">
-           <span class="dot"></span>
-           <span class="text">{{ statusText }}</span>
+    <div class="header-metadata">
+      <div class="meta-item id-badge" @click="copyId(currentStep.id || 'global')">
+        <span class="label">ID</span>
+        <span class="value">{{ currentStep.id || (currentStepIndex === -2 ? 'GLOBAL' : '-') }}</span>
+        <BasicIcon icon="mdi:content-copy" font-size="11px" class="copy-icon" />
+      </div>
+      
+      <div class="meta-divider"></div>
+
+      <div class="meta-item">
+        <span class="label">协议</span>
+        <div class="protocol-badge">
+          <BasicIcon icon="mdi:wifi-marker" font-size="14px" />
+          <span class="value">MQTT / WebSocket</span>
         </div>
-        <div class="action-buttons">
-           <CButton quaternary size="small" icon="mdi:refresh">同步</CButton>
-           <CButton primary size="small" icon="mdi:play" @click="$emit('execute')">调试运行</CButton>
+      </div>
+
+      <div class="meta-divider"></div>
+
+      <div class="meta-item">
+        <span class="label">状态</span>
+        <div class="status-indicator" :class="connectionStatus">
+          <div class="pulse-dot"></div>
+          <span class="value">{{ statusText }}</span>
         </div>
-     </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import CButton from '@/views/ui/controls/c-button/index.vue';
+import BasicIcon from '@/views/ui/base/basic-icon.vue';
+import { copyToClipboard } from '@/assets/utils/index';
 
 const props = defineProps<{
   currentStep: any;
   currentStepIndex: number;
-  connectionStatus: string;
+  connectionStatus: string; // 'connected', 'connecting', 'error', 'disconnected'
+  configName?: string;
 }>();
 
-const emit = defineEmits(['execute']);
+const configName = computed(() => props.configName || 'MQTT 物联网数据源');
 
 const statusText = computed(() => {
-  switch (props.connectionStatus) {
-    case 'connected': return 'Broker 已连接';
-    case 'connecting': return '正在连接...';
-    case 'error': return '连接异常';
-    default: return '未连接';
-  }
+  const map: any = {
+    connected: '已联机',
+    connecting: '正在握手...',
+    error: '连接断开',
+    disconnected: '未激活'
+  };
+  return map[props.connectionStatus] || '未知';
 });
+
+async function copyId(id: string) {
+  await copyToClipboard(id);
+}
 </script>
 
 <style lang="scss" scoped>
 .mqtt-editor-header {
-  height: 60px;
+  height: 48px;
+  padding: 0 24px;
+  background: var(--db-main-color-left-bar-bg);
+  border-bottom: 1px solid var(--db-main-border-black);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 24px;
-  background: var(--db-editor-color-panel-bg);
-  border-bottom: 1px solid var(--db-main-border-black);
+  flex: none;
 
-  .header-left {
+  .header-breadcrumb {
     display: flex;
     align-items: center;
-    gap: 16px;
-
-    .step-badge {
-      background: var(--db-main-border-black);
-      color: var(--theme-color-text-secondary);
-      font-size: 10px;
-      font-weight: 800;
-      padding: 3px 8px;
-      border-radius: 4px;
-      letter-spacing: 0.5px;
-    }
-
-    .step-title-group {
-      .main-title { font-size: 15px; font-weight: 700; color: var(--theme-color-text-bold); }
-      .sub-path { font-size: 11px; opacity: 0.5; margin-top: 2px; font-family: monospace; }
-    }
-  }
-
-  .header-right {
-    display: flex;
-    align-items: center;
-    gap: 24px;
-
-    .connection-status {
+    gap: 12px;
+    
+    .crumb-item {
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 12px;
-      font-weight: 600;
+      font-size: 13px;
       color: var(--theme-color-text-secondary);
-
-      .dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: var(--theme-color-gray-400);
+      opacity: 0.6;
+      transition: all 0.2s;
+      
+      &.active {
+        opacity: 1;
+        color: var(--theme-color-text-bold);
+        font-weight: 700;
+        span { margin-bottom: -1px; }
       }
+    }
+    
+    .crumb-separator {
+      font-size: 14px;
+      color: var(--theme-color-text-secondary);
+      opacity: 0.3;
+      user-select: none;
+    }
+  }
 
-      &.connected .dot { background: #10b981; box-shadow: 0 0 8px rgba(16, 185, 129, 0.4); }
-      &.connecting .dot { background: #f59e0b; animation: pulse 1s infinite; }
-      &.error .dot { background: #ef4444; }
+  .header-metadata {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+
+    .meta-divider {
+      width: 1px;
+      height: 16px;
+      background: var(--db-main-border-black);
     }
 
-    .action-buttons {
+    .meta-item {
       display: flex;
       align-items: center;
       gap: 10px;
+
+      .label {
+        font-size: 11px;
+        color: var(--theme-color-text-secondary);
+        opacity: 0.5;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .value {
+        font-size: 12px;
+        font-weight: 600;
+      }
+    }
+
+    .id-badge {
+      cursor: pointer;
+      padding: 4px 10px;
+      background: var(--db-main-border-black);
+      border-radius: 6px;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+      
+      .value { font-family: 'Fira Code', monospace; color: var(--mqtt-color-primary); font-size: 11px; }
+      .copy-icon { opacity: 0; transition: opacity 0.2s; }
+
+      &:hover {
+        border-color: var(--mqtt-color-primary);
+        background: var(--mqtt-color-primary-light);
+        .copy-icon { opacity: 0.6; }
+      }
+    }
+
+    .protocol-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 10px;
+      border-radius: 20px;
+      color: var(--mqtt-color-primary);
+      background: var(--mqtt-color-primary-light);
+      .value { font-size: 11px; font-weight: 800; }
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      
+      .pulse-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        position: relative;
+        background: currentColor;
+      }
+
+      &.connected {
+        color: #10b981;
+        .pulse-dot::after {
+          content: '';
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+          background: currentColor;
+          animation: status-pulse 1.5s infinite;
+          opacity: 0.5;
+        }
+      }
+      &.connecting { color: #f59e0b; }
+      &.disconnected { color: var(--theme-color-text-secondary); opacity: 0.6; }
+      &.error { color: #ef4444; }
+
+      .value { font-size: 11px; font-weight: 700; }
     }
   }
 }
 
-@keyframes pulse {
-  0% { opacity: 1; }
-  50% { opacity: 0.5; }
-  100% { opacity: 1; }
+@keyframes status-pulse {
+  0% { transform: scale(1); opacity: 0.5; }
+  100% { transform: scale(3.5); opacity: 0; }
 }
 </style>

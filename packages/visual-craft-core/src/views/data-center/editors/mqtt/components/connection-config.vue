@@ -2,13 +2,14 @@
   <div class="mqtt-connection-config">
     <div class="config-section">
       <div class="section-title">
-        <span class="dot"></span>
+        <BasicIcon icon="mdi:dns-outline" font-size="16px" class="section-icon" />
         Broker 服务器地址
       </div>
       <div class="form-row grid-2">
         <div class="form-item">
-          <label>服务器地址</label>
+          <label><BasicIcon icon="mdi:link-variant" font-size="13px" /> 服务器地址</label>
           <CInput 
+            icon="mdi:ip-network-outline"
             :model-value="modelValue.brokerUrl" 
             placeholder="mqtt://broker.emqx.io" 
             size="small"
@@ -16,8 +17,9 @@
           />
         </div>
         <div class="form-item">
-          <label>端口</label>
+          <label><BasicIcon icon="mdi:numeric" font-size="13px" /> 端口</label>
           <CInput 
+            icon="mdi:ethernet"
             :model-value="String(modelValue.port)" 
             placeholder="1883" 
             size="small"
@@ -29,13 +31,14 @@
 
     <div class="config-section">
       <div class="section-title">
-        <span class="dot"></span>
+        <BasicIcon icon="mdi:lan-connect" font-size="16px" class="section-icon" />
         客户端配置
       </div>
       <div class="form-row grid-2">
         <div class="form-item">
-          <label>Client ID</label>
+          <label><BasicIcon icon="mdi:fingerprint" font-size="13px" /> Client ID</label>
           <CInput 
+            icon="mdi:identifier"
             :model-value="modelValue.clientId" 
             placeholder="自动生成或手动输入" 
             size="small"
@@ -43,8 +46,9 @@
           />
         </div>
         <div class="form-item">
-          <label>协议</label>
+          <label><BasicIcon icon="mdi:protocol" font-size="13px" /> 连接协议</label>
           <CSelect 
+            icon="mdi:wifi-marker"
             :model-value="modelValue.protocol" 
             :options="protocolOptions" 
             size="small"
@@ -56,13 +60,14 @@
 
     <div class="config-section">
       <div class="section-title">
-        <span class="dot"></span>
+        <BasicIcon icon="mdi:account-key-outline" font-size="16px" class="section-icon" />
         安全认证 (可选)
       </div>
       <div class="form-row grid-2">
         <div class="form-item">
-          <label>用户名</label>
+          <label><BasicIcon icon="mdi:account-outline" font-size="13px" /> 用户名</label>
           <CInput 
+            icon="mdi:account-circle-outline"
             :model-value="modelValue.username" 
             placeholder="Username" 
             size="small"
@@ -70,8 +75,9 @@
           />
         </div>
         <div class="form-item">
-          <label>密码</label>
+          <label><BasicIcon icon="mdi:lock-outline" font-size="13px" /> 密码</label>
           <CInput 
+            icon="mdi:form-textbox-password"
             :model-value="modelValue.password" 
             type="password"
             placeholder="Password" 
@@ -84,29 +90,29 @@
 
     <div class="config-section">
       <div class="section-title">
-        <span class="dot"></span>
+        <BasicIcon icon="mdi:tune-variant" font-size="16px" class="section-icon" />
         高级参数
       </div>
       <div class="form-row grid-3">
         <div class="form-item">
-           <label>心跳间隔 (Keepalive)</label>
-           <CInput :model-value="String(modelValue.keepalive)" size="small" @update:model-value="(v: string) => update('keepalive', Number(v))" />
+           <label><BasicIcon icon="mdi:timer-outline" font-size="13px" /> 心跳 (Keepalive)</label>
+           <CInput icon="mdi:heart-pulse" :model-value="String(modelValue.keepalive)" size="small" @update:model-value="(v: string) => update('keepalive', Number(v))" />
         </div>
         <div class="form-item">
-           <label>清除会话 (Clean Session)</label>
+           <label><BasicIcon icon="mdi:broom" font-size="13px" /> 清除会话</label>
            <div class="switch-placeholder">
-              <input type="checkbox" :checked="modelValue.clean" @change="e => update('clean', (e.target as HTMLInputElement).checked)" />
+              <CSwitch :model-value="modelValue.clean" @update:model-value="v => update('clean', v)" />
            </div>
         </div>
         <div class="form-item">
-           <label>重连周期 (ms)</label>
-           <CInput :model-value="String(modelValue.reconnectPeriod)" size="small" @update:model-value="(v: string) => update('reconnectPeriod', Number(v))" />
+           <label><BasicIcon icon="mdi:refresh-auto" font-size="13px" /> 重连周期 (ms)</label>
+           <CInput icon="mdi:history" :model-value="String(modelValue.reconnectPeriod)" size="small" @update:model-value="(v: string) => update('reconnectPeriod', Number(v))" />
         </div>
       </div>
     </div>
 
     <div class="test-footer">
-       <CButton quaternary @click="$emit('test-connection')">测试连通性</CButton>
+       <CButton quaternary size="small" icon="mdi:lightning-bolt" @click="$emit('test-connection')">测试连通性</CButton>
        <span class="hint">建立 TCP/WS 连接到指定的 Broker 以验证配置</span>
     </div>
   </div>
@@ -116,6 +122,8 @@
 import CInput from '@/views/ui/controls/c-input/index.vue';
 import CSelect from '@/views/ui/controls/c-select/index.vue';
 import CButton from '@/views/ui/controls/c-button/index.vue';
+import CSwitch from '@/views/ui/controls/c-switch/index.vue';
+import BasicIcon from '@/views/ui/base/basic-icon.vue';
 
 const props = defineProps<{
   modelValue: any;
@@ -153,11 +161,10 @@ function update(key: string, value: any) {
       display: flex;
       align-items: center;
       gap: 8px;
-      
       .dot {
         width: 3px;
         height: 14px;
-        background: #818cf8;
+        background: var(--mqtt-color-primary);
         border-radius: 2px;
       }
     }

@@ -216,7 +216,7 @@ function exportCsv() {
             left: 0;
             right: 0;
             height: 2px;
-            background: #34D399;
+            background: var(--db-editor-color-primary, #34D399);
           }
         }
       }
@@ -245,8 +245,8 @@ function exportCsv() {
         background: rgba(248, 113, 113, 0.1);
         color: #f87171; 
         &.success { 
-          background: rgba(52, 211, 153, 0.1);
-          color: #34D399; 
+          background: var(--db-editor-color-primary-light, rgba(52, 211, 153, 0.1));
+          color: var(--db-editor-color-primary, #34D399); 
         }
       }
       .rows { font-weight: 500; }

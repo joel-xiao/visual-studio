@@ -38,7 +38,7 @@
             <!-- Global Variables -->
             <div class="config-section mt-30">
               <div class="section-title">
-                <span class="dot"></span>
+                <BasicIcon icon="mdi:layers-search-outline" font-size="16px" class="section-icon" />
                 全局引用变量
               </div>
               <KVEditor v-model="config.variables" label-key="变量名" label-value="初始值" label-desc="说明" />
@@ -182,10 +182,6 @@ defineExpose({ submit });
   color: var(--theme-color-text);
   position: relative;
 
-  --mqtt-color-primary: #818cf8;
-  --mqtt-color-primary-hover: #6366f1;
-  --mqtt-color-primary-light: rgba(129, 140, 248, 0.12);
-
   .editor-main-layout {
     display: flex;
     flex: 1;
@@ -278,6 +274,30 @@ defineExpose({ submit });
         border-radius: 8px;
         overflow: hidden;
       }
+    }
+  }
+}
+</style>
+
+<style lang="scss">
+:is(#visual-craft-core, #visual-craft-core-project) {
+  .mqtt-database-editor {
+    /* Dedicated MQTT Identity (Vibrant Indigo) */
+    --mqtt-color-primary: #818cf8;
+    --mqtt-color-primary-hover: #6366f1;
+    --mqtt-color-primary-light: rgba(129, 140, 248, 0.2); /* Deepen to avoid white-ish look */
+
+    /* Local system-blue overrides — only affects components INSIDE this editor */
+    --theme-color-blue-700: var(--mqtt-color-primary);
+    --theme-color-blue-800: var(--mqtt-color-primary-hover);
+    --db-editor-color-primary: var(--mqtt-color-primary);
+    --db-editor-color-primary-light: var(--mqtt-color-primary-light);
+    
+    /* Theme icons in inputs and selects */
+    .c-input :deep(.basic-icon),
+    .c-select :deep(.basic-icon) {
+      color: var(--mqtt-color-primary);
+      opacity: 0.8;
     }
   }
 }
