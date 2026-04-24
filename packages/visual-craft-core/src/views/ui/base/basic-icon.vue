@@ -16,7 +16,7 @@ export interface IProps {
   lock?: boolean;
   icon?: string;
   hover?: boolean;
-  size?: 'small' | 'medium' | 'large';
+  size?: 'small' | 'medium' | 'large' | 'mini';
   spin?: boolean;
   hint?: string;
 }
@@ -77,6 +77,12 @@ const isIconText = computed(() => {
     .iconfont { font-size: 14px; }
   }
 
+  &.mini {
+    width: 16px;
+    font-size: 12px;
+    .iconfont { font-size: 12px; }
+  }
+
   &.medium {
     width: 24px;
     font-size: 16px;
@@ -96,6 +102,7 @@ const isIconText = computed(() => {
   &.hover {
     border-radius: 3px;
     cursor: pointer;
+    &.mini { width: 20px; height: 20px; }
     &.small { width: 24px; height: 24px; }
     &.medium { width: 28px; height: 28px; }
     &.large { width: 36px; height: 36px; }

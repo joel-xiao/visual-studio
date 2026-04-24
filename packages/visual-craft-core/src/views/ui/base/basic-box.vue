@@ -10,10 +10,14 @@ import { ref, computed, watchEffect, watch } from 'vue';
 interface Props {
   modelValue?: boolean;
   type: string; // status-button button input input-select
+  size?: 'small' | 'medium' | 'large' | 'mini';
+  square?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
   modelValue: false,
-  type: ''
+  type: '',
+  size: 'medium',
+  square: false
 });
 
 const emit = defineEmits(['update:modelValue', 'update']);
@@ -33,6 +37,8 @@ watchEffect(() => {
 
 const boxStyle = computed(() => ({
   [props.type + '-box']: !!props.type,
+  [props.size]: !!props.size,
+  'is-square': props.square,
   active: model.value
 }));
 
@@ -77,8 +83,6 @@ defineExpose({ focus, blur, getRect });
 <style lang="scss">
 #visual-craft-core .basic-box {
   border-radius: 6px;
-  height: 30px;
-  min-width: 30px;
   position: relative;
   display: flex;
   -webkit-box-align: center;
@@ -122,8 +126,6 @@ defineExpose({ focus, blur, getRect });
   }
 
   &.status-button-box {
-    height: 30px;
-    width: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -159,6 +161,35 @@ defineExpose({ focus, blur, getRect });
 
   &[circle] {
     border-radius: 50%;
+  }
+
+  // Size overrides (placed at the end for precedence)
+  &.mini {
+    height: 18px;
+    min-width: 18px;
+    &.is-square { width: 18px; }
+  }
+  &.small {
+    height: 24px;
+    min-width: 24px;
+    &.is-square { width: 24px; }
+  }
+  &.medium {
+    height: 30px;
+    min-width: 30px;
+    &.is-square { width: 30px; }
+  }
+  &.large {
+    height: 36px;
+    min-width: 36px;
+    &.is-square { width: 36px; }
+  }
+
+  // Default size if no class is present
+  &:not(.mini):not(.small):not(.medium):not(.large) {
+    height: 30px;
+    min-width: 30px;
+    &.is-square { width: 30px; }
   }
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <BasicBox v-hint="hint" class="c-icon" v-bind="$attrs" :type="type">
+  <BasicBox v-hint="hint" class="c-icon" v-bind="$attrs" :type="type" :size="size" :square="square">
     <BasicIcon :icon="icon" :lock="lock" :hover="hover" :size="size" :spin="spin" />
   </BasicBox>
 </template>
@@ -25,9 +25,10 @@ export interface Props {
   type?: string;
   lock?: boolean;
   hover?: boolean;
-  size?: 'small' | 'medium' | 'large';
+  size?: 'small' | 'medium' | 'large' | 'mini';
   spin?: boolean;
   hint?: string;
+  square?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -37,7 +38,8 @@ const props = withDefaults(defineProps<Props>(), {
   hover: false,
   size: 'medium',
   spin: false,
-  hint: ''
+  hint: '',
+  square: true
 });
 </script>
 

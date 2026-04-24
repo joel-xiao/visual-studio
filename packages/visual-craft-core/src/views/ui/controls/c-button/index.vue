@@ -1,5 +1,5 @@
 <template>
-<BasicBox v-hint="hint" class="c-button" :class="{ 'c-button-small': size === 'small' }" v-bind="$attrs" :type="type || 'button'" @update="onUpdate">
+<BasicBox v-hint="hint" class="c-button" :class="[size ? 'c-button-' + size : '']" v-bind="$attrs" :type="type || 'button'" @update="onUpdate">
   <BasicIcon v-if="resolvedIcon" :icon="resolvedIcon" :spin="resolvedIcon === 'mdi:loading'" />
   <div class="c-button-text" :class="buttonTextClass">
     <slot ></slot>
@@ -29,7 +29,7 @@ export interface Props {
   loading?: boolean;
   dataType?: BooleanConstructor;
   hint?: string;
-  size?: 'small' | 'default';
+  size?: 'small' | 'default' | 'mini';
 }
 const props = withDefaults(defineProps<Props>(), {
   type: 'button',
@@ -58,7 +58,9 @@ const onUpdate = function (value: boolean) {
 #visual-craft-core .c-button {
   .c-button-text {
     padding: 0px 10px;
-
+    display: flex;
+    justify-content: center;
+    align-items: center;
     &.no-padding {
       padding: 0px;
     }
@@ -67,7 +69,6 @@ const onUpdate = function (value: boolean) {
   &[primary] {
     background: var(--db-color-button-primary-bg);
     color: var(--theme-color-text-primary-white);
-
     &:hover {
       background: var(--db-color-button-primary-bg-hover);
     }
@@ -76,7 +77,6 @@ const onUpdate = function (value: boolean) {
   &[cancel] {
     background: var(--db-color-button-cancel-bg);
     color: var(--db-color-button-text);
-
     &:hover {
       background: var(--db-color-button-cancel-bg-hover);
     }
@@ -86,14 +86,26 @@ const onUpdate = function (value: boolean) {
     height: 24px;
     min-height: 24px;
     padding: 0 4px;
-    
     .basic-icon {
       font-size: 14px;
     }
-    
     .c-button-text {
       font-size: 11px;
       padding: 0 6px;
+      &.no-padding { padding: 0; }
+    }
+  }
+
+  &.c-button-mini {
+    height: 18px;
+    min-height: 18px;
+    padding: 0 2px;
+    .basic-icon {
+      font-size: 11px;
+    }
+    .c-button-text {
+      font-size: 10px;
+      padding: 0 3px;
       &.no-padding { padding: 0; }
     }
   }

@@ -1,5 +1,5 @@
 <template>
-<div class="c-input" :class="{ 'c-input-small': size === 'small' }" v-bind="$attrs">
+<div class="c-input" :class="[size ? 'c-input-' + size : '']" v-bind="$attrs">
   <BasicBox ref="box" type="input">
     <slot name="prefix">
       <BasicIcon v-if="icon" v-hint="hint || ''" :lock="lock" :icon="icon" :style="iconStyle" @mousedown="onMouseDown" />
@@ -37,7 +37,7 @@ export interface IProps {
   modelValue?: string | number;
   suffix?: string;
   hint?: string;
-  size?: 'small' | 'default';
+  size?: 'small' | 'default' | 'mini';
 }
 const props = withDefaults(defineProps<IProps>(), {
   lock: false,
@@ -150,6 +150,22 @@ const onUpdate = function (value: string | number) {
 
     .basic-input {
       font-size: 11px;
+    }
+  }
+
+  .c-input-mini {
+    .basic-box {
+      height: 20px;
+      min-height: 20px;
+      padding: 0 4px;
+    }
+
+    .c-input-content {
+      padding-right: 2px;
+    }
+
+    .basic-input {
+      font-size: 10px;
     }
   }
 }

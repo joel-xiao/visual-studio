@@ -1,5 +1,5 @@
 <template>
-  <div class="c-select" :class="{ 'c-select-small': size === 'small' }" v-bind="$attrs">
+  <div class="c-select" :class="[size ? 'c-select-' + size : '']" v-bind="$attrs">
     <BasicBox ref="boxRef" :type="Type" @click="onOpenWrapper('wrapper')">
       <slot name="prefix">
         <BasicIcon v-if="icon" :lock="lock" :icon="icon" :style="iconStyle" @mousedown="onMouseDown" />
@@ -47,7 +47,7 @@ export interface IProps {
   lock?: boolean;
   icon?: string;
   options?: Item[];
-  size?: 'small' | 'default';
+  size?: 'small' | 'default' | 'mini';
 }
 export type Item = {
   label: string;
@@ -158,11 +158,6 @@ function onOpenWrapper(event_type: string) {
     color: #fff;
   }
 
-  .basic-select {
-    margin-right: 2px;
-    flex-shrink: 0;
-  }
-
   &.c-select-small {
     .basic-box {
       height: 28px;
@@ -178,6 +173,24 @@ function onOpenWrapper(event_type: string) {
       width: 18px;
       height: 18px;
       transform: scale(0.7) rotate(90deg);
+    }
+  }
+
+  &.c-select-mini {
+    .basic-box {
+      height: 20px;
+      min-height: 20px;
+      padding: 0 4px;
+    }
+
+    .basic-select-label {
+      font-size: 10px;
+    }
+
+    .basic-select-arrow {
+      width: 14px;
+      height: 14px;
+      transform: scale(0.6) rotate(90deg);
     }
   }
 }

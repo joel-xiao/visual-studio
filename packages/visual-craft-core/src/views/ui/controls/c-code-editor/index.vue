@@ -6,7 +6,7 @@
       :language="language"
       :theme="theme"
       :read-only="readOnly"
-      style="height: 200px"
+      :style="{ height: height }"
     />
     <div class="c-code-editor-expand">
       <BasicIcon icon="icon-spread-out" hint="全屏编辑" size="small" hover @click="openModal" />
@@ -16,14 +16,14 @@
   <BasicModal
     v-model="showModal"
     :title="label"
-    width="80vw"
+    width="60vw"
   >
     <BasicCodeEditor
       v-model="currentValue"
       :language="language"
       :theme="theme"
       :read-only="readOnly"
-      style="height: 60vh"
+      style="height:calc(100vh - 240px);"
     />
     <template v-if="!readOnly" #footer>
       <div class="c-code-editor-footer">
@@ -59,6 +59,7 @@ export interface Props {
   language?: string;
   theme?: string;
   readOnly?: boolean;
+  height?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -66,7 +67,8 @@ const props = withDefaults(defineProps<Props>(), {
   label: '代码编辑',
   language: 'javascript',
   theme: 'vs-dark',
-  readOnly: false
+  readOnly: false,
+  height: '200px'
 });
 
 const emit = defineEmits(['update:modelValue', 'update']);
