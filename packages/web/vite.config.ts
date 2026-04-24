@@ -62,7 +62,14 @@ export default defineConfig(async ({ mode }) => {
     clearScreen: false,
     server: {
       port: 1420,
-      strictPort: true
+      strictPort: true,
+      proxy: {
+        '/api': {
+          target: 'http://localhost:3001/v1',
+          changeOrigin: true,
+          rewrite: path => path.replace(/^\/api/, '')
+        }
+      }
     }
   };
 });

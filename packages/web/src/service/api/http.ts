@@ -1,30 +1,13 @@
 import axios from 'axios';
 // import NProgress from 'nprogress';
-import { useLoadingBar } from 'naive-ui';
-let loadingBar = useLoadingBar();
-if (!loadingBar) {
-  loadingBar = {
-    start: () => {
-      console.log('start');
-    },
-    finish: () => {
-      console.log('done');
-    },
-    error: () => {
-      console.log('done');
-    }
-  } as {
-    start: () => void;
-    finish: () => void;
-    error: () => void;
-  };
-}
+import { createDiscreteApi } from 'naive-ui';
+
+const { loadingBar } = createDiscreteApi(['loadingBar']);
+
 const NProgress = {
-  start: loadingBar.start,
-  done: loadingBar.finish
-} as {
-  start: () => void;
-  done: () => void;
+  start: () => loadingBar.start(),
+  done: () => loadingBar.finish(),
+  error: () => loadingBar.error()
 };
 
 axios.defaults.baseURL = '/api';
@@ -51,13 +34,18 @@ axios.interceptors.response.use(res => {
 
 interface ResType<T> {
   code: number;
+  statusCode?: number; // Backend format
   data?: T;
   msg: string;
+  message?: string; // Backend format
   err?: string;
+  timestamp?: string;
 }
 interface Http {
   get<T>(url: string, params?: unknown): Promise<ResType<T>>;
   post<T>(url: string, params?: unknown): Promise<ResType<T>>;
+  put<T>(url: string, params?: unknown): Promise<ResType<T>>;
+  delete<T>(url: string, params?: unknown): Promise<ResType<T>>;
   upload<T>(url: string, params: unknown): Promise<ResType<T>>;
   download(url: string): void;
 }
@@ -66,16 +54,30 @@ const http: Http = {
   get(url, params) {
     return new Promise((resolve, reject) => {
       NProgress.start();
-      NProgress.start();
       axios
         .get(url, { params })
         .then(res => {
           NProgress.done();
+          // Map backend fields to frontend for compatibility
+          if (res.data.statusCode !== undefined && res.data.code === undefined) {
+             res.data.code = res.data.statusCode === 200 || res.data.statusCode === 201 ? 0 : res.data.statusCode;
+          }
+          if (res.data.message && !res.data.msg) {
+             res.data.msg = res.data.message;
+          }
+          if (res.data.statusCode === 401 || res.data.code === 111) {
+             window.sessionStorage.setItem('token', '');
+          }
           resolve(res.data);
         })
         .catch(err => {
           NProgress.done();
-          reject(err.data);
+          const errorData = err.response?.data || { msg: err.message };
+          // Map backend error format if needed
+          if (errorData.message && !errorData.msg) {
+             errorData.msg = errorData.message;
+          }
+          reject(errorData);
         });
     });
   },
@@ -86,11 +88,80 @@ const http: Http = {
         .post(url, JSON.stringify(params))
         .then(res => {
           NProgress.done();
+          if (res.data.statusCode !== undefined && res.data.code === undefined) {
+             res.data.code = res.data.statusCode === 200 || res.data.statusCode === 201 ? 0 : res.data.statusCode;
+          }
+          if (res.data.message && !res.data.msg) {
+             res.data.msg = res.data.message;
+          }
+          if (res.data.statusCode === 401 || res.data.code === 111) {
+             window.sessionStorage.setItem('token', '');
+          }
           resolve(res.data);
         })
         .catch(err => {
           NProgress.done();
-          reject(err.data);
+          const errorData = err.response?.data || { msg: err.message };
+          if (errorData.message && !errorData.msg) {
+             errorData.msg = errorData.message;
+          }
+          reject(errorData);
+        });
+    });
+  },
+  put(url, params) {
+    return new Promise((resolve, reject) => {
+      NProgress.start();
+      axios
+        .put(url, JSON.stringify(params))
+        .then(res => {
+          NProgress.done();
+          if (res.data.statusCode !== undefined && res.data.code === undefined) {
+             res.data.code = res.data.statusCode === 200 || res.data.statusCode === 201 ? 0 : res.data.statusCode;
+          }
+          if (res.data.message && !res.data.msg) {
+             res.data.msg = res.data.message;
+          }
+          if (res.data.statusCode === 401 || res.data.code === 111) {
+             window.sessionStorage.setItem('token', '');
+          }
+          resolve(res.data);
+        })
+        .catch(err => {
+          NProgress.done();
+          const errorData = err.response?.data || { msg: err.message };
+          if (errorData.message && !errorData.msg) {
+             errorData.msg = errorData.message;
+          }
+          reject(errorData);
+        });
+    });
+  },
+  delete(url, params) {
+    return new Promise((resolve, reject) => {
+      NProgress.start();
+      axios
+        .delete(url, { data: params })
+        .then(res => {
+          NProgress.done();
+          if (res.data.statusCode !== undefined && res.data.code === undefined) {
+             res.data.code = res.data.statusCode === 200 || res.data.statusCode === 201 ? 0 : res.data.statusCode;
+          }
+          if (res.data.message && !res.data.msg) {
+             res.data.msg = res.data.message;
+          }
+          if (res.data.statusCode === 401 || res.data.code === 111) {
+             window.sessionStorage.setItem('token', '');
+          }
+          resolve(res.data);
+        })
+        .catch(err => {
+          NProgress.done();
+          const errorData = err.response?.data || { msg: err.message };
+          if (errorData.message && !errorData.msg) {
+             errorData.msg = errorData.message;
+          }
+          reject(errorData);
         });
     });
   },
